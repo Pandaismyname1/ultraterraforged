@@ -704,6 +704,12 @@ public final class PresetOptions {
 				.activeWhen(SEA_CLIFFS)
 				.bind((p) -> p.landforms().seaCliffs.seaStacks, (p, v) -> p.landforms().seaCliffs.seaStacks = v)
 				.build()
+		),
+		Category.of("volcanoes", RTFTranslationKeys.GUI_LABEL_VOLCANOES,
+			BoolOption.builder("landforms.volcanicSurface")
+				.translation(RTFTranslationKeys.GUI_BUTTON_VOLCANIC_SURFACE)
+				.bind((p) -> p.landforms().volcanicSurface, (p, v) -> p.landforms().volcanicSurface = v)
+				.build()
 		)
 	);
 

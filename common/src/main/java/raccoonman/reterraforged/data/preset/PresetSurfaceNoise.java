@@ -22,6 +22,8 @@ public class PresetSurfaceNoise {
 	public static final ResourceKey<Noise> DESERT = createKey("desert");
 	public static final ResourceKey<Noise> SWAMP = createKey("swamp");
 	public static final ResourceKey<Noise> FOREST = createKey("forest");
+	public static final ResourceKey<Noise> VOLCANIC_ROCK = createKey("volcanic_rock");
+	public static final ResourceKey<Noise> LAVA_FIELDS = createKey("lava_fields");
 	public static final ResourceKey<Noise> RIVER_BANK = createKey("river_bank");
 		
 	public static final ResourceKey<Noise> ICEBERG_DEEP_SHAPE = createKey("iceberg/deep/shape");
@@ -65,6 +67,9 @@ public class PresetSurfaceNoise {
 		ctx.register(DESERT, makeDesert(scaling));
 		ctx.register(SWAMP, makeSwamp());
 		ctx.register(FOREST, makeForest());
+		// patches of different volcanic rock on a cone, and old lava flows on the land around it
+		ctx.register(VOLCANIC_ROCK, Noises.map(Noises.warpPerlin(Noises.perlin(4127, 18, 2), 4128, 12, 1, 8.0F), 0.0F, 1.0F));
+		ctx.register(LAVA_FIELDS, Noises.map(Noises.warpPerlin(Noises.perlin(4129, 70, 3), 4130, 30, 1, 25.0F), 0.0F, 1.0F));
 		ctx.register(RIVER_BANK, makeRiverBank());
 		
 		registerIceberg(ctx, ICEBERG_DEEP_SHAPE, ICEBERG_DEEP_MASK, ICEBERG_DEEP_FADE_DOWN, ICEBERG_DEEP_FADE_UP, ICEBERG_DEEP_UP, ICEBERG_DEEP_DOWN, ICEBERG_DEEP_TOP, scaling, 30, 30, 0);

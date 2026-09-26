@@ -90,6 +90,9 @@ public class RTFLanguageProvider {
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_SEA_CLIFF_HEIGHT), "How many blocks the tallest cliffs rise above the sea");
 			this.add(RTFTranslationKeys.GUI_BUTTON_SEA_STACKS, "Sea Stacks");
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_SEA_STACKS), "Pillars of rock standing in the sea off the cliffs");
+			this.add(RTFTranslationKeys.GUI_LABEL_VOLCANOES, "Volcanoes");
+			this.add(RTFTranslationKeys.GUI_BUTTON_VOLCANIC_SURFACE, "Volcanic Rock & Lava");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_VOLCANIC_SURFACE), "Lava over magma in volcano craters, basalt, blackstone and tuff on their cones, and patches of old lava flows on the land around them");
 
 			this.add(RTFTranslationKeys.GUI_BUTTON_TRUE, "On");
 			this.add(RTFTranslationKeys.GUI_BUTTON_FALSE, "Off");

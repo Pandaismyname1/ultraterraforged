@@ -48,6 +48,8 @@ public class ClientTest implements ClientModInitializer {
 	private int waited;
 	private int totalTicks;
 	private String worldFolder;
+	@org.jetbrains.annotations.Nullable
+	volatile BlockPos volcano;
 
 	private record Step(String name, BooleanSupplier ready, int delay, Runnable action) {
 	}
@@ -146,12 +148,32 @@ public class ClientTest implements ClientModInitializer {
 			server.execute(() -> {
 				server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSource(new LoggingSource(this)), "rtf locate plains");
 				server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSource(new LoggingSource(this)), "rtf locate mountain_chain");
+				server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSource(new LoggingSource(this)), "rtf locate volcano");
 			});
 		});
 		this.step("rock layers", () -> true, 100, () -> {
 			IntegratedServer server = mc.getSingleplayerServer();
 			BlockPos center = mc.player.blockPosition();
-			server.execute(() -> this.slice(server.overworld(), center));
+			server.execute(() -> this.slice(server.overworld(), center, "slice"));
+		});
+		this.step("volcano", () -> true, 60, () -> {
+			if (this.volcano == null) {
+				this.log("no volcano found");
+				return;
+			}
+			IntegratedServer server = mc.getSingleplayerServer();
+			BlockPos target = this.volcano;
+			this.log("flying to the volcano at " + target);
+			server.execute(() -> server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSource(new LoggingSource(this)), "execute as @a run tp @s " + target.getX() + " " + (target.getY() + 90) + " " + (target.getZ() + 60) + " 180 45"));
+		});
+		this.step("volcano loaded", () -> true, 300, () -> {
+			if (this.volcano == null) {
+				return;
+			}
+			this.screenshot("13_volcano");
+			IntegratedServer server = mc.getSingleplayerServer();
+			BlockPos target = this.volcano;
+			server.execute(() -> this.slice(server.overworld(), target, "volcano_slice"));
 		});
 		this.step("commands", () -> true, 300, () -> {
 			IntegratedServer server = mc.getSingleplayerServer();
@@ -244,19 +266,23 @@ public class ClientTest implements ClientModInitializer {
 	}
 
 	// distinct colours for rocks that look alike on a map
-	private static final java.util.Map<net.minecraft.world.level.block.Block, Integer> ROCK_COLORS = java.util.Map.of(
-		net.minecraft.world.level.block.Blocks.STONE, 0x7F7F7F,
-		net.minecraft.world.level.block.Blocks.ANDESITE, 0x5E7A8C,
-		net.minecraft.world.level.block.Blocks.GRANITE, 0xB5654A,
-		net.minecraft.world.level.block.Blocks.DIORITE, 0xE8E8E0,
-		net.minecraft.world.level.block.Blocks.TUFF, 0x6E7A55,
-		net.minecraft.world.level.block.Blocks.CALCITE, 0xF5F0C8,
-		net.minecraft.world.level.block.Blocks.DEEPSLATE, 0x333338
+	private static final java.util.Map<net.minecraft.world.level.block.Block, Integer> ROCK_COLORS = java.util.Map.ofEntries(
+		java.util.Map.entry(net.minecraft.world.level.block.Blocks.STONE, 0x7F7F7F),
+		java.util.Map.entry(net.minecraft.world.level.block.Blocks.ANDESITE, 0x5E7A8C),
+		java.util.Map.entry(net.minecraft.world.level.block.Blocks.GRANITE, 0xB5654A),
+		java.util.Map.entry(net.minecraft.world.level.block.Blocks.DIORITE, 0xE8E8E0),
+		java.util.Map.entry(net.minecraft.world.level.block.Blocks.TUFF, 0x6E7A55),
+		java.util.Map.entry(net.minecraft.world.level.block.Blocks.CALCITE, 0xF5F0C8),
+		java.util.Map.entry(net.minecraft.world.level.block.Blocks.DEEPSLATE, 0x333338),
+		java.util.Map.entry(net.minecraft.world.level.block.Blocks.LAVA, 0xFF6A00),
+		java.util.Map.entry(net.minecraft.world.level.block.Blocks.MAGMA_BLOCK, 0x9A3A10),
+		java.util.Map.entry(net.minecraft.world.level.block.Blocks.BASALT, 0x4A4A50),
+		java.util.Map.entry(net.minecraft.world.level.block.Blocks.BLACKSTONE, 0x2A2428)
 	);
 	private static final int SLICE_SCALE = 3;
 
 	// a vertical cut through the terrain from the bottom of the world to just above the surface, and the rocks in it
-	private void slice(ServerLevel level, BlockPos center) {
+	private void slice(ServerLevel level, BlockPos center, String name) {
 		int width = 256;
 		int minY = level.getMinBuildHeight();
 		int top = minY;
@@ -291,11 +317,11 @@ public class ClientTest implements ClientModInitializer {
 					}
 				}
 			}
-			image.writeToFile(this.out.resolve("slice.png"));
+			image.writeToFile(this.out.resolve(name + ".png"));
 		} catch (IOException e) {
 			this.log("slice failed: " + e);
 		}
-		this.log("blocks in the slice: " + counts);
+		this.log("blocks in " + name + ": " + counts);
 	}
 
 	private String list(Path directory) {
@@ -326,7 +352,13 @@ public class ClientTest implements ClientModInitializer {
 	private record LoggingSource(ClientTest test) implements net.minecraft.commands.CommandSource {
 		@Override
 		public void sendSystemMessage(Component message) {
-			this.test.log("command output: " + message.getString());
+			String text = message.getString();
+			this.test.log("command output: " + text);
+			// e.g. "The nearest volcano is at [768, 81, 768] (1086 blocks away)"
+			java.util.regex.Matcher position = java.util.regex.Pattern.compile("volcano is at \\[(-?\\d+), (-?\\d+), (-?\\d+)\\]").matcher(text);
+			if (position.find()) {
+				this.test.volcano = new BlockPos(Integer.parseInt(position.group(1)), Integer.parseInt(position.group(2)), Integer.parseInt(position.group(3)));
+			}
 		}
 
 		@Override

@@ -11,25 +11,29 @@ public class LandformSettings {
 	public static final Codec<LandformSettings> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 		PresetCodecs.defaulted(Buttes.CODEC, "buttes", Buttes.makeDefault()).forGetter((o) -> o.buttes),
 		PresetCodecs.defaulted(Canyons.CODEC, "canyons", Canyons.makeDefault()).forGetter((o) -> o.canyons),
-		PresetCodecs.defaulted(SeaCliffs.CODEC, "seaCliffs", SeaCliffs.makeDefault()).forGetter((o) -> o.seaCliffs)
+		PresetCodecs.defaulted(SeaCliffs.CODEC, "seaCliffs", SeaCliffs.makeDefault()).forGetter((o) -> o.seaCliffs),
+		PresetCodecs.defaulted(Codec.BOOL, "volcanicSurface", true).forGetter((o) -> o.volcanicSurface)
 	).apply(instance, LandformSettings::new));
 
 	public Buttes buttes;
 	public Canyons canyons;
 	public SeaCliffs seaCliffs;
+	// lava in volcano craters, dark volcanic rock on their cones and old lava flows around them
+	public boolean volcanicSurface;
 
-	public LandformSettings(Buttes buttes, Canyons canyons, SeaCliffs seaCliffs) {
+	public LandformSettings(Buttes buttes, Canyons canyons, SeaCliffs seaCliffs, boolean volcanicSurface) {
 		this.buttes = buttes;
 		this.canyons = canyons;
 		this.seaCliffs = seaCliffs;
+		this.volcanicSurface = volcanicSurface;
 	}
 
 	public LandformSettings copy() {
-		return new LandformSettings(this.buttes.copy(), this.canyons.copy(), this.seaCliffs.copy());
+		return new LandformSettings(this.buttes.copy(), this.canyons.copy(), this.seaCliffs.copy(), this.volcanicSurface);
 	}
 
 	public static LandformSettings makeDefault() {
-		return new LandformSettings(Buttes.makeDefault(), Canyons.makeDefault(), SeaCliffs.makeDefault());
+		return new LandformSettings(Buttes.makeDefault(), Canyons.makeDefault(), SeaCliffs.makeDefault(), true);
 	}
 
 	// how the original TerraForged generated: none of the added landforms
@@ -38,6 +42,7 @@ public class LandformSettings {
 		settings.buttes.enabled = false;
 		settings.canyons.enabled = false;
 		settings.seaCliffs.enabled = false;
+		settings.volcanicSurface = false;
 		return settings;
 	}
 

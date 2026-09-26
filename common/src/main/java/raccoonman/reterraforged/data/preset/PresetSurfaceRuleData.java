@@ -24,6 +24,7 @@ import raccoonman.reterraforged.data.preset.settings.WorldSettings;
 import raccoonman.reterraforged.tags.RTFBlockTags;
 import raccoonman.reterraforged.world.worldgen.noise.module.Noise;
 import raccoonman.reterraforged.world.worldgen.surface.condition.RTFSurfaceConditions;
+import raccoonman.reterraforged.world.worldgen.terrain.TerrainType;
 import raccoonman.reterraforged.world.worldgen.surface.rule.RTFSurfaceRules;
 import raccoonman.reterraforged.world.worldgen.surface.rule.StrataRule;
 import raccoonman.reterraforged.world.worldgen.util.Scaling;
@@ -55,6 +56,12 @@ public class PresetSurfaceRuleData {
     private static final SurfaceRules.RuleSource POWDER_SNOW = PresetSurfaceRuleData.makeStateRule(Blocks.POWDER_SNOW);
     private static final SurfaceRules.RuleSource ICE = PresetSurfaceRuleData.makeStateRule(Blocks.ICE);
     private static final SurfaceRules.RuleSource WATER = PresetSurfaceRuleData.makeStateRule(Blocks.WATER);
+    private static final SurfaceRules.RuleSource LAVA = PresetSurfaceRuleData.makeStateRule(Blocks.LAVA);
+    private static final SurfaceRules.RuleSource MAGMA_BLOCK = PresetSurfaceRuleData.makeStateRule(Blocks.MAGMA_BLOCK);
+    private static final SurfaceRules.RuleSource BASALT = PresetSurfaceRuleData.makeStateRule(Blocks.BASALT);
+    private static final SurfaceRules.RuleSource SMOOTH_BASALT = PresetSurfaceRuleData.makeStateRule(Blocks.SMOOTH_BASALT);
+    private static final SurfaceRules.RuleSource BLACKSTONE = PresetSurfaceRuleData.makeStateRule(Blocks.BLACKSTONE);
+    private static final SurfaceRules.RuleSource TUFF = PresetSurfaceRuleData.makeStateRule(Blocks.TUFF);
 
     private static final ResourceLocation STRATA_CACHE_ID = RTFCommon.location("default");
     private static final ResourceLocation DEEP_STRATA_CACHE_ID = RTFCommon.location("deep");
@@ -407,6 +414,7 @@ public class PresetSurfaceRuleData {
         SurfaceRules.ConditionSource surfaceNoise2 = SurfaceRules.noiseCondition(Noises.SURFACE, -0.1818, 0.1818);
         SurfaceRules.ConditionSource surfaceNoise3 = SurfaceRules.noiseCondition(Noises.SURFACE, 0.5454, 0.909);
         SurfaceRules.RuleSource surface = SurfaceRules.sequence(
+        	preset.landforms().volcanicSurface ? makeVolcanoRule(noise) : SurfaceRules.ifTrue(NEVER, STONE),
         	SurfaceRules.ifTrue(
         		y4BelowSurface, 
         		makeDesertRule(scaling, noise)
@@ -684,6 +692,47 @@ public class PresetSurfaceRuleData {
     	);
     }
     
+    // lava over magma in the crater; basalt, blackstone and tuff on the steep cone; patches of old lava flows on the
+    // gentler land around it, with the usual surface in between
+    private static SurfaceRules.RuleSource makeVolcanoRule(HolderGetter<Noise> noise) {
+    	return SurfaceRules.sequence(
+    		SurfaceRules.ifTrue(
+    			RTFSurfaceConditions.terrain(TerrainType.VOLCANO_PIPE),
+    			SurfaceRules.sequence(
+    				SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, LAVA),
+    				MAGMA_BLOCK
+    			)
+    		),
+    		SurfaceRules.ifTrue(
+    			RTFSurfaceConditions.terrain(TerrainType.VOLCANO),
+    			SurfaceRules.sequence(
+    				SurfaceRules.ifTrue(
+    					RTFSurfaceConditions.steepness(0.15F),
+    					RTFSurfaceRules.noise(
+    						noise.getOrThrow(PresetSurfaceNoise.VOLCANIC_ROCK),
+    						List.of(
+    							Pair.of(0.0F, BASALT),
+    							Pair.of(0.4F, BLACKSTONE),
+    							Pair.of(0.62F, TUFF),
+    							Pair.of(0.8F, SMOOTH_BASALT)
+    						)
+    					)
+    				),
+    				SurfaceRules.ifTrue(
+    					SurfaceRules.ON_FLOOR,
+    					RTFSurfaceRules.noise(
+    						noise.getOrThrow(PresetSurfaceNoise.LAVA_FIELDS),
+    						List.of(
+    							Pair.of(0.6F, SMOOTH_BASALT),
+    							Pair.of(0.7F, TUFF)
+    						)
+    					)
+    				)
+    			)
+    		)
+    	);
+    }
+
     private static SurfaceRules.RuleSource makeForestRule(HolderGetter<Noise> noise) {
     	return SurfaceRules.ifTrue(
     		SurfaceRules.ON_FLOOR, 

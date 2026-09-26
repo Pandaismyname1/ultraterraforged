@@ -39,7 +39,9 @@ public class TerrainSensitivityTest {
 		"rivers.branchRivers.bedWidth",
 		"rivers.branchRivers.bankWidth",
 		// a few blocks across, too small to show at the sampled resolution; LandformTest checks them
-		"landforms.seaCliffs.seaStacks"
+		"landforms.seaCliffs.seaStacks",
+		// only changes the blocks on volcanoes, not their shape
+		"landforms.volcanicSurface"
 	);
 
 	@Test
