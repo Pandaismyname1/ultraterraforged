@@ -57,8 +57,9 @@ public record StrataRule(ResourceLocation cacheId, Holder<Noise> selector, Holde
 		Codec.intRange(1, 256).fieldOf("max_thickness").forGetter(StrataRule::maxThickness)
 	).apply(instance, StrataRule::new));
 
-	// how far the stacks reach past the build limits, so offset and stretched layers never run out
-	private static final int MARGIN = 128;
+	// how far the stacks reach past the build limits, so offset and stretched layers never run out; well beyond
+	// PresetStrataNoise.MAX_OFFSET
+	public static final int MARGIN = 128;
 	// layers are stretched around this height, so they stay put near sea level and tilt gently above and below
 	private static final int PIVOT_Y = 64;
 
