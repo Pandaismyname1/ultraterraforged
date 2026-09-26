@@ -17,7 +17,8 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.GenericDirtMessageScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
@@ -25,7 +26,9 @@ import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.storage.LevelResource;
+import raccoonman.reterraforged.client.gui.PresetSharing;
 import raccoonman.reterraforged.client.gui.createworld.TerrainState;
+import raccoonman.reterraforged.client.gui.screen.SavePresetScreen;
 import raccoonman.reterraforged.client.gui.screen.presetconfig.PresetConfigScreen;
 import raccoonman.reterraforged.preset.option.PresetOptions;
 
@@ -35,6 +38,7 @@ import raccoonman.reterraforged.preset.option.PresetOptions;
  */
 public class ClientTest implements ClientModInitializer {
 	private static final int TIMEOUT_TICKS = 20 * 60 * 5;
+	private static final String SAVED_PRESET = "ClientTest Preset";
 
 	private final Path out = Path.of(System.getProperty("reterraforged.clienttest.out", "clienttest"));
 	private final List<Step> steps = new ArrayList<>();
@@ -59,6 +63,12 @@ public class ClientTest implements ClientModInitializer {
 			throw new UncheckedIOException(e);
 		}
 
+		try {
+			Files.deleteIfExists(PresetSharing.presetFolder().resolve(SAVED_PRESET + ".json"));
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+
 		Minecraft mc = Minecraft.getInstance();
 		this.step("title screen", () -> mc.screen instanceof TitleScreen, 40, () -> CreateWorldScreen.openFresh(mc, mc.screen));
 		this.step("create world screen", () -> mc.screen instanceof CreateWorldScreen, 20, () -> {
@@ -77,6 +87,11 @@ public class ClientTest implements ClientModInitializer {
 			TerrainState state = TerrainState.of((CreateWorldScreen) mc.screen);
 			this.log("preset after cycling: " + state.name().getString());
 			this.screenshot("03_next_preset");
+			this.button(mc.screen, "Copy Code").onPress();
+			String code = mc.keyboardHandler.getClipboard();
+			this.log("share code: " + code.substring(0, Math.min(12, code.length())) + "... (" + code.length() + " characters)");
+			this.button(mc.screen, "Paste Code").onPress();
+			this.log("after pasting: preset " + state.name().getString() + ", edited " + state.isEdited());
 			PresetOptions.CONTINENT_SCALE.set(state.preset(), 900);
 			state.markEdited();
 		});
@@ -86,28 +101,43 @@ public class ClientTest implements ClientModInitializer {
 		});
 		this.step("advanced editor", () -> mc.screen instanceof PresetConfigScreen, 40, () -> {
 			this.screenshot("05_advanced_world");
-			((PresetConfigScreen) mc.screen).nextButton.onPress();
-			((PresetConfigScreen) mc.screen).nextButton.onPress();
+			this.log("editor widgets: " + this.describeWidgets(mc.screen));
+			this.searchBox(mc.screen).setValue("river");
+		});
+		this.step("search", () -> true, 40, () -> {
+			this.screenshot("06_search_river");
+			this.searchBox(mc.screen).setValue("");
+			this.button(mc.screen, "Page").onPress();
+			this.button(mc.screen, "Page").onPress();
 		});
 		this.step("caves page", () -> true, 40, () -> {
-			this.screenshot("06_advanced_caves");
+			this.screenshot("07_advanced_caves");
 			for (int i = 0; i < 5; i++) {
-				((PresetConfigScreen) mc.screen).nextButton.onPress();
+				this.button(mc.screen, "Page").onPress();
 			}
 		});
 		this.step("structures page", () -> true, 40, () -> {
-			this.screenshot("07_advanced_structures");
+			this.screenshot("08_advanced_structures");
+			this.button(mc.screen, "Save As").onPress();
+		});
+		this.step("save preset screen", () -> mc.screen instanceof SavePresetScreen, 20, () -> {
+			this.searchBox(mc.screen).setValue(SAVED_PRESET);
+			this.screenshot("09_save_preset");
+			this.button(mc.screen, "Save").onPress();
+		});
+		this.step("saved", () -> mc.screen instanceof PresetConfigScreen, 20, () -> {
+			this.log("saved preset file exists: " + Files.exists(PresetSharing.presetFolder().resolve(SAVED_PRESET + ".json")));
 			((PresetConfigScreen) mc.screen).doneButton.onPress();
 		});
 		this.step("back from editor", () -> mc.screen instanceof CreateWorldScreen, 20, () -> {
 			CreateWorldScreen screen = (CreateWorldScreen) mc.screen;
 			TerrainState state = TerrainState.of(screen);
 			this.log("after editor: preset " + state.name().getString() + ", continent scale " + PresetOptions.CONTINENT_SCALE.get(state.preset()) + ", edited " + state.isEdited());
-			this.screenshot("08_back_in_terrain_tab");
+			this.screenshot("10_back_in_terrain_tab");
 			this.button(screen, "Create New World").onPress();
 		});
 		this.step("world loaded", () -> mc.level != null && mc.player != null, 200, () -> {
-			this.screenshot("09_in_world");
+			this.screenshot("11_in_world");
 			IntegratedServer server = mc.getSingleplayerServer();
 			this.log("world datapacks: " + this.list(server.getWorldPath(LevelResource.DATAPACK_DIR)));
 			this.log("enabled packs: " + server.getPackRepository().getSelectedIds());
@@ -131,7 +161,7 @@ public class ClientTest implements ClientModInitializer {
 		this.step("after reopening", () -> true, 100, () -> {
 			this.log("screen after reopening: " + (mc.screen == null ? "none (in world)" : mc.screen.getClass().getSimpleName() + " '" + mc.screen.getTitle().getString() + "'"));
 			this.log("in world: " + (mc.level != null));
-			this.screenshot("10_reopened");
+			this.screenshot("12_reopened");
 			this.log("done");
 			mc.stop();
 		});
@@ -178,9 +208,18 @@ public class ClientTest implements ClientModInitializer {
 		}
 	}
 
-	private Button button(Screen screen, String text) {
+	private EditBox searchBox(Screen screen) {
 		for (var child : screen.children()) {
-			if (child instanceof Button button && button.visible && button.getMessage().getString().startsWith(text)) {
+			if (child instanceof EditBox box) {
+				return box;
+			}
+		}
+		throw new IllegalStateException("No text box in " + this.describeWidgets(screen));
+	}
+
+	private AbstractButton button(Screen screen, String text) {
+		for (var child : screen.children()) {
+			if (child instanceof AbstractButton button && button.visible && button.getMessage().getString().startsWith(text)) {
 				return button;
 			}
 		}

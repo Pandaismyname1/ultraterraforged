@@ -18,11 +18,13 @@ import raccoonman.reterraforged.data.preset.settings.Preset;
  * What the player picked for ReTerraForged in one Create World screen. Lives as long as the screen, so switching
  * tabs or resizing keeps edits.
  */
-public class TerrainState {
+public class TerrainState implements PreviewSource {
 	private final CreateWorldScreen screen;
 	private PresetLibrary.Entry source;
 	private Component name;
 	private Preset preset;
+	// the preset as selected, before any edits
+	private Preset baseline;
 	private boolean edited;
 	// the pack selection we asked the screen to load before creating the world, if a reload is in progress
 	@Nullable
@@ -45,7 +47,8 @@ public class TerrainState {
 	public void select(PresetLibrary.Entry entry) {
 		this.source = entry;
 		this.name = entry.name();
-		this.preset = entry.create();
+		this.baseline = entry.create();
+		this.preset = this.baseline.copy();
 		this.edited = false;
 		this.changed();
 	}
@@ -75,8 +78,13 @@ public class TerrainState {
 		return this.name;
 	}
 
+	@Override
 	public Preset preset() {
 		return this.preset;
+	}
+
+	public Preset baseline() {
+		return this.baseline;
 	}
 
 	public boolean isEdited() {
@@ -84,6 +92,7 @@ public class TerrainState {
 	}
 
 	// increases whenever the preset changes, so views know when to refresh
+	@Override
 	public int revision() {
 		return this.revision;
 	}
@@ -122,6 +131,7 @@ public class TerrainState {
 	 * The seed the world will be created with. An empty seed field means a random one; pick it now so the preview
 	 * shows the world that will actually be created.
 	 */
+	@Override
 	public long seed() {
 		OptionalLong seed = WorldOptions.parseSeed(this.uiState().getSeed());
 		if (seed.isPresent()) {

@@ -21,9 +21,10 @@ public class PresetConfigScreen extends LinkedPageScreen {
 	}
 
 	// opens straight into the editor for a preset that isn't saved as a file, such as the one chosen in the Terrain tab
-	public static PresetConfigScreen editing(CreateWorldScreen parent, Component name, Preset preset) {
+	// changes are marked against, and reset to, the baseline
+	public static PresetConfigScreen editing(CreateWorldScreen parent, Component name, Preset preset, Preset baseline) {
 		PresetConfigScreen screen = new PresetConfigScreen(parent);
-		screen.currentPage = new OptionPage(screen, new PresetEntry(name, preset.copy(), true, (button) -> {}), 0);
+		screen.currentPage = new OptionPage(new EditorSession(screen, new PresetEntry(name, preset.copy(), true, (button) -> {}), baseline.copy()), 0);
 		return screen;
 	}
 	

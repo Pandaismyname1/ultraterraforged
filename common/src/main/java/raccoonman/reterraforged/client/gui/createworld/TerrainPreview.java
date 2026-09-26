@@ -54,7 +54,7 @@ public class TerrainPreview extends AbstractWidget {
 	@Nullable
 	private static ResourceLocation textureId;
 
-	private final TerrainState state;
+	private final PreviewSource state;
 	private RenderMode mode = RenderMode.BIOME_TYPE;
 	private float zoom = 40.0F;
 	private float panX;
@@ -72,7 +72,7 @@ public class TerrainPreview extends AbstractWidget {
 	private record Rendered(Tile tile, float centerX, float centerZ, float zoom) {
 	}
 
-	public TerrainPreview(TerrainState state) {
+	public TerrainPreview(PreviewSource state) {
 		super(0, 0, 0, 0, Component.translatable(RTFTranslationKeys.GUI_TERRAIN_TAB_PREVIEW));
 		this.state = state;
 	}
@@ -186,7 +186,11 @@ public class TerrainPreview extends AbstractWidget {
 		if (this.rendered != null && this.isMouseOver(mouseX, mouseY)) {
 			this.renderReadout(graphics, font, mouseX, mouseY);
 		} else {
-			graphics.drawString(font, Component.translatable(RTFTranslationKeys.GUI_TERRAIN_TAB_PREVIEW_HINT).withStyle(ChatFormatting.GRAY), x + 4, y + this.height - 12, 0xFFFFFF);
+			// only where it fits, the editor's preview can be small
+			Component hint = Component.translatable(RTFTranslationKeys.GUI_TERRAIN_TAB_PREVIEW_HINT).withStyle(ChatFormatting.GRAY);
+			if (font.width(hint) <= this.width - 8) {
+				graphics.drawString(font, hint, x + 4, y + this.height - 12, 0xFFFFFF);
+			}
 		}
 	}
 

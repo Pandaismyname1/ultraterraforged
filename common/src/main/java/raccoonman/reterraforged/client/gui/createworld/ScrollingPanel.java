@@ -19,6 +19,8 @@ public class ScrollingPanel extends AbstractWidget {
 	private static final int ROW_HEIGHT = 20;
 	private static final int ROW_SPACING = 4;
 	private static final int SCROLLBAR_WIDTH = 4;
+	// room for the marker that option widgets draw left of themselves when changed
+	private static final int LEFT_INSET = 4;
 
 	private final List<AbstractWidget> children = new ArrayList<>();
 	private double scroll;
@@ -53,10 +55,10 @@ public class ScrollingPanel extends AbstractWidget {
 	}
 
 	private void layoutChildren() {
-		int childWidth = this.maxScroll() > 0 ? this.width - SCROLLBAR_WIDTH - 2 : this.width;
+		int childWidth = (this.maxScroll() > 0 ? this.width - SCROLLBAR_WIDTH - 2 : this.width) - LEFT_INSET;
 		int y = this.getY() - (int) this.scroll;
 		for (AbstractWidget child : this.children) {
-			child.setX(this.getX());
+			child.setX(this.getX() + LEFT_INSET);
 			child.setY(y);
 			child.setWidth(childWidth);
 			child.height = ROW_HEIGHT;

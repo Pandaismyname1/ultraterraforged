@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -23,6 +25,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.JsonOps;
 
+import raccoonman.reterraforged.client.data.RTFTranslationKeys;
+import raccoonman.reterraforged.client.gui.screen.presetconfig.RenderMode;
 import raccoonman.reterraforged.data.preset.settings.Preset;
 import raccoonman.reterraforged.data.preset.settings.PresetFormat;
 import raccoonman.reterraforged.preset.option.BoolOption;
@@ -159,6 +163,12 @@ public class PresetOptionsTest {
 					if (!option.isHidden()) {
 						requireKey(lang, option.translationKey(), missing);
 						requireKey(lang, option.tooltipKey(), missing);
+						// the values of cycle buttons are shown by name
+						if (option instanceof EnumOption<?> enumOption) {
+							for (Enum<?> value : enumOption.values()) {
+								requireKey(lang, RTFTranslationKeys.enumValue(value), missing);
+							}
+						}
 					}
 				}
 			}
@@ -168,6 +178,14 @@ public class PresetOptionsTest {
 		}
 		for (PresetOptions.SimpleSetting setting : PresetOptions.SIMPLE) {
 			requireKey(lang, setting.labelKey(), missing);
+		}
+		for (RenderMode mode : RenderMode.values()) {
+			requireKey(lang, RTFTranslationKeys.enumValue(mode), missing);
+		}
+		for (Field field : RTFTranslationKeys.class.getFields()) {
+			if (Modifier.isStatic(field.getModifiers()) && field.getType() == String.class) {
+				requireKey(lang, (String) field.get(null), missing);
+			}
 		}
 		assertTrue(missing.isEmpty(), "missing translations: " + missing);
 	}

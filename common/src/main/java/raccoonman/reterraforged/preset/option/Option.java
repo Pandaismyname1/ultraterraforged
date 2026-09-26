@@ -103,6 +103,17 @@ public abstract class Option<T> {
 	}
 
 	/**
+	 * Whether the value differs from the one in {@code baseline}, e.g. the preset the player started editing from.
+	 */
+	public boolean isModified(Preset preset, Preset baseline) {
+		return !Objects.equals(this.get(preset), this.get(baseline));
+	}
+
+	public void resetTo(Preset preset, Preset baseline) {
+		this.set(preset, this.get(baseline));
+	}
+
+	/**
 	 * Whether the option has any effect given the rest of the preset; inactive options are shown disabled.
 	 */
 	public boolean isActive(Preset preset) {

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
@@ -21,15 +22,17 @@ import raccoonman.reterraforged.preset.option.IntOption;
 import raccoonman.reterraforged.preset.option.Option;
 import raccoonman.reterraforged.preset.option.OptionTag;
 
-// Builds an editor widget for any preset option; every widget supports ctrl+click to reset to the default
+// Builds an editor widget for any preset option. Values that differ from the baseline (the preset the player started
+// from) are marked, and every widget supports ctrl+click to go back to the baseline value.
 public final class OptionWidgets {
+	private static final int MODIFIED_COLOR = 0xFFFFC23D;
 
-	public static AbstractWidget create(Option<?> option, Preset preset, Runnable onChange) {
-		return create(option, preset, onChange, option.displayName());
+	public static AbstractWidget create(Option<?> option, Preset preset, Preset baseline, Runnable onChange) {
+		return create(option, preset, baseline, onChange, option.displayName());
 	}
 
 	// with a label other than the option's own, e.g. where the surrounding category isn't shown
-	public static AbstractWidget create(Option<?> option, Preset preset, Runnable onChange, Component name) {
+	public static AbstractWidget create(Option<?> option, Preset preset, Preset baseline, Runnable onChange, Component name) {
 		if (option instanceof IntOption intOption) {
 			if (intOption.isSeed()) {
 				return PresetWidgets.createRandomButton(option.translationKey(), intOption.get(preset), (value) -> {
@@ -37,26 +40,37 @@ public final class OptionWidgets {
 					onChange.run();
 				});
 			}
-			return new OptionSlider<>(intOption, preset, Slider.Format.INT, intOption.min(), intOption.max(), (raw) -> raw.intValue(), onChange, name);
+			return new OptionSlider<>(intOption, preset, baseline, Slider.Format.INT, intOption.min(), intOption.max(), (raw) -> raw.intValue(), onChange, name);
 		}
 		if (option instanceof FloatOption floatOption) {
-			return new OptionSlider<>(floatOption, preset, Slider.Format.FLOAT, floatOption.min(), floatOption.max(), (raw) -> raw.floatValue(), onChange, name);
+			return new OptionSlider<>(floatOption, preset, baseline, Slider.Format.FLOAT, floatOption.min(), floatOption.max(), (raw) -> raw.floatValue(), onChange, name);
 		}
 		if (option instanceof BoolOption boolOption) {
-			return new OptionCycleButton<>(boolOption, preset, List.of(true, false), OptionWidgets::booleanName, onChange, name);
+			return new OptionCycleButton<>(boolOption, preset, baseline, List.of(true, false), OptionWidgets::booleanName, onChange, name);
 		}
 		if (option instanceof EnumOption<?> enumOption) {
-			return createEnum(enumOption, preset, onChange, name);
+			return createEnum(enumOption, preset, baseline, onChange, name);
 		}
 		throw new IllegalArgumentException("No widget for option " + option);
 	}
 
-	private static <E extends Enum<E>> AbstractWidget createEnum(EnumOption<E> option, Preset preset, Runnable onChange, Component name) {
-		return new OptionCycleButton<>(option, preset, option.values(), (value) -> Component.literal(option.name(value)), onChange, name);
+	private static <E extends Enum<E>> AbstractWidget createEnum(EnumOption<E> option, Preset preset, Preset baseline, Runnable onChange, Component name) {
+		return new OptionCycleButton<>(option, preset, baseline, option.values(), OptionWidgets::enumName, onChange, name);
+	}
+
+	public static Component enumName(Enum<?> value) {
+		return Component.translatable(RTFTranslationKeys.enumValue(value));
 	}
 
 	private static Component booleanName(boolean value) {
 		return Component.translatable(value ? RTFTranslationKeys.GUI_BUTTON_TRUE : RTFTranslationKeys.GUI_BUTTON_FALSE);
+	}
+
+	// a bar along the left edge of options the player changed
+	private static void renderModified(GuiGraphics graphics, AbstractWidget widget, boolean modified) {
+		if (modified) {
+			graphics.fill(widget.getX() - 4, widget.getY() + 1, widget.getX() - 2, widget.getY() + widget.getHeight() - 1, MODIFIED_COLOR);
+		}
 	}
 
 	private static <T> Tooltip createTooltip(Option<T> option, Component defaultValue) {
@@ -71,9 +85,10 @@ public final class OptionWidgets {
 	private static class OptionSlider<T extends Number & Comparable<T>> extends Slider {
 		private final Option<T> option;
 		private final Preset preset;
+		private final Preset baseline;
 		private final Format format;
 
-		public OptionSlider(Option<T> option, Preset preset, Format format, T min, T max, Function<Double, T> fromSlider, Runnable onChange, Component name) {
+		public OptionSlider(Option<T> option, Preset preset, Preset baseline, Format format, T min, T max, Function<Double, T> fromSlider, Runnable onChange, Component name) {
 			super(-1, -1, -1, -1, option.get(preset).floatValue(), min.floatValue(), max.floatValue(), name, format, (slider, value) -> {
 				T stored = option.set(preset, fromSlider.apply(slider.scaleValue(value)));
 				onChange.run();
@@ -81,14 +96,21 @@ public final class OptionWidgets {
 			});
 			this.option = option;
 			this.preset = preset;
+			this.baseline = baseline;
 			this.format = format;
-			this.setTooltip(createTooltip(option, Component.literal(format.getMessage(option.defaultValue().doubleValue()))));
+			this.setTooltip(createTooltip(option, Component.literal(format.getMessage(option.get(baseline).doubleValue()))));
+		}
+
+		@Override
+		public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+			super.renderWidget(graphics, mouseX, mouseY, partialTick);
+			renderModified(graphics, this, this.option.isModified(this.preset, this.baseline));
 		}
 
 		@Override
 		public boolean mouseClicked(double mouseX, double mouseY, int button) {
 			if (this.active && this.visible && Screen.hasControlDown() && this.clicked(mouseX, mouseY)) {
-				this.option.reset(this.preset);
+				this.option.resetTo(this.preset, this.baseline);
 				this.setValue(this.getSliderValue(this.option.get(this.preset).floatValue()));
 				this.applyValue();
 				this.updateMessage();
@@ -103,11 +125,12 @@ public final class OptionWidgets {
 	private static class OptionCycleButton<T> extends Button {
 		private final Option<T> option;
 		private final Preset preset;
+		private final Preset baseline;
 		private final List<T> values;
 		private final Function<T, Component> nameGetter;
 		private final Component name;
 
-		public OptionCycleButton(Option<T> option, Preset preset, List<T> values, Function<T, Component> nameGetter, Runnable onChange, Component name) {
+		public OptionCycleButton(Option<T> option, Preset preset, Preset baseline, List<T> values, Function<T, Component> nameGetter, Runnable onChange, Component name) {
 			super(-1, -1, -1, -1, CommonComponents.EMPTY, (button) -> {
 				if (button instanceof OptionCycleButton<?> self) {
 					self.cycle(Screen.hasShiftDown() ? -1 : 1);
@@ -116,16 +139,23 @@ public final class OptionWidgets {
 			}, DEFAULT_NARRATION);
 			this.option = option;
 			this.preset = preset;
+			this.baseline = baseline;
 			this.values = values;
 			this.nameGetter = nameGetter;
 			this.name = name;
-			this.setTooltip(createTooltip(option, nameGetter.apply(option.defaultValue())));
+			this.setTooltip(createTooltip(option, nameGetter.apply(option.get(baseline))));
 			this.updateMessage();
+		}
+
+		@Override
+		public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+			super.renderWidget(graphics, mouseX, mouseY, partialTick);
+			renderModified(graphics, this, this.option.isModified(this.preset, this.baseline));
 		}
 
 		private void cycle(int direction) {
 			if (Screen.hasControlDown()) {
-				this.option.reset(this.preset);
+				this.option.resetTo(this.preset, this.baseline);
 			} else {
 				int index = this.values.indexOf(this.option.get(this.preset));
 				int next = Math.floorMod(index + direction, this.values.size());

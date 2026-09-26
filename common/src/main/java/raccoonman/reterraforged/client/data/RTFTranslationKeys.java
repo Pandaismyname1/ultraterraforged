@@ -222,6 +222,35 @@ public class RTFTranslationKeys {
 	public static final String SIMPLE_SEA_LEVEL = resolve("gui.terrainTab.simple.seaLevel");
 	public static final String SIMPLE_WORLD_HEIGHT = resolve("gui.terrainTab.simple.worldHeight");
 	public static final String SIMPLE_CAVES = resolve("gui.terrainTab.simple.caves");
+	public static final String GUI_EDITOR_SEARCH = resolve("gui.editor.search");
+	public static final String GUI_EDITOR_NO_RESULTS = resolve("gui.editor.noResults");
+	public static final String GUI_EDITOR_PAGE = resolve("gui.editor.page");
+	public static final String GUI_EDITOR_RESET_PAGE = resolve("gui.editor.resetPage");
+	public static final String GUI_EDITOR_RESET_PAGE_TOOLTIP = resolve("gui.editor.resetPage.tooltip");
+	public static final String GUI_EDITOR_MODIFIED = resolve("gui.editor.modified");
+	public static final String GUI_SAVE_PRESET = resolve("gui.savePreset");
+	public static final String GUI_SAVE_PRESET_TOOLTIP = resolve("gui.savePreset.tooltip");
+	public static final String GUI_SAVE_PRESET_TITLE = resolve("gui.savePreset.title");
+	public static final String GUI_SAVE_PRESET_NAME = resolve("gui.savePreset.name");
+	public static final String GUI_SAVE_PRESET_CONFIRM = resolve("gui.savePreset.confirm");
+	public static final String GUI_SAVE_PRESET_INVALID_NAME = resolve("gui.savePreset.invalidName");
+	public static final String GUI_SAVE_PRESET_REPLACES = resolve("gui.savePreset.replaces");
+	public static final String GUI_SAVE_PRESET_SAVED = resolve("gui.savePreset.saved");
+	public static final String GUI_SAVE_PRESET_FAILED = resolve("gui.savePreset.failed");
+	public static final String GUI_SHARE_COPY = resolve("gui.share.copy");
+	public static final String GUI_SHARE_COPY_TOOLTIP = resolve("gui.share.copy.tooltip");
+	public static final String GUI_SHARE_COPIED = resolve("gui.share.copied");
+	public static final String GUI_SHARE_PASTE = resolve("gui.share.paste");
+	public static final String GUI_SHARE_PASTE_TOOLTIP = resolve("gui.share.paste.tooltip");
+	public static final String GUI_SHARE_PASTED = resolve("gui.share.pasted");
+	public static final String GUI_SHARE_PASTED_NAME = resolve("gui.share.pastedName");
+	public static final String GUI_SHARE_INVALID = resolve("gui.share.invalid");
+
+	// the display name of an enum setting's value, e.g. reterraforged.value.continentType.multi_improved
+	public static String enumValue(Enum<?> value) {
+		String type = value.getDeclaringClass().getSimpleName();
+		return resolve("value." + Character.toLowerCase(type.charAt(0)) + type.substring(1) + "." + value.name().toLowerCase(java.util.Locale.ROOT));
+	}
 	
 	public static String presetName(String id) {
 		return resolve("gui.preset." + id + ".name");

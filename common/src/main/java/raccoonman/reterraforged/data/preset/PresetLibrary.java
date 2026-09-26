@@ -2,21 +2,27 @@ package raccoonman.reterraforged.data.preset;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.jetbrains.annotations.Nullable;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonWriter;
 import com.mojang.serialization.JsonOps;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.GsonHelper;
 import raccoonman.reterraforged.RTFCommon;
 import raccoonman.reterraforged.client.data.RTFTranslationKeys;
 import raccoonman.reterraforged.data.preset.settings.BuiltinPresets;
@@ -43,6 +49,7 @@ public final class PresetLibrary {
 	}
 
 	public static final String DEFAULT_ID = "builtin/default";
+	private static final Pattern VALID_NAME = Pattern.compile("^[A-Za-z0-9_ -]+$");
 
 	private static final List<Entry> BUILTINS = List.of(
 		builtin("default", "default", BuiltinPresets::makeDefault),
@@ -54,6 +61,7 @@ public final class PresetLibrary {
 		builtin("frozen_north", "frozenNorth", BuiltinPresets::makeFrozenNorth),
 		builtin("tropics", "tropics", BuiltinPresets::makeTropics),
 		builtin("volcanic_isles", "volcanicIsles", BuiltinPresets::makeVolcanicIsles),
+		builtin("waterlands", "waterlands", BuiltinPresets::makeWaterlands),
 		builtin("patchwork", "patchwork", BuiltinPresets::makePatchwork),
 		// the original TerraForged presets
 		builtin("legacy_default", "legacyDefault", BuiltinPresets::makeLegacyDefault),
@@ -96,6 +104,42 @@ public final class PresetLibrary {
 			}
 		}
 		return entries;
+	}
+
+	// preset names become file names, so keep them to characters every file system accepts
+	public static boolean isValidName(String name) {
+		return VALID_NAME.matcher(name).matches() && !name.isBlank() && name.length() <= 64;
+	}
+
+	public static Path file(Path folder, String name) {
+		return folder.resolve(name.trim() + ".json");
+	}
+
+	/**
+	 * Saves the preset as {@code <name>.json} in the folder, replacing a preset with the same name.
+	 *
+	 * @return the entry for the saved file
+	 */
+	public static Entry save(Path folder, String name, Preset preset) throws IOException {
+		if (!isValidName(name)) {
+			throw new IllegalArgumentException("Invalid preset name: " + name);
+		}
+		Files.createDirectories(folder);
+		Path file = file(folder, name);
+		write(file, preset);
+		return new Entry("file/" + file.getFileName(), Component.literal(name.trim()), null, () -> read(file).orElseGet(BuiltinPresets::makeDefault), file);
+	}
+
+	public static void write(Path file, Preset preset) throws IOException {
+		JsonElement json = Preset.CODEC.encodeStart(JsonOps.INSTANCE, preset).getOrThrow(false, (error) -> {});
+		// write next to the target first, so a failed write never leaves half a preset behind
+		Path temp = file.resolveSibling(file.getFileName() + ".tmp");
+		try (Writer writer = Files.newBufferedWriter(temp); JsonWriter jsonWriter = new JsonWriter(writer)) {
+			jsonWriter.setSerializeNulls(false);
+			jsonWriter.setIndent("  ");
+			GsonHelper.writeValue(jsonWriter, json, null);
+		}
+		Files.move(temp, file, StandardCopyOption.REPLACE_EXISTING);
 	}
 
 	private static java.util.Optional<Preset> read(Path file) {

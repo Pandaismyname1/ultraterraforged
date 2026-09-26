@@ -21,11 +21,11 @@ import raccoonman.reterraforged.world.worldgen.tile.Tile;
 public class PresetCharacterTest {
 	private static final Map<String, Stats> STATS = new LinkedHashMap<>();
 
-	record Stats(float land, float height, float mountains, float flat, float badlands, float volcanoes, float temperature, float biomeChanges) {
+	record Stats(float land, float height, float mountains, float flat, float badlands, float volcanoes, float temperature, float biomeChanges, float inlandWater) {
 
 		@Override
 		public String toString() {
-			return String.format("land %.3f  height %.3f  mountains %.3f  flat %.3f  badlands %.3f  volcanoes %.3f  temperature %.3f  biome changes %.3f", this.land, this.height, this.mountains, this.flat, this.badlands, this.volcanoes, this.temperature, this.biomeChanges);
+			return String.format("land %.3f  height %.3f  mountains %.3f  flat %.3f  badlands %.3f  volcanoes %.3f  temperature %.3f  biome changes %.3f  inland water %.3f", this.land, this.height, this.mountains, this.flat, this.badlands, this.volcanoes, this.temperature, this.biomeChanges, this.inlandWater);
 		}
 	}
 
@@ -47,6 +47,13 @@ public class PresetCharacterTest {
 		float[] height = new float[1];
 		wide.iterate((cell, x, z) -> {
 			counts[0]++;
+			// rivers, lakes and wetlands, as a share of everything that isn't sea
+			if (!cell.terrain.isDeepOcean() && !cell.terrain.isShallowOcean()) {
+				counts[6]++;
+				if (cell.terrain.isRiver() || cell.terrain.isLake() || cell.terrain.isWetland()) {
+					counts[7]++;
+				}
+			}
 			if (cell.terrain.isSubmerged()) {
 				return;
 			}
@@ -99,7 +106,7 @@ public class PresetCharacterTest {
 		});
 
 		float land = Math.max(1, counts[1]);
-		return new Stats(landCounts[1] / (float) landCounts[0], height[0] / land, counts[2] / land, counts[3] / land, counts[4] / land, counts[5] / land, temperature[0] / land, changes / (float) Math.max(1, pairs));
+		return new Stats(landCounts[1] / (float) landCounts[0], height[0] / land, counts[2] / land, counts[3] / land, counts[4] / land, counts[5] / land, temperature[0] / land, changes / (float) Math.max(1, pairs), counts[7] / (float) Math.max(1, counts[6]));
 	}
 
 	// onLand centers the view on the continent nearest the origin, like the preview does for spawn
@@ -161,6 +168,11 @@ public class PresetCharacterTest {
 	void volcanicIslesHaveMoreVolcanoesAndSea() {
 		assertMore("volcanoes", stats("volcanic_isles").volcanoes(), stats("default").volcanoes() * 1.5F);
 		assertLess("land", stats("volcanic_isles").land(), stats("default").land());
+	}
+
+	@Test
+	void waterlandsHaveMoreRiversAndLakes() {
+		assertMore("inland water", stats("waterlands").inlandWater(), stats("default").inlandWater() * 2.0F);
 	}
 
 	@Test

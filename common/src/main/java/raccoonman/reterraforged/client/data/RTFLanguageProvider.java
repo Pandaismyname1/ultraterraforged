@@ -3,6 +3,11 @@ package raccoonman.reterraforged.client.data;
 import net.minecraft.data.PackOutput;
 import raccoonman.reterraforged.RTFCommon;
 import raccoonman.reterraforged.client.gui.Tooltips;
+import raccoonman.reterraforged.client.gui.screen.presetconfig.RenderMode;
+import raccoonman.reterraforged.data.preset.settings.ClimateSettings;
+import raccoonman.reterraforged.world.worldgen.biome.spawn.SpawnType;
+import raccoonman.reterraforged.world.worldgen.continent.ContinentType;
+import raccoonman.reterraforged.world.worldgen.noise.function.DistanceFunction;
 
 // TODO add some more languages
 public class RTFLanguageProvider {
@@ -40,6 +45,7 @@ public class RTFLanguageProvider {
 			this.preset("frozenNorth", "Frozen North", "A cold world of snow, taiga and frozen coasts");
 			this.preset("tropics", "Tropics", "A hot, humid world of jungles, savannas and warm seas");
 			this.preset("volcanicIsles", "Volcanic Isles", "Mid-sized islands crowned by volcanoes");
+			this.preset("waterlands", "Waterlands", "Countless rivers, big lakes and wetlands winding through green lowlands");
 			this.preset("patchwork", "Patchwork", "Tiny biomes and quickly changing terrain, so there is variety close to spawn");
 			this.add(RTFTranslationKeys.presetDescription("default"), "Large continents with varied terrain, rivers and mountain chains");
 			this.add(RTFTranslationKeys.presetDescription("legacyDefault"), "The original TerraForged default");
@@ -57,8 +63,8 @@ public class RTFLanguageProvider {
 			this.add(RTFTranslationKeys.GUI_STRUCTURE_SETTINGS_TITLE, "Structure Settings");
 			this.add(RTFTranslationKeys.GUI_MISCELLANEOUS_SETTINGS_TITLE, "Miscellaneous Settings");
 
-			this.add(RTFTranslationKeys.GUI_BUTTON_TRUE, "true");
-			this.add(RTFTranslationKeys.GUI_BUTTON_FALSE, "false");
+			this.add(RTFTranslationKeys.GUI_BUTTON_TRUE, "On");
+			this.add(RTFTranslationKeys.GUI_BUTTON_FALSE, "Off");
 			this.add(RTFTranslationKeys.GUI_BUTTON_CREATE, "Create");
 			this.add(RTFTranslationKeys.GUI_BUTTON_COPY, "Copy");
 			this.add(RTFTranslationKeys.GUI_BUTTON_DELETE, "Delete");
@@ -234,7 +240,7 @@ public class RTFLanguageProvider {
 			this.add(RTFTranslationKeys.OPTION_TAG_EXPERIMENTAL, "Experimental");
 			this.add(RTFTranslationKeys.OPTION_TAG_MEDIUM_PERFORMANCE_IMPACT, "Medium performance impact");
 			this.add(RTFTranslationKeys.OPTION_TAG_HEAVY_PERFORMANCE_IMPACT, "Heavy performance impact");
-			this.add(RTFTranslationKeys.GUI_RESET_TO_DEFAULT, "Ctrl+click to reset to default (%s)");
+			this.add(RTFTranslationKeys.GUI_RESET_TO_DEFAULT, "Ctrl+click to reset to %s");
 			this.add(RTFTranslationKeys.GUI_TERRAIN_TAB_TITLE, "Terrain");
 			this.add(RTFTranslationKeys.GUI_TERRAIN_TAB_ACTIVE, "World type: ReTerraForged");
 			this.add(RTFTranslationKeys.GUI_TERRAIN_TAB_INACTIVE, "Change any setting to use ReTerraForged");
@@ -257,6 +263,64 @@ public class RTFLanguageProvider {
 			this.add(RTFTranslationKeys.SIMPLE_SEA_LEVEL, "Sea Level");
 			this.add(RTFTranslationKeys.SIMPLE_WORLD_HEIGHT, "World Height");
 			this.add(RTFTranslationKeys.SIMPLE_CAVES, "Caves");
+			this.add(RTFTranslationKeys.GUI_EDITOR_SEARCH, "Search all settings...");
+			this.add(RTFTranslationKeys.GUI_EDITOR_NO_RESULTS, "No settings match");
+			this.add(RTFTranslationKeys.GUI_EDITOR_PAGE, "Page");
+			this.add(RTFTranslationKeys.GUI_EDITOR_RESET_PAGE, "Reset Page");
+			this.add(RTFTranslationKeys.GUI_EDITOR_RESET_PAGE_TOOLTIP, "Undo every change on this page since you opened the editor");
+			this.add(RTFTranslationKeys.GUI_EDITOR_MODIFIED, "Changed from %s");
+			this.add(RTFTranslationKeys.GUI_SAVE_PRESET, "Save As...");
+			this.add(RTFTranslationKeys.GUI_SAVE_PRESET_TOOLTIP, "Save these settings as a preset of your own, so you can pick them again for other worlds");
+			this.add(RTFTranslationKeys.GUI_SAVE_PRESET_TITLE, "Save Preset");
+			this.add(RTFTranslationKeys.GUI_SAVE_PRESET_NAME, "Preset name");
+			this.add(RTFTranslationKeys.GUI_SAVE_PRESET_CONFIRM, "Save");
+			this.add(RTFTranslationKeys.GUI_SAVE_PRESET_INVALID_NAME, "Use letters, numbers, spaces, - and _");
+			this.add(RTFTranslationKeys.GUI_SAVE_PRESET_REPLACES, "Replaces your preset with the same name");
+			this.add(RTFTranslationKeys.GUI_SAVE_PRESET_SAVED, "Preset saved");
+			this.add(RTFTranslationKeys.GUI_SAVE_PRESET_FAILED, "Couldn't save the preset");
+			this.add(RTFTranslationKeys.GUI_SHARE_COPY, "Copy Code");
+			this.add(RTFTranslationKeys.GUI_SHARE_COPY_TOOLTIP, "Copy these settings as a text code to share with others");
+			this.add(RTFTranslationKeys.GUI_SHARE_COPIED, "Preset code copied to the clipboard");
+			this.add(RTFTranslationKeys.GUI_SHARE_PASTE, "Paste Code");
+			this.add(RTFTranslationKeys.GUI_SHARE_PASTE_TOOLTIP, "Use the settings from a preset code in the clipboard");
+			this.add(RTFTranslationKeys.GUI_SHARE_PASTED, "Settings loaded from the preset code");
+			this.add(RTFTranslationKeys.GUI_SHARE_PASTED_NAME, "Shared preset");
+			this.add(RTFTranslationKeys.GUI_SHARE_INVALID, "The clipboard doesn't hold a valid preset code");
+
+			this.value(ContinentType.MULTI, "Classic");
+			this.value(ContinentType.SINGLE, "Classic, Simple Coasts");
+			this.value(ContinentType.MULTI_IMPROVED, "Improved");
+			this.value(ContinentType.EXPERIMENTAL, "Experimental");
+			this.value(ContinentType.INFINITE, "Endless Land");
+			this.value(DistanceFunction.EUCLIDEAN, "Round");
+			this.value(DistanceFunction.MANHATTAN, "Diamond");
+			this.value(DistanceFunction.NATURAL, "Natural");
+			this.value(SpawnType.CONTINENT_CENTER, "Center of a Continent");
+			this.value(SpawnType.ISLANDS, "Islands");
+			this.value(SpawnType.WORLD_ORIGIN, "World Origin (0, 0)");
+			this.value(ClimateSettings.BiomeNoise.EdgeType.BILLOW, "Billow");
+			this.value(ClimateSettings.BiomeNoise.EdgeType.VORONOI, "Cells");
+			this.value(ClimateSettings.BiomeNoise.EdgeType.VORONOI_EDGE, "Cell Edges");
+			this.value(ClimateSettings.BiomeNoise.EdgeType.CONSTANT, "None");
+			this.value(ClimateSettings.BiomeNoise.EdgeType.CUBIC, "Cubic");
+			this.value(ClimateSettings.BiomeNoise.EdgeType.PERLIN, "Perlin");
+			this.value(ClimateSettings.BiomeNoise.EdgeType.PERLIN2, "Perlin (Alternative)");
+			this.value(ClimateSettings.BiomeNoise.EdgeType.PERLIN_RIDGE, "Ridged");
+			this.value(ClimateSettings.BiomeNoise.EdgeType.SIMPLEX, "Simplex");
+			this.value(ClimateSettings.BiomeNoise.EdgeType.SIMPLEX2, "Simplex (Alternative)");
+			this.value(ClimateSettings.BiomeNoise.EdgeType.SIMPLEX_RIDGE, "Simplex (Legacy Ridged)");
+			this.value(ClimateSettings.BiomeNoise.EdgeType.SIN, "Waves");
+			this.value(ClimateSettings.BiomeNoise.EdgeType.WHITE, "Random");
+			this.value(RenderMode.BIOME_TYPE, "Biomes");
+			this.value(RenderMode.TRANSITION_POINTS, "Transitions");
+			this.value(RenderMode.TEMPERATURE, "Temperature");
+			this.value(RenderMode.MOISTURE, "Moisture");
+			this.value(RenderMode.BIOME, "Biome Regions");
+			this.value(RenderMode.MACRO_NOISE, "Macro Noise");
+			this.value(RenderMode.TERRAIN_REGION, "Terrain Regions");
+			this.value(RenderMode.CONTINENT_EDGE, "Continent Edges");
+			this.value(RenderMode.CONTINENT_NOISE, "Continent Noise");
+			this.value(RenderMode.CONTINENTALNESS, "Continentalness");
 
 			this.add(Tooltips.failTranslationKey(RTFTranslationKeys.GUI_BUTTON_CREATE), "Failed to create preset");
 			this.add(Tooltips.failTranslationKey(RTFTranslationKeys.GUI_BUTTON_COPY), "Failed to copy preset");
@@ -390,6 +454,10 @@ public class RTFLanguageProvider {
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_MOUNTAIN_BIOME_USAGE), "The probability that mountainous terrain will be set to a mountain biome type.\nThis may help improve compatibility with mods that rely exclusively on mountain biomes.");
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_VOLCANO_BIOME_USAGE), "The probability that volcano terrain will be set to a volcano biome type.\nThis may help improve compatibility with mods that rely exclusively on volcano biomes.");
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_STRATA_REGION_SIZE), "Controls the size of strata regions");
+		}
+
+		private void value(Enum<?> value, String name) {
+			this.add(RTFTranslationKeys.enumValue(value), name);
 		}
 
 		private void preset(String id, String name, String description) {

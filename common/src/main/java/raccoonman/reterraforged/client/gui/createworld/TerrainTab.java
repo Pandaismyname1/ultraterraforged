@@ -21,11 +21,12 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import raccoonman.reterraforged.client.data.RTFTranslationKeys;
+import raccoonman.reterraforged.client.gui.PresetSharing;
+import raccoonman.reterraforged.client.gui.screen.SavePresetScreen;
 import raccoonman.reterraforged.client.gui.screen.presetconfig.OptionWidgets;
 import raccoonman.reterraforged.client.gui.screen.presetconfig.PresetConfigScreen;
 import raccoonman.reterraforged.client.gui.screen.presetconfig.RenderMode;
 import raccoonman.reterraforged.data.preset.PresetLibrary;
-import raccoonman.reterraforged.platform.ConfigUtil;
 import raccoonman.reterraforged.preset.option.PresetOptions;
 
 /**
@@ -39,11 +40,14 @@ public class TerrainTab implements Tab {
 
 	private final CreateWorldScreen screen;
 	private final TerrainState state;
-	private final List<PresetLibrary.Entry> presets;
+	private final List<PresetLibrary.Entry> presets = new ArrayList<>();
 
 	private final StringWidget status;
 	private final Button presetButton;
 	private final Button advancedButton;
+	private final Button saveButton;
+	private final Button copyButton;
+	private final Button pasteButton;
 	private final ScrollingPanel sliders;
 	private final TerrainPreview preview;
 	private final CycleButton<RenderMode> viewButton;
@@ -54,19 +58,35 @@ public class TerrainTab implements Tab {
 	public TerrainTab(CreateWorldScreen screen) {
 		this.screen = screen;
 		this.state = TerrainState.of(screen);
-		this.presets = new ArrayList<>(PresetLibrary.builtins());
-		this.presets.addAll(PresetLibrary.files(ConfigUtil.rtf("presets")));
+		this.reloadPresets();
 
 		Minecraft minecraft = Minecraft.getInstance();
 		this.status = new StringWidget(Component.empty(), minecraft.font).alignLeft();
 		this.presetButton = Button.builder(Component.empty(), (button) -> this.cyclePreset(Screen.hasShiftDown() ? -1 : 1)).build();
 		this.advancedButton = Button.builder(Component.translatable(RTFTranslationKeys.GUI_TERRAIN_TAB_ADVANCED), (button) -> {
-			minecraft.setScreen(PresetConfigScreen.editing(this.screen, this.state.name(), this.state.preset()));
+			minecraft.setScreen(PresetConfigScreen.editing(this.screen, this.state.name(), this.state.preset(), this.state.baseline()));
 		}).build();
 		this.advancedButton.setTooltip(Tooltip.create(Component.translatable(RTFTranslationKeys.GUI_TERRAIN_TAB_ADVANCED_TOOLTIP)));
+		this.saveButton = Button.builder(Component.translatable(RTFTranslationKeys.GUI_SAVE_PRESET), (button) -> {
+			minecraft.setScreen(new SavePresetScreen(this.screen, this.state.name().getString(), this.state.preset().copy(), (saved) -> {
+				this.reloadPresets();
+				this.state.select(saved);
+				this.state.selectReTerraForged();
+			}));
+		}).tooltip(Tooltip.create(Component.translatable(RTFTranslationKeys.GUI_SAVE_PRESET_TOOLTIP))).build();
+		this.copyButton = Button.builder(Component.translatable(RTFTranslationKeys.GUI_SHARE_COPY), (button) -> PresetSharing.copy(this.state.preset()))
+			.tooltip(Tooltip.create(Component.translatable(RTFTranslationKeys.GUI_SHARE_COPY_TOOLTIP))).build();
+		this.pasteButton = Button.builder(Component.translatable(RTFTranslationKeys.GUI_SHARE_PASTE), (button) -> {
+			PresetSharing.paste().ifPresent((preset) -> {
+				this.state.select(new PresetLibrary.Entry("shared", Component.translatable(RTFTranslationKeys.GUI_SHARE_PASTED_NAME), null, preset::copy, null));
+				this.state.selectReTerraForged();
+				this.rebuildSliders();
+				this.updateLabels();
+			});
+		}).tooltip(Tooltip.create(Component.translatable(RTFTranslationKeys.GUI_SHARE_PASTE_TOOLTIP))).build();
 		this.sliders = new ScrollingPanel();
 		this.preview = new TerrainPreview(this.state);
-		this.viewButton = CycleButton.<RenderMode>builder((mode) -> Component.literal(mode.name().toLowerCase().replace('_', ' ')))
+		this.viewButton = CycleButton.<RenderMode>builder(OptionWidgets::enumName)
 			.withValues(RenderMode.values())
 			.withInitialValue(this.preview.mode())
 			.create(0, 0, 0, 0, Component.translatable(RTFTranslationKeys.GUI_TERRAIN_TAB_VIEW), (button, mode) -> this.preview.setMode(mode));
@@ -84,6 +104,9 @@ public class TerrainTab implements Tab {
 		consumer.accept(this.status);
 		consumer.accept(this.presetButton);
 		consumer.accept(this.advancedButton);
+		consumer.accept(this.saveButton);
+		consumer.accept(this.copyButton);
+		consumer.accept(this.pasteButton);
 		consumer.accept(this.sliders);
 		consumer.accept(this.preview);
 		consumer.accept(this.viewButton);
@@ -108,6 +131,15 @@ public class TerrainTab implements Tab {
 		this.advancedButton.setX(left);
 		this.advancedButton.setY(y);
 		this.advancedButton.setWidth(columnWidth);
+		y += ROW + GAP;
+		int third = (columnWidth - GAP * 2) / 3;
+		this.saveButton.setX(left);
+		this.copyButton.setX(left + third + GAP);
+		this.pasteButton.setX(left + (third + GAP) * 2);
+		for (Button button : List.of(this.saveButton, this.copyButton, this.pasteButton)) {
+			button.setY(y);
+			button.setWidth(button == this.pasteButton ? columnWidth - (third + GAP) * 2 : third);
+		}
 		y += ROW + GAP * 2;
 		this.sliders.setBounds(left, y, columnWidth, Math.max(ROW, area.bottom() - PADDING - y));
 
@@ -128,8 +160,24 @@ public class TerrainTab implements Tab {
 		this.updateLabels();
 	}
 
+	private void reloadPresets() {
+		this.presets.clear();
+		this.presets.addAll(PresetLibrary.builtins());
+		this.presets.addAll(PresetLibrary.files(PresetSharing.presetFolder()));
+	}
+
 	private void cyclePreset(int direction) {
-		int index = this.presets.indexOf(this.state.source());
+		// entries are matched by id, file entries are recreated whenever the folder is read
+		int index = -1;
+		for (int i = 0; i < this.presets.size(); i++) {
+			if (this.presets.get(i).id().equals(this.state.source().id())) {
+				index = i;
+			}
+		}
+		if (index < 0) {
+			// e.g. a pasted preset; start over from the first or last one
+			index = direction > 0 ? -1 : this.presets.size();
+		}
 		PresetLibrary.Entry next = this.presets.get(Math.floorMod(index + direction, this.presets.size()));
 		this.state.select(next);
 		this.state.selectReTerraForged();
@@ -140,7 +188,7 @@ public class TerrainTab implements Tab {
 	private void rebuildSliders() {
 		List<AbstractWidget> widgets = new ArrayList<>();
 		for (PresetOptions.SimpleSetting setting : PresetOptions.SIMPLE) {
-			widgets.add(OptionWidgets.create(setting.option(), this.state.preset(), this::onSettingChanged, Component.translatable(setting.labelKey())));
+			widgets.add(OptionWidgets.create(setting.option(), this.state.preset(), this.state.baseline(), this::onSettingChanged, Component.translatable(setting.labelKey())));
 		}
 		this.sliders.setChildren(widgets);
 		this.builtRevision = this.state.revision();

@@ -87,7 +87,7 @@ class PresetListPage extends BisectedPage<PresetConfigScreen, PresetEntry, Abstr
 			this.input.setTextColor(isValid ? white : red);
 		}, Component.translatable(RTFTranslationKeys.GUI_INPUT_PROMPT).withStyle(ChatFormatting.DARK_GRAY));
 		this.createPreset = PresetWidgets.createThrowingButton(RTFTranslationKeys.GUI_BUTTON_CREATE, () -> {
-			new PresetEntry(Component.literal(this.input.getValue()), BuiltinPresets.makeLegacyDefault(), false, this).save();
+			new PresetEntry(Component.literal(this.input.getValue()), BuiltinPresets.makeDefault(), false, this).save();
 			this.rebuildPresets();
 			this.input.setValue(StringUtil.EMPTY_STRING);
 		});
@@ -154,7 +154,7 @@ class PresetListPage extends BisectedPage<PresetConfigScreen, PresetEntry, Abstr
 			if(entry.isBuiltin()) {
 				entry = new PresetEntry(entry.name, entry.preset.copy(), true, (b) -> {});
 			}
-			return new OptionPage(this.screen, entry, 0);
+			return new OptionPage(new EditorSession(this.screen, entry, entry.getPreset().copy()), 0);
 		});
 	}
 	

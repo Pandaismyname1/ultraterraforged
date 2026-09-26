@@ -378,6 +378,28 @@ public class BuiltinPresets {
 		return preset;
 	}
 
+	public static Preset makeWaterlands() {
+		Preset preset = makeDefault();
+		RiverSettings rivers = preset.rivers();
+		rivers.riverCount = 24;
+		rivers.mainRivers.bedWidth = 14;
+		rivers.mainRivers.bankWidth = 34;
+		rivers.mainRivers.bedDepth = 6;
+		rivers.branchRivers.bedWidth = 9;
+		rivers.branchRivers.bankWidth = 22;
+		rivers.lakes.chance = 0.9F;
+		rivers.lakes.sizeMin = 100;
+		rivers.lakes.sizeMax = 300;
+		rivers.wetlands.chance = 1.0F;
+		rivers.wetlands.sizeMin = 250;
+		rivers.wetlands.sizeMax = 400;
+		preset.climate().moisture.bias = 0.4F;
+		// lowland terrain, so the water has somewhere to spread out
+		preset.terrain().plains.weight = 3.0F;
+		preset.terrain().mountains.weight = 1.0F;
+		return preset;
+	}
+
 	public static Preset makePatchwork() {
 		Preset preset = makeDefault();
 		preset.world().continent.continentScale = 2000;
