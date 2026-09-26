@@ -40,9 +40,7 @@ public class PresetOptionsTest {
 	// settings present in the preset file that intentionally have no option
 	private static final Set<String> NOT_EXPOSED = Set.of(
 		PresetFormat.VERSION_KEY,
-		"surface.erosion.snowHeight",
-		// cave settings were removed upstream; the section is kept so older files still load
-		"caves"
+		"surface.erosion.snowHeight"
 	);
 
 	@BeforeAll

@@ -18,6 +18,7 @@ import com.google.gson.JsonParser;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 
+import raccoonman.reterraforged.data.preset.settings.CaveSettings;
 import raccoonman.reterraforged.data.preset.settings.Preset;
 import raccoonman.reterraforged.data.preset.settings.PresetFormat;
 import raccoonman.reterraforged.preset.option.PresetOptions;
@@ -37,6 +38,8 @@ public class PresetFormatTest {
 		Preset preset = parse(json);
 		assertEquals(json.getAsJsonObject("world").getAsJsonObject("continent").get("continentScale").getAsInt(), PresetOptions.CONTINENT_SCALE.get(preset));
 		assertEquals(json.getAsJsonObject("rivers").get("riverCount").getAsInt(), preset.rivers().riverCount);
+		assertEquals(json.getAsJsonObject("caves").get("caveCarverProbability").getAsFloat(), preset.caves().caveCarverProbability);
+		assertEquals(json.getAsJsonObject("caves").get("entranceCaveProbability").getAsFloat(), preset.caves().entranceCaveProbability);
 		// settings that no longer exist are dropped, everything else survives a round trip
 		assertEquals(PresetOptionsTest.encode(preset), PresetOptionsTest.encode(parse(PresetOptionsTest.encode(preset))));
 	}
@@ -52,6 +55,20 @@ public class PresetFormatTest {
 		Preset preset = parse(json);
 		assertEquals(0.05F, PresetOptions.ISLAND_INLAND.get(preset));
 		assertEquals(0.2F, PresetOptions.ISLAND_COAST.get(preset));
+	}
+
+	@Test
+	void presetsFrom007GetVanillaCaves() {
+		// 0.0.7 ignored cave settings and wrote an empty caves section
+		JsonObject json = PresetOptionsTest.encode(BuiltinPresetRenderTest.presets().get("default").get());
+		json.remove(PresetFormat.VERSION_KEY);
+		json.add("caves", new JsonObject());
+		assertEquals(PresetOptionsTest.encode(presetWithCaves(CaveSettings.makeVanilla())).get("caves"), PresetOptionsTest.encode(parse(json)).get("caves"));
+	}
+
+	private static Preset presetWithCaves(CaveSettings caves) {
+		Preset preset = BuiltinPresetRenderTest.presets().get("default").get();
+		return new Preset(preset.world(), preset.surface(), caves, preset.climate(), preset.terrain(), preset.rivers(), preset.filters(), preset.miscellaneous());
 	}
 
 	@Test

@@ -36,7 +36,7 @@ public record Preset(WorldSettings world, SurfaceSettings surface, CaveSettings 
 		WorldSettings.CODEC.fieldOf("world").forGetter(Preset::world),
 		// presets are mutable, so a missing section must get its own default instance rather than a shared one
 		SurfaceSettings.CODEC.optionalFieldOf("surface").xmap((surface) -> surface.orElseGet(Preset::defaultSurface), Optional::of).forGetter(Preset::surface),
-		CaveSettings.CODEC.optionalFieldOf("caves").xmap((caves) -> caves.orElseGet(CaveSettings::new), Optional::of).forGetter(Preset::caves),
+		CaveSettings.CODEC.optionalFieldOf("caves").xmap((caves) -> caves.orElseGet(CaveSettings::makeVanilla), Optional::of).forGetter(Preset::caves),
 		ClimateSettings.CODEC.fieldOf("climate").forGetter(Preset::climate),
 		TerrainSettings.CODEC.fieldOf("terrain").forGetter(Preset::terrain),
 		RiverSettings.CODEC.fieldOf("rivers").forGetter(Preset::rivers),

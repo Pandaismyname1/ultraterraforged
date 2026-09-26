@@ -3,6 +3,7 @@ package raccoonman.reterraforged.preset.option;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -266,6 +267,41 @@ public final class PresetOptions {
 				.translation(RTFTranslationKeys.GUI_SLIDER_SLOPE_MODIFIER)
 				.range(0.0F, 255.0F)
 				.bind((p) -> p.surface().erosion().slopeModifier, (p, v) -> p.surface().erosion().slopeModifier = v)
+				.build()
+		)
+	);
+
+	// Caves
+
+	public static final Page CAVES = Page.of("caves", RTFTranslationKeys.GUI_CAVE_SETTINGS_TITLE,
+		Category.of("noiseCaves", RTFTranslationKeys.GUI_LABEL_NOISE_CAVES,
+			caveChance("entranceCaveProbability", RTFTranslationKeys.GUI_SLIDER_ENTRANCE_CAVE_CHANCE, (p) -> p.caves().entranceCaveProbability, (p, v) -> p.caves().entranceCaveProbability = v),
+			FloatOption.builder("caves.cheeseCaveDepthOffset")
+				.translation(RTFTranslationKeys.GUI_SLIDER_SURFACE_DENSITY_THRESHOLD)
+				.range(1.5625F, 10.0F)
+				.bind((p) -> p.caves().cheeseCaveDepthOffset, (p, v) -> p.caves().cheeseCaveDepthOffset = v)
+				.build(),
+			caveChance("cheeseCaveProbability", RTFTranslationKeys.GUI_SLIDER_CHEESE_CAVE_CHANCE, (p) -> p.caves().cheeseCaveProbability, (p, v) -> p.caves().cheeseCaveProbability = v),
+			caveChance("spaghettiCaveProbability", RTFTranslationKeys.GUI_SLIDER_SPAGHETTI_CAVE_CHANCE, (p) -> p.caves().spaghettiCaveProbability, (p, v) -> p.caves().spaghettiCaveProbability = v),
+			caveChance("noodleCaveProbability", RTFTranslationKeys.GUI_SLIDER_NOODLE_CAVE_CHANCE, (p) -> p.caves().noodleCaveProbability, (p, v) -> p.caves().noodleCaveProbability = v),
+			BoolOption.builder("caves.largeOreVeins")
+				.translation(RTFTranslationKeys.GUI_BUTTON_LARGE_ORE_VEINS)
+				.bind((p) -> p.caves().largeOreVeins, (p, v) -> p.caves().largeOreVeins = v)
+				.build()
+		),
+		Category.of("carvers", RTFTranslationKeys.GUI_LABEL_CARVERS,
+			caveChance("caveCarverProbability", RTFTranslationKeys.GUI_SLIDER_CAVE_CARVER_CHANCE, (p) -> p.caves().caveCarverProbability, (p, v) -> p.caves().caveCarverProbability = v),
+			FloatOption.builder("caves.deepCaveCarverProbability")
+				.translation(RTFTranslationKeys.GUI_SLIDER_DEEP_CAVE_CARVER_CHANCE)
+				.range(0.0F, 1.0F)
+				// legacy distribution has no deep cave carvers
+				.activeWhen((p) -> !p.caves().legacyCarverDistribution)
+				.bind((p) -> p.caves().deepCaveCarverProbability, (p, v) -> p.caves().deepCaveCarverProbability = v)
+				.build(),
+			caveChance("ravineCarverProbability", RTFTranslationKeys.GUI_SLIDER_RAVINE_CARVER_CHANCE, (p) -> p.caves().ravineCarverProbability, (p, v) -> p.caves().ravineCarverProbability = v),
+			BoolOption.builder("caves.legacyCarverDistribution")
+				.translation(RTFTranslationKeys.GUI_BUTTON_LEGACY_CARVER_DISTRIBUTION)
+				.bind((p) -> p.caves().legacyCarverDistribution, (p, v) -> p.caves().legacyCarverDistribution = v)
 				.build()
 		)
 	);
@@ -578,7 +614,7 @@ public final class PresetOptions {
 		)
 	);
 
-	public static final List<Page> PAGES = List.of(WORLD, SURFACE, CLIMATE, TERRAIN, RIVERS, FILTERS, MISCELLANEOUS);
+	public static final List<Page> PAGES = List.of(WORLD, SURFACE, CAVES, CLIMATE, TERRAIN, RIVERS, FILTERS, MISCELLANEOUS);
 
 	private static final Map<String, Option<?>> BY_PATH = PAGES.stream().flatMap(Page::options).collect(Collectors.toUnmodifiableMap(Option::path, Function.identity()));
 
@@ -588,6 +624,14 @@ public final class PresetOptions {
 
 	public static Optional<Option<?>> byPath(String path) {
 		return Optional.ofNullable(BY_PATH.get(path));
+	}
+
+	private static FloatOption caveChance(String name, String translationKey, Function<Preset, Float> getter, BiConsumer<Preset, Float> setter) {
+		return FloatOption.builder("caves." + name)
+			.translation(translationKey)
+			.range(0.0F, 1.0F)
+			.bind(getter, setter)
+			.build();
 	}
 
 	private static Category climateRange(String id, String label, Function<Preset, ClimateSettings.RangeValue> range, String scaleKey, String falloffKey, String minKey, String maxKey, String biasKey) {

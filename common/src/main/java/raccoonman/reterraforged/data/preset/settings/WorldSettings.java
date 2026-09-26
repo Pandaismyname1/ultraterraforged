@@ -32,14 +32,14 @@ public class WorldSettings {
     public static class Continent {
     	public static final Codec<Continent> CODEC = RecordCodecBuilder.create(instance -> instance.group(
     		ContinentType.CODEC.fieldOf("continentType").forGetter((o) -> o.continentType),
-    		DistanceFunction.CODEC.optionalFieldOf("continentShape", DistanceFunction.EUCLIDEAN).forGetter((o) -> o.continentShape),
+    		PresetCodecs.defaulted(DistanceFunction.CODEC, "continentShape", DistanceFunction.EUCLIDEAN).forGetter((o) -> o.continentShape),
     		Codec.INT.fieldOf("continentScale").forGetter((o) -> o.continentScale),
     		Codec.FLOAT.fieldOf("continentJitter").forGetter((o) -> o.continentJitter),
-    		Codec.FLOAT.optionalFieldOf("continentSkipping", 0.25F).forGetter((o) -> o.continentSkipping),
-    		Codec.FLOAT.optionalFieldOf("continentSizeVariance", 0.25F).forGetter((o) -> o.continentSizeVariance),
-    		Codec.INT.optionalFieldOf("continentNoiseOctaves", 5).forGetter((o) -> o.continentNoiseOctaves),
-    		Codec.FLOAT.optionalFieldOf("continentNoiseGain", 0.26F).forGetter((o) -> o.continentNoiseGain),
-    		Codec.FLOAT.optionalFieldOf("continentNoiseLacunarity", 4.33F).forGetter((o) -> o.continentNoiseLacunarity)
+    		PresetCodecs.defaulted(Codec.FLOAT, "continentSkipping", 0.25F).forGetter((o) -> o.continentSkipping),
+    		PresetCodecs.defaulted(Codec.FLOAT, "continentSizeVariance", 0.25F).forGetter((o) -> o.continentSizeVariance),
+    		PresetCodecs.defaulted(Codec.INT, "continentNoiseOctaves", 5).forGetter((o) -> o.continentNoiseOctaves),
+    		PresetCodecs.defaulted(Codec.FLOAT, "continentNoiseGain", 0.26F).forGetter((o) -> o.continentNoiseGain),
+    		PresetCodecs.defaulted(Codec.FLOAT, "continentNoiseLacunarity", 4.33F).forGetter((o) -> o.continentNoiseLacunarity)
     	).apply(instance, Continent::new));
     	
         public ContinentType continentType;
@@ -71,15 +71,15 @@ public class WorldSettings {
     
     public static class ControlPoints {
     	public static final Codec<ControlPoints> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-        	Codec.FLOAT.optionalFieldOf("islandInland", IslandPopulator.DEFAULT_INLAND_POINT).forGetter((o) -> o.islandInland),
-        	Codec.FLOAT.optionalFieldOf("islandCoast", IslandPopulator.DEFAULT_COAST_POINT).forGetter((o) -> o.islandCoast),
+        	PresetCodecs.defaulted(Codec.FLOAT, "islandInland", IslandPopulator.DEFAULT_INLAND_POINT).forGetter((o) -> o.islandInland),
+        	PresetCodecs.defaulted(Codec.FLOAT, "islandCoast", IslandPopulator.DEFAULT_COAST_POINT).forGetter((o) -> o.islandCoast),
     		Codec.FLOAT.fieldOf("deepOcean").forGetter((o) -> o.deepOcean),
     		Codec.FLOAT.fieldOf("shallowOcean").forGetter((o) -> o.shallowOcean),
     		Codec.FLOAT.fieldOf("beach").forGetter((o) -> o.beach),
     		Codec.FLOAT.fieldOf("coast").forGetter((o) -> o.coast),
     		Codec.FLOAT.fieldOf("inland").forGetter((o) -> o.nearInland),
-    		Codec.FLOAT.optionalFieldOf("midInland", 0.7F).forGetter((o) -> o.midInland),
-    		Codec.FLOAT.optionalFieldOf("farInland", 1.0F).forGetter((o) -> o.farInland)
+    		PresetCodecs.defaulted(Codec.FLOAT, "midInland", 0.7F).forGetter((o) -> o.midInland),
+    		PresetCodecs.defaulted(Codec.FLOAT, "farInland", 1.0F).forGetter((o) -> o.farInland)
         ).apply(instance, ControlPoints::new));
 
     	public float islandInland;
@@ -120,9 +120,9 @@ public class WorldSettings {
     	public static final Codec<Properties> CODEC = RecordCodecBuilder.create(instance -> instance.group(
     		SpawnType.CODEC.fieldOf("spawnType").forGetter((o) -> o.spawnType),
     		Codec.INT.fieldOf("worldHeight").forGetter((o) -> o.worldHeight),
-    		Codec.INT.optionalFieldOf("worldDepth", 64).forGetter((o) -> o.worldDepth),
+    		PresetCodecs.defaulted(Codec.INT, "worldDepth", 64).forGetter((o) -> o.worldDepth),
     		Codec.INT.fieldOf("seaLevel").forGetter((o) -> o.seaLevel),
-    		Codec.INT.optionalFieldOf("lavaLevel", -54).forGetter((o) -> o.lavaLevel)
+    		PresetCodecs.defaulted(Codec.INT, "lavaLevel", -54).forGetter((o) -> o.lavaLevel)
     	).apply(instance, Properties::new));
     	
         public SpawnType spawnType;
