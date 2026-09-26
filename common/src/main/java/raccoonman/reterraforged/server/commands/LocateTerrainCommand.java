@@ -34,9 +34,9 @@ public class LocateTerrainCommand {
     	commandDispatcher.register(
     		Commands.literal("rtf").requires((stack) -> stack.hasPermission(2)).then(
     			Commands.literal("locate").then(
-    				Commands.argument("terrain", TerrainArgument.terrain()).executes((ctx) -> {
+    				TerrainArgument.terrain("terrain").executes((ctx) -> {
 	    				CommandSourceStack stack = ctx.getSource();
-	    				Terrain terrain = ctx.getArgument("terrain", Terrain.class);
+	    				Terrain terrain = TerrainArgument.getTerrain(ctx, "terrain");
 	    				String terrainName = terrain.getName();
 	    				BlockPos origin = BlockPos.containing(stack.getPosition());
 	    				@Nullable

@@ -21,7 +21,7 @@ public class RTFCommandsImpl {
 	}
 	
 	@SubscribeEvent
-	private static void onRegisterCommands(RegisterCommandsEvent event) {
+	public static void onRegisterCommands(RegisterCommandsEvent event) {
 		COMMANDS.forEach((consumer) -> consumer.accept(event.getDispatcher(), event.getBuildContext()));
 	}
 }

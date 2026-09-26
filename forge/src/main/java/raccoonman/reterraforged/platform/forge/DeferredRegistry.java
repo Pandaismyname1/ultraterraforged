@@ -212,6 +212,12 @@ class DeferredRegistry<T> implements Registry<T> {
 			this.register.register(bus);
 		}
 
+		// 1.20.1 only; removed from WritableRegistry in 1.20.2
+		@Override
+		public Holder<T> registerMapping(int id, ResourceKey<T> key, T value, Lifecycle lifecycle) {
+			return this.register(key, value, lifecycle);
+		}
+
 		@Override
 		public Reference<T> register(ResourceKey<T> key, T value, Lifecycle lifecycle) {
 			Holder.Reference<T> holder = Holder.Reference.createStandAlone(new HolderOwner<>() {

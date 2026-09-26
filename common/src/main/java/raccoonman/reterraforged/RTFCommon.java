@@ -8,7 +8,6 @@ import raccoonman.reterraforged.compat.terrablender.TBCompat;
 import raccoonman.reterraforged.compat.terrablender.TBSurfaceRules;
 import raccoonman.reterraforged.data.preset.settings.Preset;
 import raccoonman.reterraforged.platform.RegistryUtil;
-import raccoonman.reterraforged.registries.RTFArgumentTypeInfos;
 import raccoonman.reterraforged.registries.RTFBuiltInRegistries;
 import raccoonman.reterraforged.registries.RTFRegistries;
 import raccoonman.reterraforged.server.commands.RTFCommands;
@@ -56,7 +55,6 @@ public class RTFCommon {
 		StructureRules.bootstrap();
 
 		RTFCommands.bootstrap();
-		RTFArgumentTypeInfos.bootstrap();
 		
 		if(TBCompat.isEnabled()) {
 			TBCompat.bootstrap();

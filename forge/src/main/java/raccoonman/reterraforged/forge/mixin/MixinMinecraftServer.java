@@ -40,11 +40,12 @@ public class MixinMinecraftServer {
 	}
 
 	@Inject(
-		method = "lambda$reloadResources$27",
-		require = 1,
+		// Forge-patched lambda (javac name); $26 on Forge 47.4 and NeoForge 47.1 for 1.20.1
+		method = "lambda$reloadResources$26",
+		remap = false,
 		at = @At("TAIL")
 	)
-	private void lambda$reloadResources$27(CallbackInfo callback) {
+	private void onReloadResources(CallbackInfo callback) {
 		this.templateManager.onReload(this.getResourceManager());
 	}
 	

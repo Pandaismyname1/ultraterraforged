@@ -27,13 +27,14 @@ import raccoonman.reterraforged.world.worldgen.GeneratorContext;
 import raccoonman.reterraforged.world.worldgen.RTFRandomState;
 import raccoonman.reterraforged.world.worldgen.WorldGenFlags;
 
+// Targets are ChunkStatus lambdas, which have no Mojang names: method_* is the Fabric intermediary (and dev) name, m_*_ the Forge/NeoForge 1.20.1 SRG name.
 @Mixin(ChunkStatus.class)
 public class MixinChunkStatus {
 
 	//structure starts
 	@Inject(
 		at = @At("HEAD"),
-		method = "method_39464",
+		method = { "method_39464", "m_289181_" },
 		remap = false
 	)
 	private static void method_39464$HEAD(ChunkStatus status, Executor executor, ServerLevel level, ChunkGenerator generator, StructureTemplateManager templateManager, ThreadedLevelLightEngine lightEngine, Function<ChunkAccess, CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>>> chunkLookup, List<ChunkAccess> regionChunks, ChunkAccess centerChunk, CallbackInfoReturnable<CompletableFuture<ChunkAccess>> callback) {
@@ -53,7 +54,7 @@ public class MixinChunkStatus {
 	
 	@Inject(
 		at = @At("TAIL"),
-		method = "method_39464",
+		method = { "method_39464", "m_289181_" },
 		remap = false
 	)
 	private static void method_39464$TAIL(ChunkStatus status, Executor executor, ServerLevel level, ChunkGenerator generator, StructureTemplateManager templateManager, ThreadedLevelLightEngine lightEngine, Function<ChunkAccess, CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>>> chunkLookup, List<ChunkAccess> regionChunks, ChunkAccess centerChunk, CallbackInfoReturnable<CompletableFuture<ChunkAccess>> callback) {
@@ -70,7 +71,7 @@ public class MixinChunkStatus {
 	//features
 	@Inject(
 		at = @At("TAIL"),
-		method = "method_51375",
+		method = { "method_51375", "m_279978_" },
 		remap = false
 	)
 	private static void method_51375(ChunkStatus status, ServerLevel level, ChunkGenerator generator, List<ChunkAccess> chunks, ChunkAccess centerChunk, CallbackInfo callback) {

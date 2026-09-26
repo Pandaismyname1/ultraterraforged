@@ -12,7 +12,6 @@ public class RTFCommands {
 
 	public static void bootstrap() {
 		register(LocateTerrainCommand::register);
-		register(ExportHeightmapCommand::register);
 	}
 	
 	@ExpectPlatform

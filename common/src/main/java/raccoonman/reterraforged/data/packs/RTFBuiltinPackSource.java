@@ -22,14 +22,13 @@ import net.minecraft.server.packs.repository.BuiltInPackSource;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.Pack.ResourcesSupplier;
 import net.minecraft.server.packs.repository.PackSource;
-import net.minecraft.world.level.validation.DirectoryValidator;
 import raccoonman.reterraforged.RTFCommon;
 
 public class RTFBuiltinPackSource extends BuiltInPackSource {
 	private static final ResourceLocation PACKS_DIR = RTFCommon.location("datapacks");
 	
-	public RTFBuiltinPackSource(DirectoryValidator directoryValidator) {
-		super(PackType.SERVER_DATA, createRTFPackSource(), PACKS_DIR, directoryValidator);
+	public RTFBuiltinPackSource() {
+		super(PackType.SERVER_DATA, createRTFPackSource(), PACKS_DIR);
 	}
 
 	@Nullable
