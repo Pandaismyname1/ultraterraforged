@@ -17,6 +17,8 @@ public class RTFLanguageProvider {
 		protected void addTranslations() {
 			this.add(RTFTranslationKeys.METADATA_DESCRIPTION, "ReTerraForged resources");
 			this.add(RTFTranslationKeys.PRESET_METADATA_DESCRIPTION, "ReTerraForged preset");
+			// display name of the world type, vanilla looks it up as generator.<namespace>.<path>
+			this.add("generator.reterraforged.reterraforged", "ReTerraForged");
 			this.add(RTFTranslationKeys.MUD_SWAMPS_METADATA_DESCRIPTION, "Changes the swamp material to mud");
 			this.add(RTFTranslationKeys.NO_ERROR_MESSAGE, "{No error message}");
 			

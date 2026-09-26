@@ -1,13 +1,12 @@
 package raccoonman.reterraforged.forge;
 
-import net.minecraft.world.level.levelgen.presets.WorldPresets;
+import raccoonman.reterraforged.data.preset.RTFWorldPresets;
 import net.minecraftforge.client.event.RegisterPresetEditorsEvent;
 import raccoonman.reterraforged.client.gui.screen.presetconfig.PresetConfigScreen;
 
 class RTFForgeClient {
 
 	public static void registerPresetEditors(RegisterPresetEditorsEvent event) {
-		// TODO we probably shouldn't register this for the default preset
-		event.register(WorldPresets.NORMAL, (screen, ctx) -> new PresetConfigScreen(screen));
+		event.register(RTFWorldPresets.RETERRAFORGED, (screen, ctx) -> new PresetConfigScreen(screen));
 	}
 }

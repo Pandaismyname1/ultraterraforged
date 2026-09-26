@@ -20,7 +20,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.world.level.levelgen.WorldOptions;
-import raccoonman.reterraforged.RTFCommon;
+import raccoonman.reterraforged.data.PresetPacks;
 import raccoonman.reterraforged.client.gui.screen.page.LinkedPageScreen;
 import raccoonman.reterraforged.client.gui.screen.presetconfig.PresetListPage.PresetEntry;
 import raccoonman.reterraforged.data.RTFDataGen;
@@ -55,7 +55,7 @@ public class PresetConfigScreen extends LinkedPageScreen {
 
 	public void applyPreset(PresetEntry preset) throws IOException {		
 		Pair<Path, PackRepository> path = this.parent.getDataPackSelectionSettings(this.parent.getUiState().getSettings().dataConfiguration());
-		Path exportPath = path.getFirst().resolve("reterraforged-preset.zip");
+		Path exportPath = path.getFirst().resolve(PresetPacks.WORLD_PACK_NAME);
 		this.exportAsDatapack(exportPath, preset);
 		PackRepository repository = path.getSecond();
 		repository.reload();
@@ -66,28 +66,6 @@ public class PresetConfigScreen extends LinkedPageScreen {
 	}
 	
 	public void exportAsDatapack(Path outputPath, PresetEntry presetEntry) throws IOException {
-		Path datagenPath = Files.createTempDirectory("datagen-target-");
-		Path datagenOutputPath = datagenPath.resolve("output");
-		
-		RegistryAccess registryAccess = this.getSettings().worldgenLoadContext();
-
-		Preset preset = presetEntry.getPreset();
-		
-		DataGenerator dataGenerator = RTFDataGen.makePreset(preset, registryAccess, datagenPath, datagenOutputPath);
-		dataGenerator.run();
-		copyToZip(datagenOutputPath, outputPath);
-		PathUtils.deleteDirectory(datagenPath);
-		
-		RTFCommon.LOGGER.info("Exported datapack to {}", outputPath);
-	}
-	
-	private static void copyToZip(Path input, Path output) {
-		Map<String, String> env = ImmutableMap.of("create", "true");
-	    URI uri = URI.create("jar:" + output.toUri());
-	    try (FileSystem fs = FileSystems.newFileSystem(uri, env)) {
-	        PathUtils.copyDirectory(input, fs.getPath("/"), StandardCopyOption.REPLACE_EXISTING);
-	    } catch (IOException e) {
-	        e.printStackTrace();
-	    }
+		PresetPacks.export(presetEntry.getPreset(), this.getSettings().worldgenLoadContext(), outputPath);
 	}
 }

@@ -1,4 +1,5 @@
 {
+  "generator.reterraforged.reterraforged": "ReTerraForged",
   "reterraforged.argument.terrain.invalid": "Could not find a terrain type with the name \"%s\"",
   "reterraforged.commands.locate.terrain.found": "The nearest %s is at %s (%s blocks away)",
   "reterraforged.commands.locate.terrain.not_found": "Could not find a \"%s\" within reasonable distance",

@@ -8,4 +8,9 @@ public class ModLoaderUtil {
 	public static boolean isLoaded(String modId) {
 		throw new IllegalStateException();
 	}
+
+	@ExpectPlatform
+	public static boolean isDedicatedServer() {
+		throw new IllegalStateException();
+	}
 }

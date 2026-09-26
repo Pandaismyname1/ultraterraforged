@@ -31,10 +31,11 @@ public class RTFDataGen {
 	}
 	
 	@Deprecated
-	public static DataGenerator makePreset(Preset preset, RegistryAccess registryAccess, Path dataGenPath, Path dataGenOutputPath) {
+	public static DataGenerator makePreset(Preset preset, HolderLookup.Provider registryAccess, Path dataGenPath, Path dataGenOutputPath) {
 		DataGenerator dataGenerator = new DataGenerator(dataGenPath, SharedConstants.getCurrentVersion(), true);
 		PackGenerator packGenerator = dataGenerator.new PackGenerator(true, "preset", new PackOutput(dataGenOutputPath));
-		CompletableFuture<HolderLookup.Provider> lookup = CompletableFuture.supplyAsync(() -> preset.buildPatch(registryAccess));
+		// built up front rather than on the common pool: on Forge, classes first loaded from common pool threads can't see mod classes
+		CompletableFuture<HolderLookup.Provider> lookup = CompletableFuture.completedFuture(preset.buildPatch(registryAccess));
 		
 		packGenerator.addProvider((output) -> {
 			return DataGenUtil.createRegistryProvider(output, lookup);
