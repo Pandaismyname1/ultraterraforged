@@ -3,34 +3,27 @@
   "id": "reterraforged",
   "version": "${version}",
   "name": "ReTerraForged",
-  "description": "A continuation of https://github.com/TerraForged/TerraForged",
+  "description": "A continuation of TerraForged (https://github.com/TerraForged/TerraForged): realistic, configurable terrain generation.",
   "authors": [
-	"dags",
-	"Won-Ton",
-	"racconman"
+    "dags",
+    "Won-Ton",
+    "raccoonman"
   ],
-  "contact": {
-    "repo": "https://github.com/racoonman2/reterraforged/",
-    "issues": "https://github.com/racoonman2/reterraforged/issues"
-  },
   "license": "MIT",
   "environment": "*",
   "entrypoints": {
     "main": [
       "raccoonman.reterraforged.fabric.RTFFabric"
-    ],
-    "fabric-datagen": [
-      "raccoonman.reterraforged.fabric.RTFFabric"
     ]
-  },
-  "depends": {
-    "fabricloader": ">=0.14.14",
-    "fabric": ">=0.86.1",
-    "minecraft": ">=1.19.4"
   },
   "mixins": [
     "reterraforged-common.mixins.json",
     "reterraforged-fabric.mixins.json"
   ],
-  "icon": "assets/reterraforged/icon.png"
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "fabric-api": ">=${fabric_api_version}",
+    "minecraft": "~${minecraft_version}",
+    "java": ">=17"
+  }
 }

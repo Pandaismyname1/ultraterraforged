@@ -1,28 +1,27 @@
 modLoader="javafml"
-loaderVersion="[30,)"
+loaderVersion="[47,)"
 license="MIT"
 
 [[mods]]
 modId="reterraforged"
 displayName="ReTerraForged"
-version="0.0.6"
-authors="dags,Won-Ton,raccoonman"
-credits="dags,Won-Ton,raccoonman"
+version="${version}"
+authors="dags, Won-Ton, raccoonman"
+credits="Based on TerraForged by dags and Won-Ton"
 logoFile="logo.png"
-displayURL="https://github.com/racoonman2/reterraforged/"
-issueTrackerURL="https://github.com/racoonman2/reterraforged/issues"
-description="A continuation of https://github.com/TerraForged/TerraForged"
+description='''A continuation of TerraForged (https://github.com/TerraForged/TerraForged): realistic, configurable terrain generation.'''
 
+# "forge" also matches NeoForge for 1.20.1 (47.1.x), which still identifies itself as Forge.
 [[dependencies.reterraforged]]
     modId="forge"
     mandatory=true
-    versionRange="[47,)"
+    versionRange="[${forge_min_version},)"
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.reterraforged]]
-	modId = "minecraft"
-	mandatory = true
-	versionRange = "[1.20.1,)"
-	ordering = "NONE"
-	side = "BOTH"
+    modId="minecraft"
+    mandatory=true
+    versionRange="[${minecraft_version}]"
+    ordering="NONE"
+    side="BOTH"
