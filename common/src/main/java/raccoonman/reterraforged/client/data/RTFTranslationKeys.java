@@ -223,6 +223,14 @@ public class RTFTranslationKeys {
 	public static final String SIMPLE_WORLD_HEIGHT = resolve("gui.terrainTab.simple.worldHeight");
 	public static final String SIMPLE_CAVES = resolve("gui.terrainTab.simple.caves");
 	
+	public static String presetName(String id) {
+		return resolve("gui.preset." + id + ".name");
+	}
+
+	public static String presetDescription(String id) {
+		return resolve("gui.preset." + id + ".description");
+	}
+
 	private static String resolve(String key) {
 		return RTFCommon.MOD_ID + "." + key;
 	}

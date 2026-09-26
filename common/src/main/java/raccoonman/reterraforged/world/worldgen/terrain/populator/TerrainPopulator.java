@@ -31,7 +31,8 @@ public record TerrainPopulator(float weight, Terrain type, Noise ground, Noise h
     
     @Override
     public TerrainPopulator mapNoise(Noise.Visitor visitor) {
-    	return new TerrainPopulator(this.weight, this.type, this.ground.mapAll(visitor), this.height.mapAll(visitor), this.erosion.mapAll(visitor), this.weirdness.mapAll(visitor));
+    	// keep the scales, or the base and vertical scale settings of every terrain type are lost
+    	return new TerrainPopulator(this.weight, this.type, this.ground.mapAll(visitor), this.height.mapAll(visitor), this.erosion.mapAll(visitor), this.weirdness.mapAll(visitor), this.baseScale, this.heightScale);
     }
     
     public static TerrainPopulator make(Terrain type, Noise ground, Noise height, Noise erosion, Noise weirdness, TerrainSettings.Terrain settings) {

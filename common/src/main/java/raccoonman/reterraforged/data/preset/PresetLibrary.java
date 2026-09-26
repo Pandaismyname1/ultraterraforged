@@ -31,7 +31,7 @@ public final class PresetLibrary {
 	 * @param id stable identifier, "builtin/<name>" or "file/<file name>"
 	 * @param factory creates a fresh, independently editable copy
 	 */
-	public record Entry(String id, Component name, Supplier<Preset> factory, @Nullable Path file) {
+	public record Entry(String id, Component name, @Nullable Component description, Supplier<Preset> factory, @Nullable Path file) {
 
 		public boolean isBuiltin() {
 			return this.file == null;
@@ -45,12 +45,22 @@ public final class PresetLibrary {
 	public static final String DEFAULT_ID = "builtin/default";
 
 	private static final List<Entry> BUILTINS = List.of(
-		builtin("default", RTFTranslationKeys.GUI_DEFAULT_PRESET_NAME, BuiltinPresets::makeDefault),
-		builtin("legacy_default", RTFTranslationKeys.GUI_DEFAULT_LEGACY_PRESET_NAME, BuiltinPresets::makeLegacyDefault),
-		builtin("beautiful", RTFTranslationKeys.GUI_BEAUTIFUL_PRESET_NAME, BuiltinPresets::makeLegacyBeautiful),
-		builtin("huge_biomes", RTFTranslationKeys.GUI_HUGE_BIOMES_PRESET_NAME, BuiltinPresets::makeLegacyHugeBiomes),
-		builtin("lite", RTFTranslationKeys.GUI_LITE_PRESET_NAME, BuiltinPresets::makeLegacyLite),
-		builtin("vanillaish", RTFTranslationKeys.GUI_VANILLAISH_PRESET_NAME, BuiltinPresets::makeLegacyVanillaish)
+		builtin("default", "default", BuiltinPresets::makeDefault),
+		builtin("archipelago", "archipelago", BuiltinPresets::makeArchipelago),
+		builtin("supercontinent", "supercontinent", BuiltinPresets::makeSupercontinent),
+		builtin("highlands", "highlands", BuiltinPresets::makeHighlands),
+		builtin("prairie", "prairie", BuiltinPresets::makePrairie),
+		builtin("badlands", "badlands", BuiltinPresets::makeBadlands),
+		builtin("frozen_north", "frozenNorth", BuiltinPresets::makeFrozenNorth),
+		builtin("tropics", "tropics", BuiltinPresets::makeTropics),
+		builtin("volcanic_isles", "volcanicIsles", BuiltinPresets::makeVolcanicIsles),
+		builtin("patchwork", "patchwork", BuiltinPresets::makePatchwork),
+		// the original TerraForged presets
+		builtin("legacy_default", "legacyDefault", BuiltinPresets::makeLegacyDefault),
+		builtin("beautiful", "beautiful", BuiltinPresets::makeLegacyBeautiful),
+		builtin("huge_biomes", "hugeBiomes", BuiltinPresets::makeLegacyHugeBiomes),
+		builtin("lite", "lite", BuiltinPresets::makeLegacyLite),
+		builtin("vanillaish", "vanillaish", BuiltinPresets::makeLegacyVanillaish)
 	);
 
 	public static List<Entry> builtins() {
@@ -81,7 +91,7 @@ public final class PresetLibrary {
 				read(file).ifPresent((preset) -> {
 					String name = file.getFileName().toString();
 					name = name.substring(0, name.length() - ".json".length());
-					entries.add(new Entry("file/" + file.getFileName(), Component.literal(name), () -> read(file).orElseGet(BuiltinPresets::makeDefault), file));
+					entries.add(new Entry("file/" + file.getFileName(), Component.literal(name), null, () -> read(file).orElseGet(BuiltinPresets::makeDefault), file));
 				});
 			}
 		}
@@ -99,8 +109,9 @@ public final class PresetLibrary {
 		}
 	}
 
-	private static Entry builtin(String name, String translationKey, Supplier<Preset> factory) {
-		return new Entry("builtin/" + name, Component.translatable(translationKey).withStyle(ChatFormatting.GRAY), factory, null);
+	private static Entry builtin(String id, String translationId, Supplier<Preset> factory) {
+		Component name = Component.translatable(RTFTranslationKeys.presetName(translationId)).withStyle(ChatFormatting.GRAY);
+		return new Entry("builtin/" + id, name, Component.translatable(RTFTranslationKeys.presetDescription(translationId)), factory, null);
 	}
 
 	private PresetLibrary() {

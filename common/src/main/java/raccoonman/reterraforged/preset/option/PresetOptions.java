@@ -405,15 +405,15 @@ public final class PresetOptions {
 				.bind((p) -> p.terrain().general.fancyMountains, (p, v) -> p.terrain().general.fancyMountains = v)
 				.build()
 		),
-		terrainType("steppe", RTFTranslationKeys.GUI_LABEL_STEPPE, (p) -> p.terrain().steppe),
-		terrainType("plains", RTFTranslationKeys.GUI_LABEL_PLAINS, (p) -> p.terrain().plains),
-		terrainType("hills", RTFTranslationKeys.GUI_LABEL_HILLS, (p) -> p.terrain().hills),
-		terrainType("dales", RTFTranslationKeys.GUI_LABEL_DALES, (p) -> p.terrain().dales),
-		terrainType("plateau", RTFTranslationKeys.GUI_LABEL_PLATEAU, (p) -> p.terrain().plateau),
-		terrainType("badlands", RTFTranslationKeys.GUI_LABEL_BADLANDS, (p) -> p.terrain().badlands),
-		terrainType("torridonian", RTFTranslationKeys.GUI_LABEL_TORRIDONIAN, (p) -> p.terrain().torridonian),
-		terrainType("mountains", RTFTranslationKeys.GUI_LABEL_MOUNTAINS, (p) -> p.terrain().mountains),
-		terrainType("volcano", RTFTranslationKeys.GUI_LABEL_VOLCANO, (p) -> p.terrain().volcano)
+		terrainType("steppe", RTFTranslationKeys.GUI_LABEL_STEPPE, (p) -> p.terrain().steppe, true, true),
+		terrainType("plains", RTFTranslationKeys.GUI_LABEL_PLAINS, (p) -> p.terrain().plains, true, false),
+		terrainType("hills", RTFTranslationKeys.GUI_LABEL_HILLS, (p) -> p.terrain().hills, false, true),
+		terrainType("dales", RTFTranslationKeys.GUI_LABEL_DALES, (p) -> p.terrain().dales, false, true),
+		terrainType("plateau", RTFTranslationKeys.GUI_LABEL_PLATEAU, (p) -> p.terrain().plateau, false, true),
+		terrainType("badlands", RTFTranslationKeys.GUI_LABEL_BADLANDS, (p) -> p.terrain().badlands, false, true),
+		terrainType("torridonian", RTFTranslationKeys.GUI_LABEL_TORRIDONIAN, (p) -> p.terrain().torridonian, false, true),
+		terrainType("mountains", RTFTranslationKeys.GUI_LABEL_MOUNTAINS, (p) -> p.terrain().mountains, true, true),
+		terrainType("volcano", RTFTranslationKeys.GUI_LABEL_VOLCANO, (p) -> p.terrain().volcano, false, false)
 	);
 
 	// Rivers
@@ -691,7 +691,8 @@ public final class PresetOptions {
 		);
 	}
 
-	private static Category terrainType(String id, String label, Function<Preset, TerrainSettings.Terrain> terrain) {
+	// some terrain types' generators ignore their scales; those options are hidden rather than shown doing nothing
+	private static Category terrainType(String id, String label, Function<Preset, TerrainSettings.Terrain> terrain, boolean usesHorizontalScale, boolean usesBaseAndVerticalScale) {
 		String path = "terrain." + id + ".";
 		return Category.of(id, label,
 			FloatOption.builder(path + "weight")
@@ -699,22 +700,26 @@ public final class PresetOptions {
 				.range(0.0F, 10.0F)
 				.bind((p) -> terrain.apply(p).weight, (p, v) -> terrain.apply(p).weight = v)
 				.build(),
-			FloatOption.builder(path + "baseScale")
+			hiddenUnless(usesBaseAndVerticalScale, FloatOption.builder(path + "baseScale")
 				.translation(RTFTranslationKeys.GUI_SLIDER_TERRAIN_BASE_SCALE)
 				.range(0.0F, 2.0F)
 				.bind((p) -> terrain.apply(p).baseScale, (p, v) -> terrain.apply(p).baseScale = v)
-				.build(),
-			FloatOption.builder(path + "verticalScale")
+			).build(),
+			hiddenUnless(usesBaseAndVerticalScale, FloatOption.builder(path + "verticalScale")
 				.translation(RTFTranslationKeys.GUI_SLIDER_TERRAIN_VERTICAL_SCALE)
 				.range(0.0F, 10.0F)
 				.bind((p) -> terrain.apply(p).verticalScale, (p, v) -> terrain.apply(p).verticalScale = v)
-				.build(),
-			FloatOption.builder(path + "horizontalScale")
+			).build(),
+			hiddenUnless(usesHorizontalScale, FloatOption.builder(path + "horizontalScale")
 				.translation(RTFTranslationKeys.GUI_SLIDER_TERRAIN_HORIZONTAL_SCALE)
 				.range(0.0F, 10.0F)
 				.bind((p) -> terrain.apply(p).horizontalScale, (p, v) -> terrain.apply(p).horizontalScale = v)
-				.build()
+			).build()
 		);
+	}
+
+	private static FloatOption.Builder hiddenUnless(boolean visible, FloatOption.Builder builder) {
+		return visible ? builder : builder.hidden();
 	}
 
 	private static Category river(String id, String label, Function<Preset, RiverSettings.River> river, int maxBedDepth, int maxBedWidth, int maxBankWidth) {
@@ -725,17 +730,20 @@ public final class PresetOptions {
 				.range(1, maxBedDepth)
 				.bind((p) -> river.apply(p).bedDepth, (p, v) -> river.apply(p).bedDepth = v)
 				.build(),
+			// river bank heights are kept in the file but the river carver doesn't use them at the moment
 			IntOption.builder(path + "minBankHeight")
 				.translation(RTFTranslationKeys.GUI_SLIDER_RIVER_MIN_BANK_HEIGHT)
 				.range(0, 20)
 				.atMost((p) -> river.apply(p).maxBankHeight)
 				.bind((p) -> river.apply(p).minBankHeight, (p, v) -> river.apply(p).minBankHeight = v)
+				.hidden()
 				.build(),
 			IntOption.builder(path + "maxBankHeight")
 				.translation(RTFTranslationKeys.GUI_SLIDER_RIVER_MAX_BANK_HEIGHT)
 				.range(1, 20)
 				.atLeast((p) -> river.apply(p).minBankHeight)
 				.bind((p) -> river.apply(p).maxBankHeight, (p, v) -> river.apply(p).maxBankHeight = v)
+				.hidden()
 				.build(),
 			IntOption.builder(path + "bedWidth")
 				.translation(RTFTranslationKeys.GUI_SLIDER_RIVER_BED_WIDTH)

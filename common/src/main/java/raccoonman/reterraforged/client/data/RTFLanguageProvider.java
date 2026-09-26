@@ -32,6 +32,21 @@ public class RTFLanguageProvider {
 			this.add(RTFTranslationKeys.GUI_HUGE_BIOMES_PRESET_NAME, "TerraForged - Huge Biomes");
 			this.add(RTFTranslationKeys.GUI_LITE_PRESET_NAME, "TerraForged - Lite");
 			this.add(RTFTranslationKeys.GUI_VANILLAISH_PRESET_NAME, "TerraForged - Vanilla-ish");
+			this.preset("archipelago", "Archipelago", "Countless small islands scattered across warm seas");
+			this.preset("supercontinent", "Supercontinent", "One vast landmass with long rivers and little ocean");
+			this.preset("highlands", "Highlands", "Mountain ranges, plateaus and hills almost everywhere");
+			this.preset("prairie", "Prairie", "Wide open plains and steppe with only the occasional hill");
+			this.preset("badlands", "Badlands", "Hot, dry canyon country of plateaus and badlands");
+			this.preset("frozenNorth", "Frozen North", "A cold world of snow, taiga and frozen coasts");
+			this.preset("tropics", "Tropics", "A hot, humid world of jungles, savannas and warm seas");
+			this.preset("volcanicIsles", "Volcanic Isles", "Mid-sized islands crowned by volcanoes");
+			this.preset("patchwork", "Patchwork", "Tiny biomes and quickly changing terrain, so there is variety close to spawn");
+			this.add(RTFTranslationKeys.presetDescription("default"), "Large continents with varied terrain, rivers and mountain chains");
+			this.add(RTFTranslationKeys.presetDescription("legacyDefault"), "The original TerraForged default");
+			this.add(RTFTranslationKeys.presetDescription("beautiful"), "The original TerraForged 'Beautiful' preset");
+			this.add(RTFTranslationKeys.presetDescription("hugeBiomes"), "The original TerraForged preset with very large biomes");
+			this.add(RTFTranslationKeys.presetDescription("lite"), "The original TerraForged 'Lite' preset");
+			this.add(RTFTranslationKeys.presetDescription("vanillaish"), "The original TerraForged 'Vanilla-ish' preset");
 			this.add(RTFTranslationKeys.GUI_WORLD_SETTINGS_TITLE, "World Settings");
 			this.add(RTFTranslationKeys.GUI_SURFACE_SETTINGS_TITLE, "Surface Settings (Experimental)");
 			this.add(RTFTranslationKeys.GUI_CAVE_SETTINGS_TITLE, "Cave Settings (Experimental)");
@@ -375,6 +390,11 @@ public class RTFLanguageProvider {
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_MOUNTAIN_BIOME_USAGE), "The probability that mountainous terrain will be set to a mountain biome type.\nThis may help improve compatibility with mods that rely exclusively on mountain biomes.");
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_VOLCANO_BIOME_USAGE), "The probability that volcano terrain will be set to a volcano biome type.\nThis may help improve compatibility with mods that rely exclusively on volcano biomes.");
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_STRATA_REGION_SIZE), "Controls the size of strata regions");
+		}
+
+		private void preset(String id, String name, String description) {
+			this.add(RTFTranslationKeys.presetName(id), name);
+			this.add(RTFTranslationKeys.presetDescription(id), description);
 		}
 	}
 }

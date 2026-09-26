@@ -61,13 +61,15 @@ public record Heightmap(CellSampler.Provider cellProvider, CellPopulator terrain
         cell.riverDistance = 1.0F;
         cell.mountainChainAlpha = this.mountainChainAlpha.compute(x, z, 0);
         
-        rivermap.apply(cell, x, z);
         this.region.apply(cell, x, z);
         
         float mountainMask = NoiseUtil.map(cell.mountainChainAlpha, 0.45F, 0.65F);
         cell.terrainMask = Math.min(cell.terrainMask + mountainMask, 1.0F);
         
         this.terrain.apply(cell, x * this.terrainFrequency, z * this.terrainFrequency);
+
+        // rivers carve into the finished terrain; applied before it, as upstream 1.20.2 did, the terrain overwrote them
+        rivermap.apply(cell, x, z);
 
         VolcanoPopulator.modifyVolcanoType(cell, this.levels);
 	}

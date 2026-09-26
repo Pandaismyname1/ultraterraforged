@@ -285,4 +285,114 @@ public class BuiltinPresets {
 			new MiscellaneousSettings(true, 721, true, true, true, false, true, true, true, true, false, 0.902F, 0.945F)
 		);
 	}
+
+	// Curated presets: each starts from the Default preset and changes the few settings that shape it most
+
+	public static Preset makeArchipelago() {
+		Preset preset = makeDefault();
+		preset.world().continent.continentScale = 800;
+		preset.world().continent.continentSkipping = 0.5F;
+		controlPoints(preset, 0.25F, 0.4F, 0.47F, 0.55F, 0.62F);
+		preset.climate().temperature.bias = 0.3F;
+		return preset;
+	}
+
+	public static Preset makeSupercontinent() {
+		Preset preset = makeDefault();
+		preset.world().continent.continentScale = 9000;
+		preset.world().continent.continentSkipping = 0.0F;
+		preset.world().continent.continentSizeVariance = 0.1F;
+		controlPoints(preset, 0.03F, 0.08F, 0.12F, 0.2F, 0.26F);
+		preset.rivers().riverCount = 14;
+		return preset;
+	}
+
+	public static Preset makeHighlands() {
+		Preset preset = makeDefault();
+		TerrainSettings terrain = preset.terrain();
+		terrain.mountains.weight = 6.0F;
+		terrain.mountains.verticalScale = 1.6F;
+		terrain.hills.weight = 3.0F;
+		terrain.hills.verticalScale = 1.5F;
+		terrain.plateau.weight = 3.0F;
+		terrain.plateau.verticalScale = 1.5F;
+		terrain.torridonian.verticalScale = 1.3F;
+		terrain.dales.verticalScale = 1.2F;
+		terrain.plains.weight = 0.5F;
+		terrain.steppe.weight = 0.3F;
+		return preset;
+	}
+
+	public static Preset makePrairie() {
+		Preset preset = makeDefault();
+		TerrainSettings terrain = preset.terrain();
+		terrain.plains.weight = 5.0F;
+		terrain.steppe.weight = 4.0F;
+		terrain.dales.weight = 2.0F;
+		terrain.hills.weight = 0.5F;
+		terrain.plateau.weight = 0.3F;
+		terrain.badlands.weight = 0.2F;
+		terrain.torridonian.weight = 0.3F;
+		terrain.mountains.weight = 0.3F;
+		terrain.volcano.weight = 0.0F;
+		preset.rivers().riverCount = 10;
+		return preset;
+	}
+
+	public static Preset makeBadlands() {
+		Preset preset = makeDefault();
+		TerrainSettings terrain = preset.terrain();
+		terrain.badlands.weight = 6.0F;
+		terrain.plateau.weight = 4.0F;
+		terrain.torridonian.weight = 3.0F;
+		preset.climate().temperature.bias = 0.8F;
+		preset.climate().temperature.min = 0.3F;
+		preset.climate().moisture.bias = -0.8F;
+		preset.climate().moisture.max = 0.6F;
+		preset.rivers().lakes.chance = 0.1F;
+		preset.rivers().wetlands.chance = 0.1F;
+		return preset;
+	}
+
+	public static Preset makeFrozenNorth() {
+		Preset preset = makeDefault();
+		preset.climate().temperature.bias = -0.8F;
+		preset.climate().temperature.max = 0.6F;
+		return preset;
+	}
+
+	public static Preset makeTropics() {
+		Preset preset = makeDefault();
+		preset.climate().temperature.bias = 0.8F;
+		preset.climate().temperature.min = 0.4F;
+		preset.climate().moisture.bias = 0.5F;
+		return preset;
+	}
+
+	public static Preset makeVolcanicIsles() {
+		Preset preset = makeDefault();
+		preset.world().continent.continentScale = 1500;
+		controlPoints(preset, 0.2F, 0.33F, 0.4F, 0.48F, 0.54F);
+		preset.terrain().volcano.weight = 10.0F;
+		preset.terrain().mountains.weight = 3.0F;
+		return preset;
+	}
+
+	public static Preset makePatchwork() {
+		Preset preset = makeDefault();
+		preset.world().continent.continentScale = 2000;
+		preset.climate().biomeShape.biomeSize = 70;
+		preset.terrain().general.terrainRegionSize = 300;
+		return preset;
+	}
+
+	// the ocean to inland transition points, which have to stay in increasing order
+	private static void controlPoints(Preset preset, float deepOcean, float shallowOcean, float beach, float coast, float inland) {
+		ControlPoints points = preset.world().controlPoints;
+		points.deepOcean = deepOcean;
+		points.shallowOcean = shallowOcean;
+		points.beach = beach;
+		points.coast = coast;
+		points.nearInland = inland;
+	}
 }

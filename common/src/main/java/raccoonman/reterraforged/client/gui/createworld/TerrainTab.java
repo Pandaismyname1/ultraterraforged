@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -46,6 +48,8 @@ public class TerrainTab implements Tab {
 	private final TerrainPreview preview;
 	private final CycleButton<RenderMode> viewButton;
 	private int builtRevision = -1;
+	@Nullable
+	private PresetLibrary.Entry tooltipSource;
 
 	public TerrainTab(CreateWorldScreen screen) {
 		this.screen = screen;
@@ -56,7 +60,6 @@ public class TerrainTab implements Tab {
 		Minecraft minecraft = Minecraft.getInstance();
 		this.status = new StringWidget(Component.empty(), minecraft.font).alignLeft();
 		this.presetButton = Button.builder(Component.empty(), (button) -> this.cyclePreset(Screen.hasShiftDown() ? -1 : 1)).build();
-		this.presetButton.setTooltip(Tooltip.create(Component.translatable(RTFTranslationKeys.GUI_TERRAIN_TAB_PRESET_TOOLTIP)));
 		this.advancedButton = Button.builder(Component.translatable(RTFTranslationKeys.GUI_TERRAIN_TAB_ADVANCED), (button) -> {
 			minecraft.setScreen(PresetConfigScreen.editing(this.screen, this.state.name(), this.state.preset()));
 		}).build();
@@ -157,6 +160,15 @@ public class TerrainTab implements Tab {
 			name.append(Component.translatable(RTFTranslationKeys.GUI_TERRAIN_TAB_MODIFIED).withStyle(ChatFormatting.YELLOW));
 		}
 		this.presetButton.setMessage(CommonComponents.optionNameValue(Component.translatable(RTFTranslationKeys.GUI_TERRAIN_TAB_PRESET), name));
+		if (this.tooltipSource != this.state.source()) {
+			this.tooltipSource = this.state.source();
+			MutableComponent tooltip = Component.empty();
+			if (this.tooltipSource.description() != null) {
+				tooltip.append(this.tooltipSource.description()).append(CommonComponents.NEW_LINE).append(CommonComponents.NEW_LINE);
+			}
+			tooltip.append(Component.translatable(RTFTranslationKeys.GUI_TERRAIN_TAB_PRESET_TOOLTIP).withStyle(ChatFormatting.GRAY));
+			this.presetButton.setTooltip(Tooltip.create(tooltip));
+		}
 
 		if (this.state.isReTerraForgedSelected()) {
 			this.status.setMessage(Component.translatable(RTFTranslationKeys.GUI_TERRAIN_TAB_ACTIVE).withStyle(ChatFormatting.GREEN));
