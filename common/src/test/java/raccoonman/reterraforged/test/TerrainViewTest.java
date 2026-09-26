@@ -108,4 +108,57 @@ public class TerrainViewTest {
 		TerrainViews.write(TerrainViews.view(preset, x, z, 1.0F), "desert_buttes_close");
 		TerrainViews.write(TerrainViews.view(preset, x, z, 3.0F), "desert_buttes_wide");
 	}
+
+	@Test
+	void canyon() throws Exception {
+		for (String name : new String[] { "badlands", "highlands", "default" }) {
+			Preset preset = preset(name);
+			Levels levels = TerrainViews.levels(preset);
+			// the high ground right beside a river: the rim of a gorge
+			long place = TerrainViews.find(preset, 16.0F, (cell) -> cell.riverDistance < 0.12F && levels.scale(cell.height) > levels.waterLevel + 45);
+			if (place == Long.MIN_VALUE) {
+				System.out.println("no river through plateau or badlands in " + name);
+				continue;
+			}
+			float x = PosUtil.unpackLeft(place);
+			float z = PosUtil.unpackRight(place);
+			System.out.println("canyon candidate in " + name + " at " + x + ", " + z);
+			TerrainViews.View close = TerrainViews.view(preset, x, z, 1.0F);
+			TerrainViews.write(close, "canyon_" + name + "_close");
+			TerrainViews.writeProfile(close, "canyon_" + name + "_profile");
+			TerrainViews.write(TerrainViews.view(preset, x, z, 4.0F), "canyon_" + name + "_wide");
+			return;
+		}
+	}
+
+	@Test
+	void plateauCanyons() throws Exception {
+		Preset preset = preset("badlands");
+		long place = TerrainViews.find(preset, 16.0F, (cell) -> (cell.terrain.includes(raccoonman.reterraforged.world.worldgen.terrain.TerrainType.PLATEAU) || cell.terrain.includes(raccoonman.reterraforged.world.worldgen.terrain.TerrainType.BADLANDS)) && cell.terrainRegionEdge > 0.9F);
+		float x = PosUtil.unpackLeft(place);
+		float z = PosUtil.unpackRight(place);
+		System.out.println("plateau at " + x + ", " + z);
+		TerrainViews.View close = TerrainViews.view(preset, x, z, 1.0F);
+		TerrainViews.write(close, "canyons_close");
+		TerrainViews.writeProfile(close, "canyons_profile");
+		TerrainViews.write(TerrainViews.view(preset, x, z, 3.0F), "canyons_wide");
+	}
+
+	@Test
+	void highPlateauCanyons() throws Exception {
+		Preset preset = preset("highlands");
+		Levels levels = TerrainViews.levels(preset);
+		long place = TerrainViews.find(preset, 16.0F, (cell) -> cell.terrain.includes(raccoonman.reterraforged.world.worldgen.terrain.TerrainType.PLATEAU) && cell.terrainRegionEdge > 0.5F && levels.scale(cell.height) > levels.waterLevel + 30);
+		if (place == Long.MIN_VALUE) {
+			System.out.println("no high plateau");
+			return;
+		}
+		float x = PosUtil.unpackLeft(place);
+		float z = PosUtil.unpackRight(place);
+		System.out.println("high plateau at " + x + ", " + z);
+		TerrainViews.View close = TerrainViews.view(preset, x, z, 1.0F);
+		TerrainViews.write(close, "high_canyons_close");
+		TerrainViews.writeProfile(close, "high_canyons_profile");
+		TerrainViews.write(TerrainViews.view(preset, x, z, 3.0F), "high_canyons_wide");
+	}
 }

@@ -33,6 +33,11 @@ public class RTFTranslationKeys {
 	public static final String GUI_SLIDER_BUTTE_DENSITY = resolve("gui.slider.butteDensity");
 	public static final String GUI_SLIDER_BUTTE_HEIGHT = resolve("gui.slider.butteHeight");
 	public static final String GUI_SLIDER_BUTTE_SIZE = resolve("gui.slider.butteSize");
+	public static final String GUI_LABEL_CANYONS = resolve("gui.label.canyons");
+	public static final String GUI_BUTTON_CANYONS = resolve("gui.button.canyons");
+	public static final String GUI_SLIDER_CANYON_DEPTH = resolve("gui.slider.canyonDepth");
+	public static final String GUI_SLIDER_CANYON_FREQUENCY = resolve("gui.slider.canyonFrequency");
+	public static final String GUI_SLIDER_CANYON_WIDTH = resolve("gui.slider.canyonWidth");
 
 	public static final String GUI_BUTTON_TRUE = resolve("gui.button.true");
 	public static final String GUI_BUTTON_FALSE = resolve("gui.button.false");

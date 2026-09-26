@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import raccoonman.reterraforged.data.preset.settings.Preset;
 import raccoonman.reterraforged.world.worldgen.cell.Cell;
+import raccoonman.reterraforged.world.worldgen.terrain.TerrainType;
 
 /**
  * Each landform is measured by generating the same place with it on and off.
@@ -90,9 +91,41 @@ public class LandformTest {
 	}
 
 	@Test
+	void canyonsOnlyCutPlateausAndStayDry() {
+		// a plateau area of the Badlands preset
+		TerrainViews.View with = TerrainViews.view(preset("badlands", (p) -> p.landforms().buttes.enabled = false), -640.0F, 80.0F, 3.0F);
+		TerrainViews.View without = TerrainViews.view(preset("badlands", (p) -> {
+			p.landforms().buttes.enabled = false;
+			p.landforms().canyons.enabled = false;
+		}), -640.0F, 80.0F, 3.0F);
+		int floor = with.levels().waterLevel + 3;
+		int cut = 0;
+		for (int x = 0; x < with.size(); x++) {
+			for (int z = 0; z < with.size(); z++) {
+				int depth = without.blockY(x, z) - with.blockY(x, z);
+				assertTrue(depth >= 0, "canyons raised the ground at " + x + ", " + z);
+				if (depth > 0) {
+					Cell cell = without.cell(x, z);
+					// low ground by the sea is relabelled coast after the landforms are shaped
+					boolean shore = cell.terrain == TerrainType.COAST || cell.terrain == TerrainType.BEACH;
+					assertTrue(shore || cell.terrain.includes(TerrainType.PLATEAU) || cell.terrain.includes(TerrainType.BADLANDS), "a canyon cut into " + cell.terrain);
+					assertTrue(with.blockY(x, z) >= floor - 1, "a canyon cut down to " + with.blockY(x, z) + " at " + x + ", " + z);
+				}
+				if (depth > 5) {
+					cut++;
+				}
+			}
+		}
+		float share = cut / (float) (with.size() * with.size());
+		System.out.printf("canyons cut %.1f%% of the area%n", share * 100.0F);
+		assertTrue(share > 0.01F && share < 0.4F, "canyons cut " + share);
+	}
+
+	@Test
 	void legacyPresetsHaveNoLandforms() {
 		for (String name : new String[] { "legacy_default", "beautiful", "huge_biomes", "lite", "vanillaish" }) {
 			assertTrue(!BuiltinPresetRenderTest.presets().get(name).get().landforms().buttes.enabled, name);
+			assertTrue(!BuiltinPresetRenderTest.presets().get(name).get().landforms().canyons.enabled, name);
 		}
 	}
 }

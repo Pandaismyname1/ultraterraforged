@@ -17,6 +17,11 @@ public record Landforms(List<Landform> landforms) implements Landform {
 		List<Landform> landforms = new ArrayList<>();
 		// each landform gets its own seed, whether or not the others are on
 		int buttesSeed = seed.next();
+		int canyonsSeed = seed.next();
+		// canyons cut first, so buttes can stand in them
+		if (settings.canyons.enabled) {
+			landforms.add(Canyons.make(canyonsSeed, settings.canyons, levels));
+		}
 		if (settings.buttes.enabled) {
 			landforms.add(Buttes.make(buttesSeed, settings.buttes, levels));
 		}

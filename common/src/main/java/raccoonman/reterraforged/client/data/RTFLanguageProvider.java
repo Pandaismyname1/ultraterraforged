@@ -72,6 +72,15 @@ public class RTFLanguageProvider {
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_BUTTE_HEIGHT), "How many blocks the tallest ones rise above the land around them");
 			this.add(RTFTranslationKeys.GUI_SLIDER_BUTTE_SIZE, "Size");
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_BUTTE_SIZE), "Scales how wide they are and how far apart they stand");
+			this.add(RTFTranslationKeys.GUI_LABEL_CANYONS, "Canyons");
+			this.add(RTFTranslationKeys.GUI_BUTTON_CANYONS, "Canyons");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_CANYONS), "Winding, branching dry canyons with walls stepped into ledges, cut into badlands and plateaus. With rock layers on, their walls show the bands of rock");
+			this.add(RTFTranslationKeys.GUI_SLIDER_CANYON_DEPTH, "Depth");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_CANYON_DEPTH), "How many blocks deep the main canyons cut; side canyons are about half as deep. They never cut below the sea");
+			this.add(RTFTranslationKeys.GUI_SLIDER_CANYON_FREQUENCY, "Frequency");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_CANYON_FREQUENCY), "How close together the canyons run");
+			this.add(RTFTranslationKeys.GUI_SLIDER_CANYON_WIDTH, "Width");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_CANYON_WIDTH), "How wide the canyons are");
 
 			this.add(RTFTranslationKeys.GUI_BUTTON_TRUE, "On");
 			this.add(RTFTranslationKeys.GUI_BUTTON_FALSE, "Off");

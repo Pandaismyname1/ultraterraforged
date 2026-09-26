@@ -630,6 +630,7 @@ public final class PresetOptions {
 	// Landforms
 
 	private static final Predicate<Preset> BUTTES = (preset) -> preset.landforms().buttes.enabled;
+	private static final Predicate<Preset> CANYONS = (preset) -> preset.landforms().canyons.enabled;
 
 	public static final Page LANDFORMS = Page.of("landforms", RTFTranslationKeys.GUI_LANDFORM_SETTINGS_TITLE,
 		Category.of("buttes", RTFTranslationKeys.GUI_LABEL_BUTTES,
@@ -654,6 +655,30 @@ public final class PresetOptions {
 				.range(0.5F, 2.5F)
 				.activeWhen(BUTTES)
 				.bind((p) -> p.landforms().buttes.size, (p, v) -> p.landforms().buttes.size = v)
+				.build()
+		),
+		Category.of("canyons", RTFTranslationKeys.GUI_LABEL_CANYONS,
+			BoolOption.builder("landforms.canyons.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_CANYONS)
+				.bind((p) -> p.landforms().canyons.enabled, (p, v) -> p.landforms().canyons.enabled = v)
+				.build(),
+			IntOption.builder("landforms.canyons.depth")
+				.translation(RTFTranslationKeys.GUI_SLIDER_CANYON_DEPTH)
+				.range(10, 100)
+				.activeWhen(CANYONS)
+				.bind((p) -> p.landforms().canyons.depth, (p, v) -> p.landforms().canyons.depth = v)
+				.build(),
+			FloatOption.builder("landforms.canyons.frequency")
+				.translation(RTFTranslationKeys.GUI_SLIDER_CANYON_FREQUENCY)
+				.range(0.2F, 3.0F)
+				.activeWhen(CANYONS)
+				.bind((p) -> p.landforms().canyons.frequency, (p, v) -> p.landforms().canyons.frequency = v)
+				.build(),
+			FloatOption.builder("landforms.canyons.width")
+				.translation(RTFTranslationKeys.GUI_SLIDER_CANYON_WIDTH)
+				.range(0.3F, 3.0F)
+				.activeWhen(CANYONS)
+				.bind((p) -> p.landforms().canyons.width, (p, v) -> p.landforms().canyons.width = v)
 				.build()
 		)
 	);
