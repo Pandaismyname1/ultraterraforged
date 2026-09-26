@@ -24,6 +24,8 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.server.IntegratedServer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.storage.LevelResource;
 import raccoonman.reterraforged.client.gui.PresetSharing;
@@ -146,7 +148,12 @@ public class ClientTest implements ClientModInitializer {
 				server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSource(new LoggingSource(this)), "rtf locate mountain_chain");
 			});
 		});
-		this.step("commands", () -> true, 100, () -> {
+		this.step("rock layers", () -> true, 100, () -> {
+			IntegratedServer server = mc.getSingleplayerServer();
+			BlockPos center = mc.player.blockPosition();
+			server.execute(() -> this.slice(server.overworld(), center));
+		});
+		this.step("commands", () -> true, 300, () -> {
 			IntegratedServer server = mc.getSingleplayerServer();
 			this.log("worldgen settings lifecycle: " + server.getWorldData().worldGenSettingsLifecycle());
 			this.worldFolder = server.getWorldPath(LevelResource.ROOT).toAbsolutePath().normalize().getFileName().toString();
@@ -234,6 +241,35 @@ public class ClientTest implements ClientModInitializer {
 			}
 		}
 		return String.join(", ", widgets);
+	}
+
+	// a vertical cut through the terrain, coloured like a map, and the rocks found in it
+	private void slice(ServerLevel level, BlockPos center) {
+		int width = 256;
+		int minY = level.getMinBuildHeight();
+		int height = level.getMaxBuildHeight() - minY;
+		java.util.Map<String, Integer> counts = new java.util.TreeMap<>();
+		try (NativeImage image = new NativeImage(width, height, true)) {
+			BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+			for (int dx = 0; dx < width; dx++) {
+				int x = center.getX() - width / 2 + dx;
+				for (int y = minY; y < minY + height; y++) {
+					pos.set(x, y, center.getZ());
+					net.minecraft.world.level.block.state.BlockState state = level.getBlockState(pos);
+					int color = state.isAir() ? 0xFF000000 : state.getMapColor(level, pos).col;
+					// NativeImage is ABGR
+					int abgr = 0xFF000000 | (color & 0xFF) << 16 | (color & 0xFF00) | (color >> 16 & 0xFF);
+					image.setPixelRGBA(dx, height - 1 - (y - minY), state.isAir() ? 0xFF201010 : abgr);
+					if (!state.isAir() && y >= 8) {
+						counts.merge(net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(state.getBlock()).getPath(), 1, Integer::sum);
+					}
+				}
+			}
+			image.writeToFile(this.out.resolve("slice.png"));
+		} catch (IOException e) {
+			this.log("slice failed: " + e);
+		}
+		this.log("blocks above y=8 in the slice: " + counts);
 	}
 
 	private String list(Path directory) {

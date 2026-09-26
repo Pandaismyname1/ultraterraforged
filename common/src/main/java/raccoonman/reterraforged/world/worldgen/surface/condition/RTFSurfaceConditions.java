@@ -1,6 +1,7 @@
 package raccoonman.reterraforged.world.worldgen.surface.condition;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import com.mojang.serialization.Codec;
@@ -28,6 +29,11 @@ public class RTFSurfaceConditions {
 		register("sediment", SedimentCondition.Source.CODEC);
 		register("river_bank", RiverBankCondition.Source.CODEC);
 		register("height_modification_detection", HeightModificationDetection.Source.CODEC);
+		register("any", AnyCondition.CODEC);
+	}
+
+	public static AnyCondition any(SurfaceRules.ConditionSource... conditions) {
+		return new AnyCondition(List.of(conditions));
 	}
 	
 	public static ModCondition modLoaded(String modId) {

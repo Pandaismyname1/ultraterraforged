@@ -57,6 +57,15 @@ public class PresetSurfaceRuleData {
     private static final SurfaceRules.RuleSource WATER = PresetSurfaceRuleData.makeStateRule(Blocks.WATER);
 
     private static final ResourceLocation STRATA_CACHE_ID = RTFCommon.location("default");
+    private static final int STRATA_VARIANTS = 100;
+    private static final int STRATA_MIN_THICKNESS = 3;
+    private static final int STRATA_MAX_THICKNESS = 14;
+    // how deep the bare rock of steep slopes stays plain stone when strata are kept off the surface
+    private static final int STRATA_PLAIN_DEPTH = 5;
+    // the top of the vanilla stone to deepslate transition
+    private static final int DEEPSLATE_TOP = 8;
+    // every block is at or above the bottom of the world
+    private static final SurfaceRules.ConditionSource NEVER = SurfaceRules.not(SurfaceRules.yBlockCheck(VerticalAnchor.bottom(), 0));
     
     private static SurfaceRules.RuleSource makeStateRule(Block block) {
         return SurfaceRules.state(block.defaultBlockState());
@@ -71,8 +80,6 @@ public class PresetSurfaceRuleData {
     	SurfaceSettings surfaceSettings = preset.surface();
     	SurfaceSettings.Erosion erosion = surfaceSettings.erosion();
 
-    	int strataBufferAmount = 5;
-    	
     	SurfaceRules.ConditionSource y4BelowSurface = SurfaceRules.stoneDepthCheck(3, false, CaveSurface.FLOOR);
         SurfaceRules.ConditionSource below97 = SurfaceRules.yBlockCheck(VerticalAnchor.absolute(97), 2);
         SurfaceRules.ConditionSource below256 = SurfaceRules.yBlockCheck(VerticalAnchor.absolute(256), 0);
@@ -88,8 +95,13 @@ public class PresetSurfaceRuleData {
         SurfaceRules.ConditionSource frozenOcean = SurfaceRules.isBiome(Biomes.FROZEN_OCEAN, Biomes.DEEP_FROZEN_OCEAN);
         SurfaceRules.ConditionSource badlands = SurfaceRules.isBiome(Biomes.BADLANDS, Biomes.ERODED_BADLANDS, Biomes.WOODED_BADLANDS);
         SurfaceRules.ConditionSource steep = SurfaceRules.steep();
-        SurfaceRules.ConditionSource erodedRock = RTFSurfaceConditions.steepness(erosion.rockSteepness, noise.getOrThrow(PresetSurfaceNoise.STEEPNESS_VARIANCE));
-        SurfaceRules.RuleSource erodedDirt = makeErodedDirtRule(noise, erosion);
+        // steep slopes wear down to bare rock and coarse dirt, unless the preset turns erosion off
+        // (and everything above the rock line, which the default presets set above the build limit)
+        SurfaceRules.ConditionSource erodedRock = miscellaneousSettings.erosionDecorator ? RTFSurfaceConditions.any(
+        	RTFSurfaceConditions.steepness(erosion.rockSteepness, noise.getOrThrow(PresetSurfaceNoise.STEEPNESS_VARIANCE)),
+        	RTFSurfaceConditions.height(noise.getOrThrow(PresetSurfaceNoise.ERODED_ROCK), noise.getOrThrow(PresetSurfaceNoise.HEIGHT_VARIANCE))
+        ) : NEVER;
+        SurfaceRules.RuleSource erodedDirt = miscellaneousSettings.erosionDecorator ? makeErodedDirtRule(noise, erosion) : SurfaceRules.ifTrue(NEVER, COARSE_DIRT);
         SurfaceRules.RuleSource grass = SurfaceRules.sequence(
         	erodedDirt,
         	SurfaceRules.ifTrue(
@@ -598,14 +610,7 @@ public class PresetSurfaceRuleData {
         				gravel
         			)
         		)
-        	)//,
-//        	SurfaceRules.ifTrue(
-//            	erodedRock,
-//            	SurfaceRules.ifTrue(
-//            		SurfaceRules.stoneDepthCheck(strataBufferAmount, false, CaveSurface.FLOOR),
-//            		makeStrataRule(strataBufferAmount, miscellaneousSettings, noise)
-//            	)
-//            )
+        	)
         );
         List<SurfaceRules.RuleSource> list = Lists.newArrayList(
         	SurfaceRules.ifTrue(
@@ -615,10 +620,21 @@ public class PresetSurfaceRuleData {
         	SurfaceRules.ifTrue(
         		SurfaceRules.abovePreliminarySurface(),
         		surface
-        	),
-//        	makeStrataRule(1, miscellaneousSettings, noise),
-        	SurfaceRules.ifTrue(SurfaceRules.verticalGradient("deepslate", VerticalAnchor.absolute(0), VerticalAnchor.absolute(8)), DEEPSLATE)
+        	)
         );
+        if (miscellaneousSettings.strataDecorator) {
+        	// whatever stone the surface left, down to where deepslate takes over
+        	SurfaceRules.RuleSource strata = makeStrataRule(miscellaneousSettings, noise);
+        	if (miscellaneousSettings.plainStoneErosion) {
+        		// the rock laid bare on steep slopes stays plain stone; the layers only show deeper in
+        		strata = SurfaceRules.sequence(
+        			SurfaceRules.ifTrue(erodedRock, SurfaceRules.ifTrue(SurfaceRules.stoneDepthCheck(STRATA_PLAIN_DEPTH, false, CaveSurface.FLOOR), STONE)),
+        			strata
+        		);
+        	}
+        	list.add(strata);
+        }
+        list.add(SurfaceRules.ifTrue(SurfaceRules.verticalGradient("deepslate", VerticalAnchor.absolute(0), VerticalAnchor.absolute(DEEPSLATE_TOP)), DEEPSLATE));
         SurfaceRules.RuleSource rules = SurfaceRules.sequence(list.toArray(SurfaceRules.RuleSource[]::new));
         return rules;
     }
@@ -673,23 +689,35 @@ public class PresetSurfaceRuleData {
     	);
     }
     
-	private static SurfaceRules.RuleSource makeStrataRule(int buffer, MiscellaneousSettings miscellaneousSettings, HolderGetter<Noise> noise) {
-		List<StrataRule.Layer> layers = new ArrayList<>();
-		
-		Holder<Noise> depth = noise.getOrThrow(PresetStrataNoise.STRATA_DEPTH);
-		layers.add(new StrataRule.Layer(RTFBlockTags.SOIL, depth, 3, 0, 1, 0.1F, 0.25F));
-		layers.add(new StrataRule.Layer(RTFBlockTags.SEDIMENT, depth, 3, 0, 2, 0.05F, 0.15F));
-		layers.add(new StrataRule.Layer(RTFBlockTags.CLAY, depth, 3, 0, 2, 0.05F, 0.1F));
-		layers.add(new StrataRule.Layer(miscellaneousSettings.rockTag(), depth, 3, 10, 30, 0.1F, 1.5F));
-		return new StrataRule(STRATA_CACHE_ID, buffer, 100, noise.getOrThrow(PresetSurfaceNoise.STRATA_REGION), layers);
+	private static SurfaceRules.RuleSource makeStrataRule(MiscellaneousSettings miscellaneousSettings, HolderGetter<Noise> noise) {
+		return new StrataRule(
+			STRATA_CACHE_ID,
+			noise.getOrThrow(PresetStrataNoise.STRATA_SELECTOR),
+			noise.getOrThrow(PresetStrataNoise.STRATA_OFFSET),
+			noise.getOrThrow(PresetStrataNoise.STRATA_THICKNESS),
+			miscellaneousSettings.rockTag(),
+			RTFBlockTags.STRATA_EXCLUDED,
+			STRATA_VARIANTS,
+			STRATA_MIN_THICKNESS,
+			STRATA_MAX_THICKNESS,
+			DEEPSLATE_TOP
+		);
 	}
 
+    // high, steep ground loses its soil: coarse dirt on the steeper slopes, loose gravel (scree) on the gentler ones
     private static SurfaceRules.RuleSource makeErodedDirtRule(HolderGetter<Noise> noise, SurfaceSettings.Erosion settings) {
+    	SurfaceRules.ConditionSource high = RTFSurfaceConditions.height(noise.getOrThrow(PresetSurfaceNoise.ERODED_DIRT), noise.getOrThrow(PresetSurfaceNoise.HEIGHT_VARIANCE));
     	return SurfaceRules.ifTrue(
-    		RTFSurfaceConditions.steepness(settings.dirtSteepness, noise.getOrThrow(PresetSurfaceNoise.STEEPNESS_VARIANCE)),
-    		SurfaceRules.ifTrue(
-    			RTFSurfaceConditions.height(noise.getOrThrow(PresetSurfaceNoise.ERODED_DIRT), noise.getOrThrow(PresetSurfaceNoise.HEIGHT_VARIANCE)),
-    			COARSE_DIRT
+    		high,
+    		SurfaceRules.sequence(
+    			SurfaceRules.ifTrue(
+    				RTFSurfaceConditions.steepness(settings.dirtSteepness, noise.getOrThrow(PresetSurfaceNoise.STEEPNESS_VARIANCE)),
+    				COARSE_DIRT
+    			),
+    			SurfaceRules.ifTrue(
+    				RTFSurfaceConditions.steepness(settings.screeSteepness, noise.getOrThrow(PresetSurfaceNoise.STEEPNESS_VARIANCE)),
+    				SurfaceRules.sequence(SurfaceRules.ifTrue(SurfaceRules.ON_CEILING, STONE), GRAVEL)
+    			)
     		)
     	);
     }

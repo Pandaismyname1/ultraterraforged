@@ -13,7 +13,6 @@ import net.minecraft.world.level.levelgen.SurfaceRules;
 import raccoonman.reterraforged.compat.terrablender.TBSurfaceRules;
 import raccoonman.reterraforged.platform.RegistryUtil;
 import raccoonman.reterraforged.world.worldgen.noise.module.Noise;
-import raccoonman.reterraforged.world.worldgen.surface.rule.StrataRule.Layer;
 
 public class RTFSurfaceRules {
 
@@ -25,10 +24,6 @@ public class RTFSurfaceRules {
 	
 	public static LayeredSurfaceRule layered(TagKey<LayeredSurfaceRule.Layer> layers) {
 		return new LayeredSurfaceRule(layers);
-	}
-	
-	public static StrataRule strata(ResourceLocation cacheId, int buffer, int iterations, Holder<Noise> selector, List<Layer> layers) {
-		return new StrataRule(cacheId, buffer, iterations, selector, layers);
 	}
 	
 	public static NoiseRule noise(Holder<Noise> noise, List<Pair<Float, SurfaceRules.RuleSource>> rules) {

@@ -211,27 +211,61 @@ public final class PresetOptions {
 
 	// Surface
 
+	private static final Predicate<Preset> EROSION = (preset) -> preset.miscellaneous().erosionDecorator;
+	private static final Predicate<Preset> STRATA = (preset) -> preset.miscellaneous().strataDecorator;
+
 	public static final Page SURFACE = Page.of("surface", RTFTranslationKeys.GUI_SURFACE_SETTINGS_TITLE,
+		Category.of("strata", RTFTranslationKeys.GUI_LABEL_STRATA,
+			BoolOption.builder("miscellaneous.strataDecorator")
+				.translation(RTFTranslationKeys.GUI_BUTTON_STRATA_DECORATOR)
+				.bind((p) -> p.miscellaneous().strataDecorator, (p, v) -> p.miscellaneous().strataDecorator = v)
+				.build(),
+			IntOption.builder("miscellaneous.strataRegionSize")
+				.translation(RTFTranslationKeys.GUI_SLIDER_STRATA_REGION_SIZE)
+				.range(50, 1000)
+				.activeWhen(STRATA)
+				.bind((p) -> p.miscellaneous().strataRegionSize, (p, v) -> p.miscellaneous().strataRegionSize = v)
+				.build(),
+			BoolOption.builder("miscellaneous.oreCompatibleStoneOnly")
+				.translation(RTFTranslationKeys.GUI_BUTTON_ORE_COMPATIBLE_STONE_ONLY)
+				.activeWhen(STRATA)
+				.bind((p) -> p.miscellaneous().oreCompatibleStoneOnly, (p, v) -> p.miscellaneous().oreCompatibleStoneOnly = v)
+				.build(),
+			BoolOption.builder("miscellaneous.plainStoneErosion")
+				.translation(RTFTranslationKeys.GUI_BUTTON_PLAIN_STONE_EROSION)
+				.activeWhen(STRATA)
+				.activeWhen(EROSION)
+				.bind((p) -> p.miscellaneous().plainStoneErosion, (p, v) -> p.miscellaneous().plainStoneErosion = v)
+				.build()
+		),
 		Category.of("erosion", RTFTranslationKeys.GUI_LABEL_SURFACE_EROSION,
+			BoolOption.builder("miscellaneous.erosionDecorator")
+				.translation(RTFTranslationKeys.GUI_BUTTON_EROSION_DECORATOR)
+				.bind((p) -> p.miscellaneous().erosionDecorator, (p, v) -> p.miscellaneous().erosionDecorator = v)
+				.build(),
 			IntOption.builder("surface.erosion.rockVariance")
 				.translation(RTFTranslationKeys.GUI_SLIDER_ROCK_VARIANCE)
 				.range(0, 255)
 				.bind((p) -> p.surface().erosion().rockVariance, (p, v) -> p.surface().erosion().rockVariance = v)
+				.activeWhen(EROSION)
 				.build(),
 			IntOption.builder("surface.erosion.rockMin")
 				.translation(RTFTranslationKeys.GUI_SLIDER_ROCK_MIN)
 				.range(-1024, 1024)
 				.bind((p) -> p.surface().erosion().rockMin, (p, v) -> p.surface().erosion().rockMin = v)
+				.activeWhen(EROSION)
 				.build(),
 			IntOption.builder("surface.erosion.dirtVariance")
 				.translation(RTFTranslationKeys.GUI_SLIDER_DIRT_VARIANCE)
 				.range(0, 255)
 				.bind((p) -> p.surface().erosion().dirtVariance, (p, v) -> p.surface().erosion().dirtVariance = v)
+				.activeWhen(EROSION)
 				.build(),
 			IntOption.builder("surface.erosion.dirtMin")
 				.translation(RTFTranslationKeys.GUI_SLIDER_DIRT_MIN)
 				.range(-1024, 1024)
 				.bind((p) -> p.surface().erosion().dirtMin, (p, v) -> p.surface().erosion().dirtMin = v)
+				.activeWhen(EROSION)
 				.build(),
 			// steepness thresholds must stay ordered scree <= dirt <= rock
 			FloatOption.builder("surface.erosion.rockSteepness")
@@ -239,6 +273,7 @@ public final class PresetOptions {
 				.range(0.0F, 1.0F)
 				.atLeast((p) -> p.surface().erosion().dirtSteepness)
 				.bind((p) -> p.surface().erosion().rockSteepness, (p, v) -> p.surface().erosion().rockSteepness = v)
+				.activeWhen(EROSION)
 				.build(),
 			FloatOption.builder("surface.erosion.dirtSteepness")
 				.translation(RTFTranslationKeys.GUI_SLIDER_DIRT_STEEPNESS)
@@ -246,12 +281,14 @@ public final class PresetOptions {
 				.atLeast((p) -> p.surface().erosion().screeSteepness)
 				.atMost((p) -> p.surface().erosion().rockSteepness)
 				.bind((p) -> p.surface().erosion().dirtSteepness, (p, v) -> p.surface().erosion().dirtSteepness = v)
+				.activeWhen(EROSION)
 				.build(),
 			FloatOption.builder("surface.erosion.screeSteepness")
 				.translation(RTFTranslationKeys.GUI_SLIDER_SCREE_STEEPNESS)
 				.range(0.0F, 1.0F)
 				.atMost((p) -> p.surface().erosion().dirtSteepness)
 				.bind((p) -> p.surface().erosion().screeSteepness, (p, v) -> p.surface().erosion().screeSteepness = v)
+				.activeWhen(EROSION)
 				.build(),
 			FloatOption.builder("surface.erosion.snowSteepness")
 				.translation(RTFTranslationKeys.GUI_SLIDER_SNOW_STEEPNESS)
@@ -554,30 +591,6 @@ public final class PresetOptions {
 			BoolOption.builder("miscellaneous.smoothLayerDecorator")
 				.translation(RTFTranslationKeys.GUI_BUTTON_SMOOTH_LAYER_DECORATOR)
 				.bind((p) -> p.miscellaneous().smoothLayerDecorator, (p, v) -> p.miscellaneous().smoothLayerDecorator = v)
-				.build(),
-			IntOption.builder("miscellaneous.strataRegionSize")
-				.translation(RTFTranslationKeys.GUI_SLIDER_STRATA_REGION_SIZE)
-				.range(50, 1000)
-				.bind((p) -> p.miscellaneous().strataRegionSize, (p, v) -> p.miscellaneous().strataRegionSize = v)
-				.build(),
-			BoolOption.builder("miscellaneous.strataDecorator")
-				.translation(RTFTranslationKeys.GUI_BUTTON_STRATA_DECORATOR)
-				.bind((p) -> p.miscellaneous().strataDecorator, (p, v) -> p.miscellaneous().strataDecorator = v)
-				.build(),
-			BoolOption.builder("miscellaneous.oreCompatibleStoneOnly")
-				.translation(RTFTranslationKeys.GUI_BUTTON_ORE_COMPATIBLE_STONE_ONLY)
-				.bind((p) -> p.miscellaneous().oreCompatibleStoneOnly, (p, v) -> p.miscellaneous().oreCompatibleStoneOnly = v)
-				.hidden()
-				.build(),
-			BoolOption.builder("miscellaneous.erosionDecorator")
-				.translation(RTFTranslationKeys.GUI_BUTTON_EROSION_DECORATOR)
-				.bind((p) -> p.miscellaneous().erosionDecorator, (p, v) -> p.miscellaneous().erosionDecorator = v)
-				.hidden()
-				.build(),
-			BoolOption.builder("miscellaneous.plainStoneErosion")
-				.translation(RTFTranslationKeys.GUI_BUTTON_PLAIN_STONE_EROSION)
-				.bind((p) -> p.miscellaneous().plainStoneErosion, (p, v) -> p.miscellaneous().plainStoneErosion = v)
-				.hidden()
 				.build(),
 			BoolOption.builder("miscellaneous.naturalSnowDecorator")
 				.translation(RTFTranslationKeys.GUI_BUTTON_NATURAL_SNOW_DECORATOR)

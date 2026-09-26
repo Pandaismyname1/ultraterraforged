@@ -23,7 +23,7 @@ import net.minecraft.world.level.levelgen.SurfaceSystem;
 import raccoonman.reterraforged.RTFCommon;
 import raccoonman.reterraforged.compat.terrablender.TBCompat;
 import raccoonman.reterraforged.world.worldgen.surface.RTFSurfaceSystem;
-import raccoonman.reterraforged.world.worldgen.surface.rule.StrataRule.Strata;
+import raccoonman.reterraforged.world.worldgen.surface.rule.StrataStack;
 import terrablender.worldgen.surface.NamespacedSurfaceRuleSource;
 
 @Mixin(SurfaceSystem.class)
@@ -31,7 +31,7 @@ import terrablender.worldgen.surface.NamespacedSurfaceRuleSource;
 class MixinSurfaceSystem {
 	private static final ResourceLocation STRATA_RANDOM = RTFCommon.location("strata");
 	private RandomSource strataRandom;
-	private Map<ResourceLocation, List<Strata>> strata;
+	private Map<ResourceLocation, List<StrataStack>> strata;
 	
 	@Inject(
 		at = @At("TAIL"),
@@ -58,7 +58,7 @@ class MixinSurfaceSystem {
 		return source;
 	}
 
-	public List<Strata> reterraforged$RTFSurfaceSystem$getOrCreateStrata(ResourceLocation cacheId, Function<RandomSource, List<Strata>> factory) {
+	public List<StrataStack> reterraforged$RTFSurfaceSystem$getOrCreateStrata(ResourceLocation cacheId, Function<RandomSource, List<StrataStack>> factory) {
 		return this.strata.computeIfAbsent(cacheId, (k) -> {
 			return factory.apply(this.strataRandom.fork());
 		});

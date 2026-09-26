@@ -1,223 +1,161 @@
 package raccoonman.reterraforged.world.worldgen.surface.rule;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.jetbrains.annotations.Nullable;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.FallingBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.SurfaceRules.Context;
-import raccoonman.reterraforged.tags.RTFBlockTags;
-import raccoonman.reterraforged.world.worldgen.GeneratorContext;
+import raccoonman.reterraforged.RTFCommon;
 import raccoonman.reterraforged.world.worldgen.RTFRandomState;
-import raccoonman.reterraforged.world.worldgen.heightmap.Levels;
-import raccoonman.reterraforged.world.worldgen.noise.NoiseUtil;
 import raccoonman.reterraforged.world.worldgen.noise.module.Noise;
-import raccoonman.reterraforged.world.worldgen.noise.module.Noises;
 import raccoonman.reterraforged.world.worldgen.surface.RTFSurfaceSystem;
-import raccoonman.reterraforged.world.worldgen.surface.rule.StrataRule.Layer;
-import raccoonman.reterraforged.world.worldgen.tile.Tile;
-import raccoonman.reterraforged.world.worldgen.util.PosUtil;
 
-public record StrataRule(ResourceLocation cacheId, int buffer, int iterations, Holder<Noise> selector, List<Layer> layers) implements SurfaceRules.RuleSource {
+/**
+ * Replaces stone with layers of different rock, like the bands in a canyon wall. The layers run roughly level but
+ * rise, fall and thicken gently across the land, and each strata region has its own sequence of rocks.
+ *
+ * @param selector picks the region's stack, values from its minimum to its maximum spread over all stacks
+ * @param offset how far the layers are raised or lowered at a position, in blocks
+ * @param thickness how much the layers are stretched at a position, 1 keeps them as generated
+ * @param materials the rocks to layer; mods' stones join through the vanilla stone tags this tag includes
+ * @param excluded rocks never to layer, even though a mod tagged them as stone
+ * @param minY below this the rule leaves the stone alone, e.g. for the deepslate transition
+ */
+public record StrataRule(ResourceLocation cacheId, Holder<Noise> selector, Holder<Noise> offset, Holder<Noise> thickness, TagKey<Block> materials, TagKey<Block> excluded, int variants, int minThickness, int maxThickness, int minY) implements SurfaceRules.RuleSource {
 	public static final Codec<StrataRule> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 		ResourceLocation.CODEC.fieldOf("cache_id").forGetter(StrataRule::cacheId),
-		Codec.INT.fieldOf("buffer").forGetter(StrataRule::buffer),
-		Codec.INT.fieldOf("iterations").forGetter(StrataRule::iterations),
 		Noise.CODEC.fieldOf("selector").forGetter(StrataRule::selector),
-		Layer.CODEC.listOf().fieldOf("layers").forGetter(StrataRule::layers)
+		Noise.CODEC.fieldOf("offset").forGetter(StrataRule::offset),
+		Noise.CODEC.fieldOf("thickness").forGetter(StrataRule::thickness),
+		TagKey.hashedCodec(Registries.BLOCK).fieldOf("materials").forGetter(StrataRule::materials),
+		TagKey.hashedCodec(Registries.BLOCK).fieldOf("excluded").forGetter(StrataRule::excluded),
+		Codec.intRange(1, 1024).fieldOf("variants").forGetter(StrataRule::variants),
+		Codec.intRange(1, 256).fieldOf("min_thickness").forGetter(StrataRule::minThickness),
+		Codec.intRange(1, 256).fieldOf("max_thickness").forGetter(StrataRule::maxThickness),
+		Codec.INT.fieldOf("min_y").forGetter(StrataRule::minY)
 	).apply(instance, StrataRule::new));
 
+	// how far the stacks reach past the build limits, so offset and stretched layers never run out
+	private static final int MARGIN = 128;
+	// layers are stretched around this height, so they stay put near sea level and tilt gently above and below
+	private static final int PIVOT_Y = 64;
+
 	@Override
-	public Rule apply(Context ctx) {
-		if((Object) ctx.system instanceof RTFSurfaceSystem rtfSurfaceSystem) {
-			return new Rule(ctx, rtfSurfaceSystem.getOrCreateStrata(this.cacheId, this::generate));
-		} else {
-			throw new IllegalStateException();
+	public SurfaceRules.SurfaceRule apply(Context ctx) {
+		if (!((Object) ctx.system instanceof RTFSurfaceSystem surfaceSystem) || !((Object) ctx.randomState instanceof RTFRandomState randomState)) {
+			throw new IllegalStateException("Strata need ReTerraForged's surface system");
 		}
+		int height = ctx.chunk.getMaxBuildHeight() - this.minY + MARGIN * 2;
+		List<StrataStack> stacks = surfaceSystem.getOrCreateStrata(this.cacheId, (random) -> this.generate(random, height));
+		if (stacks.isEmpty()) {
+			return (x, y, z) -> null;
+		}
+		// the noises are seeded by the world, so every world has its own regions and folds
+		return new Rule(stacks, randomState.wrap(this.selector.value()), randomState.wrap(this.offset.value()), randomState.wrap(this.thickness.value()));
 	}
 
 	@Override
 	public KeyDispatchDataCodec<StrataRule> codec() {
 		return new KeyDispatchDataCodec<>(CODEC);
 	}
-	
-	public List<Strata> generate(RandomSource random) {
-		List<Strata> strata = new ArrayList<>(this.iterations);
-		for(int i = 0; i < this.iterations; i++) {
-			strata.add(this.generateStrata(random));
+
+	private List<StrataStack> generate(RandomSource random, int height) {
+		List<BlockState> materials = this.findMaterials();
+		RTFCommon.LOGGER.info("Rock layers use {}", materials.stream().map((state) -> BuiltInRegistries.BLOCK.getKey(state.getBlock()).toString()).toList());
+		if (materials.isEmpty()) {
+			return List.of();
 		}
-		return strata;
-	}
-	
-	private Strata generateStrata(RandomSource random) {
-		List<Stratum> stratum = new ArrayList<>();
-		for(Layer layer : this.layers) {
-			HolderSet<Block> materials = BuiltInRegistries.BLOCK.getTag(layer.materials()).orElseThrow();
-			int layerCount = layer.layers(random.nextFloat());
-	        int lastIndex = -1;
-	        for (int i = 0; i < layerCount; i++) {
-	            int attempts = layer.attempts();
-	            int index = random.nextInt(materials.size());
-	            while (--attempts >= 0 && index == lastIndex) {
-	                index = random.nextInt(materials.size());
-	            }
-	            if (index != lastIndex) {
-	                lastIndex = index;
-	                BlockState material = materials.get(index).value().defaultBlockState();
-	                float depth = layer.depth(random.nextFloat());
-	                stratum.add(new Stratum(material, Noises.mul(Noises.perlin(random.nextInt(), 128, 3), depth)));
-	            }
-	        }
+		List<StrataStack> stacks = new ArrayList<>(this.variants);
+		for (int i = 0; i < this.variants; i++) {
+			// layers can be stretched to half their thickness at the least, see PresetStrataNoise
+			stacks.add(StrataStack.generate(random, materials, height * 2, this.minThickness, Math.max(this.minThickness, this.maxThickness)));
 		}
-		return new Strata(stratum);
+		return stacks;
 	}
-	
-	public class Rule implements SurfaceRules.SurfaceRule {
-		private Context context;
-		private List<Strata> strataEntries;
-		private Levels levels;
-		private Tile.Chunk chunk;
-		private Strata strata;
+
+	/**
+	 * Every block in the materials tag that can stand in for stone. Mods tag all sorts of things as stone, so skip what
+	 * would break or look wrong in a thick layer. Sorted by id, so the layers don't depend on the order mods load in.
+	 */
+	private List<BlockState> findMaterials() {
+		Set<Block> blocks = new TreeSet<>(Comparator.comparing((Block block) -> BuiltInRegistries.BLOCK.getKey(block)));
+		BuiltInRegistries.BLOCK.getTag(this.materials).ifPresent((tag) -> tag.forEach((holder) -> blocks.add(holder.value())));
+		List<BlockState> materials = new ArrayList<>();
+		for (Block block : blocks) {
+			BlockState state = block.defaultBlockState();
+			if (state.is(this.excluded) || block instanceof FallingBlock || block instanceof EntityBlock || !state.isCollisionShapeFullBlock(EmptyBlockGetter.INSTANCE, BlockPos.ZERO)) {
+				continue;
+			}
+			materials.add(state);
+		}
+		return materials;
+	}
+
+	private class Rule implements SurfaceRules.SurfaceRule {
+		private final List<StrataStack> stacks;
+		private final Noise selector;
+		private final Noise offset;
+		private final Noise thickness;
+		private final float selectorMin;
+		private final float selectorRange;
 		@Nullable
-		private Stratum bufferMaterial;
-		private int height;
-		private int index;
-		private float[] depthBuffer;
-		private long lastXZ;
-		
-		public Rule(Context context, List<Strata> strataEntries) {
-			this.context = context;
-			this.strataEntries = strataEntries;
-			
-			if((Object) context.randomState instanceof RTFRandomState rtfRandomState) {
-				ChunkPos chunkPos = context.chunk.getPos();
-				
-				GeneratorContext generatorContext = rtfRandomState.generatorContext();
-				this.levels = generatorContext.levels;
-				this.chunk = generatorContext.cache.provideChunk(chunkPos.x, chunkPos.z);
-			} else {
-				throw new IllegalStateException();
-			}
-		}
-		
-	    private Strata selectStrata(int x, int z) {
-	    	float value = StrataRule.this.selector.value().compute(x, z, 0);
-	        int index = (int)(value * this.strataEntries.size());
-	        index = Math.min(this.strataEntries.size() - 1, index);
-	        return this.strataEntries.get(index);
-	    }
+		private StrataStack stack;
+		private float columnOffset;
+		private float columnThickness;
+		private int lastX = Integer.MIN_VALUE;
+		private int lastZ = Integer.MIN_VALUE;
 
-		private void update(int x, int z) {
-			Strata strata = this.selectStrata(x, z);
-			
-			if(this.strata != strata) {
-				this.strata = strata;
-				
-				for(Stratum stratum : this.strata.stratum()) {
-					if(stratum.state().is(RTFBlockTags.ROCK)) {
-						this.bufferMaterial = stratum;
-						break;
-					}	
-				}
-			}
-			
-			List<Stratum> stratum = this.strata.stratum();
-			int stratumCount = stratum.size();
-			
-			if(this.depthBuffer == null || this.depthBuffer.length < stratumCount) {
-				this.depthBuffer = new float[stratumCount];
-			}
-
-			float sum = 0.0F;
-			for(int i = 0; i < stratumCount; i++) {
-				float depth = stratum.get(i).depth().compute(x, z, 0);
-				sum += depth;
-				this.depthBuffer[i] = depth;
-			}
-			
-			this.height = this.levels.scale(this.chunk.getCell(x, z).height);
-			
-			this.index = 0;
-			
-			int dy = this.height;
-			int stoneStart = this.height - this.context.stoneDepthAbove + 1;
-			for(int i = 0; i < stratumCount; i++) {
-				this.depthBuffer[i] = dy -= NoiseUtil.round((this.depthBuffer[i] / sum) * this.height);
-				
-//				if(dy <= stoneStart && this.index == 0) {
-//					this.index = i;
-//				}
-			}
+		Rule(List<StrataStack> stacks, Noise selector, Noise offset, Noise thickness) {
+			this.stacks = stacks;
+			this.selector = selector;
+			this.offset = offset;
+			this.thickness = thickness;
+			this.selectorMin = selector.minValue();
+			this.selectorRange = Math.max(1.0E-6F, selector.maxValue() - selector.minValue());
 		}
-		
+
+		private void updateColumn(int x, int z) {
+			float select = (this.selector.compute(x, z, 0) - this.selectorMin) / this.selectorRange;
+			int index = Math.min(this.stacks.size() - 1, Math.max(0, (int) (select * this.stacks.size())));
+			this.stack = this.stacks.get(index);
+			this.columnOffset = this.offset.compute(x, z, 0);
+			this.columnThickness = Math.max(0.5F, this.thickness.compute(x, z, 0));
+		}
+
 		@Override
 		public BlockState tryApply(int x, int y, int z) {
-			long packedPos = PosUtil.pack(x, z);
-			if(this.lastXZ != packedPos) {
-				this.update(x, z);
-				this.lastXZ = packedPos;
+			if (y < StrataRule.this.minY) {
+				return null;
 			}
-			
-			if(StrataRule.this.buffer != 0 && y > this.height - StrataRule.this.buffer) {
-				return this.bufferMaterial.state();
+			if (x != this.lastX || z != this.lastZ) {
+				this.updateColumn(x, z);
+				this.lastX = x;
+				this.lastZ = z;
 			}
-			
-			List<Stratum> stratum = this.strata.stratum;
-			while(y < this.depthBuffer[this.index] && this.index + 1 < stratum.size()) {
-				this.index++;
-			}
-			return stratum.get(this.index).state;
+			int minY = StrataRule.this.minY;
+			float fromPivot = y + this.columnOffset - PIVOT_Y;
+			return this.stack.at(MARGIN + (PIVOT_Y - minY) + fromPivot / this.columnThickness);
 		}
-	}
-	
-	public record Buffer(int size, TagKey<Block> materials) {
-		public static final Codec<Buffer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-			Codec.INT.fieldOf("size").forGetter(Buffer::size),
-			TagKey.hashedCodec(Registries.BLOCK).fieldOf("materials").forGetter(Buffer::materials)
-		).apply(instance, Buffer::new));
-	}
-	
-	public record Strata(List<Stratum> stratum) {
-	}
-	
-	public record Stratum(BlockState state, Noise depth) {
-	}
-	
-	public record Layer(TagKey<Block> materials, Holder<Noise> depth, int attempts, int minLayers, int maxLayers, float minDepth, float maxDepth) {
-		public static final Codec<Layer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-			TagKey.hashedCodec(Registries.BLOCK).fieldOf("materials").forGetter(Layer::materials),
-			Noise.CODEC.fieldOf("depth").forGetter(Layer::depth),
-			Codec.INT.fieldOf("attempts").forGetter(Layer::attempts),
-			Codec.INT.fieldOf("min_layers").forGetter(Layer::minLayers),
-			Codec.INT.fieldOf("max_layers").forGetter(Layer::maxLayers),
-			Codec.FLOAT.fieldOf("min_depth").forGetter(Layer::minDepth),
-			Codec.FLOAT.fieldOf("max_depth").forGetter(Layer::maxDepth)
-		).apply(instance, Layer::new));
-		
-        public int layers(float f) {
-            int range = this.maxLayers - this.minLayers;
-            return this.minLayers + NoiseUtil.round(f * range);
-        }
-        
-        public float depth(float f) {
-            float range = this.maxDepth - this.minDepth;
-            return this.minDepth + f * range;
-        }
 	}
 }

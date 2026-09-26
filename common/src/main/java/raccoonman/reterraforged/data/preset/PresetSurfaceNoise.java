@@ -40,8 +40,6 @@ public class PresetSurfaceNoise {
 	public static final ResourceKey<Noise> ICEBERG_SHALLOW_DOWN = createKey("iceberg/shallow/down");
 	public static final ResourceKey<Noise> ICEBERG_SHALLOW_TOP = createKey("iceberg/shallow/top");
 
-	public static final ResourceKey<Noise> STRATA_REGION = createKey("strata/region");
-	public static final ResourceKey<Noise> STRATA_DEPTH = createKey("strata/depth");
 	
 	public static final int GENERATOR_RESOURCE_SEED_OFFSET = 746382634;
 	
@@ -72,8 +70,6 @@ public class PresetSurfaceNoise {
 		registerIceberg(ctx, ICEBERG_DEEP_SHAPE, ICEBERG_DEEP_MASK, ICEBERG_DEEP_FADE_DOWN, ICEBERG_DEEP_FADE_UP, ICEBERG_DEEP_UP, ICEBERG_DEEP_DOWN, ICEBERG_DEEP_TOP, scaling, 30, 30, 0);
 		registerIceberg(ctx, ICEBERG_SHALLOW_SHAPE, ICEBERG_SHALLOW_MASK, ICEBERG_SHALLOW_FADE_DOWN, ICEBERG_SHALLOW_FADE_UP, ICEBERG_SHALLOW_UP, ICEBERG_SHALLOW_DOWN, ICEBERG_SHALLOW_TOP, scaling, 20, 15, 6);
 
-		ctx.register(STRATA_REGION, makeStrataRegion(miscellaneousSettings.strataRegionSize));
-		ctx.register(STRATA_DEPTH, makeStrataDepth());
 	}
 	
 	private static Noise makeErosion(int scale, int bias) {
@@ -143,17 +139,6 @@ public class PresetSurfaceNoise {
 		Noise top = Noises.perlinRidge(seed++, 25, 2);
 		top = Noises.mul(top, scaling.blocks(3));
 		ctx.register(topKey, Noises.add(top, scaling.blocks(2)));
-	}
-	
-	private static Noise makeStrataRegion(int regionSize) {
-		Noise noise = Noises.worley(0, regionSize);
-		noise = Noises.warpPerlin(noise, 1, regionSize / 4, 2, regionSize / 2.0F);
-		noise = Noises.warpPerlin(noise, 2, 15, 2, 30);
-		return noise;
-	}
-	
-	private static Noise makeStrataDepth() {
-		return Noises.perlin(0, 128, 3);
 	}
 	
 	private static Noise generatorResource(Noise noise) {

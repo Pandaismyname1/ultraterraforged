@@ -86,10 +86,10 @@ public class RTFLanguageProvider {
 			this.add(RTFTranslationKeys.GUI_BUTTON_SALT, "Salt");
 			this.add(RTFTranslationKeys.GUI_BUTTON_DISABLED, "Disabled");
 			this.add(RTFTranslationKeys.GUI_BUTTON_SMOOTH_LAYER_DECORATOR, "Smooth Layer Decorator");
-			this.add(RTFTranslationKeys.GUI_BUTTON_STRATA_DECORATOR, "Strata Decorator");
-			this.add(RTFTranslationKeys.GUI_BUTTON_ORE_COMPATIBLE_STONE_ONLY, "Ore Compatible Stone Only");
-			this.add(RTFTranslationKeys.GUI_BUTTON_EROSION_DECORATOR, "Erosion Decorator");
-			this.add(RTFTranslationKeys.GUI_BUTTON_PLAIN_STONE_EROSION, "Plain Stone Erosion");
+			this.add(RTFTranslationKeys.GUI_BUTTON_STRATA_DECORATOR, "Rock Layers");
+			this.add(RTFTranslationKeys.GUI_BUTTON_ORE_COMPATIBLE_STONE_ONLY, "Only Ore-Bearing Rock");
+			this.add(RTFTranslationKeys.GUI_BUTTON_EROSION_DECORATOR, "Slope Erosion");
+			this.add(RTFTranslationKeys.GUI_BUTTON_PLAIN_STONE_EROSION, "Plain Stone on Slopes");
 			this.add(RTFTranslationKeys.GUI_BUTTON_NATURAL_SNOW_DECORATOR, "Natural Snow Decorator");
 			this.add(RTFTranslationKeys.GUI_BUTTON_CUSTOM_BIOME_FEATURES, "Custom Biome Features");
 			this.add(RTFTranslationKeys.GUI_BUTTON_VANILLA_SPRINGS, "Vanilla Springs");
@@ -198,7 +198,8 @@ public class RTFLanguageProvider {
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_STRUCTURE_DISTANCE), "Spacing of the rings; the first ring is about 4 times this many chunks from the world origin");
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_STRUCTURE_SPREAD), "How many structures go in the first ring; each later ring holds more");
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_STRUCTURE_COUNT), "Total number of structures placed in rings");
-			this.add(RTFTranslationKeys.GUI_SLIDER_STRATA_REGION_SIZE, "Strata Region Size");
+			this.add(RTFTranslationKeys.GUI_LABEL_STRATA, "Rock Layers");
+			this.add(RTFTranslationKeys.GUI_SLIDER_STRATA_REGION_SIZE, "Rock Layer Region Size");
 			this.add(RTFTranslationKeys.GUI_SLIDER_MOUNTAIN_BIOME_USAGE, "Mountain Biome Usage");
 			this.add(RTFTranslationKeys.GUI_SLIDER_VOLCANO_BIOME_USAGE, "Volcano Biome Usage");
 
@@ -340,10 +341,10 @@ public class RTFLanguageProvider {
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_SALT), "A random seed value for the structure.");
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_DISABLED), "Prevent this structure from generating.");
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_SMOOTH_LAYER_DECORATOR), "Modifies layer block levels (ie snow) to fit the terrain");
-			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_STRATA_DECORATOR), "Generates strata (rock layers) instead of just stone");
-			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_ORE_COMPATIBLE_STONE_ONLY), "Only use stone types that ores can generate in");
-			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_EROSION_DECORATOR), "Replace surface materials where erosion has occurred");
-			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_PLAIN_STONE_EROSION), "Changes most exposed rock surfaces to plain stone");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_STRATA_DECORATOR), "Fills the underground with bands of stone, granite, diorite, andesite and other mods' natural stones that show in cliffs, caves and ravines, like layers in a canyon wall. Replaces vanilla's scattered blobs of those rocks");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_ORE_COMPATIBLE_STONE_ONLY), "Only use rocks that ores can generate in. When off, rocks such as tuff, calcite and other mods' decorative stones are layered too, and those hold no ores");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_EROSION_DECORATOR), "Steep and high ground loses its soil: bare rock on cliffs, coarse dirt and loose gravel on slopes");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_PLAIN_STONE_EROSION), "Keeps the rock laid bare on steep slopes plain stone, so the layers only show in caves, ravines and deep cuts");
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_NATURAL_SNOW_DECORATOR), "Removes snow from the terrain where it shouldn't naturally settle");
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_CUSTOM_BIOME_FEATURES), "Use custom biome features in place of vanilla ones (such as trees)");
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_VANILLA_SPRINGS), "Allow vanilla springs (water source blocks) to generate");
@@ -453,7 +454,7 @@ public class RTFLanguageProvider {
 			);
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_MOUNTAIN_BIOME_USAGE), "The probability that mountainous terrain will be set to a mountain biome type.\nThis may help improve compatibility with mods that rely exclusively on mountain biomes.");
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_VOLCANO_BIOME_USAGE), "The probability that volcano terrain will be set to a volcano biome type.\nThis may help improve compatibility with mods that rely exclusively on volcano biomes.");
-			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_STRATA_REGION_SIZE), "Controls the size of strata regions");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_STRATA_REGION_SIZE), "How far apart the areas with different sequences of rock layers are, in blocks");
 		}
 
 		private void value(Enum<?> value, String name) {
