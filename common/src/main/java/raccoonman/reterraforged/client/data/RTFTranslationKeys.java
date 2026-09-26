@@ -38,6 +38,11 @@ public class RTFTranslationKeys {
 	public static final String GUI_SLIDER_CANYON_DEPTH = resolve("gui.slider.canyonDepth");
 	public static final String GUI_SLIDER_CANYON_FREQUENCY = resolve("gui.slider.canyonFrequency");
 	public static final String GUI_SLIDER_CANYON_WIDTH = resolve("gui.slider.canyonWidth");
+	public static final String GUI_LABEL_SEA_CLIFFS = resolve("gui.label.seaCliffs");
+	public static final String GUI_BUTTON_SEA_CLIFFS = resolve("gui.button.seaCliffs");
+	public static final String GUI_SLIDER_SEA_CLIFF_FREQUENCY = resolve("gui.slider.seaCliffFrequency");
+	public static final String GUI_SLIDER_SEA_CLIFF_HEIGHT = resolve("gui.slider.seaCliffHeight");
+	public static final String GUI_BUTTON_SEA_STACKS = resolve("gui.button.seaStacks");
 
 	public static final String GUI_BUTTON_TRUE = resolve("gui.button.true");
 	public static final String GUI_BUTTON_FALSE = resolve("gui.button.false");

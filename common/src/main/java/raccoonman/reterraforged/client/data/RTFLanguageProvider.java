@@ -81,6 +81,15 @@ public class RTFLanguageProvider {
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_CANYON_FREQUENCY), "How close together the canyons run");
 			this.add(RTFTranslationKeys.GUI_SLIDER_CANYON_WIDTH, "Width");
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_CANYON_WIDTH), "How wide the canyons are");
+			this.add(RTFTranslationKeys.GUI_LABEL_SEA_CLIFFS, "Sea Cliffs");
+			this.add(RTFTranslationKeys.GUI_BUTTON_SEA_CLIFFS, "Sea Cliffs");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_SEA_CLIFFS), "Stretches of coast where the land ends in a sheer cliff over the sea, with a rocky shelf instead of a beach");
+			this.add(RTFTranslationKeys.GUI_SLIDER_SEA_CLIFF_FREQUENCY, "Frequency");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_SEA_CLIFF_FREQUENCY), "Roughly how much of the coastline has cliffs");
+			this.add(RTFTranslationKeys.GUI_SLIDER_SEA_CLIFF_HEIGHT, "Height");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_SEA_CLIFF_HEIGHT), "How many blocks the tallest cliffs rise above the sea");
+			this.add(RTFTranslationKeys.GUI_BUTTON_SEA_STACKS, "Sea Stacks");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_SEA_STACKS), "Pillars of rock standing in the sea off the cliffs");
 
 			this.add(RTFTranslationKeys.GUI_BUTTON_TRUE, "On");
 			this.add(RTFTranslationKeys.GUI_BUTTON_FALSE, "Off");

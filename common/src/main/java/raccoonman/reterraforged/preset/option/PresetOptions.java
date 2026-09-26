@@ -631,6 +631,7 @@ public final class PresetOptions {
 
 	private static final Predicate<Preset> BUTTES = (preset) -> preset.landforms().buttes.enabled;
 	private static final Predicate<Preset> CANYONS = (preset) -> preset.landforms().canyons.enabled;
+	private static final Predicate<Preset> SEA_CLIFFS = (preset) -> preset.landforms().seaCliffs.enabled;
 
 	public static final Page LANDFORMS = Page.of("landforms", RTFTranslationKeys.GUI_LANDFORM_SETTINGS_TITLE,
 		Category.of("buttes", RTFTranslationKeys.GUI_LABEL_BUTTES,
@@ -679,6 +680,29 @@ public final class PresetOptions {
 				.range(0.3F, 3.0F)
 				.activeWhen(CANYONS)
 				.bind((p) -> p.landforms().canyons.width, (p, v) -> p.landforms().canyons.width = v)
+				.build()
+		),
+		Category.of("seaCliffs", RTFTranslationKeys.GUI_LABEL_SEA_CLIFFS,
+			BoolOption.builder("landforms.seaCliffs.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_SEA_CLIFFS)
+				.bind((p) -> p.landforms().seaCliffs.enabled, (p, v) -> p.landforms().seaCliffs.enabled = v)
+				.build(),
+			FloatOption.builder("landforms.seaCliffs.frequency")
+				.translation(RTFTranslationKeys.GUI_SLIDER_SEA_CLIFF_FREQUENCY)
+				.range(0.0F, 1.0F)
+				.activeWhen(SEA_CLIFFS)
+				.bind((p) -> p.landforms().seaCliffs.frequency, (p, v) -> p.landforms().seaCliffs.frequency = v)
+				.build(),
+			IntOption.builder("landforms.seaCliffs.height")
+				.translation(RTFTranslationKeys.GUI_SLIDER_SEA_CLIFF_HEIGHT)
+				.range(6, 80)
+				.activeWhen(SEA_CLIFFS)
+				.bind((p) -> p.landforms().seaCliffs.height, (p, v) -> p.landforms().seaCliffs.height = v)
+				.build(),
+			BoolOption.builder("landforms.seaCliffs.seaStacks")
+				.translation(RTFTranslationKeys.GUI_BUTTON_SEA_STACKS)
+				.activeWhen(SEA_CLIFFS)
+				.bind((p) -> p.landforms().seaCliffs.seaStacks, (p, v) -> p.landforms().seaCliffs.seaStacks = v)
 				.build()
 		)
 	);

@@ -18,6 +18,23 @@ public interface Landform {
 	// like CellPopulator.mapNoise, so the heightmap's per thread caches reach the landform's noises
 	Landform mapNoise(Noise.Visitor visitor);
 
+	/**
+	 * The value the noise stays below over the given share of the land, measured over a wide grid, so a setting like
+	 * "30% of coasts" means that however the noise's values are spread.
+	 */
+	static float quantile(Noise noise, float share) {
+		int samples = 64;
+		float[] values = new float[samples * samples];
+		for (int i = 0; i < samples; i++) {
+			for (int j = 0; j < samples; j++) {
+				values[i * samples + j] = noise.compute(i * 97.0F - 3100.0F, j * 97.0F - 3100.0F, 0);
+			}
+		}
+		java.util.Arrays.sort(values);
+		int index = Math.max(0, Math.min(values.length - 1, Math.round(share * (values.length - 1))));
+		return values[index];
+	}
+
 	static float smoothstep(float value, float from, float to) {
 		float t = Math.max(0.0F, Math.min(1.0F, (value - from) / (to - from)));
 		return t * t * (3.0F - 2.0F * t);

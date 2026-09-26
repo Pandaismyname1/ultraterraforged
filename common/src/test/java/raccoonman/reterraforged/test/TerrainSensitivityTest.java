@@ -37,7 +37,9 @@ public class TerrainSensitivityTest {
 		// used by the river generator, but branch rivers didn't form in the sampled area, so their effect isn't verified here
 		"rivers.branchRivers.bedDepth",
 		"rivers.branchRivers.bedWidth",
-		"rivers.branchRivers.bankWidth"
+		"rivers.branchRivers.bankWidth",
+		// a few blocks across, too small to show at the sampled resolution; LandformTest checks them
+		"landforms.seaCliffs.seaStacks"
 	);
 
 	@Test

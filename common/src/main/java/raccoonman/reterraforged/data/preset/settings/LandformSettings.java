@@ -10,23 +10,26 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 public class LandformSettings {
 	public static final Codec<LandformSettings> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 		PresetCodecs.defaulted(Buttes.CODEC, "buttes", Buttes.makeDefault()).forGetter((o) -> o.buttes),
-		PresetCodecs.defaulted(Canyons.CODEC, "canyons", Canyons.makeDefault()).forGetter((o) -> o.canyons)
+		PresetCodecs.defaulted(Canyons.CODEC, "canyons", Canyons.makeDefault()).forGetter((o) -> o.canyons),
+		PresetCodecs.defaulted(SeaCliffs.CODEC, "seaCliffs", SeaCliffs.makeDefault()).forGetter((o) -> o.seaCliffs)
 	).apply(instance, LandformSettings::new));
 
 	public Buttes buttes;
 	public Canyons canyons;
+	public SeaCliffs seaCliffs;
 
-	public LandformSettings(Buttes buttes, Canyons canyons) {
+	public LandformSettings(Buttes buttes, Canyons canyons, SeaCliffs seaCliffs) {
 		this.buttes = buttes;
 		this.canyons = canyons;
+		this.seaCliffs = seaCliffs;
 	}
 
 	public LandformSettings copy() {
-		return new LandformSettings(this.buttes.copy(), this.canyons.copy());
+		return new LandformSettings(this.buttes.copy(), this.canyons.copy(), this.seaCliffs.copy());
 	}
 
 	public static LandformSettings makeDefault() {
-		return new LandformSettings(Buttes.makeDefault(), Canyons.makeDefault());
+		return new LandformSettings(Buttes.makeDefault(), Canyons.makeDefault(), SeaCliffs.makeDefault());
 	}
 
 	// how the original TerraForged generated: none of the added landforms
@@ -34,7 +37,44 @@ public class LandformSettings {
 		LandformSettings settings = makeDefault();
 		settings.buttes.enabled = false;
 		settings.canyons.enabled = false;
+		settings.seaCliffs.enabled = false;
 		return settings;
+	}
+
+	/**
+	 * Stretches of coast that end in sheer cliffs over the sea, with a rocky shelf and sea stacks offshore.
+	 */
+	public static class SeaCliffs {
+		private static final SeaCliffs DEFAULT = new SeaCliffs(true, 0.35F, 22, true);
+
+		public static final Codec<SeaCliffs> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+			PresetCodecs.defaulted(Codec.BOOL, "enabled", DEFAULT.enabled).forGetter((o) -> o.enabled),
+			PresetCodecs.defaulted(Codec.FLOAT, "frequency", DEFAULT.frequency).forGetter((o) -> o.frequency),
+			PresetCodecs.defaulted(Codec.INT, "height", DEFAULT.height).forGetter((o) -> o.height),
+			PresetCodecs.defaulted(Codec.BOOL, "seaStacks", DEFAULT.seaStacks).forGetter((o) -> o.seaStacks)
+		).apply(instance, SeaCliffs::new));
+
+		public boolean enabled;
+		// roughly the share of coastline with cliffs
+		public float frequency;
+		// the tallest cliffs rise this many blocks above the sea
+		public int height;
+		public boolean seaStacks;
+
+		public SeaCliffs(boolean enabled, float frequency, int height, boolean seaStacks) {
+			this.enabled = enabled;
+			this.frequency = frequency;
+			this.height = height;
+			this.seaStacks = seaStacks;
+		}
+
+		public SeaCliffs copy() {
+			return new SeaCliffs(this.enabled, this.frequency, this.height, this.seaStacks);
+		}
+
+		public static SeaCliffs makeDefault() {
+			return DEFAULT.copy();
+		}
 	}
 
 	/**

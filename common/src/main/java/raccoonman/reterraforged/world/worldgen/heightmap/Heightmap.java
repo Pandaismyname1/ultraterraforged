@@ -221,7 +221,8 @@ public record Heightmap(CellSampler.Provider cellProvider, CellPopulator terrain
         Noise beachNoise = Noises.perlin2(ctx.seed.next(), 20, 1);
         beachNoise = Noises.mul(beachNoise, ctx.levels.scale(5));
         
-        Landform landforms = Landforms.make(ctx.seed.offset(55123), preset.landforms(), levels);
+        // the natural shoreline lies just past the beach control point
+        Landform landforms = Landforms.make(ctx.seed.offset(55123), preset.landforms(), levels, controlPoints.beach + 0.011F);
 
         CellSampler.Provider cellProvider = new CellSampler.Provider();
         return new Heightmap(cellProvider, terrain.mapNoise(cellProvider), region, continent, climate, levels, controlPoints, terrainFrequency, mountainChainAlpha, beachNoise, landforms.mapNoise(cellProvider));

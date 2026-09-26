@@ -18,6 +18,7 @@ public class LandformTest {
 	// a desert and badlands area of the Badlands preset, with several buttes
 	private static final float DESERT_X = -304.0F;
 	private static final float DESERT_Z = -128.0F;
+	private static final int BORDER = 25;
 
 	@BeforeAll
 	static void bootstrap() {
@@ -122,10 +123,166 @@ public class LandformTest {
 	}
 
 	@Test
+	void seaCliffsStayByTheSea() {
+		Preset preset = preset("default", (p) -> {
+			p.landforms().canyons.enabled = false;
+			p.landforms().buttes.enabled = false;
+		});
+		Preset flat = preset.copy();
+		flat.landforms().seaCliffs.enabled = false;
+		TerrainViews.View with = TerrainViews.view(preset, 0.0F, 0.0F, 8.0F);
+		TerrainViews.View without = TerrainViews.view(flat, 0.0F, 0.0F, 8.0F);
+		int water = with.levels().waterLevel;
+		int size = with.size();
+		// distance in cells to the nearest water in the view without cliffs
+		int[][] distance = new int[size][size];
+		java.util.ArrayDeque<int[]> queue = new java.util.ArrayDeque<>();
+		for (int x = 0; x < size; x++) {
+			for (int z = 0; z < size; z++) {
+				distance[x][z] = without.blockY(x, z) < water ? 0 : Integer.MAX_VALUE;
+				if (distance[x][z] == 0) {
+					queue.add(new int[] { x, z });
+				}
+			}
+		}
+		while (!queue.isEmpty()) {
+			int[] cell = queue.poll();
+			for (int[] step : new int[][] { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } }) {
+				int nx = cell[0] + step[0];
+				int nz = cell[1] + step[1];
+				if (nx >= 0 && nz >= 0 && nx < size && nz < size && distance[nx][nz] == Integer.MAX_VALUE) {
+					distance[nx][nz] = distance[cell[0]][cell[1]] + 1;
+					queue.add(new int[] { nx, nz });
+				}
+			}
+		}
+		int changed = 0;
+		int farthest = 0;
+		for (int x = 0; x < size; x++) {
+			for (int z = 0; z < size; z++) {
+				// the sea near the edge of the view may lie just outside it
+				boolean inside = x >= BORDER && z >= BORDER && x < size - BORDER && z < size - BORDER;
+				// the erosion filter runs over the whole area, so any change nudges the ground a little elsewhere too
+				if (inside && Math.abs(with.blockY(x, z) - without.blockY(x, z)) >= 3) {
+					changed++;
+					farthest = Math.max(farthest, distance[x][z]);
+
+				}
+			}
+		}
+		int farthestBlocks = (int) (farthest * with.zoom());
+		System.out.println("sea cliffs changed " + changed + " cells, at most " + farthestBlocks + " blocks from the sea");
+		assertTrue(changed > 50, "sea cliffs changed only " + changed + " cells");
+		// the headland behind a cliff slopes back over about 120 blocks
+		assertTrue(farthestBlocks <= 200, "sea cliffs changed land " + farthestBlocks + " blocks from the sea");
+	}
+
+	@Test
+	void seaCliffsMakeSheerDropsIntoTheSea() {
+		Preset preset = preset("default", (p) -> {
+			p.landforms().canyons.enabled = false;
+			p.landforms().buttes.enabled = false;
+		});
+		Preset flat = preset.copy();
+		flat.landforms().seaCliffs.enabled = false;
+		// a 1 block per pixel look at the coast where the cliffs change it most
+		long place = TerrainViews.mostChanged(TerrainViews.view(preset, 0.0F, 0.0F, 8.0F), TerrainViews.view(flat, 0.0F, 0.0F, 8.0F));
+		float x = raccoonman.reterraforged.world.worldgen.util.PosUtil.unpackLeft(place);
+		float z = raccoonman.reterraforged.world.worldgen.util.PosUtil.unpackRight(place);
+		float edgeWith = shoreHeight(TerrainViews.view(preset, x, z, 1.0F));
+		float edgeWithout = shoreHeight(TerrainViews.view(flat, x, z, 1.0F));
+		System.out.printf("the tallest tenth of the water's edge stands %.1f blocks above the sea with cliffs, %.1f without%n", edgeWith, edgeWithout);
+		assertTrue(edgeWith > edgeWithout + 6.0F, "cliffs raise the water's edge only from " + edgeWithout + " to " + edgeWith);
+	}
+
+	// how high the tallest tenth of the land next to water stands above the sea
+	private static float shoreHeight(TerrainViews.View view) {
+		int water = view.levels().waterLevel;
+		java.util.List<Integer> heights = new java.util.ArrayList<>();
+		for (int x = 1; x < view.size() - 1; x++) {
+			for (int z = 1; z < view.size() - 1; z++) {
+				int y = view.blockY(x, z);
+				if (y < water) {
+					continue;
+				}
+				if (view.blockY(x + 1, z) < water || view.blockY(x - 1, z) < water || view.blockY(x, z + 1) < water || view.blockY(x, z - 1) < water) {
+					heights.add(y - water);
+				}
+			}
+		}
+		if (heights.isEmpty()) {
+			return 0.0F;
+		}
+		java.util.Collections.sort(heights);
+		return heights.get(heights.size() * 9 / 10);
+	}
+
+	@Test
+	void seaStacksStandOffTheCliffs() {
+		Preset preset = preset("default", (p) -> {
+			p.landforms().canyons.enabled = false;
+			p.landforms().buttes.enabled = false;
+		});
+		Preset noStacks = preset.copy();
+		noStacks.landforms().seaCliffs.seaStacks = false;
+		Preset noCliffs = preset.copy();
+		noCliffs.landforms().seaCliffs.enabled = false;
+		long place = TerrainViews.mostChanged(TerrainViews.view(preset, 0.0F, 0.0F, 8.0F), TerrainViews.view(noCliffs, 0.0F, 0.0F, 8.0F));
+		float x = raccoonman.reterraforged.world.worldgen.util.PosUtil.unpackLeft(place);
+		float z = raccoonman.reterraforged.world.worldgen.util.PosUtil.unpackRight(place);
+		int with = islets(TerrainViews.view(preset, x, z, 1.0F));
+		int without = islets(TerrainViews.view(noStacks, x, z, 1.0F));
+		System.out.println("small rock islands off the cliffs: " + with + " with sea stacks, " + without + " without");
+		assertTrue(with >= without + 2, with + " islets with stacks, " + without + " without");
+	}
+
+	// pieces of land surrounded by water and no bigger than a sea stack
+	private static int islets(TerrainViews.View view) {
+		int water = view.levels().waterLevel;
+		int size = view.size();
+		boolean[][] seen = new boolean[size][size];
+		int islets = 0;
+		for (int x = 0; x < size; x++) {
+			for (int z = 0; z < size; z++) {
+				if (seen[x][z] || view.blockY(x, z) < water) {
+					continue;
+				}
+				// flood fill this piece of land
+				int area = 0;
+				boolean touchesBorder = false;
+				java.util.ArrayDeque<int[]> queue = new java.util.ArrayDeque<>();
+				queue.add(new int[] { x, z });
+				seen[x][z] = true;
+				while (!queue.isEmpty()) {
+					int[] cell = queue.poll();
+					area++;
+					for (int[] step : new int[][] { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } }) {
+						int nx = cell[0] + step[0];
+						int nz = cell[1] + step[1];
+						if (nx < 0 || nz < 0 || nx >= size || nz >= size) {
+							touchesBorder = true;
+							continue;
+						}
+						if (!seen[nx][nz] && view.blockY(nx, nz) >= water) {
+							seen[nx][nz] = true;
+							queue.add(new int[] { nx, nz });
+						}
+					}
+				}
+				if (!touchesBorder && area <= 300) {
+					islets++;
+				}
+			}
+		}
+		return islets;
+	}
+
+	@Test
 	void legacyPresetsHaveNoLandforms() {
 		for (String name : new String[] { "legacy_default", "beautiful", "huge_biomes", "lite", "vanillaish" }) {
 			assertTrue(!BuiltinPresetRenderTest.presets().get(name).get().landforms().buttes.enabled, name);
 			assertTrue(!BuiltinPresetRenderTest.presets().get(name).get().landforms().canyons.enabled, name);
+			assertTrue(!BuiltinPresetRenderTest.presets().get(name).get().landforms().seaCliffs.enabled, name);
 		}
 	}
 }

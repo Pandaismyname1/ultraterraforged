@@ -13,17 +13,24 @@ import raccoonman.reterraforged.world.worldgen.util.Seed;
 // the landforms a preset turns on, applied in order
 public record Landforms(List<Landform> landforms) implements Landform {
 
-	public static Landforms make(Seed seed, LandformSettings settings, Levels levels) {
+	/**
+	 * @param shoreline the continent edge value at which the land meets the sea
+	 */
+	public static Landforms make(Seed seed, LandformSettings settings, Levels levels, float shoreline) {
 		List<Landform> landforms = new ArrayList<>();
 		// each landform gets its own seed, whether or not the others are on
 		int buttesSeed = seed.next();
 		int canyonsSeed = seed.next();
+		int seaCliffsSeed = seed.next();
 		// canyons cut first, so buttes can stand in them
 		if (settings.canyons.enabled) {
 			landforms.add(Canyons.make(canyonsSeed, settings.canyons, levels));
 		}
 		if (settings.buttes.enabled) {
 			landforms.add(Buttes.make(buttesSeed, settings.buttes, levels));
+		}
+		if (settings.seaCliffs.enabled) {
+			landforms.add(SeaCliffs.make(seaCliffsSeed, settings.seaCliffs, shoreline, levels));
 		}
 		return new Landforms(List.copyOf(landforms));
 	}

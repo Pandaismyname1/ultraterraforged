@@ -90,6 +90,7 @@ public class TerrainViewTest {
 		}
 		System.out.println("buttes raise " + raised + " of " + close.size() * close.size() + " cells, at most " + most + " blocks");
 		TerrainViews.write(close, "buttes_close");
+		TerrainViews.writePerspective(close, "buttes_3d");
 		TerrainViews.writeProfile(close, "buttes_profile");
 		TerrainViews.write(TerrainViews.view(preset, x, z, 3.0F), "buttes_wide");
 	}
@@ -158,7 +159,33 @@ public class TerrainViewTest {
 		System.out.println("high plateau at " + x + ", " + z);
 		TerrainViews.View close = TerrainViews.view(preset, x, z, 1.0F);
 		TerrainViews.write(close, "high_canyons_close");
+		TerrainViews.writePerspective(close, "high_canyons_3d");
 		TerrainViews.writeProfile(close, "high_canyons_profile");
 		TerrainViews.write(TerrainViews.view(preset, x, z, 3.0F), "high_canyons_wide");
+	}
+
+	@Test
+	void seaCliffs() throws Exception {
+		Preset preset = preset("default");
+		// only the cliffs, to see them on their own
+		preset.landforms().canyons.enabled = false;
+		preset.landforms().buttes.enabled = false;
+		Preset without = preset.copy();
+		without.landforms().seaCliffs.enabled = false;
+		// the coast west of spawn, found by where the cliffs change it most
+		long place = TerrainViews.mostChanged(TerrainViews.view(preset, 0.0F, 0.0F, 8.0F), TerrainViews.view(without, 0.0F, 0.0F, 8.0F));
+		float x = PosUtil.unpackLeft(place);
+		float z = PosUtil.unpackRight(place);
+		System.out.println("sea cliffs at " + x + ", " + z);
+		TerrainViews.View close = TerrainViews.view(preset, x, z, 1.0F);
+		TerrainViews.write(close, "sea_cliffs_close");
+		TerrainViews.writeProfile(close, "sea_cliffs_profile_x");
+		TerrainViews.writeProfileZ(close, "sea_cliffs_profile_z");
+		TerrainViews.write(TerrainViews.view(without, x, z, 1.0F), "sea_cliffs_close_without");
+		TerrainViews.View coast = TerrainViews.view(preset, x, z, 2.0F);
+		for (int turns = 0; turns < 4; turns++) {
+			TerrainViews.writePerspective(coast, "sea_cliffs_3d_" + turns, turns);
+		}
+		TerrainViews.write(TerrainViews.view(preset, x, z, 4.0F), "sea_cliffs_wide");
 	}
 }
