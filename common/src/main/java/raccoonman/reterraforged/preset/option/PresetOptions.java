@@ -627,7 +627,38 @@ public final class PresetOptions {
 		)
 	);
 
-	public static final List<Page> PAGES = List.of(WORLD, SURFACE, CAVES, CLIMATE, TERRAIN, RIVERS, FILTERS, MISCELLANEOUS);
+	// Landforms
+
+	private static final Predicate<Preset> BUTTES = (preset) -> preset.landforms().buttes.enabled;
+
+	public static final Page LANDFORMS = Page.of("landforms", RTFTranslationKeys.GUI_LANDFORM_SETTINGS_TITLE,
+		Category.of("buttes", RTFTranslationKeys.GUI_LABEL_BUTTES,
+			BoolOption.builder("landforms.buttes.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_BUTTES)
+				.bind((p) -> p.landforms().buttes.enabled, (p, v) -> p.landforms().buttes.enabled = v)
+				.build(),
+			FloatOption.builder("landforms.buttes.density")
+				.translation(RTFTranslationKeys.GUI_SLIDER_BUTTE_DENSITY)
+				.range(0.0F, 1.0F)
+				.activeWhen(BUTTES)
+				.bind((p) -> p.landforms().buttes.density, (p, v) -> p.landforms().buttes.density = v)
+				.build(),
+			IntOption.builder("landforms.buttes.height")
+				.translation(RTFTranslationKeys.GUI_SLIDER_BUTTE_HEIGHT)
+				.range(10, 120)
+				.activeWhen(BUTTES)
+				.bind((p) -> p.landforms().buttes.height, (p, v) -> p.landforms().buttes.height = v)
+				.build(),
+			FloatOption.builder("landforms.buttes.size")
+				.translation(RTFTranslationKeys.GUI_SLIDER_BUTTE_SIZE)
+				.range(0.5F, 2.5F)
+				.activeWhen(BUTTES)
+				.bind((p) -> p.landforms().buttes.size, (p, v) -> p.landforms().buttes.size = v)
+				.build()
+		)
+	);
+
+	public static final List<Page> PAGES = List.of(WORLD, SURFACE, CAVES, CLIMATE, TERRAIN, RIVERS, LANDFORMS, FILTERS, MISCELLANEOUS);
 
 	private static final Map<String, Option<?>> BY_PATH = PAGES.stream().flatMap(Page::options).collect(Collectors.toUnmodifiableMap(Option::path, Function.identity()));
 

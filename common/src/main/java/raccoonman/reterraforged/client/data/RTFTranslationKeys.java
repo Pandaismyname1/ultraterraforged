@@ -27,6 +27,12 @@ public class RTFTranslationKeys {
 	public static final String GUI_FILTER_SETTINGS_TITLE = resolve("gui.filterSettings.title");
 	public static final String GUI_STRUCTURE_SETTINGS_TITLE = resolve("gui.structureSettings.title");
 	public static final String GUI_MISCELLANEOUS_SETTINGS_TITLE = resolve("gui.miscellaneousSettings.title");
+	public static final String GUI_LANDFORM_SETTINGS_TITLE = resolve("gui.landformSettings.title");
+	public static final String GUI_LABEL_BUTTES = resolve("gui.label.buttes");
+	public static final String GUI_BUTTON_BUTTES = resolve("gui.button.buttes");
+	public static final String GUI_SLIDER_BUTTE_DENSITY = resolve("gui.slider.butteDensity");
+	public static final String GUI_SLIDER_BUTTE_HEIGHT = resolve("gui.slider.butteHeight");
+	public static final String GUI_SLIDER_BUTTE_SIZE = resolve("gui.slider.butteSize");
 
 	public static final String GUI_BUTTON_TRUE = resolve("gui.button.true");
 	public static final String GUI_BUTTON_FALSE = resolve("gui.button.false");

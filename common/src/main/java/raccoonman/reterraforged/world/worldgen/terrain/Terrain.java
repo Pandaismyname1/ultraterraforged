@@ -29,6 +29,11 @@ public class Terrain implements ITerrain.Delegate {
         return this.id;
     }
     
+    // whether this is the given type, or a blend of it with another
+    public boolean includes(Terrain terrain) {
+        return this == terrain;
+    }
+
     public String getName() {
         return this.name;
     }

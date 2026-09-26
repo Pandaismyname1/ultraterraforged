@@ -45,7 +45,7 @@ public class TerrainSensitivityTest {
 		TestBootstrap.init();
 		String baseline = fingerprint(defaultPreset());
 		List<String> inert = new ArrayList<>();
-		for (Page page : List.of(PresetOptions.WORLD, PresetOptions.CLIMATE, PresetOptions.TERRAIN, PresetOptions.RIVERS)) {
+		for (Page page : List.of(PresetOptions.WORLD, PresetOptions.CLIMATE, PresetOptions.TERRAIN, PresetOptions.RIVERS, PresetOptions.LANDFORMS)) {
 			page.options().filter((option) -> !option.isHidden() && option.isActive(defaultPreset()) && !NOT_IN_HEIGHTMAP.contains(option.path())).forEach((option) -> {
 				Preset preset = defaultPreset();
 				if (!change(option, preset)) {

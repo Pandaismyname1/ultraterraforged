@@ -25,6 +25,8 @@ import raccoonman.reterraforged.world.worldgen.noise.function.Interpolation;
 import raccoonman.reterraforged.world.worldgen.noise.module.Cache2d;
 import raccoonman.reterraforged.world.worldgen.noise.module.Noise;
 import raccoonman.reterraforged.world.worldgen.noise.module.Noises;
+import raccoonman.reterraforged.world.worldgen.landform.Landform;
+import raccoonman.reterraforged.world.worldgen.landform.Landforms;
 import raccoonman.reterraforged.world.worldgen.rivermap.Rivermap;
 import raccoonman.reterraforged.world.worldgen.terrain.MountainChainPopulator;
 import raccoonman.reterraforged.world.worldgen.terrain.TerrainCategory;
@@ -38,18 +40,19 @@ import raccoonman.reterraforged.world.worldgen.terrain.region.RegionSelector;
 import raccoonman.reterraforged.world.worldgen.util.Seed;
 
 //TODO rework this whole class
-public record Heightmap(CellSampler.Provider cellProvider, CellPopulator terrain, CellPopulator region, Continent continent, Climate climate, Levels levels, ControlPoints controlPoints, float terrainFrequency, @Deprecated Noise mountainChainAlpha, @Deprecated Noise beachAlpha) { //TODO move noise fields to RegionModule
+public record Heightmap(CellSampler.Provider cellProvider, CellPopulator terrain, CellPopulator region, Continent continent, Climate climate, Levels levels, ControlPoints controlPoints, float terrainFrequency, @Deprecated Noise mountainChainAlpha, @Deprecated Noise beachAlpha, Landform landforms) { //TODO move noise fields to RegionModule
 	
 	//TODO move this to a factory or something instead
 	public Heightmap cache() {
 		//TODO map the rest of the noise as well once this is fully working
 		CellSampler.Provider cellProvider = new CellSampler.Provider();
-		return new Heightmap(cellProvider, this.terrain.mapNoise((noise) -> {
+		Noise.Visitor visitor = (noise) -> {
 			if(noise instanceof Cache2d	cache2d) {
 				return new Cache2d.Cached(cache2d.noise());
 			}
 			return cellProvider.apply(noise);
-		}), this.region, this.continent, this.climate, this.levels, this.controlPoints, this.terrainFrequency, this.mountainChainAlpha, this.beachAlpha);
+		};
+		return new Heightmap(cellProvider, this.terrain.mapNoise(visitor), this.region, this.continent, this.climate, this.levels, this.controlPoints, this.terrainFrequency, this.mountainChainAlpha, this.beachAlpha, this.landforms.mapNoise(visitor));
 	}
 	
 	public void applyContinent(Cell cell, float x, float z) {
@@ -57,6 +60,17 @@ public record Heightmap(CellSampler.Provider cellProvider, CellPopulator terrain
 	}
 	
 	public void applyTerrain(Cell cell, float x, float z, Rivermap rivermap) {
+		this.applyTerrainTypes(cell, x, z);
+
+        // rivers carve into the finished terrain; applied before it, as upstream 1.20.2 did, the terrain overwrote them
+        rivermap.apply(cell, x, z);
+
+        this.landforms.apply(cell, x, z, this);
+
+        VolcanoPopulator.modifyVolcanoType(cell, this.levels);
+	}
+
+	private void applyTerrainTypes(Cell cell, float x, float z) {
         cell.terrain = TerrainType.PLAINS;
         cell.riverDistance = 1.0F;
         cell.mountainChainAlpha = this.mountainChainAlpha.compute(x, z, 0);
@@ -67,11 +81,25 @@ public record Heightmap(CellSampler.Provider cellProvider, CellPopulator terrain
         cell.terrainMask = Math.min(cell.terrainMask + mountainMask, 1.0F);
         
         this.terrain.apply(cell, x * this.terrainFrequency, z * this.terrainFrequency);
+	}
 
-        // rivers carve into the finished terrain; applied before it, as upstream 1.20.2 did, the terrain overwrote them
-        rivermap.apply(cell, x, z);
-
-        VolcanoPopulator.modifyVolcanoType(cell, this.levels);
+	/**
+	 * The terrain types, rivers and climate at another position, without landforms, e.g. for the ground a landform
+	 * stands on.
+	 */
+	public Cell sampleTerrain(float x, float z) {
+		Cell previous = this.cellProvider.getCacheCell();
+		Cell cell = new Cell();
+		this.cellProvider.setCacheCell(cell);
+		try {
+			this.applyContinent(cell, x, z);
+			this.applyTerrainTypes(cell, x, z);
+			Rivermap.get(cell, null, this).apply(cell, x, z);
+			this.applyClimate(cell, x, z);
+			return cell;
+		} finally {
+			this.cellProvider.setCacheCell(previous);
+		}
 	}
 	
 	public void applyClimate(Cell cell, float x, float z) {
@@ -193,7 +221,9 @@ public record Heightmap(CellSampler.Provider cellProvider, CellPopulator terrain
         Noise beachNoise = Noises.perlin2(ctx.seed.next(), 20, 1);
         beachNoise = Noises.mul(beachNoise, ctx.levels.scale(5));
         
+        Landform landforms = Landforms.make(ctx.seed.offset(55123), preset.landforms(), levels);
+
         CellSampler.Provider cellProvider = new CellSampler.Provider();
-        return new Heightmap(cellProvider, terrain.mapNoise(cellProvider), region, continent, climate, levels, controlPoints, terrainFrequency, mountainChainAlpha, beachNoise);
+        return new Heightmap(cellProvider, terrain.mapNoise(cellProvider), region, continent, climate, levels, controlPoints, terrainFrequency, mountainChainAlpha, beachNoise, landforms.mapNoise(cellProvider));
 	}
 }

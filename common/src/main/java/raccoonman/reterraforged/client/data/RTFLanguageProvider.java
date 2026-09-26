@@ -62,6 +62,16 @@ public class RTFLanguageProvider {
 			this.add(RTFTranslationKeys.GUI_FILTER_SETTINGS_TITLE, "Filter Settings");
 			this.add(RTFTranslationKeys.GUI_STRUCTURE_SETTINGS_TITLE, "Structure Settings");
 			this.add(RTFTranslationKeys.GUI_MISCELLANEOUS_SETTINGS_TITLE, "Miscellaneous Settings");
+			this.add(RTFTranslationKeys.GUI_LANDFORM_SETTINGS_TITLE, "Landforms");
+			this.add(RTFTranslationKeys.GUI_LABEL_BUTTES, "Buttes & Mesas");
+			this.add(RTFTranslationKeys.GUI_BUTTON_BUTTES, "Buttes & Mesas");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_BUTTES), "Flat-topped towers of rock with sheer cliffs, from narrow buttes to broad, sometimes stepped mesas. They stand in badlands, on plateaus and on flat desert and savanna land");
+			this.add(RTFTranslationKeys.GUI_SLIDER_BUTTE_DENSITY, "Frequency");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_BUTTE_DENSITY), "How many of the possible spots get a butte or mesa");
+			this.add(RTFTranslationKeys.GUI_SLIDER_BUTTE_HEIGHT, "Height");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_BUTTE_HEIGHT), "How many blocks the tallest ones rise above the land around them");
+			this.add(RTFTranslationKeys.GUI_SLIDER_BUTTE_SIZE, "Size");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_BUTTE_SIZE), "Scales how wide they are and how far apart they stand");
 
 			this.add(RTFTranslationKeys.GUI_BUTTON_TRUE, "On");
 			this.add(RTFTranslationKeys.GUI_BUTTON_FALSE, "Off");
