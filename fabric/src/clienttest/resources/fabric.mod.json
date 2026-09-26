@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "reterraforged_clienttest",
+  "version": "0",
+  "name": "ReTerraForged client test",
+  "description": "Drives the client through world creation and takes screenshots. Only on the clientTest run's classpath.",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "raccoonman.reterraforged.clienttest.ClientTest"
+    ]
+  },
+  "depends": {
+    "reterraforged": "*",
+    "fabric-lifecycle-events-v1": "*"
+  }
+}

@@ -1,38 +1,30 @@
 package raccoonman.reterraforged.client.gui.screen.presetconfig;
 
 import java.io.IOException;
-import java.net.URI;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.util.Map;
-
-import org.apache.commons.io.file.PathUtils;
-
-import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.util.Pair;
 
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationContext;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.data.DataGenerator;
-import net.minecraft.server.packs.repository.PackRepository;
-import net.minecraft.world.level.levelgen.WorldOptions;
-import raccoonman.reterraforged.data.PresetPacks;
+import net.minecraft.network.chat.Component;
+import raccoonman.reterraforged.client.gui.createworld.TerrainState;
 import raccoonman.reterraforged.client.gui.screen.page.LinkedPageScreen;
 import raccoonman.reterraforged.client.gui.screen.presetconfig.PresetListPage.PresetEntry;
-import raccoonman.reterraforged.data.RTFDataGen;
+import raccoonman.reterraforged.data.PresetPacks;
 import raccoonman.reterraforged.data.preset.settings.Preset;
 
-//FIXME pressing the create world screen before the pack is copied will fuck the game up (surprisingly noone seems to have run into this?)
 public class PresetConfigScreen extends LinkedPageScreen {
 	private CreateWorldScreen parent;
 	
 	public PresetConfigScreen(CreateWorldScreen parent) {
 		this.parent = parent;
 		this.currentPage = new PresetListPage(this);
+	}
+
+	// opens straight into the editor for a preset that isn't saved as a file, such as the one chosen in the Terrain tab
+	public static PresetConfigScreen editing(CreateWorldScreen parent, Component name, Preset preset) {
+		PresetConfigScreen screen = new PresetConfigScreen(parent);
+		screen.currentPage = new OptionPage(screen, new PresetEntry(name, preset.copy(), true, (button) -> {}), 0);
+		return screen;
 	}
 	
 	@Override
@@ -42,27 +34,24 @@ public class PresetConfigScreen extends LinkedPageScreen {
 		this.minecraft.setScreen(this.parent);
 	}
 	
+	// the world is created from the seed text in the World tab, so that is what has to change
 	public void setSeed(long seed) {
-		//TODO update the seed edit box
-		this.parent.getUiState().setSettings(this.getSettings().withOptions((options) -> {
-			return new WorldOptions(seed, options.generateStructures(), options.generateBonusChest());
-		}));
+		this.parent.getUiState().setSeed(Long.toString(seed));
+	}
+
+	public long seed() {
+		return TerrainState.of(this.parent).seed();
 	}
 	
 	public WorldCreationContext getSettings() {
 		return this.parent.getUiState().getSettings();
 	}
 
-	public void applyPreset(PresetEntry preset) throws IOException {		
-		Pair<Path, PackRepository> path = this.parent.getDataPackSelectionSettings(this.parent.getUiState().getSettings().dataConfiguration());
-		Path exportPath = path.getFirst().resolve(PresetPacks.WORLD_PACK_NAME);
-		this.exportAsDatapack(exportPath, preset);
-		PackRepository repository = path.getSecond();
-		repository.reload();
-		if(repository.addPack("file/" + exportPath.getFileName())) {
-			this.parent.tryApplyNewDataPacks(repository, false, (data) -> {
-			});
-		}
+	// hands the edited preset to the Create World screen; its datapack is made when the world is created
+	public void applyPreset(PresetEntry preset) throws IOException {
+		TerrainState state = TerrainState.of(this.parent);
+		state.set(preset.getName(), preset.getPreset());
+		state.selectReTerraForged();
 	}
 	
 	public void exportAsDatapack(Path outputPath, PresetEntry presetEntry) throws IOException {

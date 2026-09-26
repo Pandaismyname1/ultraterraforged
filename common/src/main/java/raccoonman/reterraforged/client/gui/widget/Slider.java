@@ -75,12 +75,13 @@ public class Slider extends AbstractSliderButton {
     	INT {
 			@Override
 			public double scale(double input) {
-				return (int) input;
+				// round rather than truncate, or 3000 comes back as 2999 after the float round trip
+				return Math.round(input);
 			}
 
 			@Override
 			public String getMessage(double input) {
-				return String.valueOf((int) input);
+				return String.valueOf(Math.round(input));
 			}
 		},
     	FLOAT {

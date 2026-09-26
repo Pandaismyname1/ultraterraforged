@@ -22,9 +22,14 @@ import raccoonman.reterraforged.preset.option.Option;
 import raccoonman.reterraforged.preset.option.OptionTag;
 
 // Builds an editor widget for any preset option; every widget supports ctrl+click to reset to the default
-final class OptionWidgets {
+public final class OptionWidgets {
 
 	public static AbstractWidget create(Option<?> option, Preset preset, Runnable onChange) {
+		return create(option, preset, onChange, option.displayName());
+	}
+
+	// with a label other than the option's own, e.g. where the surrounding category isn't shown
+	public static AbstractWidget create(Option<?> option, Preset preset, Runnable onChange, Component name) {
 		if (option instanceof IntOption intOption) {
 			if (intOption.isSeed()) {
 				return PresetWidgets.createRandomButton(option.translationKey(), intOption.get(preset), (value) -> {
@@ -32,22 +37,22 @@ final class OptionWidgets {
 					onChange.run();
 				});
 			}
-			return new OptionSlider<>(intOption, preset, Slider.Format.INT, intOption.min(), intOption.max(), (raw) -> raw.intValue(), onChange);
+			return new OptionSlider<>(intOption, preset, Slider.Format.INT, intOption.min(), intOption.max(), (raw) -> raw.intValue(), onChange, name);
 		}
 		if (option instanceof FloatOption floatOption) {
-			return new OptionSlider<>(floatOption, preset, Slider.Format.FLOAT, floatOption.min(), floatOption.max(), (raw) -> raw.floatValue(), onChange);
+			return new OptionSlider<>(floatOption, preset, Slider.Format.FLOAT, floatOption.min(), floatOption.max(), (raw) -> raw.floatValue(), onChange, name);
 		}
 		if (option instanceof BoolOption boolOption) {
-			return new OptionCycleButton<>(boolOption, preset, List.of(true, false), OptionWidgets::booleanName, onChange);
+			return new OptionCycleButton<>(boolOption, preset, List.of(true, false), OptionWidgets::booleanName, onChange, name);
 		}
 		if (option instanceof EnumOption<?> enumOption) {
-			return createEnum(enumOption, preset, onChange);
+			return createEnum(enumOption, preset, onChange, name);
 		}
 		throw new IllegalArgumentException("No widget for option " + option);
 	}
 
-	private static <E extends Enum<E>> AbstractWidget createEnum(EnumOption<E> option, Preset preset, Runnable onChange) {
-		return new OptionCycleButton<>(option, preset, option.values(), (value) -> Component.literal(option.name(value)), onChange);
+	private static <E extends Enum<E>> AbstractWidget createEnum(EnumOption<E> option, Preset preset, Runnable onChange, Component name) {
+		return new OptionCycleButton<>(option, preset, option.values(), (value) -> Component.literal(option.name(value)), onChange, name);
 	}
 
 	private static Component booleanName(boolean value) {
@@ -68,8 +73,8 @@ final class OptionWidgets {
 		private final Preset preset;
 		private final Format format;
 
-		public OptionSlider(Option<T> option, Preset preset, Format format, T min, T max, Function<Double, T> fromSlider, Runnable onChange) {
-			super(-1, -1, -1, -1, option.get(preset).floatValue(), min.floatValue(), max.floatValue(), option.displayName(), format, (slider, value) -> {
+		public OptionSlider(Option<T> option, Preset preset, Format format, T min, T max, Function<Double, T> fromSlider, Runnable onChange, Component name) {
+			super(-1, -1, -1, -1, option.get(preset).floatValue(), min.floatValue(), max.floatValue(), name, format, (slider, value) -> {
 				T stored = option.set(preset, fromSlider.apply(slider.scaleValue(value)));
 				onChange.run();
 				return slider.getSliderValue(stored.floatValue());
@@ -100,8 +105,9 @@ final class OptionWidgets {
 		private final Preset preset;
 		private final List<T> values;
 		private final Function<T, Component> nameGetter;
+		private final Component name;
 
-		public OptionCycleButton(Option<T> option, Preset preset, List<T> values, Function<T, Component> nameGetter, Runnable onChange) {
+		public OptionCycleButton(Option<T> option, Preset preset, List<T> values, Function<T, Component> nameGetter, Runnable onChange, Component name) {
 			super(-1, -1, -1, -1, CommonComponents.EMPTY, (button) -> {
 				if (button instanceof OptionCycleButton<?> self) {
 					self.cycle(Screen.hasShiftDown() ? -1 : 1);
@@ -112,6 +118,7 @@ final class OptionWidgets {
 			this.preset = preset;
 			this.values = values;
 			this.nameGetter = nameGetter;
+			this.name = name;
 			this.setTooltip(createTooltip(option, nameGetter.apply(option.defaultValue())));
 			this.updateMessage();
 		}
@@ -128,7 +135,7 @@ final class OptionWidgets {
 		}
 
 		private void updateMessage() {
-			this.setMessage(CommonComponents.optionNameValue(this.option.displayName(), this.nameGetter.apply(this.option.get(this.preset))));
+			this.setMessage(CommonComponents.optionNameValue(this.name, this.nameGetter.apply(this.option.get(this.preset))));
 		}
 	}
 

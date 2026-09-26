@@ -21,7 +21,7 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 
 import raccoonman.reterraforged.client.gui.screen.presetconfig.RenderMode;
-import raccoonman.reterraforged.data.preset.settings.BuiltinPresets;
+import raccoonman.reterraforged.data.preset.PresetLibrary;
 import raccoonman.reterraforged.data.preset.settings.Preset;
 import raccoonman.reterraforged.world.worldgen.tile.Tile;
 
@@ -42,12 +42,9 @@ public class BuiltinPresetRenderTest {
 
 	public static Map<String, Supplier<Preset>> presets() {
 		Map<String, Supplier<Preset>> presets = new LinkedHashMap<>();
-		presets.put("default", BuiltinPresets::makeDefault);
-		presets.put("legacy_default", BuiltinPresets::makeLegacyDefault);
-		presets.put("legacy_vanillaish", BuiltinPresets::makeLegacyVanillaish);
-		presets.put("legacy_beautiful", BuiltinPresets::makeLegacyBeautiful);
-		presets.put("legacy_lite", BuiltinPresets::makeLegacyLite);
-		presets.put("legacy_huge_biomes", BuiltinPresets::makeLegacyHugeBiomes);
+		for (PresetLibrary.Entry entry : PresetLibrary.builtins()) {
+			presets.put(entry.id().substring("builtin/".length()), entry.factory());
+		}
 		return presets;
 	}
 

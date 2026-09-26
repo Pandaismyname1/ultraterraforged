@@ -618,6 +618,27 @@ public final class PresetOptions {
 
 	private static final Map<String, Option<?>> BY_PATH = PAGES.stream().flatMap(Page::options).collect(Collectors.toUnmodifiableMap(Option::path, Function.identity()));
 
+	// the few settings shown directly in the Create World screen, most noticeable first, with labels that make sense
+	// without their page and category
+	public record SimpleSetting(Option<?> option, String labelKey) {
+	}
+
+	public static final List<SimpleSetting> SIMPLE = List.of(
+		simple("world.continent.continentScale", RTFTranslationKeys.SIMPLE_CONTINENT_SIZE),
+		simple("climate.biomeShape.biomeSize", RTFTranslationKeys.SIMPLE_BIOME_SIZE),
+		simple("terrain.general.terrainRegionSize", RTFTranslationKeys.SIMPLE_TERRAIN_AREA_SIZE),
+		simple("terrain.mountains.weight", RTFTranslationKeys.SIMPLE_MOUNTAINS),
+		simple("rivers.riverCount", RTFTranslationKeys.SIMPLE_RIVERS),
+		simple("rivers.lakes.chance", RTFTranslationKeys.SIMPLE_LAKES),
+		simple("world.properties.seaLevel", RTFTranslationKeys.SIMPLE_SEA_LEVEL),
+		simple("world.properties.worldHeight", RTFTranslationKeys.SIMPLE_WORLD_HEIGHT),
+		simple("caves.cheeseCaveProbability", RTFTranslationKeys.SIMPLE_CAVES)
+	);
+
+	private static SimpleSetting simple(String path, String labelKey) {
+		return new SimpleSetting(byPath(path).orElseThrow(() -> new IllegalStateException("No option " + path)), labelKey);
+	}
+
 	public static Stream<Option<?>> all() {
 		return PAGES.stream().flatMap(Page::options);
 	}

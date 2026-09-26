@@ -200,6 +200,28 @@ public class RTFTranslationKeys {
 	public static final String OPTION_TAG_MEDIUM_PERFORMANCE_IMPACT = resolve("option.tag.mediumPerformanceImpact");
 	public static final String OPTION_TAG_HEAVY_PERFORMANCE_IMPACT = resolve("option.tag.heavyPerformanceImpact");
 	public static final String GUI_RESET_TO_DEFAULT = resolve("gui.resetToDefault");
+	public static final String GUI_TERRAIN_TAB_TITLE = resolve("gui.terrainTab.title");
+	public static final String GUI_TERRAIN_TAB_ACTIVE = resolve("gui.terrainTab.active");
+	public static final String GUI_TERRAIN_TAB_INACTIVE = resolve("gui.terrainTab.inactive");
+	public static final String GUI_TERRAIN_TAB_PRESET = resolve("gui.terrainTab.preset");
+	public static final String GUI_TERRAIN_TAB_PRESET_TOOLTIP = resolve("gui.terrainTab.preset.tooltip");
+	public static final String GUI_TERRAIN_TAB_MODIFIED = resolve("gui.terrainTab.modified");
+	public static final String GUI_TERRAIN_TAB_ADVANCED = resolve("gui.terrainTab.advanced");
+	public static final String GUI_TERRAIN_TAB_ADVANCED_TOOLTIP = resolve("gui.terrainTab.advanced.tooltip");
+	public static final String GUI_TERRAIN_TAB_VIEW = resolve("gui.terrainTab.view");
+	public static final String GUI_TERRAIN_TAB_PREVIEW = resolve("gui.terrainTab.preview");
+	public static final String GUI_TERRAIN_TAB_PREVIEW_LOADING = resolve("gui.terrainTab.preview.loading");
+	public static final String GUI_TERRAIN_TAB_PREVIEW_HINT = resolve("gui.terrainTab.preview.hint");
+	public static final String GUI_TERRAIN_TAB_APPLY_FAILED = resolve("gui.terrainTab.applyFailed");
+	public static final String SIMPLE_CONTINENT_SIZE = resolve("gui.terrainTab.simple.continentSize");
+	public static final String SIMPLE_BIOME_SIZE = resolve("gui.terrainTab.simple.biomeSize");
+	public static final String SIMPLE_TERRAIN_AREA_SIZE = resolve("gui.terrainTab.simple.terrainAreaSize");
+	public static final String SIMPLE_MOUNTAINS = resolve("gui.terrainTab.simple.mountains");
+	public static final String SIMPLE_RIVERS = resolve("gui.terrainTab.simple.rivers");
+	public static final String SIMPLE_LAKES = resolve("gui.terrainTab.simple.lakes");
+	public static final String SIMPLE_SEA_LEVEL = resolve("gui.terrainTab.simple.seaLevel");
+	public static final String SIMPLE_WORLD_HEIGHT = resolve("gui.terrainTab.simple.worldHeight");
+	public static final String SIMPLE_CAVES = resolve("gui.terrainTab.simple.caves");
 	
 	private static String resolve(String key) {
 		return RTFCommon.MOD_ID + "." + key;

@@ -40,6 +40,7 @@ import raccoonman.reterraforged.client.gui.widget.Label;
 import raccoonman.reterraforged.client.gui.widget.WidgetList;
 import raccoonman.reterraforged.client.gui.widget.WidgetList.Entry;
 import raccoonman.reterraforged.data.preset.settings.BuiltinPresets;
+import raccoonman.reterraforged.data.preset.PresetLibrary;
 import raccoonman.reterraforged.data.preset.settings.Preset;
 import raccoonman.reterraforged.platform.ConfigUtil;
 
@@ -185,15 +186,12 @@ class PresetListPage extends BisectedPage<PresetConfigScreen, PresetEntry, Abstr
 		this.selectPreset(null);
 		
 		List<PresetEntry> entries = new ArrayList<>();
-		entries.addAll(this.listPresets(PRESET_PATH));
-		entries.addAll(this.listPresets(LEGACY_PRESET_PATH));
-
-		entries.add(new PresetEntry(Component.translatable(RTFTranslationKeys.GUI_DEFAULT_PRESET_NAME).withStyle(ChatFormatting.GRAY), BuiltinPresets.makeDefault(), true, this));
-		entries.add(new PresetEntry(Component.translatable(RTFTranslationKeys.GUI_DEFAULT_LEGACY_PRESET_NAME).withStyle(ChatFormatting.GRAY), BuiltinPresets.makeLegacyDefault(), true, this));
-		entries.add(new PresetEntry(Component.translatable(RTFTranslationKeys.GUI_BEAUTIFUL_PRESET_NAME).withStyle(ChatFormatting.GRAY), BuiltinPresets.makeLegacyBeautiful(), true, this));
-		entries.add(new PresetEntry(Component.translatable(RTFTranslationKeys.GUI_HUGE_BIOMES_PRESET_NAME).withStyle(ChatFormatting.GRAY), BuiltinPresets.makeLegacyHugeBiomes(), true, this));
-		entries.add(new PresetEntry(Component.translatable(RTFTranslationKeys.GUI_LITE_PRESET_NAME).withStyle(ChatFormatting.GRAY), BuiltinPresets.makeLegacyLite(), true, this));
-		entries.add(new PresetEntry(Component.translatable(RTFTranslationKeys.GUI_VANILLAISH_PRESET_NAME).withStyle(ChatFormatting.GRAY), BuiltinPresets.makeLegacyVanillaish(), true, this));
+		for (PresetLibrary.Entry entry : PresetLibrary.files(PRESET_PATH, LEGACY_PRESET_PATH)) {
+			entries.add(new PresetEntry(entry.name(), entry.create(), false, this));
+		}
+		for (PresetLibrary.Entry entry : PresetLibrary.builtins()) {
+			entries.add(new PresetEntry(entry.name(), entry.create(), true, this));
+		}
 		this.left.replaceEntries(entries.stream().map(WidgetList.Entry::new).toList());
 	}
 	
@@ -207,28 +205,6 @@ class PresetListPage extends BisectedPage<PresetConfigScreen, PresetEntry, Abstr
 		}).findAny().isPresent();
 	}
 	
-	private List<PresetEntry> listPresets(Path path) throws IOException	{
-		List<PresetEntry> presets = new ArrayList<>();
-		if(Files.exists(path)) {
-			for(Path presetPath : Files.list(path)
-				.filter(Files::isRegularFile)
-				.toList()
-			) {
-				try(Reader reader = Files.newBufferedReader(presetPath)) {
-					String base = FileNameUtils.getBaseName(presetPath.toString());
-					DataResult<Preset> result = Preset.CODEC.parse(JsonOps.INSTANCE, JsonParser.parseReader(reader));
-					Optional<PartialResult<Preset>> error = result.error();
-					if(error.isPresent()) {
-						RTFCommon.LOGGER.error(error.get().message());
-						continue;
-					}
-					Preset preset = result.result().get();
-					presets.add(new PresetEntry(Component.literal(base), preset, false, this));
-				}
-			}
-		}
-		return presets;
-	}
 	
 	public static class PresetEntry extends Label {
 		private Component name;

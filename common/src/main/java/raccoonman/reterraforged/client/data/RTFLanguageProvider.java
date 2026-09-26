@@ -220,6 +220,28 @@ public class RTFLanguageProvider {
 			this.add(RTFTranslationKeys.OPTION_TAG_MEDIUM_PERFORMANCE_IMPACT, "Medium performance impact");
 			this.add(RTFTranslationKeys.OPTION_TAG_HEAVY_PERFORMANCE_IMPACT, "Heavy performance impact");
 			this.add(RTFTranslationKeys.GUI_RESET_TO_DEFAULT, "Ctrl+click to reset to default (%s)");
+			this.add(RTFTranslationKeys.GUI_TERRAIN_TAB_TITLE, "Terrain");
+			this.add(RTFTranslationKeys.GUI_TERRAIN_TAB_ACTIVE, "World type: ReTerraForged");
+			this.add(RTFTranslationKeys.GUI_TERRAIN_TAB_INACTIVE, "Change any setting to use ReTerraForged");
+			this.add(RTFTranslationKeys.GUI_TERRAIN_TAB_PRESET, "Preset");
+			this.add(RTFTranslationKeys.GUI_TERRAIN_TAB_PRESET_TOOLTIP, "Click for the next preset, shift+click for the previous one. Presets saved in the advanced settings are listed too.");
+			this.add(RTFTranslationKeys.GUI_TERRAIN_TAB_MODIFIED, "*");
+			this.add(RTFTranslationKeys.GUI_TERRAIN_TAB_ADVANCED, "Advanced Settings...");
+			this.add(RTFTranslationKeys.GUI_TERRAIN_TAB_ADVANCED_TOOLTIP, "Every setting, grouped into pages, and saving your own presets");
+			this.add(RTFTranslationKeys.GUI_TERRAIN_TAB_VIEW, "View");
+			this.add(RTFTranslationKeys.GUI_TERRAIN_TAB_PREVIEW, "Terrain preview");
+			this.add(RTFTranslationKeys.GUI_TERRAIN_TAB_PREVIEW_LOADING, "Generating...");
+			this.add(RTFTranslationKeys.GUI_TERRAIN_TAB_PREVIEW_HINT, "Scroll to zoom, drag to move");
+			this.add(RTFTranslationKeys.GUI_TERRAIN_TAB_APPLY_FAILED, "Couldn't apply the terrain preset");
+			this.add(RTFTranslationKeys.SIMPLE_CONTINENT_SIZE, "Continent Size");
+			this.add(RTFTranslationKeys.SIMPLE_BIOME_SIZE, "Biome Size");
+			this.add(RTFTranslationKeys.SIMPLE_TERRAIN_AREA_SIZE, "Terrain Area Size");
+			this.add(RTFTranslationKeys.SIMPLE_MOUNTAINS, "Mountains");
+			this.add(RTFTranslationKeys.SIMPLE_RIVERS, "Rivers");
+			this.add(RTFTranslationKeys.SIMPLE_LAKES, "Lakes");
+			this.add(RTFTranslationKeys.SIMPLE_SEA_LEVEL, "Sea Level");
+			this.add(RTFTranslationKeys.SIMPLE_WORLD_HEIGHT, "World Height");
+			this.add(RTFTranslationKeys.SIMPLE_CAVES, "Caves");
 
 			this.add(Tooltips.failTranslationKey(RTFTranslationKeys.GUI_BUTTON_CREATE), "Failed to create preset");
 			this.add(Tooltips.failTranslationKey(RTFTranslationKeys.GUI_BUTTON_COPY), "Failed to copy preset");

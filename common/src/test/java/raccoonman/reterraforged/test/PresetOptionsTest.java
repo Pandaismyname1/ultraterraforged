@@ -123,7 +123,7 @@ public class PresetOptionsTest {
 
 	@Test
 	void resetRestoresTheDefault() {
-		Preset preset = BuiltinPresetRenderTest.presets().get("legacy_huge_biomes").get();
+		Preset preset = BuiltinPresetRenderTest.presets().get("huge_biomes").get();
 		PresetOptions.all().forEach((option) -> option.reset(preset));
 		// resetting in page order can be blocked by a neighbour that hasn't been reset yet, so reset twice
 		PresetOptions.all().forEach((option) -> option.reset(preset));
@@ -165,6 +165,9 @@ public class PresetOptionsTest {
 		}
 		for (OptionTag tag : OptionTag.values()) {
 			requireKey(lang, tag.translationKey(), missing);
+		}
+		for (PresetOptions.SimpleSetting setting : PresetOptions.SIMPLE) {
+			requireKey(lang, setting.labelKey(), missing);
 		}
 		assertTrue(missing.isEmpty(), "missing translations: " + missing);
 	}

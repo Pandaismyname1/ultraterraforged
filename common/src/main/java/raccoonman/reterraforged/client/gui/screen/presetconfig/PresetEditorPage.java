@@ -81,7 +81,7 @@ public abstract class PresetEditorPage extends BisectedPage<PresetConfigScreen, 
 		this.renderMode = PresetWidgets.createCycle(ImmutableList.copyOf(RenderMode.values()), this.renderMode != null ? this.renderMode.getValue() : RenderMode.BIOME_TYPE, Optional.empty(), (button, value) -> {
 			this.regenerate();
 		}, RenderMode::name);
-		this.seed = PresetWidgets.createRandomButton(RTFTranslationKeys.GUI_BUTTON_SEED, (int) this.screen.getSettings().options().seed(), (i) -> {
+		this.seed = PresetWidgets.createRandomButton(RTFTranslationKeys.GUI_BUTTON_SEED, (int) this.screen.seed(), (i) -> {
 			this.screen.setSeed(i);
 			this.regenerate();
 		});
@@ -161,7 +161,7 @@ public abstract class PresetEditorPage extends BisectedPage<PresetConfigScreen, 
 			PerformanceConfig config = PerformanceConfig.read(PerformanceConfig.DEFAULT_FILE_PATH)
 				.resultOrPartial(RTFCommon.LOGGER::error)
 				.orElseGet(PerformanceConfig::makeDefault);
-	        GeneratorContext generatorContext = GeneratorContext.makeUncached(preset, (int) settings.options().seed(), FACTOR, 0, config.batchCount());
+	        GeneratorContext generatorContext = GeneratorContext.makeUncached(preset, (int) PresetEditorPage.this.screen.seed(), FACTOR, 0, config.batchCount());
 	        
 	        this.centerX = 0;
 	        this.centerZ = 0;

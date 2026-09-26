@@ -76,3 +76,24 @@ components.java {
         skip()
     }
 }
+
+// A client run that drives world creation and takes screenshots: ./gradlew :fabric:runClientTest
+// Output (screenshots, log of what happened) goes to fabric/build/clienttest.
+sourceSets {
+    clienttest {
+        compileClasspath += main.compileClasspath + main.output
+        runtimeClasspath += main.runtimeClasspath + main.output
+    }
+}
+
+loom {
+    runs {
+        clientTest {
+            client()
+            name = "Client Test"
+            source sourceSets.clienttest
+            runDir = "run-clienttest"
+            property "reterraforged.clienttest.out", file("build/clienttest").absolutePath
+        }
+    }
+}

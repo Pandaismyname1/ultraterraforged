@@ -17,6 +17,7 @@
   	"MixinClimateSampler",
   	"MixinChunkStatus",
   	"MixinServerPacksSource",
+  	"MixinRegistryDataLoader",
   	"MixinNoiseBasedChunkGenerator",
   	"MixinContext",
   	"MixinSurfaceRules$BiomeConditionSource",
@@ -27,7 +28,8 @@
   	"worldpreview.SampleUtilsMixin"
   ],
   "client": [
-  	"ScreenInvoker"
+  	"ScreenInvoker",
+  	"MixinCreateWorldScreen"
   ],
   "injectors": {
     "defaultRequire": 1

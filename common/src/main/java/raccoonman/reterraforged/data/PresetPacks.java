@@ -20,6 +20,11 @@ public final class PresetPacks {
 	// the name the preset pack has in a world's datapacks folder
 	public static final String WORLD_PACK_NAME = "reterraforged-preset.zip";
 
+	// world packs are named reterraforged-preset.zip on servers and reterraforged-preset-<hash>.zip when made in the Create World screen
+	public static boolean isPresetPack(String packId) {
+		return packId.startsWith("file/reterraforged-preset") && packId.endsWith(".zip");
+	}
+
 	/**
 	 * Writes the datapack for a preset as a zip, replacing any existing file.
 	 *
