@@ -19,12 +19,13 @@ import com.mojang.serialization.JsonOps;
  * before versioning existed (ReTerraForged 0.0.7 and earlier) count as version 0.
  */
 public final class PresetFormat {
-	public static final int CURRENT_VERSION = 1;
+	public static final int CURRENT_VERSION = 2;
 	public static final String VERSION_KEY = "version";
 
 	// UPGRADES.get(n) turns a version n preset into version n + 1
 	private static final List<Consumer<JsonObject>> UPGRADES = List.of(
-		PresetFormat::renameMushroomIslandPoints
+		PresetFormat::renameMushroomIslandPoints,
+		PresetFormat::flattenLegacyStructures
 	);
 
 	static {
@@ -101,6 +102,32 @@ public final class PresetFormat {
 			rename(controlPoints, "mushroomFieldsInland", "islandInland");
 			rename(controlPoints, "mushroomFieldsCoast", "islandCoast");
 		}
+	}
+
+	// 1 -> 2: 0.0.6 nested structure sets as structures.structures and stored "disabled"; the settings were never applied
+	// back then, but keep what the user chose now that they are
+	private static void flattenLegacyStructures(JsonObject preset) {
+		JsonObject structures = getObject(preset, "structures");
+		if (structures == null) {
+			return;
+		}
+		JsonObject legacy = getObject(structures, "structures");
+		if (legacy == null) {
+			return;
+		}
+		JsonObject flattened = new JsonObject();
+		legacy.entrySet().forEach((entry) -> {
+			if (!entry.getValue().isJsonObject()) {
+				return;
+			}
+			JsonObject set = entry.getValue().getAsJsonObject().deepCopy();
+			JsonElement disabled = set.remove("disabled");
+			if (disabled != null && disabled.isJsonPrimitive() && disabled.getAsBoolean()) {
+				set.addProperty("enabled", false);
+			}
+			flattened.add(entry.getKey(), set);
+		});
+		preset.add("structures", flattened);
 	}
 
 	private static void rename(JsonObject object, String from, String to) {

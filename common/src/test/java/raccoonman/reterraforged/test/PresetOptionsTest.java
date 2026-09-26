@@ -40,7 +40,9 @@ public class PresetOptionsTest {
 	// settings present in the preset file that intentionally have no option
 	private static final Set<String> NOT_EXPOSED = Set.of(
 		PresetFormat.VERSION_KEY,
-		"surface.erosion.snowHeight"
+		"surface.erosion.snowHeight",
+		// structure options are generated per structure set from the registry, see StructureOptionsTest
+		"structures"
 	);
 
 	@BeforeAll
@@ -150,7 +152,9 @@ public class PresetOptionsTest {
 		for (Page page : PresetOptions.PAGES) {
 			requireKey(lang, page.titleKey(), missing);
 			for (Category category : page.categories()) {
-				category.label().ifPresent((label) -> requireKey(lang, label, missing));
+				if (category.labelKey() != null) {
+					requireKey(lang, category.labelKey(), missing);
+				}
 				for (Option<?> option : category.options()) {
 					if (!option.isHidden()) {
 						requireKey(lang, option.translationKey(), missing);

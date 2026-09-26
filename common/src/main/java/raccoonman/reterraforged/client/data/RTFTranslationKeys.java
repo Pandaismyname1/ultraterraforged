@@ -153,6 +153,11 @@ public class RTFTranslationKeys {
 	public static final String GUI_SLIDER_SMOOTHING_RATE = resolve("gui.slider.smoothing.rate");
 	public static final String GUI_SLIDER_SPACING = resolve("gui.slider.spacing");
 	public static final String GUI_SLIDER_SEPARATION = resolve("gui.slider.separation");
+	public static final String GUI_BUTTON_STRUCTURE_ENABLED = resolve("gui.button.structureEnabled");
+	public static final String GUI_SLIDER_STRUCTURE_FREQUENCY = resolve("gui.slider.structureFrequency");
+	public static final String GUI_SLIDER_STRUCTURE_DISTANCE = resolve("gui.slider.structureDistance");
+	public static final String GUI_SLIDER_STRUCTURE_SPREAD = resolve("gui.slider.structureSpread");
+	public static final String GUI_SLIDER_STRUCTURE_COUNT = resolve("gui.slider.structureCount");
 	public static final String GUI_SLIDER_STRATA_REGION_SIZE = resolve("gui.slider.strataRegionSize");
 	public static final String GUI_SLIDER_MOUNTAIN_BIOME_USAGE = resolve("gui.slider.mountainBiomeUsage");
 	public static final String GUI_SLIDER_VOLCANO_BIOME_USAGE = resolve("gui.slider.volcanoBiomeUsage");

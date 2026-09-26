@@ -165,6 +165,16 @@ public class RTFLanguageProvider {
 			this.add(RTFTranslationKeys.GUI_SLIDER_SMOOTHING_RATE, "Smoothing Rate");
 			this.add(RTFTranslationKeys.GUI_SLIDER_SPACING, "Spacing");
 			this.add(RTFTranslationKeys.GUI_SLIDER_SEPARATION, "Separation");
+			this.add(RTFTranslationKeys.GUI_BUTTON_STRUCTURE_ENABLED, "Generate");
+			this.add(RTFTranslationKeys.GUI_SLIDER_STRUCTURE_FREQUENCY, "Frequency");
+			this.add(RTFTranslationKeys.GUI_SLIDER_STRUCTURE_DISTANCE, "Ring Distance");
+			this.add(RTFTranslationKeys.GUI_SLIDER_STRUCTURE_SPREAD, "Ring Spread");
+			this.add(RTFTranslationKeys.GUI_SLIDER_STRUCTURE_COUNT, "Count");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_STRUCTURE_ENABLED), "Whether this structure set generates at all");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_STRUCTURE_FREQUENCY), "Chance that a placement attempt actually generates a structure");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_STRUCTURE_DISTANCE), "Spacing of the rings; the first ring is about 4 times this many chunks from the world origin");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_STRUCTURE_SPREAD), "How many structures go in the first ring; each later ring holds more");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_STRUCTURE_COUNT), "Total number of structures placed in rings");
 			this.add(RTFTranslationKeys.GUI_SLIDER_STRATA_REGION_SIZE, "Strata Region Size");
 			this.add(RTFTranslationKeys.GUI_SLIDER_MOUNTAIN_BIOME_USAGE, "Mountain Biome Usage");
 			this.add(RTFTranslationKeys.GUI_SLIDER_VOLCANO_BIOME_USAGE, "Volcano Biome Usage");
