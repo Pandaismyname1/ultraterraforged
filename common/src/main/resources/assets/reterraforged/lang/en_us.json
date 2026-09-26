@@ -102,6 +102,7 @@
   "reterraforged.gui.preset.legacyDefault.name": "TerraForged - Default",
   "reterraforged.gui.preset.lite.name": "TerraForged - Lite",
   "reterraforged.gui.preset.vanillaish.name": "TerraForged - Vanilla-ish",
+  "reterraforged.gui.resetToDefault": "Ctrl+click to reset to default (%s)",
   "reterraforged.gui.riverSettings.title": "River Settings",
   "reterraforged.gui.selectPreset.inputPrompt": "Type preset name",
   "reterraforged.gui.selectPreset.missingLegacyPresets": "Couldn't find any legacy presets",
@@ -302,5 +303,8 @@
   "reterraforged.gui.worldSettings.title": "World Settings",
   "reterraforged.metadata.description": "ReTerraForged resources",
   "reterraforged.mudSwamps.metadata.description": "Changes the swamp material to mud",
+  "reterraforged.option.tag.experimental": "Experimental",
+  "reterraforged.option.tag.heavyPerformanceImpact": "Heavy performance impact",
+  "reterraforged.option.tag.mediumPerformanceImpact": "Medium performance impact",
   "reterraforged.preset.metadata.description": "ReTerraForged preset"
 }

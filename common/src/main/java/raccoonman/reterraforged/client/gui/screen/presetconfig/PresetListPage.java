@@ -153,7 +153,7 @@ class PresetListPage extends BisectedPage<PresetConfigScreen, PresetEntry, Abstr
 			if(entry.isBuiltin()) {
 				entry = new PresetEntry(entry.name, entry.preset.copy(), true, (b) -> {});
 			}
-			return new WorldSettingsPage(this.screen, entry);
+			return new OptionPage(this.screen, entry, 0);
 		});
 	}
 	

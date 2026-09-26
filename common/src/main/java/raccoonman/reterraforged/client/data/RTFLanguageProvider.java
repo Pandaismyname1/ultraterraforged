@@ -204,6 +204,10 @@ public class RTFLanguageProvider {
 			this.add(RTFTranslationKeys.TERRAIN_FOUND, "The nearest %s is at %s (%s blocks away)");
 			this.add(RTFTranslationKeys.TERRAIN_NOT_FOUND, "Could not find a \"%s\" within reasonable distance");
 			this.add(RTFTranslationKeys.TERRAIN_ARGUMENT_INVALID, "Could not find a terrain type with the name \"%s\"");
+			this.add(RTFTranslationKeys.OPTION_TAG_EXPERIMENTAL, "Experimental");
+			this.add(RTFTranslationKeys.OPTION_TAG_MEDIUM_PERFORMANCE_IMPACT, "Medium performance impact");
+			this.add(RTFTranslationKeys.OPTION_TAG_HEAVY_PERFORMANCE_IMPACT, "Heavy performance impact");
+			this.add(RTFTranslationKeys.GUI_RESET_TO_DEFAULT, "Ctrl+click to reset to default (%s)");
 
 			this.add(Tooltips.failTranslationKey(RTFTranslationKeys.GUI_BUTTON_CREATE), "Failed to create preset");
 			this.add(Tooltips.failTranslationKey(RTFTranslationKeys.GUI_BUTTON_COPY), "Failed to copy preset");

@@ -1,5 +1,7 @@
 package raccoonman.reterraforged.data.preset.settings;
 
+import java.util.Optional;
+
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
@@ -30,16 +32,24 @@ import raccoonman.reterraforged.registries.RTFRegistries;
 
 //TODO make this actually immutable when we rework the gui
 public record Preset(WorldSettings world, SurfaceSettings surface, CaveSettings caves, ClimateSettings climate, TerrainSettings terrain, RiverSettings rivers, FilterSettings filters, MiscellaneousSettings miscellaneous) {
-	public static final Codec<Preset> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+	private static final Codec<Preset> UNVERSIONED_CODEC = RecordCodecBuilder.create(instance -> instance.group(
 		WorldSettings.CODEC.fieldOf("world").forGetter(Preset::world),
-		SurfaceSettings.CODEC.optionalFieldOf("surface", new SurfaceSettings(new SurfaceSettings.Erosion(30, 140, 40, 95, 95, 0.65F, 0.475F, 0.4F, 0.45F, 6.0F, 3.0F))).forGetter(Preset::surface),
-		CaveSettings.CODEC.optionalFieldOf("caves", new CaveSettings()).forGetter(Preset::caves),
+		// presets are mutable, so a missing section must get its own default instance rather than a shared one
+		SurfaceSettings.CODEC.optionalFieldOf("surface").xmap((surface) -> surface.orElseGet(Preset::defaultSurface), Optional::of).forGetter(Preset::surface),
+		CaveSettings.CODEC.optionalFieldOf("caves").xmap((caves) -> caves.orElseGet(CaveSettings::new), Optional::of).forGetter(Preset::caves),
 		ClimateSettings.CODEC.fieldOf("climate").forGetter(Preset::climate),
 		TerrainSettings.CODEC.fieldOf("terrain").forGetter(Preset::terrain),
 		RiverSettings.CODEC.fieldOf("rivers").forGetter(Preset::rivers),
 		FilterSettings.CODEC.fieldOf("filters").forGetter(Preset::filters),
 		MiscellaneousSettings.CODEC.fieldOf("miscellaneous").forGetter(Preset::miscellaneous)
 	).apply(instance, Preset::new));
+
+	// what preset files and datapacks use; handles upgrading presets saved by older versions
+	public static final Codec<Preset> CODEC = PresetFormat.versioned(UNVERSIONED_CODEC);
+
+	private static SurfaceSettings defaultSurface() {
+		return new SurfaceSettings(new SurfaceSettings.Erosion(30, 140, 40, 95, 95, 0.65F, 0.475F, 0.4F, 0.45F, 6.0F, 3.0F));
+	}
 	
 	public Preset copy() {
 		return new Preset(this.world.copy(), this.surface.copy(), this.caves.copy(), this.climate.copy(), this.terrain.copy(), this.rivers.copy(), this.filters.copy(), /* this.structures.copy(), */this.miscellaneous.copy());

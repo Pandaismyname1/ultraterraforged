@@ -191,6 +191,10 @@ public class RTFTranslationKeys {
 	public static final String TERRAIN_FOUND = resolve("commands.locate.terrain.found");
 	public static final String TERRAIN_NOT_FOUND = resolve("commands.locate.terrain.not_found");
 	public static final String TERRAIN_ARGUMENT_INVALID = resolve("argument.terrain.invalid");
+	public static final String OPTION_TAG_EXPERIMENTAL = resolve("option.tag.experimental");
+	public static final String OPTION_TAG_MEDIUM_PERFORMANCE_IMPACT = resolve("option.tag.mediumPerformanceImpact");
+	public static final String OPTION_TAG_HEAVY_PERFORMANCE_IMPACT = resolve("option.tag.heavyPerformanceImpact");
+	public static final String GUI_RESET_TO_DEFAULT = resolve("gui.resetToDefault");
 	
 	private static String resolve(String key) {
 		return RTFCommon.MOD_ID + "." + key;

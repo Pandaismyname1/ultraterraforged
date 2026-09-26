@@ -3,7 +3,7 @@ package raccoonman.reterraforged.data.preset.settings;
 import com.mojang.serialization.Codec;
 
 public class CaveSettings {
-	public static final Codec<CaveSettings> CODEC = Codec.unit(new CaveSettings());
+	public static final Codec<CaveSettings> CODEC = Codec.unit(CaveSettings::new);
 //	public static final Codec<CaveSettings> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 //		
 //	).apply(instance, CaveSettings::new));
