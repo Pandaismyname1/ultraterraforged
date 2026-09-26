@@ -1,5 +1,4 @@
 {
-  
   "required": true,
   "plugin": "raccoonman.reterraforged.mixin.plugin.MixinPlugin",
   "package": "raccoonman.reterraforged.mixin",
@@ -15,10 +14,17 @@
   	"MixinStructure",
   	"MixinMinecraftServer",
   	"MixinSpawnFinder",
+  	"MixinClimateSampler",
+  	"MixinChunkStatus",
+  	"MixinServerPacksSource",
+  	"MixinNoiseBasedChunkGenerator",
+  	"MixinContext",
+  	"MixinSurfaceRules$BiomeConditionSource",
   	"terrablender.MixinParameterList",
   	"terrablender.MixinClimateSampler",
   	"terrablender.MixinTargetPoint",
-  	"terrablender.MixinNoiseChunk"
+  	"terrablender.MixinNoiseChunk",
+  	"worldpreview.SampleUtilsMixin"
   ],
   "client": [
   	"ScreenInvoker"

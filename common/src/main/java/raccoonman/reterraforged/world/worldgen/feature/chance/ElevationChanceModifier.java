@@ -10,7 +10,7 @@ import net.minecraft.core.SectionPos;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import raccoonman.reterraforged.world.worldgen.GeneratorContext;
 import raccoonman.reterraforged.world.worldgen.RTFRandomState;
-import raccoonman.reterraforged.world.worldgen.densityfunction.tile.Tile;
+import raccoonman.reterraforged.world.worldgen.tile.Tile;
 
 class ElevationChanceModifier extends RangeChanceModifier {
 	public static final Codec<ElevationChanceModifier> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -39,7 +39,7 @@ class ElevationChanceModifier extends RangeChanceModifier {
 			int chunkX = SectionPos.blockToSectionCoord(x);
 			int chunkZ = SectionPos.blockToSectionCoord(z);
 			Tile.Chunk chunk = generatorContext.cache.provideAtChunk(chunkX, chunkZ).getChunkReader(chunkX, chunkZ);
-			return rtfRandomState.generatorContext().generator.getHeightmap().levels().elevation(chunk.getCell(x, z).height);
+			return rtfRandomState.generatorContext().localHeightmap.get().levels().elevation(chunk.getCell(x, z).height);
 		} else {
 			throw new UnsupportedOperationException();
 		}
