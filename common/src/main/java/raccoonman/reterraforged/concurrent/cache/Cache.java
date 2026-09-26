@@ -7,14 +7,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.IntFunction;
 import java.util.function.LongFunction;
 
+import raccoonman.reterraforged.concurrent.ThreadPools;
 import raccoonman.reterraforged.concurrent.cache.map.LongMap;
 
 public class Cache<V extends ExpiringEntry> implements AutoCloseable {
-	public static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor((r) -> {
-		Thread thread = new Thread(r);
-		thread.setName("CacheScheduler");
-		return thread;
-	});
+	public static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor(ThreadPools.daemonFactory("RTF-CacheScheduler"));
 	
     private LongMap<V> map;
     private long lifetimeMS;
