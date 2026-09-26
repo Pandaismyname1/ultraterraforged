@@ -57,9 +57,14 @@ public class PresetSurfaceRuleData {
     private static final SurfaceRules.RuleSource WATER = PresetSurfaceRuleData.makeStateRule(Blocks.WATER);
 
     private static final ResourceLocation STRATA_CACHE_ID = RTFCommon.location("default");
+    private static final ResourceLocation DEEP_STRATA_CACHE_ID = RTFCommon.location("deep");
     private static final int STRATA_VARIANTS = 100;
-    private static final int STRATA_MIN_THICKNESS = 3;
-    private static final int STRATA_MAX_THICKNESS = 14;
+    // thin beds, so a cliff shows many alternating layers
+    private static final int STRATA_MIN_THICKNESS = 1;
+    private static final int STRATA_MAX_THICKNESS = 6;
+    // share of plain stone, and of deepslate in the deep layers
+    private static final float STRATA_STONE_SHARE = 0.25F;
+    private static final float STRATA_DEEPSLATE_SHARE = 0.4F;
     // how deep the bare rock of steep slopes stays plain stone when strata are kept off the surface
     private static final int STRATA_PLAIN_DEPTH = 5;
     // the top of the vanilla stone to deepslate transition
@@ -622,8 +627,11 @@ public class PresetSurfaceRuleData {
         		surface
         	)
         );
+        // vanilla's gradual change from stone to deepslate; with rock layers the deepslate is layered too
+        SurfaceRules.ConditionSource deepslateLevel = SurfaceRules.verticalGradient("deepslate", VerticalAnchor.absolute(0), VerticalAnchor.absolute(DEEPSLATE_TOP));
+        list.add(SurfaceRules.ifTrue(deepslateLevel, miscellaneousSettings.strataDecorator ? makeDeepStrataRule(noise) : DEEPSLATE));
         if (miscellaneousSettings.strataDecorator) {
-        	// whatever stone the surface left, down to where deepslate takes over
+        	// whatever stone the surface left
         	SurfaceRules.RuleSource strata = makeStrataRule(miscellaneousSettings, noise);
         	if (miscellaneousSettings.plainStoneErosion) {
         		// the rock laid bare on steep slopes stays plain stone; the layers only show deeper in
@@ -634,7 +642,7 @@ public class PresetSurfaceRuleData {
         	}
         	list.add(strata);
         }
-        list.add(SurfaceRules.ifTrue(SurfaceRules.verticalGradient("deepslate", VerticalAnchor.absolute(0), VerticalAnchor.absolute(DEEPSLATE_TOP)), DEEPSLATE));
+
         SurfaceRules.RuleSource rules = SurfaceRules.sequence(list.toArray(SurfaceRules.RuleSource[]::new));
         return rules;
     }
@@ -695,12 +703,30 @@ public class PresetSurfaceRuleData {
 			noise.getOrThrow(PresetStrataNoise.STRATA_SELECTOR),
 			noise.getOrThrow(PresetStrataNoise.STRATA_OFFSET),
 			noise.getOrThrow(PresetStrataNoise.STRATA_THICKNESS),
+			Blocks.STONE,
+			STRATA_STONE_SHARE,
 			miscellaneousSettings.rockTag(),
 			RTFBlockTags.STRATA_EXCLUDED,
 			STRATA_VARIANTS,
 			STRATA_MIN_THICKNESS,
-			STRATA_MAX_THICKNESS,
-			DEEPSLATE_TOP
+			STRATA_MAX_THICKNESS
+		);
+	}
+
+	// deepslate layered with tuff and whatever else ores turn into deepslate ores in
+	private static SurfaceRules.RuleSource makeDeepStrataRule(HolderGetter<Noise> noise) {
+		return new StrataRule(
+			DEEP_STRATA_CACHE_ID,
+			noise.getOrThrow(PresetStrataNoise.STRATA_SELECTOR),
+			noise.getOrThrow(PresetStrataNoise.STRATA_OFFSET),
+			noise.getOrThrow(PresetStrataNoise.STRATA_THICKNESS),
+			Blocks.DEEPSLATE,
+			STRATA_DEEPSLATE_SHARE,
+			RTFBlockTags.DEEP_ROCK,
+			RTFBlockTags.STRATA_EXCLUDED,
+			STRATA_VARIANTS,
+			STRATA_MIN_THICKNESS,
+			STRATA_MAX_THICKNESS
 		);
 	}
 

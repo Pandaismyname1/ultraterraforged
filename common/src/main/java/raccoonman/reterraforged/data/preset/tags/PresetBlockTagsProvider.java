@@ -43,7 +43,8 @@ public class PresetBlockTagsProvider extends IntrinsicHolderTagsProvider<Block> 
 			.addOptional(new ResourceLocation("create", "scorchia"))
 			.addOptional(new ResourceLocation("create", "scoria"))
 			.addOptional(new ResourceLocation("create", "veridium"));
-		// deepslate has its own layer at the bottom of the world
+		// deepslate is layered on its own, with the rocks ores turn into deepslate ores in
+		this.tag(RTFBlockTags.DEEP_ROCK).addOptionalTag(BlockTags.DEEPSLATE_ORE_REPLACEABLES.location());
 		this.tag(RTFBlockTags.STRATA_EXCLUDED).add(Blocks.DEEPSLATE);
 		this.tag(BlockTags.OVERWORLD_CARVER_REPLACEABLES).add(Blocks.CLAY);
 	}

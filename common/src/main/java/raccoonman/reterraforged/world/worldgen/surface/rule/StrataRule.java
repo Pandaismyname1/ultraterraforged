@@ -40,20 +40,21 @@ import raccoonman.reterraforged.world.worldgen.surface.RTFSurfaceSystem;
  * @param thickness how much the layers are stretched at a position, 1 keeps them as generated
  * @param materials the rocks to layer; mods' stones join through the vanilla stone tags this tag includes
  * @param excluded rocks never to layer, even though a mod tagged them as stone
- * @param minY below this the rule leaves the stone alone, e.g. for the deepslate transition
+ * @param base the main rock, like stone above deepslate, which fills about {@code baseShare} of the layers
  */
-public record StrataRule(ResourceLocation cacheId, Holder<Noise> selector, Holder<Noise> offset, Holder<Noise> thickness, TagKey<Block> materials, TagKey<Block> excluded, int variants, int minThickness, int maxThickness, int minY) implements SurfaceRules.RuleSource {
+public record StrataRule(ResourceLocation cacheId, Holder<Noise> selector, Holder<Noise> offset, Holder<Noise> thickness, Block base, float baseShare, TagKey<Block> materials, TagKey<Block> excluded, int variants, int minThickness, int maxThickness) implements SurfaceRules.RuleSource {
 	public static final Codec<StrataRule> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 		ResourceLocation.CODEC.fieldOf("cache_id").forGetter(StrataRule::cacheId),
 		Noise.CODEC.fieldOf("selector").forGetter(StrataRule::selector),
 		Noise.CODEC.fieldOf("offset").forGetter(StrataRule::offset),
 		Noise.CODEC.fieldOf("thickness").forGetter(StrataRule::thickness),
+		BuiltInRegistries.BLOCK.byNameCodec().fieldOf("base").forGetter(StrataRule::base),
+		Codec.floatRange(0.0F, 0.95F).fieldOf("base_share").forGetter(StrataRule::baseShare),
 		TagKey.hashedCodec(Registries.BLOCK).fieldOf("materials").forGetter(StrataRule::materials),
 		TagKey.hashedCodec(Registries.BLOCK).fieldOf("excluded").forGetter(StrataRule::excluded),
 		Codec.intRange(1, 1024).fieldOf("variants").forGetter(StrataRule::variants),
 		Codec.intRange(1, 256).fieldOf("min_thickness").forGetter(StrataRule::minThickness),
-		Codec.intRange(1, 256).fieldOf("max_thickness").forGetter(StrataRule::maxThickness),
-		Codec.INT.fieldOf("min_y").forGetter(StrataRule::minY)
+		Codec.intRange(1, 256).fieldOf("max_thickness").forGetter(StrataRule::maxThickness)
 	).apply(instance, StrataRule::new));
 
 	// how far the stacks reach past the build limits, so offset and stretched layers never run out
@@ -66,13 +67,11 @@ public record StrataRule(ResourceLocation cacheId, Holder<Noise> selector, Holde
 		if (!((Object) ctx.system instanceof RTFSurfaceSystem surfaceSystem) || !((Object) ctx.randomState instanceof RTFRandomState randomState)) {
 			throw new IllegalStateException("Strata need ReTerraForged's surface system");
 		}
-		int height = ctx.chunk.getMaxBuildHeight() - this.minY + MARGIN * 2;
+		int bottom = ctx.chunk.getMinBuildHeight();
+		int height = ctx.chunk.getMaxBuildHeight() - bottom + MARGIN * 2;
 		List<StrataStack> stacks = surfaceSystem.getOrCreateStrata(this.cacheId, (random) -> this.generate(random, height));
-		if (stacks.isEmpty()) {
-			return (x, y, z) -> null;
-		}
 		// the noises are seeded by the world, so every world has its own regions and folds
-		return new Rule(stacks, randomState.wrap(this.selector.value()), randomState.wrap(this.offset.value()), randomState.wrap(this.thickness.value()));
+		return new Rule(stacks, bottom, randomState.wrap(this.selector.value()), randomState.wrap(this.offset.value()), randomState.wrap(this.thickness.value()));
 	}
 
 	@Override
@@ -82,14 +81,11 @@ public record StrataRule(ResourceLocation cacheId, Holder<Noise> selector, Holde
 
 	private List<StrataStack> generate(RandomSource random, int height) {
 		List<BlockState> materials = this.findMaterials();
-		RTFCommon.LOGGER.info("Rock layers use {}", materials.stream().map((state) -> BuiltInRegistries.BLOCK.getKey(state.getBlock()).toString()).toList());
-		if (materials.isEmpty()) {
-			return List.of();
-		}
+		RTFCommon.LOGGER.info("Rock layers ({}, on {}) use {}", this.cacheId, BuiltInRegistries.BLOCK.getKey(this.base), materials.stream().map((state) -> BuiltInRegistries.BLOCK.getKey(state.getBlock()).toString()).toList());
 		List<StrataStack> stacks = new ArrayList<>(this.variants);
 		for (int i = 0; i < this.variants; i++) {
 			// layers can be stretched to half their thickness at the least, see PresetStrataNoise
-			stacks.add(StrataStack.generate(random, materials, height * 2, this.minThickness, Math.max(this.minThickness, this.maxThickness)));
+			stacks.add(StrataStack.generate(random, this.base.defaultBlockState(), this.baseShare, materials, height * 2, this.minThickness, Math.max(this.minThickness, this.maxThickness)));
 		}
 		return stacks;
 	}
@@ -104,7 +100,7 @@ public record StrataRule(ResourceLocation cacheId, Holder<Noise> selector, Holde
 		List<BlockState> materials = new ArrayList<>();
 		for (Block block : blocks) {
 			BlockState state = block.defaultBlockState();
-			if (state.is(this.excluded) || block instanceof FallingBlock || block instanceof EntityBlock || !state.isCollisionShapeFullBlock(EmptyBlockGetter.INSTANCE, BlockPos.ZERO)) {
+			if (block == this.base || state.is(this.excluded) || block instanceof FallingBlock || block instanceof EntityBlock || !state.isCollisionShapeFullBlock(EmptyBlockGetter.INSTANCE, BlockPos.ZERO)) {
 				continue;
 			}
 			materials.add(state);
@@ -114,6 +110,7 @@ public record StrataRule(ResourceLocation cacheId, Holder<Noise> selector, Holde
 
 	private class Rule implements SurfaceRules.SurfaceRule {
 		private final List<StrataStack> stacks;
+		private final int bottom;
 		private final Noise selector;
 		private final Noise offset;
 		private final Noise thickness;
@@ -126,8 +123,9 @@ public record StrataRule(ResourceLocation cacheId, Holder<Noise> selector, Holde
 		private int lastX = Integer.MIN_VALUE;
 		private int lastZ = Integer.MIN_VALUE;
 
-		Rule(List<StrataStack> stacks, Noise selector, Noise offset, Noise thickness) {
+		Rule(List<StrataStack> stacks, int bottom, Noise selector, Noise offset, Noise thickness) {
 			this.stacks = stacks;
+			this.bottom = bottom;
 			this.selector = selector;
 			this.offset = offset;
 			this.thickness = thickness;
@@ -145,17 +143,13 @@ public record StrataRule(ResourceLocation cacheId, Holder<Noise> selector, Holde
 
 		@Override
 		public BlockState tryApply(int x, int y, int z) {
-			if (y < StrataRule.this.minY) {
-				return null;
-			}
 			if (x != this.lastX || z != this.lastZ) {
 				this.updateColumn(x, z);
 				this.lastX = x;
 				this.lastZ = z;
 			}
-			int minY = StrataRule.this.minY;
 			float fromPivot = y + this.columnOffset - PIVOT_Y;
-			return this.stack.at(MARGIN + (PIVOT_Y - minY) + fromPivot / this.columnThickness);
+			return this.stack.at(MARGIN + (PIVOT_Y - this.bottom) + fromPivot / this.columnThickness);
 		}
 	}
 }

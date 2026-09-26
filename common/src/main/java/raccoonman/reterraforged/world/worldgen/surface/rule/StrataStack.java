@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
@@ -12,10 +11,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * each strata region uses one.
  */
 public final class StrataStack {
-	// plain stone makes up about this share of the layers however many rocks mods add, so the underground still
-	// reads as stone
-	private static final float STONE_SHARE = 0.45F;
-	// each stack uses stone and only a few of the other rocks, like a real region's geology; with many mods adding
+	// each stack uses the base rock and only a few of the others, like a real region's geology; with many mods adding
 	// rocks this keeps every region coherent instead of a mix of everything
 	private static final int MIN_ROCKS_PER_STACK = 2;
 	private static final int MAX_ROCKS_PER_STACK = 4;
@@ -32,18 +28,18 @@ public final class StrataStack {
 	/**
 	 * Stacks layers of the given rocks until they are {@code height} blocks tall. Neighbouring layers are always of
 	 * different rock, otherwise the boundary between them wouldn't show.
+	 *
+	 * @param base the region's main rock, e.g. stone; always used, whether or not it's among the materials
+	 * @param baseShare roughly the share of layers of the base rock, however many other rocks mods add
 	 */
-	public static StrataStack generate(RandomSource random, List<BlockState> materials, int height, int minThickness, int maxThickness) {
-		if (materials.isEmpty()) {
-			throw new IllegalArgumentException("No strata materials");
-		}
-		materials = pickRocks(random, materials);
-		long others = materials.stream().filter((material) -> !material.is(Blocks.STONE)).count();
-		float stoneWeight = others == 0 ? 1.0F : others * STONE_SHARE / (1.0F - STONE_SHARE);
+	public static StrataStack generate(RandomSource random, BlockState base, float baseShare, List<BlockState> materials, int height, int minThickness, int maxThickness) {
+		materials = pickRocks(random, base, materials);
+		long others = materials.size() - 1;
+		float baseWeight = others == 0 ? 1.0F : others * baseShare / (1.0F - baseShare);
 		float[] weights = new float[materials.size()];
 		float total = 0.0F;
 		for (int i = 0; i < weights.length; i++) {
-			total += materials.get(i).is(Blocks.STONE) ? stoneWeight : 1.0F;
+			total += materials.get(i) == base ? baseWeight : 1.0F;
 			weights[i] = total;
 		}
 		List<Integer> tops = new ArrayList<>();
@@ -70,12 +66,13 @@ public final class StrataStack {
 		return new StrataStack(tops.stream().mapToInt(Integer::intValue).toArray(), states.toArray(BlockState[]::new));
 	}
 
-	// plain stone, if available, and a few others
-	private static List<BlockState> pickRocks(RandomSource random, List<BlockState> materials) {
-		List<BlockState> stone = new ArrayList<>();
+	// the base rock and a few others
+	private static List<BlockState> pickRocks(RandomSource random, BlockState base, List<BlockState> materials) {
 		List<BlockState> others = new ArrayList<>();
 		for (BlockState material : materials) {
-			(material.is(Blocks.STONE) ? stone : others).add(material);
+			if (material != base) {
+				others.add(material);
+			}
 		}
 		int count = Math.min(others.size(), MIN_ROCKS_PER_STACK + random.nextInt(MAX_ROCKS_PER_STACK - MIN_ROCKS_PER_STACK + 1));
 		// the first few of a shuffled copy
@@ -85,7 +82,8 @@ public final class StrataStack {
 			others.set(swap, others.get(i));
 			others.set(i, rock);
 		}
-		List<BlockState> picked = new ArrayList<>(stone);
+		List<BlockState> picked = new ArrayList<>();
+		picked.add(base);
 		picked.addAll(others.subList(0, count));
 		return picked;
 	}

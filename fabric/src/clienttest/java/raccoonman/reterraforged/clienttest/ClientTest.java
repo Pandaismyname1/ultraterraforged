@@ -243,25 +243,51 @@ public class ClientTest implements ClientModInitializer {
 		return String.join(", ", widgets);
 	}
 
-	// a vertical cut through the terrain, coloured like a map, and the rocks found in it
+	// distinct colours for rocks that look alike on a map
+	private static final java.util.Map<net.minecraft.world.level.block.Block, Integer> ROCK_COLORS = java.util.Map.of(
+		net.minecraft.world.level.block.Blocks.STONE, 0x7F7F7F,
+		net.minecraft.world.level.block.Blocks.ANDESITE, 0x5E7A8C,
+		net.minecraft.world.level.block.Blocks.GRANITE, 0xB5654A,
+		net.minecraft.world.level.block.Blocks.DIORITE, 0xE8E8E0,
+		net.minecraft.world.level.block.Blocks.TUFF, 0x6E7A55,
+		net.minecraft.world.level.block.Blocks.CALCITE, 0xF5F0C8,
+		net.minecraft.world.level.block.Blocks.DEEPSLATE, 0x333338
+	);
+	private static final int SLICE_SCALE = 3;
+
+	// a vertical cut through the terrain from the bottom of the world to just above the surface, and the rocks in it
 	private void slice(ServerLevel level, BlockPos center) {
 		int width = 256;
 		int minY = level.getMinBuildHeight();
-		int height = level.getMaxBuildHeight() - minY;
+		int top = minY;
+		net.minecraft.world.level.block.state.BlockState[][] states = new net.minecraft.world.level.block.state.BlockState[width][];
 		java.util.Map<String, Integer> counts = new java.util.TreeMap<>();
-		try (NativeImage image = new NativeImage(width, height, true)) {
-			BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+		for (int dx = 0; dx < width; dx++) {
+			int x = center.getX() - width / 2 + dx;
+			int surface = level.getChunk(x >> 4, center.getZ() >> 4).getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE_WG, x & 15, center.getZ() & 15);
+			top = Math.max(top, surface);
+			states[dx] = new net.minecraft.world.level.block.state.BlockState[level.getMaxBuildHeight() - minY];
+			for (int y = minY; y < level.getMaxBuildHeight(); y++) {
+				net.minecraft.world.level.block.state.BlockState state = level.getBlockState(pos.set(x, y, center.getZ()));
+				states[dx][y - minY] = state;
+				if (!state.isAir()) {
+					counts.merge(net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(state.getBlock()).getPath(), 1, Integer::sum);
+				}
+			}
+		}
+		int height = Math.min(level.getMaxBuildHeight(), top + 10) - minY;
+		try (NativeImage image = new NativeImage(width * SLICE_SCALE, height * SLICE_SCALE, true)) {
 			for (int dx = 0; dx < width; dx++) {
-				int x = center.getX() - width / 2 + dx;
-				for (int y = minY; y < minY + height; y++) {
-					pos.set(x, y, center.getZ());
-					net.minecraft.world.level.block.state.BlockState state = level.getBlockState(pos);
-					int color = state.isAir() ? 0xFF000000 : state.getMapColor(level, pos).col;
+				for (int dy = 0; dy < height; dy++) {
+					net.minecraft.world.level.block.state.BlockState state = states[dx][dy];
+					int color = state.isAir() ? 0x201010 : ROCK_COLORS.getOrDefault(state.getBlock(), state.getMapColor(level, pos.set(center.getX() - width / 2 + dx, dy + minY, center.getZ())).col);
 					// NativeImage is ABGR
 					int abgr = 0xFF000000 | (color & 0xFF) << 16 | (color & 0xFF00) | (color >> 16 & 0xFF);
-					image.setPixelRGBA(dx, height - 1 - (y - minY), state.isAir() ? 0xFF201010 : abgr);
-					if (!state.isAir() && y >= 8) {
-						counts.merge(net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(state.getBlock()).getPath(), 1, Integer::sum);
+					for (int px = 0; px < SLICE_SCALE; px++) {
+						for (int py = 0; py < SLICE_SCALE; py++) {
+							image.setPixelRGBA(dx * SLICE_SCALE + px, (height - 1 - dy) * SLICE_SCALE + py, abgr);
+						}
 					}
 				}
 			}
@@ -269,7 +295,7 @@ public class ClientTest implements ClientModInitializer {
 		} catch (IOException e) {
 			this.log("slice failed: " + e);
 		}
-		this.log("blocks above y=8 in the slice: " + counts);
+		this.log("blocks in the slice: " + counts);
 	}
 
 	private String list(Path directory) {

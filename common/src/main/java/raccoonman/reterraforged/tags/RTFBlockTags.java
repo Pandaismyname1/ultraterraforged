@@ -11,6 +11,8 @@ public class RTFBlockTags {
 	public static final TagKey<Block> ORE_COMPATIBLE_ROCK = resolve("ore_compatible_rock");
 	// rocks that never go into rock layers, whatever other tags they are in
 	public static final TagKey<Block> STRATA_EXCLUDED = resolve("strata_excluded");
+	// the rocks layered into deepslate
+	public static final TagKey<Block> DEEP_ROCK = resolve("deep_rock");
 	public static final TagKey<Block> CLAY = resolve("clay");
 	public static final TagKey<Block> SEDIMENT = resolve("sediment");
 	public static final TagKey<Block> ERODIBLE = resolve("erodible");

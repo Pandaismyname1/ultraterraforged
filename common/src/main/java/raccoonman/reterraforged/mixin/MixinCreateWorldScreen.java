@@ -59,6 +59,11 @@ abstract class MixinCreateWorldScreen extends Screen implements TerrainState.Hol
 			if (!this.recreated && ClientConfig.load().defaultWorldType()) {
 				state.selectReTerraForged();
 			}
+			// set only by the dev launch configurations, so test worlds can be flown around
+			if (!this.recreated && Boolean.getBoolean("reterraforged.dev.creative")) {
+				state.uiState().setGameMode(WorldCreationUiState.SelectedGameMode.CREATIVE);
+				state.uiState().setAllowCheats(true);
+			}
 		}
 	}
 

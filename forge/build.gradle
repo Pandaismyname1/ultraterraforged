@@ -10,6 +10,13 @@ architectury {
 loom {
     accessWidenerPath = project(":common").loom.accessWidenerPath
 
+    runs {
+        // new worlds in the dev game start in creative with cheats, to fly around and inspect terrain
+        client {
+            property "reterraforged.dev.creative", "true"
+        }
+    }
+
     forge {
         convertAccessWideners = true
         extraAccessWideners.add loom.accessWidenerPath.get().asFile.name

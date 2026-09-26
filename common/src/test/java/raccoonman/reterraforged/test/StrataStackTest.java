@@ -27,7 +27,7 @@ public class StrataStackTest {
 
 	@Test
 	void layersCoverTheHeightWithVisibleBoundaries() {
-		StrataStack stack = StrataStack.generate(RandomSource.create(42L), rocks, 600, 3, 14);
+		StrataStack stack = StrataStack.generate(RandomSource.create(42L), Blocks.STONE.defaultBlockState(), 0.25F, rocks, 600, 3, 14);
 		int previousTop = 0;
 		for (int i = 0; i < stack.layerCount(); i++) {
 			int thickness = stack.layerTop(i) - previousTop;
@@ -43,8 +43,8 @@ public class StrataStackTest {
 
 	@Test
 	void sameSeedSameLayers() {
-		StrataStack a = StrataStack.generate(RandomSource.create(7L), rocks, 300, 3, 14);
-		StrataStack b = StrataStack.generate(RandomSource.create(7L), rocks, 300, 3, 14);
+		StrataStack a = StrataStack.generate(RandomSource.create(7L), Blocks.STONE.defaultBlockState(), 0.25F, rocks, 300, 3, 14);
+		StrataStack b = StrataStack.generate(RandomSource.create(7L), Blocks.STONE.defaultBlockState(), 0.25F, rocks, 300, 3, 14);
 		assertEquals(a.layerCount(), b.layerCount());
 		for (int i = 0; i < a.layerCount(); i++) {
 			assertEquals(a.layerTop(i), b.layerTop(i));
@@ -54,7 +54,7 @@ public class StrataStackTest {
 
 	@Test
 	void lookupFindsTheLayerAtEachHeight() {
-		StrataStack stack = StrataStack.generate(RandomSource.create(3L), rocks, 200, 3, 14);
+		StrataStack stack = StrataStack.generate(RandomSource.create(3L), Blocks.STONE.defaultBlockState(), 0.25F, rocks, 200, 3, 14);
 		for (int i = 0; i < stack.layerCount(); i++) {
 			int bottom = i == 0 ? 0 : stack.layerTop(i - 1);
 			assertEquals(stack.layerState(i), stack.at(bottom), "bottom of layer " + i);
@@ -66,22 +66,43 @@ public class StrataStackTest {
 	}
 
 	@Test
-	void stoneStaysTheMostCommonRock() {
-		Map<BlockState, Integer> thickness = new HashMap<>();
-		for (int seed = 0; seed < 50; seed++) {
-			StrataStack stack = StrataStack.generate(RandomSource.create(seed), rocks, 600, 3, 14);
-			int previousTop = 0;
-			for (int i = 0; i < stack.layerCount(); i++) {
-				thickness.merge(stack.layerState(i), stack.layerTop(i) - previousTop, Integer::sum);
-				previousTop = stack.layerTop(i);
+	void baseRockKeepsItsShare() {
+		// however many rocks there are, the base rock fills about the share it's given
+		for (int extra : new int[] { 0, 10 }) {
+			List<BlockState> materials = new java.util.ArrayList<>(rocks);
+			for (int i = 0; i < extra; i++) {
+				materials.add(List.of(Blocks.TUFF, Blocks.CALCITE, Blocks.SMOOTH_BASALT, Blocks.DRIPSTONE_BLOCK, Blocks.SANDSTONE, Blocks.TERRACOTTA, Blocks.MUD_BRICKS, Blocks.PRISMARINE, Blocks.BLACKSTONE, Blocks.END_STONE).get(i).defaultBlockState());
+			}
+			int stone = 0;
+			int all = 0;
+			for (int seed = 0; seed < 50; seed++) {
+				StrataStack stack = StrataStack.generate(RandomSource.create(seed), Blocks.STONE.defaultBlockState(), 0.25F, materials, 600, 1, 6);
+				int previousTop = 0;
+				for (int i = 0; i < stack.layerCount(); i++) {
+					int thickness = stack.layerTop(i) - previousTop;
+					all += thickness;
+					if (stack.layerState(i).is(Blocks.STONE)) {
+						stone += thickness;
+					}
+					previousTop = stack.layerTop(i);
+				}
+			}
+			float share = stone / (float) all;
+			assertTrue(share > 0.15F && share < 0.35F, "stone share " + share + " with " + extra + " extra rocks");
+		}
+	}
+
+	@Test
+	void thinBedsMakeManyLayers() {
+		// a 60 block cliff should cut through a lasagna of layers, not a few thick bands
+		StrataStack stack = StrataStack.generate(RandomSource.create(5L), Blocks.STONE.defaultBlockState(), 0.25F, rocks, 600, 1, 6);
+		int layers = 0;
+		for (int i = 0; i < stack.layerCount() && stack.layerTop(i) < 300; i++) {
+			if (stack.layerTop(i) >= 240) {
+				layers++;
 			}
 		}
-		int stone = thickness.get(Blocks.STONE.defaultBlockState());
-		for (BlockState rock : rocks) {
-			if (!rock.is(Blocks.STONE)) {
-				assertTrue(stone > thickness.get(rock) * 1.5F, "stone " + stone + " vs " + rock + " " + thickness.get(rock));
-			}
-		}
+		assertTrue(layers >= 12, layers + " layers in 60 blocks");
 	}
 
 	@Test
@@ -94,7 +115,7 @@ public class StrataStackTest {
 		java.util.Set<BlockState> seen = new java.util.HashSet<>();
 		RandomSource random = RandomSource.create(99L);
 		for (int i = 0; i < 100; i++) {
-			StrataStack stack = StrataStack.generate(random, many, 600, 3, 14);
+			StrataStack stack = StrataStack.generate(random, Blocks.STONE.defaultBlockState(), 0.25F, many, 600, 3, 14);
 			java.util.Set<BlockState> used = new java.util.HashSet<>();
 			for (int layer = 0; layer < stack.layerCount(); layer++) {
 				used.add(stack.layerState(layer));
@@ -110,7 +131,7 @@ public class StrataStackTest {
 
 	@Test
 	void aSingleRockMakesOneLayer() {
-		StrataStack stack = StrataStack.generate(RandomSource.create(1L), List.of(Blocks.STONE.defaultBlockState()), 100, 3, 14);
+		StrataStack stack = StrataStack.generate(RandomSource.create(1L), Blocks.STONE.defaultBlockState(), 0.25F, List.of(Blocks.STONE.defaultBlockState()), 100, 3, 14);
 		assertEquals(1, stack.layerCount());
 		assertTrue(stack.layerTop(0) >= 100);
 	}

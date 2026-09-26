@@ -88,12 +88,17 @@ sourceSets {
 
 loom {
     runs {
+        // new worlds in the dev game start in creative with cheats, to fly around and inspect terrain
+        client {
+            property "reterraforged.dev.creative", "true"
+        }
         clientTest {
             client()
             name = "Client Test"
             source sourceSets.clienttest
             runDir = "run-clienttest"
             property "reterraforged.clienttest.out", file("build/clienttest").absolutePath
+            property "reterraforged.dev.creative", "true"
         }
     }
 }
