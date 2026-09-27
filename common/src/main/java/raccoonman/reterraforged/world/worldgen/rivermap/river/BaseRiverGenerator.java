@@ -34,6 +34,7 @@ public abstract class BaseRiverGenerator<T extends Continent> implements RiverGe
     // rivers, lakes and wetlands above the sea follow the land rather than all lying at sea level
     protected boolean raisedWater;
     protected int gorgeDepth;
+    protected boolean winding;
     
     public BaseRiverGenerator(T continent, GeneratorContext context) {
         this.continent = continent;
@@ -48,6 +49,7 @@ public abstract class BaseRiverGenerator<T extends Continent> implements RiverGe
         this.lake = LakeConfig.of(context.preset.rivers().lakes, context.levels);
         this.raisedWater = context.preset.rivers().raisedWater;
         this.gorgeDepth = context.preset.rivers().gorgeDepth;
+        this.winding = context.preset.rivers().winding;
     }
     
     @Override
@@ -63,7 +65,7 @@ public abstract class BaseRiverGenerator<T extends Continent> implements RiverGe
             this.generateWetlands(river, random);
         }
         Network[] networks = rivers.stream().map(Network.Builder::build).toArray(Network[]::new);
-        return new Rivermap(x, z, networks, warp, this.raisedWater, this.gorgeDepth);
+        return new Rivermap(x, z, networks, warp, this.raisedWater, this.gorgeDepth, this.winding);
     }
     
     public List<Network.Builder> generateRoots(int x, int z, Random random, GenWarp warp) {

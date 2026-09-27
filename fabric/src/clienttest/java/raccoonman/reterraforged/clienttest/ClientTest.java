@@ -40,6 +40,9 @@ import raccoonman.reterraforged.preset.option.PresetOptions;
  */
 public class ClientTest implements ClientModInitializer {
 	private static final int TIMEOUT_TICKS = 20 * 60 * 5;
+	// with -Dreterraforged.clienttest.tour=true: a default world, visiting each of these, as /rtf locate finds them
+	private static final boolean TOUR = Boolean.getBoolean("reterraforged.clienttest.tour");
+	private static final String[] TOUR_STOPS = System.getProperty("reterraforged.clienttest.stops", "river,salt_flat,alluvial_fan,glacial_valley,cirque,drumlins,moraine,barrier_island,karst,sinkhole,delta,wetland,lake").split(",");
 	private static final String SAVED_PRESET = "ClientTest Preset";
 
 	private final Path out = Path.of(System.getProperty("reterraforged.clienttest.out", "clienttest"));
@@ -50,6 +53,10 @@ public class ClientTest implements ClientModInitializer {
 	private String worldFolder;
 	@org.jetbrains.annotations.Nullable
 	volatile BlockPos volcano;
+	// where the last /rtf locate led
+	@org.jetbrains.annotations.Nullable
+	volatile BlockPos located;
+	volatile boolean locateDone;
 
 	private record Step(String name, BooleanSupplier ready, int delay, Runnable action) {
 	}
@@ -74,6 +81,11 @@ public class ClientTest implements ClientModInitializer {
 		}
 
 		Minecraft mc = Minecraft.getInstance();
+		if (TOUR) {
+			this.tour(mc);
+			ClientTickEvents.END_CLIENT_TICK.register((client) -> this.tick());
+			return;
+		}
 		this.step("title screen", () -> mc.screen instanceof TitleScreen, 40, () -> CreateWorldScreen.openFresh(mc, mc.screen));
 		this.step("create world screen", () -> mc.screen instanceof CreateWorldScreen, 20, () -> {
 			CreateWorldScreen screen = (CreateWorldScreen) mc.screen;
@@ -204,6 +216,141 @@ public class ClientTest implements ClientModInitializer {
 		ClientTickEvents.END_CLIENT_TICK.register((client) -> this.tick());
 	}
 
+	private void tour(Minecraft mc) {
+		this.step("title screen", () -> mc.screen instanceof TitleScreen, 40, () -> CreateWorldScreen.openFresh(mc, mc.screen));
+		this.step("create world screen", () -> mc.screen instanceof CreateWorldScreen, 40, () -> {
+			this.log("reterraforged selected: " + TerrainState.of((CreateWorldScreen) mc.screen).isReTerraForgedSelected() + ", preset " + TerrainState.of((CreateWorldScreen) mc.screen).name().getString());
+			this.button(mc.screen, "Create New World").onPress();
+		});
+		this.step("world loaded", () -> mc.level != null && mc.player != null, 200, () -> {
+			IntegratedServer server = mc.getSingleplayerServer();
+			server.execute(() -> {
+				this.command(server, "time set noon");
+				this.command(server, "gamerule doDaylightCycle false");
+				this.command(server, "weather clear 100000");
+				this.command(server, "gamerule doWeatherCycle false");
+			});
+		});
+		for (String stop : TOUR_STOPS) {
+			this.step("locate " + stop, () -> true, 20, () -> {
+				this.located = null;
+				this.locateDone = false;
+				IntegratedServer server = mc.getSingleplayerServer();
+				server.execute(() -> {
+					this.command(server, "rtf locate " + stop);
+					this.locateDone = true;
+				});
+			});
+			this.step("fly to " + stop, () -> this.locateDone, 5, () -> {
+				BlockPos target = this.located;
+				if (target == null) {
+					this.log("no " + stop + " found");
+					return;
+				}
+				IntegratedServer server = mc.getSingleplayerServer();
+				boolean sea = stop.equals("barrier_island") || stop.equals("delta");
+				int height = sea ? 70 : 40;
+				int back = sea ? 90 : 60;
+				server.execute(() -> this.command(server, "execute as @a run tp @s " + target.getX() + " " + (target.getY() + height) + " " + (target.getZ() + back) + " 180 " + (sea ? 40 : 30)));
+				// hovering there, rather than falling to the ground
+				mc.player.getAbilities().flying = true;
+				mc.player.onUpdateAbilities();
+			});
+			this.step("look at " + stop, () -> true, 400, () -> {
+				BlockPos target = this.located;
+				if (target == null) {
+					return;
+				}
+				this.screenshot("tour_" + stop);
+				IntegratedServer server = mc.getSingleplayerServer();
+				server.execute(() -> this.surfaceStats(server.overworld(), target, stop));
+			});
+			if (stop.equals("glacial_valley") || stop.equals("cirque")) {
+				this.step("snow at " + stop, () -> true, 20, () -> {
+					BlockPos target = this.located;
+					if (target == null) {
+						return;
+					}
+					IntegratedServer server = mc.getSingleplayerServer();
+					server.execute(() -> this.snowStats(server.overworld(), target, stop));
+				});
+			}
+		}
+		this.step("done", () -> true, 20, () -> {
+			this.log("done");
+			mc.stop();
+		});
+	}
+
+	private void command(IntegratedServer server, String command) {
+		server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSource(new LoggingSource(this)), command);
+	}
+
+	// the blocks on the surface, and on the floor under water, around a place
+	private void surfaceStats(ServerLevel level, BlockPos center, String name) {
+		java.util.Map<String, Integer> top = new java.util.TreeMap<>();
+		java.util.Map<String, Integer> floor = new java.util.TreeMap<>();
+		int radius = 32;
+		for (int dx = -radius; dx <= radius; dx += 2) {
+			for (int dz = -radius; dz <= radius; dz += 2) {
+				int x = center.getX() + dx;
+				int z = center.getZ() + dz;
+				net.minecraft.world.level.chunk.ChunkAccess chunk = level.getChunk(x >> 4, z >> 4);
+				int surface = chunk.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE, x & 15, z & 15);
+				int ground = chunk.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.OCEAN_FLOOR, x & 15, z & 15);
+				top.merge(this.name(level.getBlockState(new BlockPos(x, surface, z))), 1, Integer::sum);
+				if (level.getBlockState(new BlockPos(x, ground + 1, z)).getFluidState().is(net.minecraft.tags.FluidTags.WATER)) {
+					floor.merge(this.name(level.getBlockState(new BlockPos(x, ground, z))), 1, Integer::sum);
+				}
+			}
+		}
+		this.log("surface at " + name + " " + center + ": " + top);
+		this.log("under water at " + name + ": " + floor);
+	}
+
+	// how much of the ground has snow, on slopes facing north and south, by height
+	private void snowStats(ServerLevel level, BlockPos center, String name) {
+		int radius = 160;
+		int[][] snow = new int[2][40];
+		int[][] all = new int[2][40];
+		for (int dx = -radius; dx <= radius; dx += 2) {
+			for (int dz = -radius; dz <= radius; dz += 2) {
+				int x = center.getX() + dx;
+				int z = center.getZ() + dz;
+				int y = this.ground(level, x, z);
+				int slopeZ = this.ground(level, x, z + 3) - this.ground(level, x, z - 3);
+				int slopeX = this.ground(level, x + 3, z) - this.ground(level, x - 3, z);
+				// steep and facing mostly north (the ground rising to the south) or south
+				if (Math.abs(slopeZ) < 4 || Math.abs(slopeX) > Math.abs(slopeZ)) {
+					continue;
+				}
+				int facing = slopeZ > 0 ? 0 : 1;
+				int band = Math.max(0, Math.min(39, (y - 60) / 8));
+				all[facing][band]++;
+				net.minecraft.world.level.block.state.BlockState above = level.getBlockState(new BlockPos(x, y + 1, z));
+				net.minecraft.world.level.block.state.BlockState at = level.getBlockState(new BlockPos(x, y, z));
+				if (above.is(net.minecraft.world.level.block.Blocks.SNOW) || at.is(net.minecraft.world.level.block.Blocks.SNOW_BLOCK) || at.is(net.minecraft.world.level.block.Blocks.POWDER_SNOW)) {
+					snow[facing][band]++;
+				}
+			}
+		}
+		StringBuilder line = new StringBuilder("snow by height at " + name + " (north-facing / south-facing):");
+		for (int band = 0; band < 40; band++) {
+			if (all[0][band] + all[1][band] > 20) {
+				line.append(String.format(" y%d: %d%% of %d / %d%% of %d;", 60 + band * 8, all[0][band] == 0 ? 0 : snow[0][band] * 100 / all[0][band], all[0][band], all[1][band] == 0 ? 0 : snow[1][band] * 100 / all[1][band], all[1][band]));
+			}
+		}
+		this.log(line.toString());
+	}
+
+	private int ground(ServerLevel level, int x, int z) {
+		return level.getChunk(x >> 4, z >> 4).getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.OCEAN_FLOOR, x & 15, z & 15);
+	}
+
+	private String name(net.minecraft.world.level.block.state.BlockState state) {
+		return net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(state.getBlock()).getPath();
+	}
+
 	private void step(String name, BooleanSupplier ready, int delay, Runnable action) {
 		this.steps.add(new Step(name, ready, delay, action));
 	}
@@ -212,7 +359,7 @@ public class ClientTest implements ClientModInitializer {
 		if (this.stepIndex >= this.steps.size()) {
 			return;
 		}
-		if (++this.totalTicks > TIMEOUT_TICKS) {
+		if (++this.totalTicks > (TOUR ? TIMEOUT_TICKS * 8 : TIMEOUT_TICKS)) {
 			this.log("TIMEOUT waiting for: " + this.steps.get(this.stepIndex).name() + " (screen " + Minecraft.getInstance().screen + ")");
 			this.screenshot("timeout");
 			this.stepIndex = this.steps.size();
@@ -364,6 +511,10 @@ public class ClientTest implements ClientModInitializer {
 			java.util.regex.Matcher position = java.util.regex.Pattern.compile("volcano_pipe is at \\[(-?\\d+), (-?\\d+), (-?\\d+)\\]").matcher(text);
 			if (position.find()) {
 				this.test.volcano = new BlockPos(Integer.parseInt(position.group(1)), Integer.parseInt(position.group(2)), Integer.parseInt(position.group(3)));
+			}
+			java.util.regex.Matcher any = java.util.regex.Pattern.compile("is at \\[(-?\\d+), (-?\\d+), (-?\\d+)\\]").matcher(text);
+			if (any.find()) {
+				this.test.located = new BlockPos(Integer.parseInt(any.group(1)), Integer.parseInt(any.group(2)), Integer.parseInt(any.group(3)));
 			}
 		}
 

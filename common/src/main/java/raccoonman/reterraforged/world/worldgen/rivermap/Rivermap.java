@@ -22,10 +22,11 @@ public class Rivermap implements ExpiringEntry {
     private long timestamp;
     private boolean raisedWater;
     private int gorgeDepth;
+    private boolean winding;
     private volatile boolean levelled;
     private volatile List<Mouth> mouths;
     
-    public Rivermap(int x, int z, Network[] networks, GenWarp warp, boolean raisedWater, int gorgeDepth) {
+    public Rivermap(int x, int z, Network[] networks, GenWarp warp, boolean raisedWater, int gorgeDepth, boolean winding) {
         this.timestamp = System.currentTimeMillis();
         this.x = x;
         this.z = z;
@@ -34,19 +35,23 @@ public class Rivermap implements ExpiringEntry {
         this.riverWarp = warp.river();
         this.raisedWater = raisedWater;
         this.gorgeDepth = gorgeDepth;
+        this.winding = winding;
     }
     
     /**
-     * Works out where the water of rivers, lakes and wetlands above the sea lies, from the land they run through; once,
-     * by the first heightmap to use this map.
+     * Moves rivers onto the lowest ground they can reach, and works out where the water of rivers, lakes and wetlands
+     * above the sea lies, from the land they run through; once, by the first heightmap to use this map.
      */
     public void levelWater(Heightmap heightmap) {
-    	if (!this.raisedWater || this.levelled) {
+    	if (!this.raisedWater && !this.winding || this.levelled) {
     		return;
     	}
     	synchronized (this) {
     		if (!this.levelled) {
-    			WaterLevels.level(this.networks, this.riverWarp, this.gorgeDepth, heightmap);
+    			RiverRoutes.route(this.networks, this.riverWarp, heightmap, this.winding);
+    			if (this.raisedWater) {
+    				WaterLevels.level(this.networks, this.gorgeDepth, heightmap);
+    			}
     			this.levelled = true;
     		}
     	}
@@ -77,7 +82,7 @@ public class Rivermap implements ExpiringEntry {
     				continue;
     			}
     			River river = carver.river;
-    			long mouth = WaterLevels.channel(river, carver.warp, 1.0F);
+    			long mouth = RiverRoutes.channel(carver, 1.0F);
     			mouths.add(new Mouth(PosUtil.unpackLeftf(mouth), PosUtil.unpackRightf(mouth), river.ndx, river.ndz, carver.config.bankWidth, river.length));
     		}
     		this.mouths = mouths = List.copyOf(mouths);

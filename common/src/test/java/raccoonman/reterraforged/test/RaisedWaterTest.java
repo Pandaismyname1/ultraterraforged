@@ -19,7 +19,7 @@ import raccoonman.reterraforged.world.worldgen.heightmap.Heightmap;
 import raccoonman.reterraforged.world.worldgen.heightmap.Levels;
 import raccoonman.reterraforged.world.worldgen.noise.domain.Domain;
 import raccoonman.reterraforged.world.worldgen.rivermap.Rivermap;
-import raccoonman.reterraforged.world.worldgen.rivermap.WaterLevels;
+import raccoonman.reterraforged.world.worldgen.rivermap.RiverRoutes;
 import raccoonman.reterraforged.world.worldgen.rivermap.river.Network;
 import raccoonman.reterraforged.world.worldgen.rivermap.river.River;
 import raccoonman.reterraforged.world.worldgen.terrain.populator.RiverPopulator;
@@ -39,19 +39,39 @@ public class RaisedWaterTest {
 		return BuiltinPresetRenderTest.presets().get("default").get();
 	}
 
-	// places by rivers on ground well above the sea, spread over a wide area
+	// places on rivers whose water lies well above the sea, spread over a few rivermaps
 	private static List<float[]> riverSpots(Preset preset, int count) {
-		TerrainViews.View wide = TerrainViews.view(preset, 0.0F, 0.0F, 16.0F);
+		GeneratorContext context = GeneratorContext.makeUncached(preset, PresetRenderer.SEED, PresetRenderer.TILE_SIZE, 0, 6);
+		Heightmap heightmap = context.localHeightmap.get();
+		Levels levels = heightmap.levels();
 		List<float[]> spots = new ArrayList<>();
-		for (int x = 8; x < wide.size() - 8; x++) {
-			for (int z = 8; z < wide.size() - 8; z++) {
-				if (wide.cell(x, z).riverDistance < 0.1F && wide.blockY(x, z) >= wide.levels().waterLevel + 10) {
-					spots.add(new float[] { wide.blockX(x), wide.blockZ(z) });
+		for (float[] at : new float[][] { { 0.0F, 0.0F }, { 6000.0F, 2000.0F }, { -5000.0F, 4000.0F } }) {
+			Cell cell = new Cell();
+			heightmap.applyContinent(cell, at[0], at[1]);
+			Rivermap rivermap = Rivermap.get(cell, null, heightmap);
+			try {
+				for (Network network : (Network[]) field(Rivermap.class, "networks").get(rivermap)) {
+					spots(network, levels, spots);
 				}
+			} catch (ReflectiveOperationException e) {
+				throw new IllegalStateException(e);
 			}
 		}
 		Collections.shuffle(spots, new Random(1));
 		return spots.subList(0, Math.min(count, spots.size()));
+	}
+
+	private static void spots(Network network, Levels levels, List<float[]> spots) {
+		RiverPopulator carver = network.riverCarver();
+		for (float t = 0.1F; t < 0.9F; t += 0.1F) {
+			if (carver.waterLevelAt(t) >= levels.water(10)) {
+				long world = RiverRoutes.channelInWorld(carver, t);
+				spots.add(new float[] { PosUtil.unpackLeftf(world), PosUtil.unpackRightf(world) });
+			}
+		}
+		for (Network child : network.children()) {
+			spots(child, levels, spots);
+		}
 	}
 
 	@Test
@@ -159,11 +179,12 @@ public class RaisedWaterTest {
 		River river = carver.river;
 		for (float t = 0.02F; t < 0.98F; t += 0.02F) {
 			float water = carver.waterLevelAt(t);
-			long channel = WaterLevels.channel(river, carver.warp, t);
+			long channel = RiverRoutes.channel(carver, t);
 			float lowest = Float.MAX_VALUE;
 			float side = carver.config.bankWidth + 4.0F;
 			for (float offset : new float[] { 0.0F, side, -side }) {
-				lowest = Math.min(lowest, ground(PosUtil.unpackLeftf(channel) + river.normX * offset, PosUtil.unpackRightf(channel) + river.normZ * offset, warp, heightmap));
+				long world = carver.frame.toWorld(PosUtil.unpackLeftf(channel) + river.normX * offset, PosUtil.unpackRightf(channel) + river.normZ * offset);
+				lowest = Math.min(lowest, heightmap.sampleGround(PosUtil.unpackLeftf(world), PosUtil.unpackRightf(world)).height);
 			}
 			counts[1]++;
 			// between samples the land can dip or rise, so allow a few blocks
@@ -189,21 +210,74 @@ public class RaisedWaterTest {
 		}
 	}
 
-	// as WaterLevels measures it, undoing the rivermap's warp
-	private static float ground(float x, float z, Domain warp, Heightmap heightmap) {
-		float worldX = x;
-		float worldZ = z;
-		for (int i = 0; i < 2; i++) {
-			worldX = x - warp.getOffsetX(worldX, worldZ, 0);
-			worldZ = z - warp.getOffsetZ(worldX, worldZ, 0);
-		}
-		return heightmap.sampleGround(worldX, worldZ).height;
-	}
-
 	private static Field field(Class<?> type, String name) throws NoSuchFieldException {
 		Field field = type.getDeclaredField(name);
 		field.setAccessible(true);
 		return field;
+	}
+
+	@Test
+	void windingRiversClimbLess() throws Exception {
+		Preset winding = preset();
+		Preset straight = preset();
+		straight.rivers().winding = false;
+		long start = System.nanoTime();
+		float[] on = climbs(winding);
+		long middle = System.nanoTime();
+		float[] off = climbs(straight);
+		System.out.printf("preparing the rivermaps took %d ms winding, %d ms straight%n", (middle - start) / 1_000_000L, (System.nanoTime() - middle) / 1_000_000L);
+		System.out.printf("winding rivers: %.0f blocks of river, %.0f climbs, %.0f blocks climbed, %.0f gorge samples, %.0f%% well above the sea; straight: %.0f climbs, %.0f blocks climbed, %.0f gorge samples, %.0f%% well above the sea%n", on[0], on[1], on[2], on[3], on[5] * 100.0F / on[4], off[1], off[2], off[3], off[5] * 100.0F / off[4]);
+		assertTrue(on[2] < off[2] * 0.6F, "winding rivers climb " + on[2] + " blocks, straight ones " + off[2]);
+	}
+
+	// over the rivers of a few rivermaps: their length, how often and how far their water climbs going downstream, and how
+	// often it lies more than half a gorge below the land beside it
+	private static float[] climbs(Preset preset) throws Exception {
+		GeneratorContext context = GeneratorContext.makeUncached(preset, PresetRenderer.SEED, PresetRenderer.TILE_SIZE, 0, 6);
+		Heightmap heightmap = context.localHeightmap.get();
+		float[] totals = new float[6];
+		java.util.Set<Rivermap> seen = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+		for (float[] at : new float[][] { { 0.0F, 0.0F }, { 6000.0F, 2000.0F }, { -5000.0F, 4000.0F }, { 2000.0F, -6000.0F } }) {
+			Cell cell = new Cell();
+			heightmap.applyContinent(cell, at[0], at[1]);
+			Rivermap rivermap = Rivermap.get(cell, null, heightmap);
+			if (!seen.add(rivermap)) {
+				continue;
+			}
+			for (Network network : (Network[]) field(Rivermap.class, "networks").get(rivermap)) {
+				climbs(network, heightmap, preset.rivers().gorgeDepth, totals);
+			}
+		}
+		return totals;
+	}
+
+	private static void climbs(Network network, Heightmap heightmap, int gorgeDepth, float[] totals) {
+		RiverPopulator carver = network.riverCarver();
+		Levels levels = heightmap.levels();
+		int samples = (int) (carver.river.length / 16.0F);
+		totals[0] += carver.river.length;
+		float previous = carver.waterLevelAt(0.0F);
+		for (int i = 1; i <= samples; i++) {
+			float t = i / (float) samples;
+			float water = carver.waterLevelAt(t);
+			if (water > previous + levels.unit * 0.5F) {
+				totals[1]++;
+				totals[2] += (water - previous) * levels.worldHeight;
+			}
+			previous = water;
+			totals[4]++;
+			if (water >= levels.water(10)) {
+				totals[5]++;
+			}
+			long world = RiverRoutes.channelInWorld(carver, t);
+			float ground = heightmap.sampleGround(PosUtil.unpackLeftf(world), PosUtil.unpackRightf(world)).height;
+			if ((ground - water) * levels.worldHeight > gorgeDepth / 2) {
+				totals[3]++;
+			}
+		}
+		for (Network child : network.children()) {
+			climbs(child, heightmap, gorgeDepth, totals);
+		}
 	}
 
 	@Test

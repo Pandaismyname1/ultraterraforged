@@ -20,6 +20,49 @@ public class LandformSurveyTest {
 	}
 
 	@Test
+	void windingRivers() throws java.io.IOException {
+		if (!Boolean.getBoolean("rtf.survey.rivers")) {
+			return;
+		}
+		Preset on = BuiltinPresetRenderTest.presets().get("default").get();
+		Preset off = on.copy();
+		off.rivers().winding = false;
+		float zoom = Float.parseFloat(System.getProperty("rtf.survey.zoom", "8"));
+		TerrainViews.View wide = TerrainViews.view(on, 0.0F, 0.0F, 16.0F);
+		int found = 0;
+		for (int x = 8; x < wide.size() - 8 && found < 4; x += 17) {
+			for (int z = 8; z < wide.size() - 8 && found < 4; z += 13) {
+				if (wide.cell(x, z).riverDistance < 0.1F && wide.blockY(x, z) >= wide.levels().waterLevel + 10) {
+					float bx = wide.blockX(x);
+					float bz = wide.blockZ(z);
+					System.out.println("SURVEY river spot " + bx + " " + bz);
+					TerrainViews.write(TerrainViews.view(on, bx, bz, zoom), "rivers_winding_" + found);
+					TerrainViews.write(TerrainViews.view(off, bx, bz, zoom), "rivers_straight_" + found);
+					found++;
+				}
+			}
+		}
+	}
+
+	@Test
+	void saltCracks() {
+		if (!Boolean.getBoolean("rtf.survey.salt")) {
+			return;
+		}
+		raccoonman.reterraforged.world.worldgen.noise.module.Noise noise = raccoonman.reterraforged.data.preset.PresetSurfaceNoise.makeSaltFlat();
+		float[] values = new float[200 * 200];
+		for (int x = 0; x < 200; x++) {
+			for (int z = 0; z < 200; z++) {
+				values[x * 200 + z] = noise.compute(x * 1.3F, z * 1.3F, 0);
+			}
+		}
+		java.util.Arrays.sort(values);
+		for (float q : new float[] { 0.5F, 0.8F, 0.85F, 0.9F, 0.92F, 0.95F }) {
+			System.out.println("SURVEY salt q" + q + " " + values[(int) (q * values.length)]);
+		}
+	}
+
+	@Test
 	void desertRelief() {
 		if (!Boolean.getBoolean("rtf.survey.desert")) {
 			return;

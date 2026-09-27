@@ -68,7 +68,7 @@ public class PresetSurfaceRuleData {
     // rivers this many blocks above the sea run over gravel and cobbles rather than sand
     private static final int MOUNTAIN_RIVER_HEIGHT = 45;
     // where the salt crust noise is above this, it's a crack between the crust's polygons
-    private static final float SALT_CRACK = 0.9F;
+    private static final float SALT_CRACK = 0.983F;
 
     private static final ResourceLocation STRATA_CACHE_ID = RTFCommon.location("default");
     private static final ResourceLocation DEEP_STRATA_CACHE_ID = RTFCommon.location("deep");
@@ -778,7 +778,7 @@ public class PresetSurfaceRuleData {
     	SurfaceRules.ConditionSource high = RTFSurfaceConditions.height(scaling.ground(MOUNTAIN_RIVER_HEIGHT));
     	SurfaceRules.RuleSource wetBanks = SurfaceRules.sequence(
     		SurfaceRules.ifTrue(underwater, RTFSurfaceRules.noise(bed, List.of(Pair.of(0.62F, CLAY), Pair.of(-1.0F, MUD)))),
-    		SurfaceRules.ifTrue(RTFSurfaceConditions.riverSide(0.9F), RTFSurfaceRules.noise(bed, List.of(Pair.of(0.4F, MUD))))
+    		RTFSurfaceRules.noise(bed, List.of(Pair.of(0.55F, MUD)))
     	);
     	SurfaceRules.RuleSource mountainBanks = SurfaceRules.sequence(
     		SurfaceRules.ifTrue(underwater, RTFSurfaceRules.noise(bed, List.of(Pair.of(0.7F, MOSSY_COBBLESTONE), Pair.of(0.6F, COBBLESTONE), Pair.of(-1.0F, gravel)))),
@@ -789,13 +789,14 @@ public class PresetSurfaceRuleData {
     		SurfaceRules.ifTrue(RTFSurfaceConditions.riverSide(0.85F), RTFSurfaceRules.noise(bed, List.of(Pair.of(0.45F, sand))))
     	);
     	return SurfaceRules.ifTrue(
-    		RTFSurfaceConditions.riverSide(1.0F),
+    		SurfaceRules.not(RTFSurfaceConditions.steepness(0.45F)),
     		SurfaceRules.ifTrue(
-    			SurfaceRules.not(RTFSurfaceConditions.steepness(0.45F)),
-    			SurfaceRules.ifTrue(
-    				SurfaceRules.stoneDepthCheck(2, false, CaveSurface.FLOOR),
-    				SurfaceRules.sequence(
-    					SurfaceRules.ifTrue(wet, wetBanks),
+    			SurfaceRules.stoneDepthCheck(2, false, CaveSurface.FLOOR),
+    			SurfaceRules.sequence(
+    				// the whole of a wetland, not just along its river
+    				SurfaceRules.ifTrue(wet, SurfaceRules.ifTrue(RTFSurfaceConditions.any(RTFSurfaceConditions.terrain(TerrainType.WETLAND, TerrainType.DELTA), RTFSurfaceConditions.riverSide(1.0F)), wetBanks)),
+    				SurfaceRules.ifTrue(
+    					RTFSurfaceConditions.riverSide(1.0F),
     					SurfaceRules.ifTrue(
     						SurfaceRules.not(wet),
     						SurfaceRules.sequence(

@@ -13,7 +13,8 @@ public class RiverSettings {
 		Lake.CODEC.fieldOf("lakes").forGetter((o) -> o.lakes),
 		Wetland.CODEC.fieldOf("wetlands").forGetter((o) -> o.wetlands),
 		PresetCodecs.defaulted(Codec.BOOL, "raisedWater", true).forGetter((o) -> o.raisedWater),
-		PresetCodecs.defaulted(Codec.INT, "gorgeDepth", DEFAULT_GORGE_DEPTH).forGetter((o) -> o.gorgeDepth)
+		PresetCodecs.defaulted(Codec.INT, "gorgeDepth", DEFAULT_GORGE_DEPTH).forGetter((o) -> o.gorgeDepth),
+		PresetCodecs.defaulted(Codec.BOOL, "winding", true).forGetter((o) -> o.winding)
 	).apply(instance, RiverSettings::new));
 	
     public int seedOffset;
@@ -28,16 +29,18 @@ public class RiverSettings {
     // with raised water, rivers cut at most this many blocks below the land beside them, and climb with the land
     // where it rises higher
     public int gorgeDepth;
+    // rivers move sideways off their straight lines onto the lowest ground, going around rises rather than over them
+    public boolean winding;
     
     public RiverSettings(int seedOffset, int riverCount, River mainRivers, River branchRivers, Lake lakes, Wetland wetlands) {
-    	this(seedOffset, riverCount, mainRivers, branchRivers, lakes, wetlands, true, DEFAULT_GORGE_DEPTH);
+    	this(seedOffset, riverCount, mainRivers, branchRivers, lakes, wetlands, true, DEFAULT_GORGE_DEPTH, true);
     }
     
     public RiverSettings(int seedOffset, int riverCount, River mainRivers, River branchRivers, Lake lakes, Wetland wetlands, boolean raisedWater) {
-    	this(seedOffset, riverCount, mainRivers, branchRivers, lakes, wetlands, raisedWater, DEFAULT_GORGE_DEPTH);
+    	this(seedOffset, riverCount, mainRivers, branchRivers, lakes, wetlands, raisedWater, DEFAULT_GORGE_DEPTH, raisedWater);
     }
     
-    public RiverSettings(int seedOffset, int riverCount, River mainRivers, River branchRivers, Lake lakes, Wetland wetlands, boolean raisedWater, int gorgeDepth) {
+    public RiverSettings(int seedOffset, int riverCount, River mainRivers, River branchRivers, Lake lakes, Wetland wetlands, boolean raisedWater, int gorgeDepth, boolean winding) {
         this.seedOffset = seedOffset;
         this.riverCount = riverCount;
         this.mainRivers = mainRivers;
@@ -46,10 +49,11 @@ public class RiverSettings {
         this.wetlands = wetlands;
         this.raisedWater = raisedWater;
         this.gorgeDepth = gorgeDepth;
+        this.winding = winding;
     }
     
     public RiverSettings copy() {
-    	return new RiverSettings(this.seedOffset, this.riverCount, this.mainRivers.copy(), this.branchRivers.copy(), this.lakes.copy(), this.wetlands.copy(), this.raisedWater, this.gorgeDepth);
+    	return new RiverSettings(this.seedOffset, this.riverCount, this.mainRivers.copy(), this.branchRivers.copy(), this.lakes.copy(), this.wetlands.copy(), this.raisedWater, this.gorgeDepth, this.winding);
     }
 
     public static class River {

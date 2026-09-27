@@ -272,6 +272,8 @@ public class RTFLanguageProvider {
 			this.add(RTFTranslationKeys.GUI_SLIDER_RIVER_COUNT, "River Count");
 			this.add(RTFTranslationKeys.GUI_BUTTON_RAISED_WATER, "Rivers Follow the Land");
 			this.add(RTFTranslationKeys.GUI_SLIDER_GORGE_DEPTH, "Max Gorge Depth");
+			this.add(RTFTranslationKeys.GUI_BUTTON_WINDING_RIVERS, "Rivers Wind Along Valleys");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_WINDING_RIVERS), "Rivers move off their straight courses onto the lowest ground nearby, winding around hills and along valleys rather than climbing over them or cutting gorges");
 			this.add(RTFTranslationKeys.GUI_SLIDER_RIVER_BED_DEPTH, "Bed Depth");
 			this.add(RTFTranslationKeys.GUI_SLIDER_RIVER_MIN_BANK_HEIGHT, "Min Bank Height");
 			this.add(RTFTranslationKeys.GUI_SLIDER_RIVER_MAX_BANK_HEIGHT, "Max Bank Height");

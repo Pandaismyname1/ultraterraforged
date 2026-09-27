@@ -101,6 +101,8 @@
   "reterraforged.gui.button.vanillaSprings.tooltip": "Allow vanilla springs (water source blocks) to generate",
   "reterraforged.gui.button.volcanicSurface": "Volcanic Rock & Lava",
   "reterraforged.gui.button.volcanicSurface.tooltip": "Lava over magma in volcano craters, basalt, blackstone and tuff on their cones, and patches of old lava flows on the land around them",
+  "reterraforged.gui.button.windingRivers": "Rivers Wind Along Valleys",
+  "reterraforged.gui.button.windingRivers.tooltip": "Rivers move off their straight courses onto the lowest ground nearby, winding around hills and along valleys rather than climbing over them or cutting gorges",
   "reterraforged.gui.caveSettings.title": "Cave Settings (Experimental)",
   "reterraforged.gui.climateSettings.title": "Climate Settings",
   "reterraforged.gui.editor.modified": "Changed from %s",

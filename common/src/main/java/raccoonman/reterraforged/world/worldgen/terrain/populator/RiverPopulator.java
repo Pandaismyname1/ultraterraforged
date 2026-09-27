@@ -8,6 +8,7 @@ import raccoonman.reterraforged.world.worldgen.noise.NoiseUtil;
 import raccoonman.reterraforged.world.worldgen.noise.function.CurveFunction;
 import raccoonman.reterraforged.world.worldgen.noise.function.CurveFunctions;
 import raccoonman.reterraforged.world.worldgen.noise.module.Line;
+import raccoonman.reterraforged.world.worldgen.rivermap.RiverRoutes;
 import raccoonman.reterraforged.world.worldgen.rivermap.river.Range;
 import raccoonman.reterraforged.world.worldgen.rivermap.river.River;
 import raccoonman.reterraforged.world.worldgen.rivermap.river.RiverConfig;
@@ -41,6 +42,13 @@ public class RiverPopulator implements Comparable<RiverPopulator> {
     private Levels levels;
     // the water's surface from the source to the mouth, for rivers above the sea; null for rivers at sea level
     private float[] waterLevels;
+    // how far the river is moved sideways off its straight line, from the source to the mouth, so it follows the
+    // land; null if it isn't
+    private float[] route;
+    // map places in the river's own space, and in the space its forks, lakes and wetlands lie in, to the world; set
+    // once the rivermap is prepared
+    public RiverRoutes.Frame frame;
+    public RiverRoutes.Frame innerFrame;
     
     public RiverPopulator(River river, RiverWarp warp, RiverConfig config, Settings settings, Levels levels) {
         this.fade = settings.fadeIn;
@@ -64,6 +72,20 @@ public class RiverPopulator implements Comparable<RiverPopulator> {
     	this.waterLevels = waterLevels;
     }
     
+    public void setRoute(float[] route) {
+    	this.route = route;
+    }
+
+    // how far the river is moved sideways off its line at this point along it, towards its normal
+    public float routeOffset(float t) {
+    	if (this.route == null) {
+    		return 0.0F;
+    	}
+    	float position = NoiseUtil.clamp(t, 0.0F, 1.0F) * (this.route.length - 1);
+    	int index = Math.min((int) position, this.route.length - 2);
+    	return NoiseUtil.lerp(this.route[index], this.route[index + 1], position - index);
+    }
+
     public boolean hasWaterLevels() {
     	return this.waterLevels != null;
     }

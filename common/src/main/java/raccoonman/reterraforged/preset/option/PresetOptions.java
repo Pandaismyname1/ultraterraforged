@@ -481,6 +481,10 @@ public final class PresetOptions {
 				.range(4, 80)
 				.activeWhen((p) -> p.rivers().raisedWater)
 				.bind((p) -> p.rivers().gorgeDepth, (p, v) -> p.rivers().gorgeDepth = v)
+				.build(),
+			BoolOption.builder("rivers.winding")
+				.translation(RTFTranslationKeys.GUI_BUTTON_WINDING_RIVERS)
+				.bind((p) -> p.rivers().winding, (p, v) -> p.rivers().winding = v)
 				.build()
 		),
 		river("mainRivers", RTFTranslationKeys.GUI_LABEL_MAIN_RIVERS, (p) -> p.rivers().mainRivers, 50, 200, 150),

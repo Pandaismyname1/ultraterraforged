@@ -191,6 +191,7 @@ public class RTFTranslationKeys {
 	public static final String GUI_SLIDER_RIVER_COUNT = resolve("gui.slider.riverCount");
 	public static final String GUI_BUTTON_RAISED_WATER = resolve("gui.button.raisedWater");
 	public static final String GUI_SLIDER_GORGE_DEPTH = resolve("gui.slider.gorgeDepth");
+	public static final String GUI_BUTTON_WINDING_RIVERS = resolve("gui.button.windingRivers");
 	public static final String GUI_SLIDER_RIVER_BED_DEPTH = resolve("gui.slider.river.bedDepth");
 	public static final String GUI_SLIDER_RIVER_MIN_BANK_HEIGHT = resolve("gui.slider.river.minBankHeight");
 	public static final String GUI_SLIDER_RIVER_MAX_BANK_HEIGHT = resolve("gui.slider.river.maxBankHeight");

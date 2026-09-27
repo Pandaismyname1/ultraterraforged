@@ -30,6 +30,13 @@ public record Network(RiverPopulator riverCarver, LakePopulator[] lakes, Wetland
             z += PosUtil.unpackRightf(offset);
             t = Line.distanceOnLine(x, z, river.x1, river.z1, river.x2, river.z2);
         }
+        // moved sideways onto the lowest ground, see RiverRoutes; square to the line, so how far along it stays the same
+        float route = this.riverCarver.routeOffset(t);
+        x -= river.normX * route;
+        z -= river.normZ * route;
+        float preRoute = this.riverCarver.routeOffset(pt);
+        px -= river.normX * preRoute;
+        pz -= river.normZ * preRoute;
         this.carveRiver(cell, px, pz, pt, x, z, t);
         this.carveWetlands(cell, x, z, nx, nz);
         this.carveLakes(cell, x, z, nx, nz);

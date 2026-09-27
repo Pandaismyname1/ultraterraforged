@@ -2,11 +2,8 @@ package raccoonman.reterraforged.world.worldgen.rivermap;
 
 import raccoonman.reterraforged.world.worldgen.heightmap.Heightmap;
 import raccoonman.reterraforged.world.worldgen.heightmap.Levels;
-import raccoonman.reterraforged.world.worldgen.noise.domain.Domain;
 import raccoonman.reterraforged.world.worldgen.rivermap.river.Network;
-import raccoonman.reterraforged.world.worldgen.noise.module.Line;
 import raccoonman.reterraforged.world.worldgen.rivermap.river.River;
-import raccoonman.reterraforged.world.worldgen.rivermap.river.RiverWarp;
 import raccoonman.reterraforged.world.worldgen.terrain.populator.LakePopulator;
 import raccoonman.reterraforged.world.worldgen.terrain.populator.RiverPopulator;
 import raccoonman.reterraforged.world.worldgen.terrain.populator.WetlandPopulator;
@@ -38,20 +35,19 @@ public final class WaterLevels {
 	}
 
 	/**
-	 * @param warp the rivermap's warp, from the world into the rivers' own space
-	 */
-	/**
+	 * The rivers must have their frames, from {@link RiverRoutes#route}.
+	 *
 	 * @param gorgeDepth how many blocks a river may cut below the land beside it
 	 */
-	public static void level(Network[] networks, Domain warp, int gorgeDepth, Heightmap heightmap) {
+	public static void level(Network[] networks, int gorgeDepth, Heightmap heightmap) {
 		Levels levels = heightmap.levels();
 		for (Network network : networks) {
-			level(network, levels.water, warp, gorgeDepth * levels.unit, heightmap, levels);
+			level(network, levels.water, gorgeDepth * levels.unit, heightmap, levels);
 		}
 	}
 
 	// levels a river ending at the given water level, then the forks flowing into it
-	private static void level(Network network, float mouth, Domain warp, float gorge, Heightmap heightmap, Levels levels) {
+	private static void level(Network network, float mouth, float gorge, Heightmap heightmap, Levels levels) {
 		RiverPopulator carver = network.riverCarver();
 		River river = carver.river;
 		int samples = Math.max(2, (int) Math.ceil(river.length / SPACING) + 1);
@@ -59,18 +55,18 @@ public final class WaterLevels {
 		float[] lowest = new float[samples];
 		for (int i = 0; i < samples; i++) {
 			float t = i / (float) (samples - 1);
-			long position = channel(river, carver.warp, t);
+			long position = RiverRoutes.channel(carver, t);
 			float x = PosUtil.unpackLeftf(position);
 			float z = PosUtil.unpackRightf(position);
 			float low = Float.MAX_VALUE;
 			for (float offset : new float[] { 0.0F, side, -side }) {
-				low = Math.min(low, ground(x + river.normX * offset, z + river.normZ * offset, warp, heightmap));
+				low = Math.min(low, ground(x + river.normX * offset, z + river.normZ * offset, carver.frame, heightmap));
 			}
 			lowest[i] = low;
 		}
 		// a lake at the source holds the river's first water, so it has to fit inside the lake's shore too
 		for (LakePopulator lake : network.lakes()) {
-			lowest[0] = Math.min(lowest[0], shore(lake, warp, heightmap));
+			lowest[0] = Math.min(lowest[0], shore(lake, carver.innerFrame, heightmap));
 		}
 		float[] water = new float[samples];
 		// the top water block, stepping down where the land beside the river drops below it, and up where the river
@@ -107,7 +103,7 @@ public final class WaterLevels {
 		}
 		for (Network child : network.children()) {
 			float junction = child.riverCarver().junction;
-			level(child, carver.waterLevelAt(junction < 0.0F ? 1.0F : junction), warp, gorge, heightmap, levels);
+			level(child, carver.waterLevelAt(junction < 0.0F ? 1.0F : junction), gorge, heightmap, levels);
 		}
 	}
 
@@ -116,51 +112,22 @@ public final class WaterLevels {
 		return (y + 0.01F) / levels.worldHeight;
 	}
 
-	/**
-	 * Where the middle of a river's winding channel lies, in the rivers' space, at a point along its straight line: the
-	 * point the river's own warp moves onto the line there. The warp depends on the point it moves, so it's found by
-	 * repeatedly stepping back from the line by the warp at the last guess.
-	 */
-	public static long channel(River river, RiverWarp warp, float t) {
-		float lineX = river.x1 + river.dx * t;
-		float lineZ = river.z1 + river.dz * t;
-		float x = lineX;
-		float z = lineZ;
-		for (int i = 0; i < 6; i++) {
-			float along = Line.distanceOnLine(x, z, river.x1, river.z1, river.x2, river.z2);
-			if (!warp.test(along)) {
-				break;
-			}
-			long offset = warp.getOffset(x, z, along, river);
-			x = lineX - PosUtil.unpackLeftf(offset);
-			z = lineZ - PosUtil.unpackRightf(offset);
-		}
-		return PosUtil.packf(x, z);
-	}
-
 	// the lowest ground around a lake's shore
-	private static float shore(LakePopulator lake, Domain warp, Heightmap heightmap) {
+	private static float shore(LakePopulator lake, RiverRoutes.Frame frame, Heightmap heightmap) {
 		float radius = lake.radius() + 16.0F;
 		float lowest = Float.MAX_VALUE;
 		for (int i = 0; i < 8; i++) {
 			double angle = i * Math.PI / 4.0D;
 			float x = lake.center().x() + (float) Math.cos(angle) * radius;
 			float z = lake.center().y() + (float) Math.sin(angle) * radius;
-			lowest = Math.min(lowest, ground(x, z, warp, heightmap));
+			lowest = Math.min(lowest, ground(x, z, frame, heightmap));
 		}
 		return lowest;
 	}
 
-	// the ground at a point in the rivers' space, found in the world by undoing the warp
-	private static float ground(float x, float z, Domain warp, Heightmap heightmap) {
-		float worldX = x;
-		float worldZ = z;
-		for (int i = 0; i < 2; i++) {
-			float offsetX = warp.getOffsetX(worldX, worldZ, 0);
-			float offsetZ = warp.getOffsetZ(worldX, worldZ, 0);
-			worldX = x - offsetX;
-			worldZ = z - offsetZ;
-		}
-		return heightmap.sampleGround(worldX, worldZ).height;
+	// the ground at a point in a river's space
+	private static float ground(float x, float z, RiverRoutes.Frame frame, Heightmap heightmap) {
+		long world = frame.toWorld(x, z);
+		return heightmap.sampleGround(PosUtil.unpackLeftf(world), PosUtil.unpackRightf(world)).height;
 	}
 }
