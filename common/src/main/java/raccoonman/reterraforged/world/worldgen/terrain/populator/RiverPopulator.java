@@ -73,13 +73,10 @@ public class RiverPopulator implements Comparable<RiverPopulator> {
     	return this.waterLevels == null ? this.waterLine : sample(this.waterLevels, t);
     }
     
+    // the water stays level from one sample to the next, so it changes in steps: small waterfalls
     private static float sample(float[] values, float t) {
-    	float position = NoiseUtil.clamp(t, 0.0F, 1.0F) * (values.length - 1);
-    	int index = (int) position;
-    	if (index >= values.length - 1) {
-    		return values[values.length - 1];
-    	}
-    	return NoiseUtil.lerp(values[index], values[index + 1], position - index);
+    	int index = (int) (NoiseUtil.clamp(t, 0.0F, 1.0F) * (values.length - 1));
+    	return values[Math.min(index, values.length - 1)];
     }
 
     @Override
@@ -160,6 +157,8 @@ public class RiverPopulator implements Comparable<RiverPopulator> {
     	} else if (cell.height < level && distance < width) {
     		// only the channel holds water; land lower than the river further out stays dry
     		cell.waterLevel = cell.waterLevel > 0.0F ? Math.min(cell.waterLevel, level) : level;
+    		// erosion would pile the bed up into islands
+    		cell.erosionMask = true;
     	}
     }
 

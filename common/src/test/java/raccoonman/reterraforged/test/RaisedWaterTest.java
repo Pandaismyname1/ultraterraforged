@@ -140,16 +140,17 @@ public class RaisedWaterTest {
 		Rivermap rivermap = Rivermap.get(cell, null, heightmap);
 		Network[] networks = (Network[]) field(Rivermap.class, "networks").get(rivermap);
 		Domain warp = (Domain) field(Rivermap.class, "riverWarp").get(rivermap);
-		int[] counts = new int[4];
+		int[] counts = new int[5];
 		for (Network network : networks) {
 			assertEquals(levels.water, network.riverCarver().waterLevelAt(1.0F), 1.0E-6F, "a river doesn't reach the sea at sea level");
 			check(network, warp, heightmap, preset.rivers().gorgeDepth, counts);
 		}
-		System.out.println(counts[0] + " forks, " + counts[1] + " points along rivers checked, " + counts[2] + " in gorges, " + counts[3] + " with water more than 4 blocks above the land beside it");
+		System.out.println(counts[0] + " forks, " + counts[1] + " points along rivers checked, " + counts[2] + " in gorges, " + counts[3] + " with water more than 4 blocks above the land beside it, " + counts[4] + " cutting more than 8 blocks deeper than a gorge");
 		assertTrue(counts[0] > 10 && counts[1] > 1000, "too few rivers checked");
 		// the land is measured every 16 blocks along a river; a dip in between can leave the water above it, held in by
 		// an embankment
 		assertTrue(counts[3] < counts[1] / 50, counts[3] + " points with water above the land beside it");
+		assertTrue(counts[4] < counts[1] / 50, counts[4] + " points cutting deeper than a gorge");
 	}
 
 	private static void check(Network network, Domain warp, Heightmap heightmap, int gorgeDepth, int[] counts) {
@@ -168,7 +169,10 @@ public class RaisedWaterTest {
 			// between samples the land can dip or rise, so allow a few blocks
 			if (lowest > levels.water(4)) {
 				float cut = (lowest - water) * levels.worldHeight;
-				assertTrue(cut <= gorgeDepth + 12, "a river cuts " + cut + " blocks below the land beside it");
+				// the water is level for 16 blocks at a time, and the land can rise over that
+				if (cut > gorgeDepth + 8) {
+					counts[4]++;
+				}
 				if (cut < -4) {
 					counts[3]++;
 				}

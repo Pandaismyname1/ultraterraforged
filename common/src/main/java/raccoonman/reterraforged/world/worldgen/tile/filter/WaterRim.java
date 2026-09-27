@@ -5,8 +5,9 @@ import raccoonman.reterraforged.world.worldgen.heightmap.Levels;
 import raccoonman.reterraforged.world.worldgen.tile.Tile;
 
 /**
- * Keeps the water of rivers, lakes and wetlands above the sea in: dry ground right beside it that's lower than the
- * water, where erosion or smoothing wore a bank down, is raised to the water's surface.
+ * Keeps the water of rivers, lakes and wetlands above the sea tidy after erosion and smoothing: dry ground right beside
+ * it that's lower than the water, where a bank was worn down, is raised to the water's surface, and single spots of
+ * the bed left standing out of the water are sunk back under it.
  */
 public record WaterRim(Levels levels) implements Filter {
 
@@ -17,6 +18,13 @@ public record WaterRim(Levels levels) implements Filter {
 			for (int x = 0; x < size; x++) {
 				Cell cell = tile.getCellRaw(x, z);
 				int y = this.levels.scale(cell.height);
+				if (cell.waterLevel > 0.0F && !this.wet(cell) && x > 0 && z > 0 && x < size - 1 && z < size - 1) {
+					int around = this.wetCount(tile.getCellRaw(x - 1, z)) + this.wetCount(tile.getCellRaw(x + 1, z)) + this.wetCount(tile.getCellRaw(x, z - 1)) + this.wetCount(tile.getCellRaw(x, z + 1));
+					if (around >= 3) {
+						cell.height = Math.min(cell.height, cell.waterLevel - this.levels.unit);
+						continue;
+					}
+				}
 				// wet ground, and ground under the sea, stay as they are
 				if (this.wet(cell) || y < this.levels.waterY) {
 					continue;
@@ -35,6 +43,10 @@ public record WaterRim(Levels levels) implements Filter {
 
 	private boolean wet(Cell cell) {
 		return cell.waterLevel > 0.0F && this.levels.scale(cell.height) < this.levels.scale(cell.waterLevel);
+	}
+
+	private int wetCount(Cell cell) {
+		return this.wet(cell) ? 1 : 0;
 	}
 
 	// the water surface over a cell, or 0 if it's dry

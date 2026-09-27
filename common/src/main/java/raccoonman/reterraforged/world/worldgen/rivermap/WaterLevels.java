@@ -30,6 +30,9 @@ public final class WaterLevels {
 	private static final float BEYOND_BANKS = 4.0F;
 	// wetlands only lie where their river drops no more than this many blocks along them
 	private static final int WETLAND_DROP = 2;
+	// the water drops, or climbs, this many blocks at a time, so rivers run in level pools with small waterfalls between
+	// them rather than a one block step every few blocks
+	private static final int TERRACE = 3;
 
 	private WaterLevels() {
 	}
@@ -69,17 +72,24 @@ public final class WaterLevels {
 		for (LakePopulator lake : network.lakes()) {
 			lowest[0] = Math.min(lowest[0], shore(lake, warp, heightmap));
 		}
-		float margin = MARGIN * levels.unit;
 		float[] water = new float[samples];
-		float level = Float.MAX_VALUE;
+		// the top water block, stepping down where the land beside the river drops below it, and up where the river
+		// would otherwise cut deeper than a gorge
+		int level = Integer.MAX_VALUE;
 		for (int i = 0; i < samples; i++) {
-			level = Math.min(level, lowest[i] - margin);
-			// no deeper than a gorge
-			level = Math.max(level, lowest[i] - Math.max(gorge, margin));
+			int highest = (int) Math.floor(lowest[i] * levels.worldHeight) - MARGIN;
+			int deepest = (int) Math.ceil((lowest[i] - gorge) * levels.worldHeight);
+			if (level > highest) {
+				level = Math.floorDiv(highest, TERRACE) * TERRACE;
+			}
+			if (level < deepest) {
+				level = Math.min(highest, Math.floorDiv(deepest + TERRACE - 1, TERRACE) * TERRACE);
+			}
 			// nor below the sea; the sea fills anything lower
-			water[i] = Math.max(level, levels.water);
+			level = Math.max(level, levels.waterY);
+			water[i] = height(level, levels);
 		}
-		// it meets the water it flows into at that water's level, stepping up to it if it has to
+		// it meets the water it flows into at that water's level, stepping up or down to it
 		water[samples - 1] = mouth;
 		carver.setWaterLevels(water);
 
@@ -99,6 +109,11 @@ public final class WaterLevels {
 			float junction = child.riverCarver().junction;
 			level(child, carver.waterLevelAt(junction < 0.0F ? 1.0F : junction), warp, gorge, heightmap, levels);
 		}
+	}
+
+	// a height whose block is the given one, safely inside it
+	private static float height(int y, Levels levels) {
+		return (y + 0.01F) / levels.worldHeight;
 	}
 
 	/**
