@@ -184,7 +184,7 @@ recommended performance mods; `-Putf.perfMods=false` leaves them out. `./gradlew
 include checks that the built-in presets still generate the same terrain. Notes for porting to newer Minecraft
 versions are in [docs/porting](docs/porting).
 
-GitHub Actions builds both loaders and runs the tests on every push (`build.yml`). Releases are started by hand
+GitHub Actions builds both loaders on every push (`build.yml`); the tests take long, so they run locally only. Releases are started by hand
 (`release.yml`): they create the GitHub release from [CHANGELOG.md](CHANGELOG.md), then upload to Modrinth and
 CurseForge once their project ids are set in the workflow and `MODRINTH_TOKEN` / `CURSEFORGE_TOKEN` exist as repository
 secrets. Publishing a release also pushes the Maven artifacts to the `maven` branch (`publish-maven.yml`).
