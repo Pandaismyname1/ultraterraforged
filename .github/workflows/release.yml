@@ -1,0 +1,114 @@
+name: Release
+on:
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: Release channel on Modrinth and CurseForge
+        type: choice
+        default: alpha
+        options: [release, beta, alpha]
+
+# Project ids on each platform. Fill these in once the UltraTerraForged project pages exist.
+env:
+  MODRINTH_ID: ""
+  CURSEFORGE_ID: ""
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: 'temurin'
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/loom-cache
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle
+
+      - name: Get Mod Version
+        id: mod_version
+        run: grep "mod_version" gradle.properties | sed "s/\s//g" >> $GITHUB_OUTPUT
+
+      - name: Get Platform Version
+        id: minecraft_version
+        run: grep "minecraft_version" gradle.properties | sed "s/\s//g" >> $GITHUB_OUTPUT
+
+      - name: Get Composite Version
+        id: composite_version
+        run: echo "composite_version=${{ steps.mod_version.outputs.mod_version }}+${{ steps.minecraft_version.outputs.minecraft_version }}" >> $GITHUB_OUTPUT
+
+      - name: Build Fabric
+        env:
+          RELEASE: true
+        run: ./gradlew :fabric:build -Prtf.perfMods=false
+
+      - name: Build Forge
+        env:
+          RELEASE: true
+        run: ./gradlew :forge:build -Prtf.perfMods=false
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.composite_version.outputs.composite_version }}
+          name: UltraTerraForged ${{ steps.composite_version.outputs.composite_version }}
+          body_path: CHANGELOG.md
+          prerelease: ${{ inputs.version_type != 'release' }}
+          files: |
+            fabric/build/libs/ultraterraforged-${{ steps.composite_version.outputs.composite_version }}-fabric.jar
+            forge/build/libs/ultraterraforged-${{ steps.composite_version.outputs.composite_version }}-forge.jar
+
+      # mc-publish skips a platform whose token is empty, so the two uploads below
+      # only run once MODRINTH_TOKEN / CURSEFORGE_TOKEN exist as repository secrets.
+      - name: Publish Fabric to Modrinth and CurseForge
+        uses: Kira-NT/mc-publish@v3.3.1
+        with:
+          modrinth-id: ${{ env.MODRINTH_ID }}
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          curseforge-id: ${{ env.CURSEFORGE_ID }}
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          name: UltraTerraForged ${{ steps.composite_version.outputs.composite_version }} Fabric
+          version: ${{ steps.composite_version.outputs.composite_version }}-fabric
+          version-type: ${{ inputs.version_type }}
+          changelog-file: CHANGELOG.md
+          loaders: |
+            fabric
+            quilt
+          game-versions: ${{ steps.minecraft_version.outputs.minecraft_version }}
+          java: 17
+          dependencies: |
+            fabric-api(required)
+          files: fabric/build/libs/ultraterraforged-${{ steps.composite_version.outputs.composite_version }}-fabric.jar
+
+      # the Forge jar also runs on NeoForge 47.1, so it's listed for both
+      - name: Publish Forge to Modrinth and CurseForge
+        uses: Kira-NT/mc-publish@v3.3.1
+        with:
+          modrinth-id: ${{ env.MODRINTH_ID }}
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          curseforge-id: ${{ env.CURSEFORGE_ID }}
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          name: UltraTerraForged ${{ steps.composite_version.outputs.composite_version }} Forge
+          version: ${{ steps.composite_version.outputs.composite_version }}-forge
+          version-type: ${{ inputs.version_type }}
+          changelog-file: CHANGELOG.md
+          loaders: |
+            forge
+            neoforge
+          game-versions: ${{ steps.minecraft_version.outputs.minecraft_version }}
+          java: 17
+          files: forge/build/libs/ultraterraforged-${{ steps.composite_version.outputs.composite_version }}-forge.jar
