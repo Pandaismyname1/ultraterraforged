@@ -1,5 +1,7 @@
 package raccoonman.reterraforged.world.worldgen.terrain.populator;
 
+import raccoonman.reterraforged.world.worldgen.terrain.region.RegionModule;
+
 import raccoonman.reterraforged.data.preset.settings.TerrainSettings;
 import raccoonman.reterraforged.world.worldgen.biome.Erosion;
 import raccoonman.reterraforged.world.worldgen.biome.Weirdness;
@@ -372,10 +374,12 @@ public class Populators {
         Noise heightLookup = Noises.perlin(seed.next(), 2, 1);
         heightLookup = Noises.map(heightLookup, 0.45F, 0.65F);
         
-        Noise height = Noises.worley(region.seed(), region.scale(), CellFunction.NOISE_LOOKUP, DistanceFunction.EUCLIDEAN, heightLookup);
+        // cones stand at the centres of volcano regions, so use the same cells as the regions
+        int regionSeed = RegionModule.cellSeed(region);
+        Noise height = Noises.worley(regionSeed, region.scale(), RegionModule.JITTER, CellFunction.NOISE_LOOKUP, DistanceFunction.EUCLIDEAN, heightLookup);
         height = Noises.warp(height, region.warpX(), region.warpZ(), region.warpStrength());
         
-        Noise cone = Noises.worleyEdge(region.seed(), region.scale(), EdgeFunction.DISTANCE_2_DIV, DistanceFunction.EUCLIDEAN);
+        Noise cone = Noises.worleyEdge(regionSeed, region.scale(), RegionModule.JITTER, EdgeFunction.DISTANCE_2_DIV, DistanceFunction.EUCLIDEAN);
         cone = Noises.invert(cone);
         cone = Noises.warp(cone, region.warpX(), region.warpZ(), region.warpStrength());
         cone = Noises.powCurve(cone, 11.0F);

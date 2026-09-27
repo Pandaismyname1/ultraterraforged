@@ -22,7 +22,8 @@ import raccoonman.reterraforged.world.worldgen.terrain.TerrainType;
 // so the command tree stays vanilla-compatible and clients don't need the mod installed
 public class TerrainArgument {
     public static final DynamicCommandExceptionType ERROR_INVALID_VALUE = new DynamicCommandExceptionType(input -> Component.translatable(RTFTranslationKeys.TERRAIN_ARGUMENT_INVALID, input));
-    private static final List<Terrain> BLACKLIST = ImmutableList.of(TerrainType.NONE, TerrainType.VOLCANO_PIPE);
+    // volcano_pipe, the lava lake in a crater, can be located too
+    private static final List<Terrain> BLACKLIST = ImmutableList.of(TerrainType.NONE);
 
     public static RequiredArgumentBuilder<CommandSourceStack, String> terrain(String name) {
     	return Commands.argument(name, StringArgumentType.word()).suggests((ctx, builder) -> {

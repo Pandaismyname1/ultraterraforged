@@ -692,9 +692,18 @@ public class PresetSurfaceRuleData {
     	);
     }
     
-    // lava over magma in the crater; basalt, blackstone and tuff on the steep cone; patches of old lava flows on the
-    // gentler land around it, with the usual surface in between
+    // lava over magma in the crater; basalt, blackstone and tuff all over the cone; patches of old lava flows on the
+    // land around it, with the usual surface in between
     private static SurfaceRules.RuleSource makeVolcanoRule(HolderGetter<Noise> noise) {
+    	SurfaceRules.RuleSource volcanicRock = RTFSurfaceRules.noise(
+    		noise.getOrThrow(PresetSurfaceNoise.VOLCANIC_ROCK),
+    		List.of(
+    			Pair.of(0.0F, BASALT),
+    			Pair.of(0.4F, BLACKSTONE),
+    			Pair.of(0.62F, TUFF),
+    			Pair.of(0.8F, SMOOTH_BASALT)
+    		)
+    	);
     	return SurfaceRules.sequence(
     		SurfaceRules.ifTrue(
     			RTFSurfaceConditions.terrain(TerrainType.VOLCANO_PIPE),
@@ -705,19 +714,12 @@ public class PresetSurfaceRuleData {
     		),
     		SurfaceRules.ifTrue(
     			RTFSurfaceConditions.terrain(TerrainType.VOLCANO),
+    			volcanicRock
+    		),
+    		SurfaceRules.ifTrue(
+    			RTFSurfaceConditions.terrain(TerrainType.VOLCANIC_LOWLANDS),
     			SurfaceRules.sequence(
-    				SurfaceRules.ifTrue(
-    					RTFSurfaceConditions.steepness(0.15F),
-    					RTFSurfaceRules.noise(
-    						noise.getOrThrow(PresetSurfaceNoise.VOLCANIC_ROCK),
-    						List.of(
-    							Pair.of(0.0F, BASALT),
-    							Pair.of(0.4F, BLACKSTONE),
-    							Pair.of(0.62F, TUFF),
-    							Pair.of(0.8F, SMOOTH_BASALT)
-    						)
-    					)
-    				),
+    				SurfaceRules.ifTrue(RTFSurfaceConditions.steepness(0.15F), volcanicRock),
     				SurfaceRules.ifTrue(
     					SurfaceRules.ON_FLOOR,
     					RTFSurfaceRules.noise(

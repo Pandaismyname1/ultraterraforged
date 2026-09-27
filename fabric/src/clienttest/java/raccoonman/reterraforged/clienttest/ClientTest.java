@@ -148,7 +148,7 @@ public class ClientTest implements ClientModInitializer {
 			server.execute(() -> {
 				server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSource(new LoggingSource(this)), "rtf locate plains");
 				server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSource(new LoggingSource(this)), "rtf locate mountain_chain");
-				server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSource(new LoggingSource(this)), "rtf locate volcano");
+				server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSource(new LoggingSource(this)), "rtf locate volcano_pipe");
 			});
 		});
 		this.step("rock layers", () -> true, 100, () -> {
@@ -164,7 +164,13 @@ public class ClientTest implements ClientModInitializer {
 			IntegratedServer server = mc.getSingleplayerServer();
 			BlockPos target = this.volcano;
 			this.log("flying to the volcano at " + target);
-			server.execute(() -> server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSource(new LoggingSource(this)), "execute as @a run tp @s " + target.getX() + " " + (target.getY() + 90) + " " + (target.getZ() + 60) + " 180 45"));
+			server.execute(() -> {
+				// the locate command reports sea level; stand above the crater's real surface, looking at it
+				int surface = server.overworld().getChunk(target.getX() >> 4, target.getZ() >> 4).getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE_WG, target.getX() & 15, target.getZ() & 15);
+				this.volcano = new BlockPos(target.getX(), surface, target.getZ());
+				this.log("crater surface at y=" + surface + ", block " + server.overworld().getBlockState(new BlockPos(target.getX(), surface, target.getZ())).getBlock() + " / below " + server.overworld().getBlockState(new BlockPos(target.getX(), surface - 1, target.getZ())).getBlock());
+				server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSource(new LoggingSource(this)), "execute as @a run tp @s " + target.getX() + " " + (surface + 40) + " " + (target.getZ() + 70) + " 180 30");
+			});
 		});
 		this.step("volcano loaded", () -> true, 300, () -> {
 			if (this.volcano == null) {
@@ -354,8 +360,8 @@ public class ClientTest implements ClientModInitializer {
 		public void sendSystemMessage(Component message) {
 			String text = message.getString();
 			this.test.log("command output: " + text);
-			// e.g. "The nearest volcano is at [768, 81, 768] (1086 blocks away)"
-			java.util.regex.Matcher position = java.util.regex.Pattern.compile("volcano is at \\[(-?\\d+), (-?\\d+), (-?\\d+)\\]").matcher(text);
+			// e.g. "The nearest volcano_pipe is at [768, 81, 768] (1086 blocks away)"
+			java.util.regex.Matcher position = java.util.regex.Pattern.compile("volcano_pipe is at \\[(-?\\d+), (-?\\d+), (-?\\d+)\\]").matcher(text);
 			if (position.find()) {
 				this.test.volcano = new BlockPos(Integer.parseInt(position.group(1)), Integer.parseInt(position.group(2)), Integer.parseInt(position.group(3)));
 			}

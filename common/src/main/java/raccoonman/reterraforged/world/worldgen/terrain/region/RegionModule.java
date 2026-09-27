@@ -15,6 +15,14 @@ import raccoonman.reterraforged.world.worldgen.util.PosUtil;
 
 public class RegionModule implements CellPopulator {
     private int seed;
+    // how far a region's centre may stray from the middle of its grid cell; noises that follow the regions, like
+    // volcano cones, must use the same seed and jitter
+    public static final float JITTER = 0.7F;
+
+    public static int cellSeed(RegionConfig regionConfig) {
+        return regionConfig.seed() + 7;
+    }
+
     private float frequency;
     private float edgeMin;
     private float edgeMax;
@@ -22,7 +30,7 @@ public class RegionModule implements CellPopulator {
     private Domain warp;
     
     public RegionModule(RegionConfig regionConfig) {
-        this.seed = regionConfig.seed() + 7;
+        this.seed = cellSeed(regionConfig);
         this.edgeMin = 0.0F;
         this.edgeMax = 0.5F;
         this.edgeRange = this.edgeMax - this.edgeMin;
@@ -52,8 +60,8 @@ public class RegionModule implements CellPopulator {
                 int cx = xi + dx;
                 int cy = yi + dy;
                 Vec2f vec = NoiseUtil.cell(this.seed, cx, cy);
-                float vecX = cx + vec.x() * 0.7F;
-                float vecY = cy + vec.y() * 0.7F;
+                float vecX = cx + vec.x() * JITTER;
+                float vecY = cy + vec.y() * JITTER;
                 float distance = dist.apply(vecX - px, vecY - py);
                 if (distance < edgeDistance) {
                     edgeDistance2 = edgeDistance;

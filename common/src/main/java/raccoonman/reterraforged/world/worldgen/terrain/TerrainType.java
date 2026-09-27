@@ -42,6 +42,8 @@ public class TerrainType {
     public static final Terrain ARCHIPELAGO = register("archipelago", TerrainCategory.ISLAND);
     public static final Terrain MUSHROOM_ARCHIPELAGO = register("mushroom_archipelago", TerrainCategory.ISLAND);
     public static final Terrain MUSHROOM_FIELDS = register("mushroom_fields", TerrainCategory.ISLAND);
+    // the rolling land around a volcano's cone; the cone itself is VOLCANO
+    public static final Terrain VOLCANIC_LOWLANDS = registerVolcano("volcanic_lowlands", TerrainCategory.HIGHLAND);
     
     public static void forEach(Consumer<Terrain> action) {
         TerrainType.REGISTRY.forEach(action);

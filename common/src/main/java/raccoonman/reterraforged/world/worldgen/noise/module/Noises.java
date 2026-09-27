@@ -176,7 +176,12 @@ public class Noises {
 	}
 	
 	public static Noise worley(int seed, int scale, CellFunction cellFunction, DistanceFunction distanceFunction, Noise lookup) {
-		return shiftSeed(new Worley(1.0F / scale, 1.0F, cellFunction, distanceFunction, lookup), seed);
+		return worley(seed, scale, 1.0F, cellFunction, distanceFunction, lookup);
+	}
+
+	// jitter: how far cell centres may stray from the middle of their grid cells, 0 to 1
+	public static Noise worley(int seed, int scale, float jitter, CellFunction cellFunction, DistanceFunction distanceFunction, Noise lookup) {
+		return shiftSeed(new Worley(1.0F / scale, jitter, cellFunction, distanceFunction, lookup), seed);
 	}
 	
 	public static Noise worleyEdge(int seed, int scale) {
@@ -184,7 +189,11 @@ public class Noises {
 	}
 	
 	public static Noise worleyEdge(int seed, int scale, EdgeFunction edgeFunction, DistanceFunction distanceFunction) {
-		return shiftSeed(new WorleyEdge(1.0F / scale, 1.0F, edgeFunction, distanceFunction), seed);
+		return worleyEdge(seed, scale, 1.0F, edgeFunction, distanceFunction);
+	}
+
+	public static Noise worleyEdge(int seed, int scale, float jitter, EdgeFunction edgeFunction, DistanceFunction distanceFunction) {
+		return shiftSeed(new WorleyEdge(1.0F / scale, jitter, edgeFunction, distanceFunction), seed);
 	}
 	
 	public static Noise billow(int seed, int scale, int octaves) {

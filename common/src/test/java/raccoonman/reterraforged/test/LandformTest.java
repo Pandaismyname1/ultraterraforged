@@ -371,6 +371,59 @@ public class LandformTest {
 	}
 
 	@Test
+	void volcanoesHaveConesAndLavaCraters() {
+		// the centres of volcano regions on land, over a wide area
+		Preset preset = preset("default", (p) -> {});
+		TerrainViews.View survey = TerrainViews.view(preset, 0.0F, 0.0F, 48.0F);
+		java.util.Set<Long> centres = new java.util.LinkedHashSet<>();
+		for (int x = 0; x < survey.size(); x++) {
+			for (int z = 0; z < survey.size(); z++) {
+				Cell cell = survey.cell(x, z);
+				if (cell.terrain.isVolcano() && survey.blockY(x, z) > survey.levels().waterLevel) {
+					centres.add(cell.terrainRegionCenter);
+				}
+			}
+		}
+		assertTrue(!centres.isEmpty(), "no volcanoes on land");
+		int craters = 0;
+		for (long centre : centres) {
+			float cx = raccoonman.reterraforged.world.worldgen.util.PosUtil.unpackLeft(centre);
+			float cz = raccoonman.reterraforged.world.worldgen.util.PosUtil.unpackRight(centre);
+			TerrainViews.View close = TerrainViews.view(preset, cx, cz, 1.0F);
+			int water = close.levels().waterLevel;
+			int highest = Integer.MIN_VALUE;
+			int lowest = Integer.MAX_VALUE;
+			int lavaMin = Integer.MAX_VALUE;
+			int lavaMax = Integer.MIN_VALUE;
+			int lava = 0;
+			for (int x = 0; x < close.size(); x++) {
+				for (int z = 0; z < close.size(); z++) {
+					int y = close.blockY(x, z);
+					highest = Math.max(highest, y);
+					lowest = Math.min(lowest, y);
+					if (close.cell(x, z).terrain == TerrainType.VOLCANO_PIPE) {
+						lava++;
+						lavaMin = Math.min(lavaMin, y);
+						lavaMax = Math.max(lavaMax, y);
+					}
+				}
+			}
+			if (lowest < water) {
+				// by the sea; the cone may stand in it
+				continue;
+			}
+			System.out.println("volcano at " + cx + ", " + cz + ": rises " + (highest - lowest) + " blocks, crater lava " + lava + " cells at y " + lavaMin + " to " + lavaMax);
+			assertTrue(highest - lowest > 50, "the volcano at " + cx + ", " + cz + " rises only " + (highest - lowest) + " blocks");
+			if (lava > 0) {
+				craters++;
+				// a lava lake, not lava running down a slope
+				assertTrue(lavaMax - lavaMin <= 3, "the crater floor at " + cx + ", " + cz + " spans " + lavaMin + " to " + lavaMax);
+			}
+		}
+		assertTrue(craters > 0, "no volcano has a lava crater");
+	}
+
+	@Test
 	void legacyPresetsHaveNoLandforms() {
 		for (String name : new String[] { "legacy_default", "beautiful", "huge_biomes", "lite", "vanillaish" }) {
 			assertTrue(!BuiltinPresetRenderTest.presets().get(name).get().landforms().buttes.enabled, name);
