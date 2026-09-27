@@ -220,6 +220,51 @@ public class LandformTest {
 	}
 
 	@Test
+	void gravelBeachesLieUnderTheCliffs() {
+		Preset preset = preset("default", (p) -> {
+			p.landforms().canyons.enabled = false;
+			p.landforms().buttes.enabled = false;
+			p.landforms().seaCliffs.gravelBeaches = 1.0F;
+		});
+		TerrainViews.View view = TerrainViews.view(preset, 0.0F, 0.0F, 4.0F);
+		int water = view.levels().waterLevel;
+		int beaches = 0;
+		int underCliffs = 0;
+		for (int x = 4; x < view.size() - 4; x++) {
+			for (int z = 4; z < view.size() - 4; z++) {
+				if (view.cell(x, z).terrain != TerrainType.SHINGLE_BEACH) {
+					continue;
+				}
+				int y = view.blockY(x, z);
+				assertTrue(y >= water - 1 && y <= water + 2, "a gravel beach at " + x + ", " + z + " lies at " + y);
+				beaches++;
+				// a cliff within 16 blocks; the beach is up to about 15 wide
+				int highest = y;
+				for (int dx = -4; dx <= 4; dx++) {
+					for (int dz = -4; dz <= 4; dz++) {
+						highest = Math.max(highest, view.blockY(x + dx, z + dz));
+					}
+				}
+				if (highest >= water + 6) {
+					underCliffs++;
+				}
+			}
+		}
+		System.out.println(beaches + " cells of gravel beach, " + underCliffs + " of them under a cliff");
+		assertTrue(beaches > 20, "only " + beaches + " cells of gravel beach");
+		assertTrue(underCliffs >= beaches * 3 / 4, "only " + underCliffs + " of " + beaches + " cells of gravel beach lie under a cliff");
+
+		Preset none = preset.copy();
+		none.landforms().seaCliffs.gravelBeaches = 0.0F;
+		TerrainViews.View without = TerrainViews.view(none, 0.0F, 0.0F, 4.0F);
+		for (int x = 0; x < without.size(); x++) {
+			for (int z = 0; z < without.size(); z++) {
+				assertTrue(without.cell(x, z).terrain != TerrainType.SHINGLE_BEACH, "a gravel beach with gravel beaches off at " + x + ", " + z);
+			}
+		}
+	}
+
+	@Test
 	void seaStacksStandOffTheCliffs() {
 		Preset preset = preset("default", (p) -> {
 			p.landforms().canyons.enabled = false;

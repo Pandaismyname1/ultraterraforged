@@ -208,6 +208,23 @@ public class TerrainViewTest {
 	}
 
 	@Test
+	void gravelBeaches() throws Exception {
+		Preset preset = preset("default");
+		preset.landforms().seaCliffs.gravelBeaches = 1.0F;
+		Preset without = preset.copy();
+		without.landforms().seaCliffs.enabled = false;
+		long place = TerrainViews.mostChanged(TerrainViews.view(preset, 0.0F, 0.0F, 8.0F), TerrainViews.view(without, 0.0F, 0.0F, 8.0F));
+		float x = PosUtil.unpackLeft(place);
+		float z = PosUtil.unpackRight(place);
+		System.out.println("gravel beach at " + x + ", " + z);
+		TerrainViews.View close = TerrainViews.view(preset, x, z, 1.0F);
+		TerrainViews.write(close, "gravel_beach_close");
+		for (int turns = 0; turns < 4; turns++) {
+			TerrainViews.writePerspective(close, "gravel_beach_3d_" + turns, turns);
+		}
+	}
+
+	@Test
 	void dunes() throws Exception {
 		for (String name : new String[] { "default", "badlands" }) {
 			Preset preset = preset(name);

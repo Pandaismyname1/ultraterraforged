@@ -160,13 +160,14 @@ public class LandformSettings {
 	 * Stretches of coast that end in sheer cliffs over the sea, with a rocky shelf and sea stacks offshore.
 	 */
 	public static class SeaCliffs {
-		private static final SeaCliffs DEFAULT = new SeaCliffs(true, 0.35F, 22, true);
+		private static final SeaCliffs DEFAULT = new SeaCliffs(true, 0.35F, 22, true, 0.5F);
 
 		public static final Codec<SeaCliffs> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			PresetCodecs.defaulted(Codec.BOOL, "enabled", DEFAULT.enabled).forGetter((o) -> o.enabled),
 			PresetCodecs.defaulted(Codec.FLOAT, "frequency", DEFAULT.frequency).forGetter((o) -> o.frequency),
 			PresetCodecs.defaulted(Codec.INT, "height", DEFAULT.height).forGetter((o) -> o.height),
-			PresetCodecs.defaulted(Codec.BOOL, "seaStacks", DEFAULT.seaStacks).forGetter((o) -> o.seaStacks)
+			PresetCodecs.defaulted(Codec.BOOL, "seaStacks", DEFAULT.seaStacks).forGetter((o) -> o.seaStacks),
+			PresetCodecs.defaulted(Codec.FLOAT, "gravelBeaches", DEFAULT.gravelBeaches).forGetter((o) -> o.gravelBeaches)
 		).apply(instance, SeaCliffs::new));
 
 		public boolean enabled;
@@ -175,16 +176,19 @@ public class LandformSettings {
 		// the tallest cliffs rise this many blocks above the sea
 		public int height;
 		public boolean seaStacks;
+		// share of the cliff coast with a narrow gravel beach at the foot of the cliffs
+		public float gravelBeaches;
 
-		public SeaCliffs(boolean enabled, float frequency, int height, boolean seaStacks) {
+		public SeaCliffs(boolean enabled, float frequency, int height, boolean seaStacks, float gravelBeaches) {
 			this.enabled = enabled;
 			this.frequency = frequency;
 			this.height = height;
 			this.seaStacks = seaStacks;
+			this.gravelBeaches = gravelBeaches;
 		}
 
 		public SeaCliffs copy() {
-			return new SeaCliffs(this.enabled, this.frequency, this.height, this.seaStacks);
+			return new SeaCliffs(this.enabled, this.frequency, this.height, this.seaStacks, this.gravelBeaches);
 		}
 
 		public static SeaCliffs makeDefault() {

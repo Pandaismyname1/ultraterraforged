@@ -8,19 +8,26 @@ import raccoonman.reterraforged.world.worldgen.heightmap.Levels;
 import raccoonman.reterraforged.world.worldgen.noise.NoiseUtil;
 import raccoonman.reterraforged.world.worldgen.noise.module.Noise;
 import raccoonman.reterraforged.world.worldgen.noise.module.Noises;
+import raccoonman.reterraforged.world.worldgen.terrain.TerrainType;
 
 /**
  * Stretches of coast where the land ends in a sheer cliff straight into the sea, with no beach, and sea stacks
  * standing offshore. Land near the sea is raised, most at the shore and less further inland, while the sea is not, so
- * the cliff always stands exactly on the natural coastline.
+ * the cliff always stands exactly on the natural coastline. Along some stretches the lowest strip of shore is left
+ * low, as a narrow gravel beach at the foot of the cliff.
  *
  * @param shoreline continent edge values below this are the open sea, rather than a lake inland
  * @param coastline where along the coast cliffs form
  * @param heightVariation how tall the cliffs are along the coast, as a share of the full height
+ * @param beaches where along the cliff coast there are gravel beaches, above beachThreshold
  */
-public record SeaCliffs(int seed, float shoreline, float threshold, float height, boolean stacks, Noise coastline, Noise heightVariation, Levels levels, ThreadLocal<Long2FloatOpenHashMap> stackSites, ThreadLocal<Long2FloatOpenHashMap> nearSea) implements Landform {
+public record SeaCliffs(int seed, float shoreline, float threshold, float height, boolean stacks, Noise coastline, Noise heightVariation, Noise beaches, float beachThreshold, Levels levels, ThreadLocal<Long2FloatOpenHashMap> stackSites, ThreadLocal<Long2FloatOpenHashMap> nearSea) implements Landform {
 	// in blocks
 	private static final int SHELF_DEPTH = 2;
+	// ground this many blocks above the sea is left as beach, where there is one
+	private static final float BEACH_HEIGHT = 3.0F;
+	// and it's a gravel beach under cliffs at least this tall
+	private static final float MIN_BEACH_CLIFF = 6.0F;
 	private static final float STACK_GRID = 40.0F;
 	private static final float STACK_CHANCE = 0.35F;
 	private static final float[] STACK_LAND_SEARCH = { 20.0F, 36.0F, 52.0F };
@@ -38,7 +45,11 @@ public record SeaCliffs(int seed, float shoreline, float threshold, float height
 		Noise heightVariation = Noises.map(Noises.perlin(seed + 3, 300, 2), 0.55F, 1.15F);
 		// the share of coast with cliffs sets how high the noise must be
 		float threshold = Landform.quantile(coastline, 1.0F - Math.max(0.0F, Math.min(1.0F, settings.frequency)));
-		return new SeaCliffs(seed, shoreline, threshold, settings.height, settings.seaStacks, coastline, heightVariation, levels, ThreadLocal.withInitial(Long2FloatOpenHashMap::new), ThreadLocal.withInitial(Long2FloatOpenHashMap::new));
+		Noise beaches = Noises.perlin(seed + 5, 260, 2);
+		float gravelBeaches = Math.max(0.0F, Math.min(1.0F, settings.gravelBeaches));
+		// none at all when turned down fully, rather than the odd spot at the noise's peaks
+		float beachThreshold = gravelBeaches <= 0.0F ? Float.POSITIVE_INFINITY : Landform.quantile(beaches, 1.0F - gravelBeaches);
+		return new SeaCliffs(seed, shoreline, threshold, settings.height, settings.seaStacks, coastline, heightVariation, beaches, beachThreshold, levels, ThreadLocal.withInitial(Long2FloatOpenHashMap::new), ThreadLocal.withInitial(Long2FloatOpenHashMap::new));
 	}
 
 	@Override
@@ -62,18 +73,27 @@ public record SeaCliffs(int seed, float shoreline, float threshold, float height
 	}
 
 	private void applyCliff(Cell cell, float x, float z, float mask, float proximity) {
+		float beach = this.beachThreshold == Float.POSITIVE_INFINITY ? 0.0F : Landform.smoothstep(this.beaches.compute(x, z, 0), this.beachThreshold - 0.02F, this.beachThreshold + 0.02F);
 		if (cell.height >= this.levels.water) {
 			// land: raised most at the shore, sloping back down to the natural land inland
 			float shape = Landform.smoothstep(proximity, 0.15F, 0.85F);
-			float rise = this.height * this.heightVariation.compute(x, z, 0) * this.levels.unit * shape * mask;
-			cell.height += rise;
+			// but the lowest strip of shore stays low where there is a beach, with the cliff rising behind it
+			float strip = beach * (1.0F - Landform.smoothstep((cell.height - this.levels.water) * this.levels.worldHeight, BEACH_HEIGHT, BEACH_HEIGHT + 1.5F));
+			float cliff = this.height * this.heightVariation.compute(x, z, 0) * shape * mask;
+			cell.height += cliff * (1.0F - strip) * this.levels.unit;
 			if (shape > 0.6F) {
 				// keep the cliff sheer; the filters would round it off
 				cell.erosionMask = true;
 			}
+			// the beach is gravel where a real cliff stands over it
+			if (strip > 0.5F && cliff >= MIN_BEACH_CLIFF && (cell.height - this.levels.water) * this.levels.worldHeight <= BEACH_HEIGHT + 0.5F) {
+				cell.terrain = TerrainType.SHINGLE_BEACH;
+				cell.erosionMask = true;
+			}
 		} else if (cell.height > this.levels.water(-SHELF_DEPTH)) {
-			// no shallow beach at the foot of a cliff
-			cell.height = NoiseUtil.lerp(cell.height, this.levels.water(-SHELF_DEPTH), mask * proximity);
+			// a shelf of rock at the foot of a cliff, or the beach shelving into the sea
+			float shelf = NoiseUtil.lerp(this.levels.water(-SHELF_DEPTH), this.levels.water(-1), beach);
+			cell.height = Math.min(cell.height, NoiseUtil.lerp(cell.height, shelf, mask * proximity));
 		}
 	}
 
@@ -204,6 +224,6 @@ public record SeaCliffs(int seed, float shoreline, float threshold, float height
 
 	@Override
 	public Landform mapNoise(Noise.Visitor visitor) {
-		return new SeaCliffs(this.seed, this.shoreline, this.threshold, this.height, this.stacks, this.coastline.mapAll(visitor), this.heightVariation.mapAll(visitor), this.levels, this.stackSites, this.nearSea);
+		return new SeaCliffs(this.seed, this.shoreline, this.threshold, this.height, this.stacks, this.coastline.mapAll(visitor), this.heightVariation.mapAll(visitor), this.beaches.mapAll(visitor), this.beachThreshold, this.levels, this.stackSites, this.nearSea);
 	}
 }

@@ -419,6 +419,11 @@ public class PresetSurfaceRuleData {
         SurfaceRules.ConditionSource surfaceNoise3 = SurfaceRules.noiseCondition(Noises.SURFACE, 0.5454, 0.909);
         SurfaceRules.RuleSource surface = SurfaceRules.sequence(
         	preset.landforms().volcanicSurface ? makeVolcanoRule(noise) : SurfaceRules.ifTrue(NEVER, STONE),
+        	// the gravel beaches at the foot of sea cliffs
+        	SurfaceRules.ifTrue(
+        		RTFSurfaceConditions.terrain(TerrainType.SHINGLE_BEACH),
+        		SurfaceRules.ifTrue(SurfaceRules.UNDER_FLOOR, gravel)
+        	),
         	SurfaceRules.ifTrue(
         		y4BelowSurface, 
         		SurfaceRules.ifTrue(

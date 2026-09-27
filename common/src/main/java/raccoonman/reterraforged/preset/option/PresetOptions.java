@@ -706,6 +706,12 @@ public final class PresetOptions {
 				.translation(RTFTranslationKeys.GUI_BUTTON_SEA_STACKS)
 				.activeWhen(SEA_CLIFFS)
 				.bind((p) -> p.landforms().seaCliffs.seaStacks, (p, v) -> p.landforms().seaCliffs.seaStacks = v)
+				.build(),
+			FloatOption.builder("landforms.seaCliffs.gravelBeaches")
+				.translation(RTFTranslationKeys.GUI_SLIDER_GRAVEL_BEACHES)
+				.range(0.0F, 1.0F)
+				.activeWhen(SEA_CLIFFS)
+				.bind((p) -> p.landforms().seaCliffs.gravelBeaches, (p, v) -> p.landforms().seaCliffs.gravelBeaches = v)
 				.build()
 		),
 		Category.of("fjords", RTFTranslationKeys.GUI_LABEL_FJORDS,

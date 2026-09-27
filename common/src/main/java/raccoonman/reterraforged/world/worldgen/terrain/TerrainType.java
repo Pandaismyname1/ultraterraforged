@@ -46,6 +46,8 @@ public class TerrainType {
     public static final Terrain VOLCANIC_LOWLANDS = registerVolcano("volcanic_lowlands", TerrainCategory.HIGHLAND);
     // sand dune fields in deserts; their steep faces stay sand
     public static final Terrain DUNES = register("dunes", TerrainCategory.FLATLAND);
+    // the narrow gravel beach at the foot of a sea cliff
+    public static final Terrain SHINGLE_BEACH = registerShingle("shingle_beach");
     
     public static void forEach(Consumer<Terrain> action) {
         TerrainType.REGISTRY.forEach(action);
@@ -140,6 +142,25 @@ public class TerrainType {
     private static Terrain registerMountain(String name, TerrainCategory type) {
         synchronized (TerrainType.LOCK) {
             Terrain terrain = new ConfiguredTerrain(TerrainType.REGISTRY.size(), name, type, true, true);
+            TerrainType.REGISTRY.add(terrain);
+            return terrain;
+        }
+    }
+    
+    // a beach that keeps its own type, rather than being relabelled coast or beach with the rest of the shore
+    private static Terrain registerShingle(String name) {
+        synchronized (TerrainType.LOCK) {
+            Terrain terrain = new Terrain(TerrainType.REGISTRY.size(), name, TerrainCategory.BEACH) {
+                @Override
+                public boolean isCoast() {
+                    return false;
+                }
+                
+                @Override
+                public boolean overridesCoast() {
+                    return true;
+                }
+            };
             TerrainType.REGISTRY.add(terrain);
             return terrain;
         }
