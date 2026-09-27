@@ -12,6 +12,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import com.pandaismyname1.ultraterraforged.platform.RegistryUtil;
 import com.pandaismyname1.ultraterraforged.registries.UTFBuiltInRegistries;
 import com.pandaismyname1.ultraterraforged.world.worldgen.biome.modifier.BiomeModifier;
@@ -23,6 +24,7 @@ public class BiomeModifiersImpl {
 	public static void bootstrap() {
 		register("add", AddModifier.CODEC);
 		register("replace", ReplaceModifier.CODEC);
+		RegistryUtil.register(NeoForgeRegistries.BIOME_MODIFIER_SERIALIZERS, "preset", PresetBiomeModifier.CODEC);
 	}
 
 	public static BiomeModifier add(Order order, GenerationStep.Decoration step, Optional<Pair<Filter.Behavior, HolderSet<Biome>>> biomes, HolderSet<PlacedFeature> features) {

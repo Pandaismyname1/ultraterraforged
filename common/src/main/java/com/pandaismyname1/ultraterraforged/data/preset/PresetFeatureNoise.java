@@ -1,6 +1,6 @@
 package com.pandaismyname1.ultraterraforged.data.preset;
 
-import net.minecraft.data.worldgen.BootstapContext;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noise;
@@ -9,7 +9,7 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noises;
 public class PresetFeatureNoise {
 	public static final ResourceKey<Noise> MEADOW_TREES = createKey("meadow_trees");
 	
-	public static void bootstrap(Preset preset, BootstapContext<Noise> ctx) {
+	public static void bootstrap(Preset preset, BootstrapContext<Noise> ctx) {
 		ctx.register(MEADOW_TREES, createMeadowTrees());
 	}
 	

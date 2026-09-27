@@ -32,7 +32,7 @@ public class PresetShareCodeTest {
 	}
 
 	private static JsonElement json(Preset preset) {
-		return Preset.CODEC.encodeStart(JsonOps.INSTANCE, preset).getOrThrow(false, (error) -> {});
+		return Preset.CODEC.encodeStart(JsonOps.INSTANCE, preset).getOrThrow();
 	}
 
 	@Test
@@ -42,7 +42,7 @@ public class PresetShareCodeTest {
 			assertTrue(code.startsWith(PresetShareCode.PREFIX));
 			// short enough to paste into chat or a forum post
 			assertTrue(code.length() < 4000, "code is " + code.length() + " characters long");
-			Preset decoded = PresetShareCode.decode(code).getOrThrow(false, (error) -> {});
+			Preset decoded = PresetShareCode.decode(code).getOrThrow();
 			assertEquals(json(preset.get()), json(decoded));
 		}
 	}
@@ -52,7 +52,7 @@ public class PresetShareCodeTest {
 		Preset preset = BuiltinPresets.makeDefault();
 		preset.world().continent.continentScale = 1234;
 		preset.rivers().riverCount = 17;
-		Preset decoded = PresetShareCode.decode(PresetShareCode.encode(preset)).getOrThrow(false, (error) -> {});
+		Preset decoded = PresetShareCode.decode(PresetShareCode.encode(preset)).getOrThrow();
 		assertEquals(1234, decoded.world().continent.continentScale);
 		assertEquals(17, decoded.rivers().riverCount);
 	}

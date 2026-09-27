@@ -1,5 +1,6 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.densityfunction;
 
+import com.pandaismyname1.ultraterraforged.data.UTFCodecs;
 import java.util.function.Supplier;
 
 import org.jetbrains.annotations.Nullable;
@@ -105,7 +106,7 @@ public record CellSampler(Supplier<GeneratorContext> generatorContext, CellField
 		
 		@Override
 		public KeyDispatchDataCodec<Marker> codec() {
-			return new KeyDispatchDataCodec<>(CODEC);
+			return UTFCodecs.keyDispatch(CODEC);
 		}
 	}
 }

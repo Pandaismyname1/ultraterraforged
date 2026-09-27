@@ -1,6 +1,5 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.biome.modifier.neoforge;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -15,10 +14,9 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
-import net.minecraftforge.common.world.ModifiableBiomeInfo.BiomeInfo.Builder;
-import com.pandaismyname1.ultraterraforged.neoforge.mixin.MixinBiomeGenerationSettingsPlainsBuilder;
+import net.neoforged.neoforge.common.world.BiomeGenerationSettingsBuilder;
 
-record ReplaceModifier(GenerationStep.Decoration step, Optional<HolderSet<Biome>> biomes, Map<ResourceKey<PlacedFeature>, Holder<PlacedFeature>> replacements) implements ForgeBiomeModifier {
+record ReplaceModifier(GenerationStep.Decoration step, Optional<HolderSet<Biome>> biomes, Map<ResourceKey<PlacedFeature>, Holder<PlacedFeature>> replacements) implements NeoForgeBiomeModifier {
 	public static final Codec<ReplaceModifier> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 		GenerationStep.Decoration.CODEC.fieldOf("step").forGetter(ReplaceModifier::step),
 		Biome.LIST_CODEC.optionalFieldOf("biomes").forGetter(ReplaceModifier::biomes),
@@ -26,27 +24,15 @@ record ReplaceModifier(GenerationStep.Decoration step, Optional<HolderSet<Biome>
 	).apply(instance, ReplaceModifier::new));
 
 	@Override
-	public void modify(Holder<Biome> biome, Phase phase, Builder builder) {
-		if(phase == Phase.AFTER_EVERYTHING) {
-			if(builder.getGenerationSettings() instanceof MixinBiomeGenerationSettingsPlainsBuilder builderAccessor) {
-				if(this.biomes.isPresent() && !this.biomes.get().contains(biome)) {
-					return;
-				}
-				
-				List<List<Holder<PlacedFeature>>> featureSteps = builderAccessor.getFeatures();
-				int index = this.step.ordinal();
-	
-				while (index >= featureSteps.size()) {
-					featureSteps.add(Collections.emptyList());
-				}
-
-				featureSteps.get(index).replaceAll((f) -> {
-					return f.unwrapKey().map(this.replacements::get).orElse(f);
-				});
-			} else {
-				throw new IllegalStateException();
-			}
+	public void modify(Holder<Biome> biome, BiomeGenerationSettingsBuilder generationSettings) {
+		if(this.biomes.isPresent() && !this.biomes.get().contains(biome)) {
+			return;
 		}
+		List<Holder<PlacedFeature>> step = generationSettings.getFeatures(this.step);
+		step.replaceAll((f) -> {
+			Holder<PlacedFeature> replacement = f.unwrapKey().map(this.replacements::get).orElse(null);
+			return replacement != null ? replacement : f;
+		});
 	}
 
 	@Override

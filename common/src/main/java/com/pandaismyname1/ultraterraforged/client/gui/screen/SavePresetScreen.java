@@ -7,7 +7,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.toasts.SystemToast.SystemToastIds;
+import net.minecraft.client.gui.components.toasts.SystemToast.SystemToastId;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -76,12 +76,12 @@ public class SavePresetScreen extends Screen {
 		String text = this.name.getValue().trim();
 		try {
 			PresetLibrary.Entry entry = PresetLibrary.save(PresetSharing.presetFolder(), text, this.preset);
-			Toasts.notify(UTFTranslationKeys.GUI_SAVE_PRESET_SAVED, Component.literal(text), SystemToastIds.PERIODIC_NOTIFICATION);
+			Toasts.notify(UTFTranslationKeys.GUI_SAVE_PRESET_SAVED, Component.literal(text), SystemToastId.PERIODIC_NOTIFICATION);
 			this.onSaved.accept(entry);
 			this.onClose();
 		} catch (Exception e) {
 			UTFCommon.LOGGER.error("Couldn't save preset {}", text, e);
-			Toasts.notify(UTFTranslationKeys.GUI_SAVE_PRESET_FAILED, Component.literal(String.valueOf(e.getMessage())), SystemToastIds.PACK_LOAD_FAILURE);
+			Toasts.notify(UTFTranslationKeys.GUI_SAVE_PRESET_FAILED, Component.literal(String.valueOf(e.getMessage())), SystemToastId.PACK_LOAD_FAILURE);
 		}
 	}
 
@@ -97,10 +97,9 @@ public class SavePresetScreen extends Screen {
 
 	@Override
 	public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-		this.renderBackground(graphics);
+		super.render(graphics, mouseX, mouseY, partialTick);
 		graphics.drawCenteredString(this.font, this.title, this.width / 2, this.height / 2 - 60, 0xFFFFFF);
 		graphics.drawCenteredString(this.font, this.hint, this.width / 2, this.height / 2 - 4, 0xFFFFFF);
-		super.render(graphics, mouseX, mouseY, partialTick);
 	}
 
 	@Override

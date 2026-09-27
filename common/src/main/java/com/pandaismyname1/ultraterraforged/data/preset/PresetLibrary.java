@@ -223,7 +223,7 @@ public final class PresetLibrary {
 	}
 
 	public static void write(Path file, Preset preset) throws IOException {
-		JsonElement json = Preset.CODEC.encodeStart(JsonOps.INSTANCE, preset).getOrThrow(false, (error) -> {});
+		JsonElement json = Preset.CODEC.encodeStart(JsonOps.INSTANCE, preset).getOrThrow();
 		// write next to the target first, so a failed write never leaves half a preset behind
 		Path temp = file.resolveSibling(file.getFileName() + ".tmp");
 		try (Writer writer = Files.newBufferedWriter(temp); JsonWriter jsonWriter = new JsonWriter(writer)) {

@@ -18,6 +18,7 @@ import com.mojang.serialization.Lifecycle;
 
 import net.minecraft.SharedConstants;
 import net.minecraft.core.MappedRegistry;
+import net.minecraft.core.RegistrationInfo;
 import net.minecraft.core.Registry;
 import net.minecraft.core.WritableRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -58,7 +59,6 @@ public final class TestBootstrap {
 			MockedStatic<BiomeModifiers> biomeModifiers = Mockito.mockStatic(BiomeModifiers.class)
 		) {
 			registryUtil.when(() -> RegistryUtil.createRegistry(any())).thenAnswer((invocation) -> newRegistry(invocation.getArgument(0)));
-			registryUtil.when(() -> RegistryUtil.getWritable(any())).thenAnswer((invocation) -> invocation.getArgument(0));
 			registryUtil.when(() -> RegistryUtil.register(any(), anyString(), any())).thenAnswer((invocation) -> {
 				register(invocation.getArgument(0), invocation.getArgument(1), invocation.getArgument(2));
 				return null;
@@ -78,7 +78,7 @@ public final class TestBootstrap {
 
 	@SuppressWarnings("unchecked")
 	private static <T> void register(Registry<T> registry, String name, Object value) {
-		((WritableRegistry<T>) registry).register(UTFRegistries.createKey(registry.key(), name), (T) value, Lifecycle.stable());
+		((WritableRegistry<T>) registry).register(UTFRegistries.createKey(registry.key(), name), (T) value, RegistrationInfo.BUILT_IN);
 	}
 
 	private static List<MappedRegistry<?>> unfreezeBuiltInRegistries() {

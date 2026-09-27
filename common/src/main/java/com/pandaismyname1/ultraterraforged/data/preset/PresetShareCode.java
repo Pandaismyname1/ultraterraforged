@@ -26,7 +26,7 @@ public final class PresetShareCode {
 	private static final int MAX_SIZE = 1 << 20;
 
 	public static String encode(Preset preset) {
-		JsonElement json = Preset.CODEC.encodeStart(JsonOps.INSTANCE, preset).getOrThrow(false, (error) -> {});
+		JsonElement json = Preset.CODEC.encodeStart(JsonOps.INSTANCE, preset).getOrThrow();
 		byte[] bytes = json.toString().getBytes(StandardCharsets.UTF_8);
 		Deflater deflater = new Deflater(Deflater.BEST_COMPRESSION);
 		try {

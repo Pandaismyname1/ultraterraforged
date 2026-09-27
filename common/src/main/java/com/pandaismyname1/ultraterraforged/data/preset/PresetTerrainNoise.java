@@ -1,6 +1,6 @@
 package com.pandaismyname1.ultraterraforged.data.preset;
 
-import net.minecraft.data.worldgen.BootstapContext;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noise;
@@ -16,7 +16,7 @@ public class PresetTerrainNoise {
 	public static final ResourceKey<Noise> RIDGES_FOLDED = createKey("ridges_folded");
 	public static final ResourceKey<Noise> OFFSET = createKey("offset");
 	
-	public static void bootstrap(Preset preset, BootstapContext<Noise> ctx) {
+	public static void bootstrap(Preset preset, BootstrapContext<Noise> ctx) {
 	}
 
 	protected static ResourceKey<Noise> createKey(String name) {

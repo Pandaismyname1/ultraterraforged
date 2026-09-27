@@ -1,5 +1,6 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.surface.rule;
 
+import com.pandaismyname1.ultraterraforged.data.UTFCodecs;
 import java.util.List;
 
 import com.mojang.datafixers.util.Pair;
@@ -29,7 +30,7 @@ record NoiseRule(Holder<Noise> noise, List<Pair<Float, SurfaceRules.RuleSource>>
 
 	@Override
 	public KeyDispatchDataCodec<NoiseRule> codec() {
-		return new KeyDispatchDataCodec<>(CODEC);
+		return UTFCodecs.keyDispatch(CODEC);
 	}
 	
 	private static Codec<Pair<Float, SurfaceRules.RuleSource>> entryCodec() {

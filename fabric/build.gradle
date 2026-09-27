@@ -45,11 +45,12 @@ dependencies {
     // Modrinth version ids (the version numbers are shared between loaders). -Putf.perfMods=false leaves them out, to
     // measure or debug UltraTerraForged on its own. See docs/porting/performance-mods.md.
     if (project.findProperty("utf.perfMods") != "false") {
-        devModsFolder "maven.modrinth:c2me-fabric:fyt7FtgA"     // C2ME 0.2.0+alpha.11.18: its modules are nested jars
-        modLocalRuntime "maven.modrinth:noisiumed:vcRbbvYP"     // Noisiumed 3.0.6
-        modLocalRuntime "maven.modrinth:lithium:iEcXOkz4"       // Lithium 0.11.4
-        modLocalRuntime "maven.modrinth:modernfix:rPmgLeZC"     // ModernFix 5.25.2
-        modLocalRuntime "maven.modrinth:sodium:OihdIimA"        // Sodium 0.5.13
+        // C2ME 0.4.0-alpha.0.29: its modules are nested jars. Not C2ME OpenCL: it needs Java 25, the dev game runs on 21.
+        devModsFolder "maven.modrinth:c2me-fabric:RMHYO1LJ"
+        modLocalRuntime "maven.modrinth:noisiumed:8mNj0Di8"     // Noisiumed 3.0.6
+        modLocalRuntime "maven.modrinth:lithium:N08Z8wog"       // Lithium 0.15.4
+        modLocalRuntime "maven.modrinth:modernfix:NnNX8LBn"     // ModernFix 5.25.1
+        modLocalRuntime "maven.modrinth:sodium:SMxNOGZ6"        // Sodium 0.8.13
     }
 }
 

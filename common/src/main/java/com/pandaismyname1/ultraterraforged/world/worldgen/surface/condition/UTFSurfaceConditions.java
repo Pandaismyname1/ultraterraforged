@@ -1,5 +1,6 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.surface.condition;
 
+import com.pandaismyname1.ultraterraforged.data.UTFCodecs;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -127,7 +128,7 @@ public class UTFSurfaceConditions {
 	}
 	
 	public static void register(String name, Codec<? extends SurfaceRules.ConditionSource> value) {
-		RegistryUtil.register(BuiltInRegistries.MATERIAL_CONDITION, name, value);
+		RegistryUtil.register(BuiltInRegistries.MATERIAL_CONDITION, name, UTFCodecs.entry(value));
 	}
 	
 	private static Holder<Noise> constant(float value) {

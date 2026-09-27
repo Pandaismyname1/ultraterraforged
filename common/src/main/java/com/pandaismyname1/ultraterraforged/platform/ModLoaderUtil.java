@@ -15,7 +15,7 @@ public class ModLoaderUtil {
 	}
 
 	/**
-	 * The mod loader running the game: "fabric", or "forge", which also covers NeoForge on 1.20.1.
+	 * The mod loader running the game: "fabric" or "neoforge".
 	 */
 	@ExpectPlatform
 	public static String loaderName() {

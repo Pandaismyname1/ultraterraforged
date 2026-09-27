@@ -74,16 +74,14 @@ public final class ServerPresets {
 			Preset preset = defaults.create();
 			Files.createDirectories(file.getParent());
 			try (Writer writer = Files.newBufferedWriter(file)) {
-				JsonElement json = Preset.CODEC.encodeStart(JsonOps.INSTANCE, preset).getOrThrow(false, UTFCommon.LOGGER::error);
+				JsonElement json = Preset.CODEC.encodeStart(JsonOps.INSTANCE, preset).getOrThrow();
 				new GsonBuilder().setPrettyPrinting().create().toJson(json, writer);
 			}
 			UTFCommon.LOGGER.info("Wrote the {} preset to {}; edit it to change the terrain of new worlds", defaults.id(), file);
 			return preset;
 		}
 		try (Reader reader = Files.newBufferedReader(file)) {
-			return Preset.CODEC.parse(JsonOps.INSTANCE, JsonParser.parseReader(reader)).getOrThrow(false, (error) -> {
-				throw new IllegalStateException("Invalid preset in " + file + ": " + error);
-			});
+			return Preset.CODEC.parse(JsonOps.INSTANCE, JsonParser.parseReader(reader)).getOrThrow((error) -> new IllegalStateException("Invalid preset in " + file + ": " + error));
 		}
 	}
 

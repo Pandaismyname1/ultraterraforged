@@ -1,5 +1,6 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.surface.rule;
 
+import com.pandaismyname1.ultraterraforged.data.UTFCodecs;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -77,7 +78,7 @@ public record StrataRule(ResourceLocation cacheId, Holder<Noise> selector, Holde
 
 	@Override
 	public KeyDispatchDataCodec<StrataRule> codec() {
-		return new KeyDispatchDataCodec<>(CODEC);
+		return UTFCodecs.keyDispatch(CODEC);
 	}
 
 	private List<StrataStack> generate(RandomSource random, int height) {

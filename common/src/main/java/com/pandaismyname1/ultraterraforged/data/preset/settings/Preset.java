@@ -11,7 +11,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.worldgen.BootstapContext;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import com.pandaismyname1.ultraterraforged.compat.terrablender.TBNoiseRouterData;
 import com.pandaismyname1.ultraterraforged.data.preset.PresetBiomeData;
@@ -84,7 +84,7 @@ public record Preset(WorldSettings world, SurfaceSettings surface, CaveSettings 
 			TBNoiseRouterData.bootstrap(ctx);
 		});
 		this.addPatch(builder, Registries.NOISE_SETTINGS, PresetNoiseGeneratorSettings::bootstrap);
-		return builder.buildPatch(RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY), registries);
+		return builder.buildPatch(RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY), UTFRegistries.withDataRegistries(registries), UTFRegistries.cloner()).patches();
 	}
 	
 	private <T> void addPatch(RegistrySetBuilder builder, ResourceKey<? extends Registry<T>> key, Patch<T> patch) {
@@ -94,6 +94,6 @@ public record Preset(WorldSettings world, SurfaceSettings surface, CaveSettings 
     }
     
 	private interface Patch<T> {
-        void apply(Preset preset, BootstapContext<T> ctx);
+        void apply(Preset preset, BootstrapContext<T> ctx);
 	}
 }

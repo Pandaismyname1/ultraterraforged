@@ -2,67 +2,67 @@ package com.pandaismyname1.ultraterraforged.platform.neoforge;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.Lifecycle;
 
 import net.minecraft.core.Registry;
-import net.minecraft.core.WritableRegistry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DataPackRegistryEvent;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.GameData;
-import net.minecraftforge.registries.RegistryBuilder;
-import com.pandaismyname1.ultraterraforged.UTFCommon;
-import com.pandaismyname1.ultraterraforged.registries.UTFBuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DataPackRegistryEvent;
+import net.neoforged.neoforge.registries.NewRegistryEvent;
+import net.neoforged.neoforge.registries.RegisterEvent;
+import net.neoforged.neoforge.registries.RegistryBuilder;
 import com.pandaismyname1.ultraterraforged.registries.UTFRegistries;
 
-//this is only public so the initializer class can call register
-//TODO make this non public
+// NeoForge only accepts registry writes during its registration events, which come after UTF's bootstrap, so writes
+// wait here until then
 public final class RegistryUtilImpl {
-	private static final Map<ResourceKey<? extends Registry<?>>, DeferredRegistry.Writable<?>> REGISTERS = new ConcurrentHashMap<>();
+	private static final Map<ResourceKey<? extends Registry<?>>, List<Entry<?>>> ENTRIES = Collections.synchronizedMap(new LinkedHashMap<>());
+	private static final List<Registry<?>> REGISTRIES = Collections.synchronizedList(new ArrayList<>());
 	private static final List<DataRegistry<?>> DATA_REGISTRIES = Collections.synchronizedList(new ArrayList<>());
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static void register(IEventBus bus) {
-		for(DeferredRegistry.Writable<?> registry : REGISTERS.values()) {
-			registry.register(bus);
-		}
-		
-		bus.addListener((DataPackRegistryEvent.NewRegistry event) -> {
-			for(DataRegistry registry : DATA_REGISTRIES) {
-				event.dataPackRegistry(registry.key(), registry.codec());
+		bus.addListener((NewRegistryEvent event) -> REGISTRIES.forEach(event::register));
+		bus.addListener((RegisterEvent event) -> {
+			List<Entry<?>> entries = ENTRIES.get(event.getRegistryKey());
+			if (entries != null) {
+				entries.forEach((entry) -> entry.register(event));
 			}
 		});
-	}
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static <T> WritableRegistry<T> getWritable(Registry<T> registry) {
-		return (WritableRegistry<T>) REGISTERS.computeIfAbsent(registry.key(), (k) -> {
-			return new DeferredRegistry.Writable<>(DeferredRegister.create((ResourceKey) k, UTFCommon.MOD_ID));
-		});
+		bus.addListener((DataPackRegistryEvent.NewRegistry event) -> DATA_REGISTRIES.forEach((registry) -> registry.register(event)));
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static <T> void register(Registry<T> registry, String name, T value) {
+		ResourceKey<? extends Registry<T>> key = registry.key();
+		ENTRIES.computeIfAbsent(key, (k) -> Collections.synchronizedList(new ArrayList<>())).add(new Entry<>(key, UTFRegistries.createKey(key, name).location(), value));
+	}
+
 	public static <T> Registry<T> createRegistry(ResourceKey<? extends Registry<T>> key) {
-		DeferredRegister<T> register = DeferredRegister.create((ResourceKey) key, UTFCommon.MOD_ID);
-		register.makeRegistry(() -> {
-			return new RegistryBuilder().hasTags();
-		});
-		REGISTERS.put(key, new DeferredRegistry.Writable<>(register));
-		return DeferredRegistry.memoize(key, () -> {
-			return GameData.getWrapper(key, Lifecycle.stable());
-		});
+		Registry<T> registry = new RegistryBuilder<>(key).sync(false).create();
+		REGISTRIES.add(registry);
+		return registry;
 	}
 
 	public static <T> void createDataRegistry(ResourceKey<? extends Registry<T>> key, Codec<T> codec) {
 		DATA_REGISTRIES.add(new DataRegistry<>(key, codec));
 	}
-	
+
+	private record Entry<T>(ResourceKey<? extends Registry<T>> registry, ResourceLocation name, T value) {
+
+		void register(RegisterEvent event) {
+			event.register(this.registry, this.name, this::value);
+		}
+	}
+
 	private record DataRegistry<T>(ResourceKey<? extends Registry<T>> key, Codec<T> codec) {
+
+		@SuppressWarnings("unchecked")
+		void register(DataPackRegistryEvent.NewRegistry event) {
+			event.dataPackRegistry((ResourceKey<Registry<T>>) this.key, this.codec);
+		}
 	}
 }

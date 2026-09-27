@@ -4,7 +4,8 @@ UltraTerraForged recommends a set of performance mods, shows in the Create World
 runs them in the dev environment. Which builds exist changes with every Minecraft version and loader, so this page
 records what was found for each version, what was tested with UltraTerraForged, and what to change when porting.
 
-State as of 2026-09-27 (UltraTerraForged on 1.20.1, Fabric and Forge; the Forge jar also covers NeoForge 47.1).
+State as of 2026-09-28, on the 1.21.1 branch (Fabric and NeoForge). The 1.20.1 branch (Fabric and Forge, whose jar
+also covers NeoForge 47.1) keeps its own copy of this page; its findings are kept below too.
 
 ## Where it lives
 
@@ -13,20 +14,24 @@ State as of 2026-09-27 (UltraTerraForged on 1.20.1, Fabric and Forge; the Forge 
 | The list of mods, their mod ids and the builds per loader | `common/.../compat/performance/PerformanceMods.java` (data only) |
 | The Terrain tab section and its light | `common/.../client/gui/createworld/PerformanceModsSection.java`, wired in `TerrainTab` |
 | Tests of the light rules | `common/src/test/.../PerformanceModsTest.java` |
-| The dev runs' mods | `fabric/build.gradle`, `forge/build.gradle` (`modLocalRuntime`, pinned) |
+| The dev runs' mods | `fabric/build.gradle` (`modLocalRuntime`, `devModsFolder`), `neoforge/build.gradle` (`devMods`), pinned |
 | Repositories | root `build.gradle`: Modrinth maven (`maven.modrinth`), Cursemaven (`curse.maven`) |
 | Availability lookup | `docs/porting/tools/perfmods.py` |
 | Server tests: timing chunk generation, running console commands | `docs/porting/tools/servers/` |
 
 `-Putf.perfMods=false` runs the dev game without them, e.g. to measure or debug UltraTerraForged on its own.
 
-Two things the dev runs need that a real game doesn't:
+What the dev runs need that a real game doesn't:
+
+- **NeoForge (1.21.1): nothing special.** NeoForge has run on Mojang's names since 1.20.2, as the dev game does, so
+  released jars work unchanged: `syncDevMods` puts them in `neoforge/run/mods` (and removes anything else there), nested
+  jars and all. None of the Forge workarounds below apply any more.
 
 - **Mods made of nested jars** (C2ME: one jar holding its ~20 modules) don't load from the Gradle classpath, which
   doesn't unpack jars in jars ("requires c2me-base, which is missing"). Fabric puts them in the `devModsFolder`
   configuration instead: `syncDevMods` copies them unremapped to `fabric/build/devmods`, and every run passes that
   folder to Fabric loader as `fabric.addMods`, which unpacks and remaps them like a mods folder.
-- **The Forge dev game runs with Mojang's names; released Forge mods use SRG names**, so released jars can't just go in
+- **1.20.1 only: the Forge dev game runs with Mojang's names; released Forge mods use SRG names**, so released jars can't just go in
   `forge/run/mods` (unlike Fabric, whose loader remaps the mods folder in dev). Everything goes through Loom, which
   remaps dependencies, and a few things need more:
   - Remapping a mod drops its list of nested jars (`META-INF/jarjar/metadata.json`), so their libraries don't load.
@@ -43,14 +48,15 @@ Two things the dev runs need that a real game doesn't:
     remaps them itself.
   - Connector brings its own Mixin, which ignores the `--mixin.config` arguments the dev game passes, so
     `forge/src/main/resources/META-INF/MANIFEST.MF` names UltraTerraForged's mixin configs, as the released jar's does.
-- **Sodium refuses the dev game's LWJGL** (3.3.2 against the 3.3.1 launchers ship), so the runs set
+- **Sodium refused the 1.20.1 dev game's LWJGL** (3.3.2 against the 3.3.1 launchers ship), so the Fabric runs set
   `sodium.checks.issue2561=false`. Check whether that's still needed after a port: newer Sodium versions require
   other LWJGL versions, and the property name follows Sodium's issue number.
 
 ### The light
 
-Only mods with a build for the running Minecraft version and loader count; a mod that only runs through Sinytra
-Connector counts once Connector is installed.
+Only mods with a build for the running Minecraft version, loader and Java version count; a mod that only runs through
+Sinytra Connector counts once Connector is installed. A build that needs a newer Java than the game runs on
+(`Build.needsJava`) shows "Needs Java N" and doesn't count.
 
 | Light | When |
 |---|---|
@@ -64,7 +70,7 @@ Connector counts once Connector is installed.
 | Mod | Does | Mod ids | Notes |
 |---|---|---|---|
 | [C2ME](https://modrinth.com/mod/c2me-fabric) | chunk generation, loading and saving on many threads | `c2me` | Always alpha. NeoForge builds from 1.21.1 ([c2me-neoforge](https://modrinth.com/mod/c2me-neoforge)); none for Forge, but the Fabric build runs through Connector on 1.20.1 |
-| [C2ME OpenCL](https://modrinth.com/mod/c2me-ocl) | C2ME add-on: parts of world generation on the GPU | | From 1.21.1, alpha. Needs C2ME |
+| [C2ME OpenCL](https://modrinth.com/mod/c2me-ocl) | C2ME add-on: parts of world generation on the GPU | `c2me-opts-accel-opencl` (Fabric), `c2me_opts_accel_opencl` (NeoForge, nested) | From 1.21.1, alpha. Needs C2ME, **Java 25** and an OpenCL device |
 | [Noisiumed](https://modrinth.com/mod/noisiumed) / [Noisium](https://modrinth.com/mod/noisium) | faster block placement when filling chunks | `noisiumed`, `noisium` | Noisium is archived; Noisiumed is the maintained fork. Either counts; never install both. Noisiumed refuses to run under Connector |
 | [Lithium](https://modrinth.com/mod/lithium) | ticking, AI, physics, some world generation | `lithium` | No Forge build: [Radium](https://modrinth.com/mod/radium) (`radium`, preferred) or [Canary](https://modrinth.com/mod/canary) (`canary`) stand in. Official NeoForge builds from 1.21.1 |
 | [ModernFix](https://modrinth.com/mod/modernfix) | loading time, memory | `modernfix` | Overwrites the same biome temperature cache method as Lithium; the log warns, it's harmless |
@@ -72,7 +78,46 @@ Connector counts once Connector is installed.
 | [Sodium](https://modrinth.com/mod/sodium) | rendering | `sodium` | Client only. No Forge build: [Embeddium](https://modrinth.com/mod/embeddium) (`embeddium`) stands in. Official NeoForge builds from 1.21.1 |
 | [Sinytra Connector](https://modrinth.com/mod/connector) | runs Fabric mods on Forge/NeoForge | `connector` | Needs [Forgified Fabric API](https://modrinth.com/mod/forgified-fabric-api). Not a performance mod; lets the Forge list count Fabric-only mods |
 
-## 1.20.1 (current)
+## 1.21.1 (current)
+
+Every mod has a build for both loaders except AllTheLeaks (NeoForge only), so the stand-ins (Radium, Canary, Embeddium)
+and Sinytra Connector drop out. What the dev runs use:
+
+| Mod | Fabric | NeoForge 21.1 |
+|---|---|---|
+| C2ME | 0.4.0-alpha.0.29 (`RMHYO1LJ`) | 0.4.0-alpha.0.122 (`c2me-neoforge`, `yxOYFgnK`) |
+| C2ME OpenCL | 0.4.0-alpha.0.29 (`j7FyNUo9`), not in the dev runs: Java 25 | 0.4.0-alpha.0.122 (`shL6D1IO`), the same |
+| Noisium | Noisiumed 3.0.6 (`8mNj0Di8`) | Noisiumed 3.0.6 (`U3gpLtpO`) |
+| Lithium | 0.15.4 (`N08Z8wog`) | 0.15.4 (`DDUrRVCA`) |
+| ModernFix | 5.25.1 (`NnNX8LBn`) | 5.27.24 (`5HLHxQ2F`) |
+| AllTheLeaks | none | 1.1.13 (`curse.maven:alltheleaks-1091339:8943912`) |
+| Sodium | 0.8.13 (`SMxNOGZ6`) | 0.8.13 (`uMOpc5uV`) |
+
+So six of the seven count on Fabric and all seven on NeoForge, on Java 25; one fewer each on Java 21.
+
+### Java 25
+
+The launcher runs 1.21.1 on Java 21, but C2ME's 0.4.0 line (June 2026 on) builds two modules for newer Java:
+
+- `c2me-opts-natives-math`, nested in C2ME itself, needs Java 25 (22 in the 0.3.0 line). On Java 21 Fabric simply
+  skips it and C2ME runs without it.
+- **C2ME OpenCL depends on that module, so it needs Java 25.** On Java 21 Fabric refuses to start
+  ("requires version 25 or later of Java") and NeoForge crashes (`UnsupportedClassVersionError`). Hence
+  `needsJava(25)` in `PerformanceMods` and its absence from the dev runs, which use the project's Java 21.
+
+### Tested with UltraTerraForged
+
+Dedicated servers of each loader, seed 1111, default preset, `/utf locate river`, `/utf locate cirque`, 256
+forceloaded chunks, on Java 21:
+
+- Without performance mods, and with C2ME, Noisiumed, Lithium, ModernFix (and AllTheLeaks on NeoForge): both loaders
+  generate and locate the same terrain (the nearest river at 3440, 1552; the nearest cirque at 6224, -48), with no
+  errors. The only warnings are the mods' optional mixins probing for mods that aren't there (Starlight, Sodium on a
+  server).
+- NeoForge applies the preset's biome modifiers through UTF's one NeoForge biome modifier
+  (`Applying the 30 biome modifiers of the world's preset` in the log).
+
+## 1.20.1 (the 1.20.1 branch)
 
 What the dev runs use, pinned to Modrinth version ids because Noisiumed shares its version numbers between loaders:
 

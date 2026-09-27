@@ -1,6 +1,6 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.feature.template.decorator;
 
-import java.util.function.Function;
+import com.pandaismyname1.ultraterraforged.data.UTFCodecs;
 
 import com.mojang.serialization.Codec;
 
@@ -10,7 +10,7 @@ import com.pandaismyname1.ultraterraforged.registries.UTFBuiltInRegistries;
 import com.pandaismyname1.ultraterraforged.world.worldgen.feature.template.template.TemplateContext;
 
 public interface TemplateDecorator<T extends TemplateContext> {
-    public static final Codec<TemplateDecorator<?>> CODEC = UTFBuiltInRegistries.TEMPLATE_DECORATOR_TYPE.byNameCodec().dispatch(TemplateDecorator::codec, Function.identity());
+    public static final Codec<TemplateDecorator<?>> CODEC = UTFCodecs.dispatch(UTFBuiltInRegistries.TEMPLATE_DECORATOR_TYPE, TemplateDecorator::codec);
     
     void apply(LevelAccessor level, T buffer, RandomSource random, boolean modified);
     

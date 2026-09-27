@@ -1,5 +1,6 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.surface.rule;
 
+import com.pandaismyname1.ultraterraforged.data.UTFCodecs;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
@@ -29,7 +30,7 @@ public record LayeredSurfaceRule(TagKey<Layer> layers) implements SurfaceRules.R
 
 	@Override
 	public KeyDispatchDataCodec<LayeredSurfaceRule> codec() {
-		return new KeyDispatchDataCodec<>(CODEC);
+		return UTFCodecs.keyDispatch(CODEC);
 	}
 
 	public static Layer layer(TagKey<Layer> layers) {

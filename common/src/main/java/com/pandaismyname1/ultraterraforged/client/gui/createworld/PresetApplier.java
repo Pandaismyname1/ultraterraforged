@@ -77,7 +77,7 @@ public final class PresetApplier {
 	}
 
 	static String packName(Preset preset) {
-		String json = Preset.CODEC.encodeStart(JsonOps.INSTANCE, preset).getOrThrow(false, UTFCommon.LOGGER::error).toString();
+		String json = Preset.CODEC.encodeStart(JsonOps.INSTANCE, preset).getOrThrow().toString();
 		try {
 			byte[] hash = MessageDigest.getInstance("SHA-1").digest(json.getBytes(StandardCharsets.UTF_8));
 			return PACK_PREFIX + "-" + HexFormat.of().formatHex(hash).substring(0, 12) + ".zip";

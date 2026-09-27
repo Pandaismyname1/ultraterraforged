@@ -8,7 +8,7 @@ import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.worldgen.BootstapContext;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
@@ -28,7 +28,7 @@ import com.pandaismyname1.ultraterraforged.data.preset.settings.StructureSetting
  */
 public class PresetStructureSets {
 
-	public static void bootstrap(Preset preset, BootstapContext<StructureSet> ctx, HolderLookup.RegistryLookup<StructureSet> registered) {
+	public static void bootstrap(Preset preset, BootstrapContext<StructureSet> ctx, HolderLookup.RegistryLookup<StructureSet> registered) {
 		HolderGetter<Structure> structures = ctx.lookup(Registries.STRUCTURE);
 		HolderGetter<StructureSet> structureSets = ctx.lookup(Registries.STRUCTURE_SET);
 		HolderGetter<Biome> biomes = ctx.lookup(Registries.BIOME);

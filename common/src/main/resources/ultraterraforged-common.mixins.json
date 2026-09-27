@@ -15,7 +15,7 @@
   	"MixinMinecraftServer",
   	"MixinSpawnFinder",
   	"MixinClimateSampler",
-  	"MixinChunkStatus",
+  	"MixinChunkStatusTasks",
   	"MixinServerPacksSource",
   	"MixinRegistryDataLoader",
   	"MixinNoiseBasedChunkGenerator",

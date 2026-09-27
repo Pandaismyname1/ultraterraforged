@@ -1,5 +1,6 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.surface.condition;
 
+import com.pandaismyname1.ultraterraforged.data.UTFCodecs;
 import org.jetbrains.annotations.Nullable;
 
 import com.mojang.serialization.Codec;
@@ -59,7 +60,7 @@ class NearGroundCondition extends SurfaceRules.LazyYCondition {
 
 		@Override
 		public KeyDispatchDataCodec<Source> codec() {
-			return new KeyDispatchDataCodec<>(CODEC);
+			return UTFCodecs.keyDispatch(CODEC);
 		}
 	}
 }

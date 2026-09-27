@@ -97,9 +97,7 @@ public class PresetFormatTest {
 	}
 
 	private static Preset parse(JsonObject json) {
-		return Preset.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow(false, (error) -> {
-			throw new AssertionError(error);
-		});
+		return Preset.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow((error) -> new AssertionError(error));
 	}
 
 	private static JsonObject fixture(String name) throws Exception {

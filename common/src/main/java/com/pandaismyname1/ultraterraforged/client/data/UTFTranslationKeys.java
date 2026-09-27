@@ -379,6 +379,7 @@ public class UTFTranslationKeys {
 	public static final String GUI_PERFORMANCE_MODS_INSTALLED = resolve("gui.performanceMods.installed");
 	public static final String GUI_PERFORMANCE_MODS_MISSING = resolve("gui.performanceMods.missing");
 	public static final String GUI_PERFORMANCE_MODS_NEEDS_VERSION = resolve("gui.performanceMods.needsVersion");
+	public static final String GUI_PERFORMANCE_MODS_NEEDS_JAVA = resolve("gui.performanceMods.needsJava");
 	public static final String GUI_PERFORMANCE_MODS_NOT_ON_LOADER = resolve("gui.performanceMods.notOnLoader");
 	public static final String GUI_PERFORMANCE_MODS_NEEDS_CONNECTOR = resolve("gui.performanceMods.needsConnector");
 	public static final String GUI_PERFORMANCE_MODS_VIA_CONNECTOR = resolve("gui.performanceMods.viaConnector");

@@ -195,8 +195,8 @@ public class PresetOptionsTest {
 		// older files have no surface section; each decoded preset must get its own copy of the default
 		JsonObject json = encode(BuiltinPresetRenderTest.presets().get("default").get());
 		json.remove("surface");
-		Preset a = Preset.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow(false, Assertions::fail);
-		Preset b = Preset.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow(false, Assertions::fail);
+		Preset a = Preset.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow(AssertionError::new);
+		Preset b = Preset.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow(AssertionError::new);
 		assertTrue(a.surface() != b.surface());
 	}
 
@@ -281,7 +281,7 @@ public class PresetOptionsTest {
 	}
 
 	static JsonObject encode(Preset preset) {
-		return Preset.CODEC.encodeStart(JsonOps.INSTANCE, preset).getOrThrow(false, Assertions::fail).getAsJsonObject();
+		return Preset.CODEC.encodeStart(JsonOps.INSTANCE, preset).getOrThrow(AssertionError::new).getAsJsonObject();
 	}
 
 	static Map<String, JsonElement> flatten(JsonObject json) {

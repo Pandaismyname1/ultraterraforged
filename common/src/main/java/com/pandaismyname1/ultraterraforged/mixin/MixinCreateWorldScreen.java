@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.components.tabs.Tab;
+import net.minecraft.client.gui.components.tabs.TabManager;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
@@ -32,6 +33,9 @@ abstract class MixinCreateWorldScreen extends Screen implements TerrainState.Hol
 	WorldCreationUiState uiState;
 	@Shadow
 	private boolean recreated;
+	@Shadow
+	@Final
+	private TabManager tabManager;
 
 	@Unique
 	private TerrainState ultraterraforged$terrainState;
@@ -62,7 +66,7 @@ abstract class MixinCreateWorldScreen extends Screen implements TerrainState.Hol
 			// set only by the dev launch configurations, so test worlds can be flown around
 			if (!this.recreated && Boolean.getBoolean("ultraterraforged.dev.creative")) {
 				state.uiState().setGameMode(WorldCreationUiState.SelectedGameMode.CREATIVE);
-				state.uiState().setAllowCheats(true);
+				state.uiState().setAllowCommands(true);
 			}
 		}
 	}
@@ -92,13 +96,23 @@ abstract class MixinCreateWorldScreen extends Screen implements TerrainState.Hol
 		} catch (IOException | RuntimeException e) {
 			UTFCommon.LOGGER.error("Couldn't prepare the UltraTerraForged preset", e);
 			state.setPendingSelection(null);
-			SystemToast.addOrUpdate(this.minecraft.getToasts(), SystemToast.SystemToastIds.PACK_LOAD_FAILURE, Component.translatable(UTFTranslationKeys.GUI_TERRAIN_TAB_APPLY_FAILED), Component.literal(String.valueOf(e.getMessage())));
+			SystemToast.addOrUpdate(this.minecraft.getToasts(), SystemToast.SystemToastId.PACK_LOAD_FAILURE, Component.translatable(UTFTranslationKeys.GUI_TERRAIN_TAB_APPLY_FAILED), Component.literal(String.valueOf(e.getMessage())));
 			callback.cancel();
 		}
 	}
 
-	@Inject(method = "tick", at = @At("TAIL"))
-	private void ultraterraforged$createOncePresetLoaded(CallbackInfo callback) {
+	// since 1.20.5 neither the screen nor its tabs tick on their own
+	@Override
+	public void tick() {
+		super.tick();
+		if (this.tabManager.getCurrentTab() instanceof TerrainTab terrainTab) {
+			terrainTab.tick();
+		}
+		this.ultraterraforged$createOncePresetLoaded();
+	}
+
+	@Unique
+	private void ultraterraforged$createOncePresetLoaded() {
 		TerrainState state = this.ultraterraforged$getTerrainState();
 		if (PresetApplier.isReadyToCreate(state)) {
 			state.setPendingSelection(null);

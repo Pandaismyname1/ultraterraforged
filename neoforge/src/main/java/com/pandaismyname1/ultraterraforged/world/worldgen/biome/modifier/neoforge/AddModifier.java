@@ -1,10 +1,8 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.biome.modifier.neoforge;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import org.jetbrains.annotations.Nullable;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -14,12 +12,11 @@ import net.minecraft.core.HolderSet;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
-import net.minecraftforge.common.world.ModifiableBiomeInfo.BiomeInfo.Builder;
-import com.pandaismyname1.ultraterraforged.neoforge.mixin.MixinBiomeGenerationSettingsPlainsBuilder;
+import net.neoforged.neoforge.common.world.BiomeGenerationSettingsBuilder;
 import com.pandaismyname1.ultraterraforged.world.worldgen.biome.modifier.Filter;
 import com.pandaismyname1.ultraterraforged.world.worldgen.biome.modifier.Order;
 
-record AddModifier(Order order, GenerationStep.Decoration step, Optional<Filter> biomes, HolderSet<PlacedFeature> features) implements ForgeBiomeModifier {
+record AddModifier(Order order, GenerationStep.Decoration step, Optional<Filter> biomes, HolderSet<PlacedFeature> features) implements NeoForgeBiomeModifier {
 	public static final Codec<AddModifier> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 		Order.CODEC.fieldOf("order").forGetter(AddModifier::order),
 		GenerationStep.Decoration.CODEC.fieldOf("step").forGetter(AddModifier::step),
@@ -28,30 +25,14 @@ record AddModifier(Order order, GenerationStep.Decoration step, Optional<Filter>
 	).apply(instance, AddModifier::new));
 
 	@Override
-	public void modify(Holder<Biome> biome, Phase phase, Builder builder) {
-		if(phase == Phase.AFTER_EVERYTHING) {
-			if(builder.getGenerationSettings() instanceof MixinBiomeGenerationSettingsPlainsBuilder builderAccessor) {
-				if(this.biomes.isPresent() && !this.biomes.get().test(biome)) {
-					return;
-				}
-				
-				List<List<Holder<PlacedFeature>>> featureSteps = builderAccessor.getFeatures();
-				int index = this.step.ordinal();
-	
-				while (index >= featureSteps.size()) {
-					featureSteps.add(Collections.emptyList());
-				}
-	
-				featureSteps.set(index, this.add(featureSteps.get(index)));
-			} else {
-				throw new IllegalStateException();
-			}
+	public void modify(Holder<Biome> biome, BiomeGenerationSettingsBuilder generationSettings) {
+		if(this.biomes.isPresent() && !this.biomes.get().test(biome)) {
+			return;
 		}
-	}
-
-	private List<Holder<PlacedFeature>> add(@Nullable List<Holder<PlacedFeature>> values) {
-		if (values == null) return this.features.stream().toList();
-		return this.order.add(values, this.features.stream().toList());
+		List<Holder<PlacedFeature>> step = generationSettings.getFeatures(this.step);
+		List<Holder<PlacedFeature>> added = this.order.add(new ArrayList<>(step), this.features.stream().toList());
+		step.clear();
+		step.addAll(added);
 	}
 
 	@Override

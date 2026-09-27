@@ -1,5 +1,6 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.densityfunction;
 
+import com.pandaismyname1.ultraterraforged.data.UTFCodecs;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
@@ -32,7 +33,7 @@ public record NoiseSampler(Holder<Noise> noise, int seed) implements MappedFunct
 
 		@Override
 		public KeyDispatchDataCodec<NoiseSampler.Marker> codec() {
-			return new KeyDispatchDataCodec<>(CODEC);
+			return UTFCodecs.keyDispatch(CODEC);
 		}
 
 		@Override

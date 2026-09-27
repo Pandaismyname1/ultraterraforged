@@ -1,11 +1,23 @@
 package com.pandaismyname1.ultraterraforged.registries;
 
-import com.mojang.serialization.Codec;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.Lifecycle;
+
+import net.minecraft.core.Cloner;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
+import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.resources.ResourceKey;
 import com.pandaismyname1.ultraterraforged.UTFCommon;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
+import com.pandaismyname1.ultraterraforged.platform.RegistryUtil;
 import com.pandaismyname1.ultraterraforged.world.worldgen.biome.modifier.BiomeModifier;
 import com.pandaismyname1.ultraterraforged.world.worldgen.feature.chance.ChanceModifier;
 import com.pandaismyname1.ultraterraforged.world.worldgen.feature.template.decorator.TemplateDecorator;
@@ -31,6 +43,57 @@ public class UTFRegistries {
 	public static final ResourceKey<Registry<LayeredSurfaceRule.Layer>> SURFACE_LAYERS = createKey("worldgen/surface_layers");
 
 	public static final ResourceKey<Registry<Preset>> PRESET = createKey("worldgen/preset");
+
+	private static final List<Consumer<Cloner.Factory>> DATA_REGISTRY_CODECS = new ArrayList<>();
+	private static final List<ResourceKey<? extends Registry<?>>> DATA_REGISTRIES = new ArrayList<>();
+
+	// a datapack registry, made by the loader; its codec is also kept for cloner()
+	public static <T> void createDataRegistry(ResourceKey<? extends Registry<T>> key, Codec<T> codec) {
+		DATA_REGISTRY_CODECS.add((factory) -> factory.addCodec(key, codec));
+		DATA_REGISTRIES.add(key);
+		RegistryUtil.createDataRegistry(key, codec);
+	}
+
+	// copies entries between registry lookups, as building a registry patch does: knows the codecs of vanilla's
+	// worldgen registries and of UTF's
+	public static Cloner.Factory cloner() {
+		Cloner.Factory factory = new Cloner.Factory();
+		RegistryDataLoader.WORLDGEN_REGISTRIES.forEach((data) -> data.runWithArguments(factory::addCodec));
+		DATA_REGISTRY_CODECS.forEach((codec) -> codec.accept(factory));
+		return factory;
+	}
+
+	// the given lookup, plus an empty registry for each of UTF's datapack registries it lacks: building a registry
+	// patch looks up every registry it patches in the lookup it starts from
+	public static HolderLookup.Provider withDataRegistries(HolderLookup.Provider registries) {
+		List<ResourceKey<? extends Registry<?>>> missing = DATA_REGISTRIES.stream().filter((key) -> registries.lookup(key).isEmpty()).toList();
+		if (missing.isEmpty()) {
+			return registries;
+		}
+		List<HolderLookup.RegistryLookup<?>> empty = missing.stream().<HolderLookup.RegistryLookup<?>>map((key) -> emptyLookup(key)).toList();
+		return new HolderLookup.Provider() {
+
+			@Override
+			public Stream<ResourceKey<? extends Registry<?>>> listRegistries() {
+				return Stream.concat(registries.listRegistries(), missing.stream());
+			}
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public <T> Optional<HolderLookup.RegistryLookup<T>> lookup(ResourceKey<? extends Registry<? extends T>> key) {
+				Optional<HolderLookup.RegistryLookup<T>> lookup = registries.lookup(key);
+				if (lookup.isPresent()) {
+					return lookup;
+				}
+				return empty.stream().filter((registry) -> registry.key().equals(key)).findFirst().map((registry) -> (HolderLookup.RegistryLookup<T>) registry);
+			}
+		};
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private static HolderLookup.RegistryLookup<?> emptyLookup(ResourceKey<? extends Registry<?>> key) {
+		return new MappedRegistry(key, Lifecycle.stable()).asLookup();
+	}
 	
 	public static <T> ResourceKey<T> createKey(ResourceKey<? extends Registry<T>> registryKey, String valueKey) {
 		return ResourceKey.create(registryKey, UTFCommon.location(valueKey));

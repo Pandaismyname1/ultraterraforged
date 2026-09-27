@@ -4,7 +4,7 @@ import java.util.stream.Stream;
 
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.worldgen.BootstapContext;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.levelgen.DensityFunction;
 import net.minecraft.world.level.levelgen.DensityFunctions;
@@ -33,7 +33,7 @@ public class PresetNoiseRouterData {
 	// how far under the surface cave entrances are kept to slopes
 	private static final double MOUTH_DEPTH = 24.0D;
 	
-    public static void bootstrap(Preset preset, BootstapContext<DensityFunction> ctx) {
+    public static void bootstrap(Preset preset, BootstrapContext<DensityFunction> ctx) {
         HolderGetter<DensityFunction> densityFunctions = ctx.lookup(Registries.DENSITY_FUNCTION);
         HolderGetter<NormalNoise.NoiseParameters> noiseParams = ctx.lookup(Registries.NOISE);
         

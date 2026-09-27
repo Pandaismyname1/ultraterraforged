@@ -1,5 +1,6 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.densityfunction;
 
+import com.pandaismyname1.ultraterraforged.data.UTFCodecs;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
@@ -42,7 +43,7 @@ record ClampToNearestUnit(DensityFunction function, int resolution) implements D
 
 	@Override
 	public KeyDispatchDataCodec<ClampToNearestUnit> codec() {
-		return new KeyDispatchDataCodec<>(CODEC);
+		return UTFCodecs.keyDispatch(CODEC);
 	}
 	
 	private double computeClamped(double value) {

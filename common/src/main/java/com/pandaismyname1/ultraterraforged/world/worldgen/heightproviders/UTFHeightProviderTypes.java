@@ -1,6 +1,8 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.heightproviders;
 
+import com.pandaismyname1.ultraterraforged.data.UTFCodecs;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.levelgen.heightproviders.HeightProvider;
@@ -14,7 +16,8 @@ public class UTFHeightProviderTypes {
 	}
 	
 	private static <T extends HeightProvider> HeightProviderType<T> register(String name, Codec<T> codec) {
-		HeightProviderType<T> type = () -> codec;
+		MapCodec<T> mapCodec = UTFCodecs.asMap(codec);
+		HeightProviderType<T> type = () -> mapCodec;
 		RegistryUtil.register(BuiltInRegistries.HEIGHT_PROVIDER_TYPE, name, type);
 		return type;
 	}

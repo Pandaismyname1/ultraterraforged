@@ -64,7 +64,7 @@ final class PerformanceModsSection {
 	}
 
 	private static String loaderName(String loader) {
-		return loader.equals(PerformanceMods.FABRIC) ? "Fabric" : "Forge";
+		return loader.equals(PerformanceMods.FABRIC) ? "Fabric" : "NeoForge";
 	}
 
 	private static Tooltip tooltip(PerformanceMods.Report report) {
@@ -183,6 +183,10 @@ final class PerformanceModsSection {
 			} else if (mod.availableFrom() != null) {
 				this.state = Component.translatable(UTFTranslationKeys.GUI_PERFORMANCE_MODS_NEEDS_VERSION, mod.availableFrom());
 				this.stateColor = 0xFF808080;
+			} else if (mod.builds(loader).stream().anyMatch((build) -> build.minJava() > Runtime.version().feature())) {
+				int java = mod.builds(loader).stream().mapToInt(PerformanceMods.Build::minJava).min().orElse(0);
+				this.state = Component.translatable(UTFTranslationKeys.GUI_PERFORMANCE_MODS_NEEDS_JAVA, java);
+				this.stateColor = 0xFF808080;
 			} else if (mod.builds(loader).stream().anyMatch(PerformanceMods.Build::viaConnector)) {
 				this.state = Component.translatable(UTFTranslationKeys.GUI_PERFORMANCE_MODS_NEEDS_CONNECTOR);
 				this.stateColor = 0xFFB0B0B0;
@@ -235,7 +239,7 @@ final class PerformanceModsSection {
 
 		@Override
 		public void onClick(double mouseX, double mouseY) {
-			ConfirmLinkScreen.confirmLinkNow(this.url, this.screen, true);
+			ConfirmLinkScreen.confirmLinkNow(this.screen, this.url, true);
 		}
 
 		@Override

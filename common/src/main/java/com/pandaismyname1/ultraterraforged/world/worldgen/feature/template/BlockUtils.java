@@ -36,7 +36,7 @@ public class BlockUtils {
     }
 
     public static boolean isSolid(BlockState state, BlockGetter reader, BlockPos pos) {
-        return state.canOcclude() || !state.isPathfindable(reader, pos, PathComputationType.LAND);
+        return state.canOcclude() || !state.isPathfindable(PathComputationType.LAND);
     }
 
     public static boolean isSoilOrRock(LevelAccessor world, BlockPos pos) {

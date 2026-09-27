@@ -1,6 +1,6 @@
 package com.pandaismyname1.ultraterraforged.platform.neoforge;
 
-import net.minecraftforge.fml.loading.FMLLoader;
+import net.neoforged.fml.loading.FMLLoader;
 
 public class ModLoaderUtilImpl {
 	
@@ -13,6 +13,6 @@ public class ModLoaderUtilImpl {
 	}
 
 	public static String loaderName() {
-		return "forge";
+		return "neoforge";
 	}
 }

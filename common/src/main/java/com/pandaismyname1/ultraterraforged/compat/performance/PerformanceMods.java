@@ -14,10 +14,10 @@ import com.pandaismyname1.ultraterraforged.platform.ModLoaderUtil;
  * this file is updated from it when porting.
  */
 public final class PerformanceMods {
-	public static final String MINECRAFT_VERSION = "1.20.1";
+	public static final String MINECRAFT_VERSION = "1.21.1";
 	public static final String FABRIC = "fabric";
-	public static final String FORGE = "forge";
-	// Sinytra Connector, which runs Fabric mods on Forge
+	public static final String NEOFORGE = "neoforge";
+	// Sinytra Connector, which runs Fabric mods on NeoForge; none of the mods needs it on this version
 	private static final String CONNECTOR = "connector";
 
 	public enum Category {
@@ -36,16 +36,21 @@ public final class PerformanceMods {
 	 * @param modIds the ids it loads under, any of which counts
 	 * @param url where to get it
 	 * @param alternative whether it's a port or fork standing in for the mod itself
-	 * @param viaConnector whether it's a Fabric build that only runs on Forge through Sinytra Connector
+	 * @param viaConnector whether it's a Fabric build that only runs on NeoForge through Sinytra Connector
+	 * @param minJava the oldest Java it runs on, or 0 for any the game runs on
 	 */
-	public record Build(String name, List<String> modIds, String url, boolean alternative, boolean viaConnector) {
+	public record Build(String name, List<String> modIds, String url, boolean alternative, boolean viaConnector, int minJava) {
 
 		static Build of(String name, String modId, String url) {
-			return new Build(name, List.of(modId), url, false, false);
+			return new Build(name, List.of(modId), url, false, false, 0);
 		}
 
 		static Build alternative(String name, String modId, String url) {
-			return new Build(name, List.of(modId), url, true, false);
+			return new Build(name, List.of(modId), url, true, false, 0);
+		}
+
+		Build needsJava(int version) {
+			return new Build(this.name, this.modIds, this.url, this.alternative, this.viaConnector, version);
 		}
 	}
 
@@ -54,13 +59,13 @@ public final class PerformanceMods {
 	 * @param name the mod itself
 	 * @param url its page
 	 * @param fabric the builds for Fabric, best first
-	 * @param forge the builds for Forge and NeoForge, best first
+	 * @param neoforge the builds for NeoForge, best first
 	 * @param availableFrom for a mod with no build for this Minecraft version, the first version it has one for
 	 */
-	public record Mod(String key, String name, String url, Category category, List<Build> fabric, List<Build> forge, @Nullable String availableFrom) {
+	public record Mod(String key, String name, String url, Category category, List<Build> fabric, List<Build> neoforge, @Nullable String availableFrom) {
 
 		public List<Build> builds(String loader) {
-			return loader.equals(FABRIC) ? this.fabric : this.forge;
+			return loader.equals(FABRIC) ? this.fabric : this.neoforge;
 		}
 	}
 
@@ -71,13 +76,14 @@ public final class PerformanceMods {
 	public static final List<Mod> MODS = List.of(
 		new Mod("c2me", "C2ME", MODRINTH + "c2me-fabric", Category.WORLD_GENERATION,
 			List.of(Build.of("C2ME", "c2me", MODRINTH + "c2me-fabric")),
-			// no Forge build, but the Fabric one runs through Sinytra Connector (tested with UltraTerraForged)
-			List.of(new Build("C2ME", List.of("c2me"), MODRINTH + "c2me-fabric", false, true)),
+			List.of(Build.of("C2ME", "c2me", MODRINTH + "c2me-neoforge")),
 			null),
 		new Mod("c2meOpenCl", "C2ME OpenCL", MODRINTH + "c2me-ocl", Category.WORLD_GENERATION,
-			List.of(),
-			List.of(),
-			"1.21.1"),
+			// built for Java 25, while the launcher runs 1.21.1 on Java 21; C2ME itself runs on 21
+			List.of(Build.of("C2ME OpenCL", "c2me-opts-accel-opencl", MODRINTH + "c2me-ocl").needsJava(25)),
+			// the NeoForge build nests a mod with the id spelled with underscores
+			List.of(Build.of("C2ME OpenCL", "c2me_opts_accel_opencl", MODRINTH + "c2me-ocl").needsJava(25)),
+			null),
 		new Mod("noisium", "Noisium", MODRINTH + "noisiumed", Category.WORLD_GENERATION,
 			// Noisium itself is archived; Noisiumed is the maintained fork, and either does the job
 			List.of(Build.of("Noisiumed", "noisiumed", MODRINTH + "noisiumed"), Build.alternative("Noisium", "noisium", MODRINTH + "noisium")),
@@ -85,7 +91,7 @@ public final class PerformanceMods {
 			null),
 		new Mod("lithium", "Lithium", MODRINTH + "lithium", Category.GENERAL,
 			List.of(Build.of("Lithium", "lithium", MODRINTH + "lithium")),
-			List.of(Build.alternative("Radium", "radium", MODRINTH + "radium"), Build.alternative("Canary", "canary", MODRINTH + "canary")),
+			List.of(Build.of("Lithium", "lithium", MODRINTH + "lithium")),
 			null),
 		new Mod("modernFix", "ModernFix", MODRINTH + "modernfix", Category.GENERAL,
 			List.of(Build.of("ModernFix", "modernfix", MODRINTH + "modernfix")),
@@ -97,7 +103,7 @@ public final class PerformanceMods {
 			null),
 		new Mod("sodium", "Sodium", MODRINTH + "sodium", Category.CLIENT,
 			List.of(Build.of("Sodium", "sodium", MODRINTH + "sodium")),
-			List.of(Build.alternative("Embeddium", "embeddium", MODRINTH + "embeddium")),
+			List.of(Build.of("Sodium", "sodium", MODRINTH + "sodium")),
 			null)
 	);
 
@@ -129,10 +135,11 @@ public final class PerformanceMods {
 	}
 
 	public static Report report() {
-		return report(ModLoaderUtil.loaderName(), ModLoaderUtil::isLoaded);
+		return report(ModLoaderUtil.loaderName(), ModLoaderUtil::isLoaded, Runtime.version().feature());
 	}
 
-	public static Report report(String loader, Predicate<String> loaded) {
+	// java: the version the game runs on; builds that need a newer one aren't recommended, nor counted as available
+	public static Report report(String loader, Predicate<String> loaded, int java) {
 		boolean connector = loaded.test(CONNECTOR);
 		List<Status> statuses = MODS.stream().map((mod) -> {
 			Build installed = null;
@@ -141,7 +148,7 @@ public final class PerformanceMods {
 				if (installed == null && build.modIds().stream().anyMatch(loaded)) {
 					installed = build;
 				}
-				if (recommended == null && (!build.viaConnector() || connector)) {
+				if (recommended == null && (!build.viaConnector() || connector) && java >= build.minJava()) {
 					recommended = build;
 				}
 			}

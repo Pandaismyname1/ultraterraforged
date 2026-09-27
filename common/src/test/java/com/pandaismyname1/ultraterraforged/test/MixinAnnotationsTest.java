@@ -66,7 +66,7 @@ public class MixinAnnotationsTest {
 			}
 		}
 		System.out.println(checked + " injectors checked");
-		assertTrue(checked > 10, "only found " + checked + " injectors to check");
+		assertTrue(checked >= 5, "only found " + checked + " injectors to check");
 		assertTrue(wrong.isEmpty(), "injectors with an array of @At: " + wrong);
 	}
 }

@@ -1,5 +1,6 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.surface.condition;
 
+import com.pandaismyname1.ultraterraforged.data.UTFCodecs;
 import java.util.List;
 
 import com.mojang.serialization.Codec;
@@ -30,6 +31,6 @@ public record AnyCondition(List<SurfaceRules.ConditionSource> conditions) implem
 
 	@Override
 	public KeyDispatchDataCodec<AnyCondition> codec() {
-		return new KeyDispatchDataCodec<>(CODEC);
+		return UTFCodecs.keyDispatch(CODEC);
 	}
 }

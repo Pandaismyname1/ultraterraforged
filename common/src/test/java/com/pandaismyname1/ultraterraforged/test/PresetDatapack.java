@@ -46,7 +46,7 @@ public final class PresetDatapack {
 			patch = preset.buildPatch(VanillaRegistries.createLookup());
 		}
 
-		RegistryOps<JsonElement> ops = RegistryOps.create(JsonOps.INSTANCE, patch);
+		RegistryOps<JsonElement> ops = patch.createSerializationContext(JsonOps.INSTANCE);
 		Map<String, JsonElement> files = new TreeMap<>();
 		List<String> errors = new ArrayList<>();
 		for (RegistryDataLoader.RegistryData<?> data : RegistryDataLoader.WORLDGEN_REGISTRIES) {

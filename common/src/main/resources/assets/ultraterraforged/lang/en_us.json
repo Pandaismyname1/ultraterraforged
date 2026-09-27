@@ -264,6 +264,7 @@
   "ultraterraforged.gui.performanceMods.mod.noisium": "Fills new chunks with blocks faster, without changing the terrain. Noisium itself is no longer updated; Noisiumed is its maintained fork.",
   "ultraterraforged.gui.performanceMods.mod.sodium": "Renders the world far faster, for smoother frame rates and longer view distances.",
   "ultraterraforged.gui.performanceMods.needsConnector": "Needs Sinytra Connector",
+  "ultraterraforged.gui.performanceMods.needsJava": "Needs Java %s",
   "ultraterraforged.gui.performanceMods.needsVersion": "Needs %s+",
   "ultraterraforged.gui.performanceMods.notOnLoader": "Not on %s",
   "ultraterraforged.gui.performanceMods.open": "Click to open its page.",

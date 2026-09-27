@@ -1,5 +1,6 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.noise.module;
 
+import com.pandaismyname1.ultraterraforged.data.UTFCodecs;
 import java.util.function.Function;
 
 import com.mojang.datafixers.util.Either;
@@ -19,7 +20,7 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.noise.function.EdgeFun
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.function.Interpolation;
 
 public class Noises {
-    private static final Codec<Noise> CODEC = UTFBuiltInRegistries.NOISE_TYPE.byNameCodec().dispatch(Noise::codec, Function.identity());
+    private static final Codec<Noise> CODEC = UTFCodecs.dispatch(UTFBuiltInRegistries.NOISE_TYPE, Noise::codec);
     public static final float MAX_REASONABLE_NOISE_VALUE = 1000000.0F;
     public static final Codec<Float> NOISE_VALUE_CODEC = Codec.floatRange(-MAX_REASONABLE_NOISE_VALUE, MAX_REASONABLE_NOISE_VALUE);
     public static final Codec<Noise> DIRECT_CODEC = Codec.either(NOISE_VALUE_CODEC, CODEC).xmap(either -> either.map(Noises::constant, Function.identity()), noise -> {

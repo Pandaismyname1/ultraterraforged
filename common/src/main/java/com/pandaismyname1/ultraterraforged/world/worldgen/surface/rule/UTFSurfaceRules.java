@@ -1,5 +1,6 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.surface.rule;
 
+import com.pandaismyname1.ultraterraforged.data.UTFCodecs;
 import java.util.List;
 
 import com.mojang.datafixers.util.Pair;
@@ -31,6 +32,6 @@ public class UTFSurfaceRules {
 	}
 	
 	public static void register(String name, Codec<? extends SurfaceRules.RuleSource> value) {
-		RegistryUtil.register(BuiltInRegistries.MATERIAL_RULE, name, value);
+		RegistryUtil.register(BuiltInRegistries.MATERIAL_RULE, name, UTFCodecs.entry(value));
 	}
 }

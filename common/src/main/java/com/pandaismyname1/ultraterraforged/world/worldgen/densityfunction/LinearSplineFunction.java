@@ -1,5 +1,6 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.densityfunction;
 
+import com.pandaismyname1.ultraterraforged.data.UTFCodecs;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,7 +68,7 @@ public record LinearSplineFunction(DensityFunction input, List<Pair<Double, Dens
 
 	@Override
 	public KeyDispatchDataCodec<LinearSplineFunction> codec() {
-		return new KeyDispatchDataCodec<>(CODEC);
+		return UTFCodecs.keyDispatch(CODEC);
 	}
 
 	public static LinearSplineFunction.Builder builder(DensityFunction input) {

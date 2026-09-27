@@ -42,6 +42,14 @@ configurations {
         canBeResolved = true
         canBeConsumed = false
     }
+
+    // performance mods for the dev game, as released: NeoForge has run on Mojang's names since 1.20.2, as the dev game
+    // does, so they go into its mods folder unchanged, nested jars and all
+    devMods {
+        canBeResolved = true
+        canBeConsumed = false
+        transitive = false
+    }
 }
 
 dependencies {
@@ -49,6 +57,29 @@ dependencies {
 
     common(project(path: ":common", configuration: "namedElements")) { transitive = false }
     shadowBundle(project(path: ":common", configuration: "transformProductionNeoForge")) { transitive = false }
+
+    // Performance mods, in the dev runs only: the ones PerformanceMods lists for NeoForge on this version, pinned to
+    // Modrinth version ids and a CurseForge file. -Putf.perfMods=false leaves them out. See
+    // docs/porting/performance-mods.md.
+    if (project.findProperty("utf.perfMods") != "false") {
+        // not C2ME OpenCL: it needs Java 25, the dev game runs on 21
+        devMods "maven.modrinth:c2me-neoforge:yxOYFgnK"         // C2ME 0.4.0-alpha.0.122
+        devMods "maven.modrinth:noisiumed:U3gpLtpO"             // Noisiumed 3.0.6
+        devMods "maven.modrinth:lithium:DDUrRVCA"               // Lithium 0.15.4
+        devMods "maven.modrinth:modernfix:5HLHxQ2F"             // ModernFix 5.27.24
+        devMods "maven.modrinth:sodium:uMOpc5uV"                // Sodium 0.8.13
+        devMods "curse.maven:alltheleaks-1091339:8943912"       // AllTheLeaks 1.1.13
+    }
+}
+
+// the dev game's mods folder holds exactly the performance mods: a jar left from another version would break the game
+def devModsDir = file("run/mods")
+def syncDevMods = tasks.register("syncDevMods", Sync) {
+    from configurations.devMods
+    into devModsDir
+}
+tasks.matching { it.name.startsWith("run") }.configureEach {
+    dependsOn syncDevMods
 }
 
 processResources {

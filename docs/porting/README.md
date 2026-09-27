@@ -1,6 +1,7 @@
 # Porting UTF to 1.21.1 → 26.1 → 26.1.2 → 26.2 → 26.3
 
-Exploration done 2026-09-27 against the 1.20.1 line (commit `036d949`). **Nothing has been ported.**
+Exploration done 2026-09-27 against the 1.20.1 line (commit `036d949`). **1.21.1 was ported on 2026-09-28** (branch
+`1.21.1`; what differed from the plan is at the end of [1.21.1.md](1.21.1.md)); the later hops are still plans.
 
 > **Baseline and naming.** The analysis ran on `036d949`, before the UltraTerraForged rename (`7c5c17e`). The docs use the renamed identifiers: `com.pandaismyname1.ultraterraforged`, `UTF*` classes and the `ultraterraforged` mod id. File line numbers and error counts are still those of `036d949`. The raw compiler output in [census/](census) is kept verbatim, with the old names. These docs describe what each Minecraft update breaks in UTF, and how to fix it, before anyone starts. From 1.21.1 on, UTF is **Fabric + NeoForge**; Forge stays on the 1.20.1 line only.
 

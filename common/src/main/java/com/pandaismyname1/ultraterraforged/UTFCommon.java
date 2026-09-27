@@ -7,7 +7,6 @@ import net.minecraft.resources.ResourceLocation;
 import com.pandaismyname1.ultraterraforged.compat.terrablender.TBCompat;
 import com.pandaismyname1.ultraterraforged.compat.terrablender.TBSurfaceRules;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
-import com.pandaismyname1.ultraterraforged.platform.RegistryUtil;
 import com.pandaismyname1.ultraterraforged.registries.UTFBuiltInRegistries;
 import com.pandaismyname1.ultraterraforged.registries.UTFRegistries;
 import com.pandaismyname1.ultraterraforged.server.commands.UTFCommands;
@@ -60,15 +59,15 @@ public class UTFCommon {
 			TBCompat.bootstrap();
 		}
 		
-		RegistryUtil.createDataRegistry(UTFRegistries.NOISE, Noise.DIRECT_CODEC);
-		RegistryUtil.createDataRegistry(UTFRegistries.BIOME_MODIFIER, BiomeModifier.CODEC);
-		RegistryUtil.createDataRegistry(UTFRegistries.STRUCTURE_RULE, StructureRule.CODEC);
-		RegistryUtil.createDataRegistry(UTFRegistries.SURFACE_LAYERS, LayeredSurfaceRule.Layer.CODEC);
-		RegistryUtil.createDataRegistry(UTFRegistries.PRESET, Preset.CODEC);
+		UTFRegistries.createDataRegistry(UTFRegistries.NOISE, Noise.DIRECT_CODEC);
+		UTFRegistries.createDataRegistry(UTFRegistries.BIOME_MODIFIER, BiomeModifier.CODEC);
+		UTFRegistries.createDataRegistry(UTFRegistries.STRUCTURE_RULE, StructureRule.CODEC);
+		UTFRegistries.createDataRegistry(UTFRegistries.SURFACE_LAYERS, LayeredSurfaceRule.Layer.CODEC);
+		UTFRegistries.createDataRegistry(UTFRegistries.PRESET, Preset.CODEC);
 	}
 	
 	public static ResourceLocation location(String name) {
-		if (name.contains(":")) return new ResourceLocation(name);
-		return new ResourceLocation(UTFCommon.MOD_ID, name);
+		if (name.contains(":")) return ResourceLocation.parse(name);
+		return ResourceLocation.fromNamespaceAndPath(UTFCommon.MOD_ID, name);
 	}
 }

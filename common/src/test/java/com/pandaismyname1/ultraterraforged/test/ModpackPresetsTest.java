@@ -32,7 +32,7 @@ public class ModpackPresetsTest {
 
 	// a modpack preset file: the settings plus an optional name and description
 	private static void writePreset(Path file, Preset preset, String name, String description) throws Exception {
-		JsonObject json = Preset.CODEC.encodeStart(JsonOps.INSTANCE, preset).getOrThrow(false, (error) -> {}).getAsJsonObject();
+		JsonObject json = Preset.CODEC.encodeStart(JsonOps.INSTANCE, preset).getOrThrow().getAsJsonObject();
 		if (name != null) {
 			json.addProperty("name", name);
 		}

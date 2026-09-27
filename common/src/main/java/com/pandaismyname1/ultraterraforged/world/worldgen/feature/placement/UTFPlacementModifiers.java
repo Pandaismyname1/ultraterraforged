@@ -1,8 +1,10 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.feature.placement;
 
+import com.pandaismyname1.ultraterraforged.data.UTFCodecs;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -57,7 +59,8 @@ public class UTFPlacementModifiers {
     }
     
     private static <P extends PlacementModifier> PlacementModifierType<P> register(String name, Codec<P> codec) {
-    	PlacementModifierType<P> type = () -> codec;
+    	MapCodec<P> mapCodec = UTFCodecs.asMap(codec);
+    	PlacementModifierType<P> type = () -> mapCodec;
 		RegistryUtil.register(BuiltInRegistries.PLACEMENT_MODIFIER_TYPE, name, type);
 		return type;
     }

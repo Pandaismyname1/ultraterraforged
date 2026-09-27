@@ -1,5 +1,6 @@
 package com.pandaismyname1.ultraterraforged.compat.terrablender;
 
+import com.pandaismyname1.ultraterraforged.data.UTFCodecs;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
@@ -56,7 +57,7 @@ public class TBSurfaceRules {
 
 		@Override
 		public KeyDispatchDataCodec<TBRule> codec() {
-			return new KeyDispatchDataCodec<>(CODEC);
+			return UTFCodecs.keyDispatch(CODEC);
 		}
 	}
 }

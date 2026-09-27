@@ -41,9 +41,7 @@ public class PresetDatapackTest {
 				assertTrue(pack.files().containsKey(file), "missing " + file);
 			}
 			// the preset travels with the world and reads back unchanged
-			Preset stored = Preset.CODEC.parse(JsonOps.INSTANCE, pack.files().get(PRESET_FILE)).getOrThrow(false, (error) -> {
-				throw new AssertionError(error);
-			});
+			Preset stored = Preset.CODEC.parse(JsonOps.INSTANCE, pack.files().get(PRESET_FILE)).getOrThrow((error) -> new AssertionError(error));
 			assertEquals(PresetOptionsTest.encode(preset), PresetOptionsTest.encode(stored));
 		}));
 	}
@@ -73,10 +71,10 @@ public class PresetDatapackTest {
 	@Test
 	void structureSpacingAndDisablingReachTheStructureSets() {
 		Preset preset = defaultPreset();
-		ResourceLocation villages = new ResourceLocation("villages");
+		ResourceLocation villages = ResourceLocation.parse("villages");
 		preset.structures().getOrCreate(villages).spacing = 20;
 		preset.structures().getOrCreate(villages).separation = 25;
-		preset.structures().getOrCreate(new ResourceLocation("pillager_outposts")).enabled = false;
+		preset.structures().getOrCreate(ResourceLocation.parse("pillager_outposts")).enabled = false;
 
 		PresetDatapack.Result pack = PresetDatapack.generate(preset);
 		assertTrue(pack.errors().isEmpty(), String.join("\n", pack.errors()));

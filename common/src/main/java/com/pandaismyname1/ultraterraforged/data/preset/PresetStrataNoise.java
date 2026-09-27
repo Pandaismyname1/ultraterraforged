@@ -1,6 +1,6 @@
 package com.pandaismyname1.ultraterraforged.data.preset;
 
-import net.minecraft.data.worldgen.BootstapContext;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noise;
@@ -22,7 +22,7 @@ public class PresetStrataNoise {
 	// the most a layer is moved up or down; StrataRule keeps this much margin around the world
 	public static final float MAX_OFFSET = TILT_HEIGHT + FOLD_HEIGHT;
 
-	public static void bootstrap(Preset preset, BootstapContext<Noise> ctx) {
+	public static void bootstrap(Preset preset, BootstrapContext<Noise> ctx) {
 		Layers noises = make(preset.miscellaneous().strataRegionSize);
 		ctx.register(STRATA_SELECTOR, noises.selector());
 		ctx.register(STRATA_OFFSET, noises.offset());

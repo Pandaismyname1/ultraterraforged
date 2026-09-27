@@ -159,7 +159,7 @@ public class TerrainTab implements Tab {
 		this.viewButton.height = ROW;
 	}
 
-	@Override
+	// called by the Create World screen while this tab is shown
 	public void tick() {
 		// the preset can change from outside the tab, e.g. the advanced editor
 		if (this.builtRevision != this.state.revision()) {

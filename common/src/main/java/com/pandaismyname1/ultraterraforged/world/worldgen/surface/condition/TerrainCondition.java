@@ -1,5 +1,6 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.surface.condition;
 
+import com.pandaismyname1.ultraterraforged.data.UTFCodecs;
 import java.util.List;
 import java.util.Set;
 
@@ -38,7 +39,7 @@ class TerrainCondition extends CellCondition {
 
 		@Override
 		public KeyDispatchDataCodec<Source> codec() {
-			return new KeyDispatchDataCodec<>(CODEC);
+			return UTFCodecs.keyDispatch(CODEC);
 		}
 	}
 }

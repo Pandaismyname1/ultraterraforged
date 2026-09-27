@@ -1,6 +1,6 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.noise.domain;
 
-import java.util.function.Function;
+import com.pandaismyname1.ultraterraforged.data.UTFCodecs;
 
 import com.mojang.serialization.Codec;
 
@@ -8,7 +8,7 @@ import com.pandaismyname1.ultraterraforged.registries.UTFBuiltInRegistries;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noise;
 
 public interface Domain {
-    public static final Codec<Domain> CODEC = UTFBuiltInRegistries.DOMAIN_TYPE.byNameCodec().dispatch(Domain::codec, Function.identity());
+    public static final Codec<Domain> CODEC = UTFCodecs.dispatch(UTFBuiltInRegistries.DOMAIN_TYPE, Domain::codec);
 	
     float getOffsetX(float x, float z, int seed);
     

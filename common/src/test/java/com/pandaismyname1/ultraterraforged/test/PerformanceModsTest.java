@@ -15,12 +15,13 @@ import com.pandaismyname1.ultraterraforged.compat.performance.PerformanceMods.Re
 
 public class PerformanceModsTest {
 
+	// on Java 25, which every build runs on
 	private static Report fabric(String... ids) {
-		return PerformanceMods.report(PerformanceMods.FABRIC, Set.of(ids)::contains);
+		return PerformanceMods.report(PerformanceMods.FABRIC, Set.of(ids)::contains, 25);
 	}
 
-	private static Report forge(String... ids) {
-		return PerformanceMods.report(PerformanceMods.FORGE, Set.of(ids)::contains);
+	private static Report neoforge(String... ids) {
+		return PerformanceMods.report(PerformanceMods.NEOFORGE, Set.of(ids)::contains, 25);
 	}
 
 	private static PerformanceMods.Status status(Report report, String key) {
@@ -32,43 +33,48 @@ public class PerformanceModsTest {
 		assertEquals(Light.RED, fabric().light());
 		assertEquals(Light.ORANGE, fabric("sodium", "lithium", "modernfix").light());
 		assertEquals(Light.YELLOW, fabric("c2me").light());
-		assertEquals(Light.GREEN, fabric("c2me", "noisiumed", "lithium", "modernfix", "sodium").light());
+		assertEquals(Light.GREEN, fabric("c2me", "c2me-opts-accel-opencl", "noisiumed", "lithium", "modernfix", "sodium").light());
 		// Noisium itself counts as much as its fork
-		assertEquals(Light.GREEN, fabric("c2me", "noisium", "lithium", "modernfix", "sodium").light());
+		assertEquals(Light.GREEN, fabric("c2me", "c2me-opts-accel-opencl", "noisium", "lithium", "modernfix", "sodium").light());
 
-		assertEquals(Light.RED, forge().light());
-		assertEquals(Light.ORANGE, forge("embeddium", "radium", "modernfix", "alltheleaks").light());
-		// green on Forge doesn't need C2ME, which has no Forge build, unless Connector is there to run it
-		assertEquals(Light.GREEN, forge("noisiumed", "radium", "modernfix", "alltheleaks", "embeddium").light());
-		assertEquals(Light.YELLOW, forge("connector", "noisiumed", "radium", "modernfix", "alltheleaks", "embeddium").light());
-		assertEquals(Light.GREEN, forge("connector", "c2me", "noisiumed", "radium", "modernfix", "alltheleaks", "embeddium").light());
-		assertEquals(Light.GREEN, forge("noisiumed", "canary", "modernfix", "alltheleaks", "embeddium").light());
+		assertEquals(Light.RED, neoforge().light());
+		assertEquals(Light.ORANGE, neoforge("sodium", "lithium", "modernfix", "alltheleaks").light());
+		assertEquals(Light.YELLOW, neoforge("c2me", "noisiumed", "lithium", "modernfix", "alltheleaks", "sodium").light());
+		// the NeoForge build of C2ME OpenCL loads under an id with underscores
+		assertEquals(Light.GREEN, neoforge("c2me", "c2me_opts_accel_opencl", "noisiumed", "lithium", "modernfix", "alltheleaks", "sodium").light());
 	}
 
 	@Test
 	void onlyModsWithABuildCount() {
 		Report fabric = fabric();
-		// C2ME OpenCL has nothing for 1.20.1, and AllTheLeaks is Forge only
-		assertEquals(5, fabric.available());
+		// AllTheLeaks is NeoForge only
+		assertEquals(6, fabric.available());
 		assertEquals(PerformanceMods.MODS.size(), fabric.statuses().size());
-		assertTrue(!status(fabric, "c2meOpenCl").isAvailable());
 		assertTrue(!status(fabric, "allTheLeaks").isAvailable());
-		assertEquals(5, forge().available());
-		// C2ME runs on Forge only through Sinytra Connector
-		assertTrue(!status(forge(), "c2me").isAvailable());
-		assertEquals(6, forge("connector").available());
-		assertEquals("C2ME", status(forge("connector"), "c2me").recommended().name());
-		assertNotNull(status(forge("connector", "c2me"), "c2me").installed());
+		// every mod has a NeoForge build on 1.21.1, C2ME included, so nothing needs Sinytra Connector
+		assertEquals(7, neoforge().available());
+		assertEquals("C2ME", status(neoforge(), "c2me").recommended().name());
+		assertNotNull(status(neoforge("c2me"), "c2me").installed());
 	}
 
 	@Test
-	void standInsAreRecommendedWhereTheModHasNoBuild() {
-		assertEquals("Radium", status(forge(), "lithium").recommended().name());
-		assertEquals("Embeddium", status(forge(), "sodium").recommended().name());
+	void buildsForANewerJavaDontCount() {
+		// C2ME OpenCL needs Java 25; the launcher runs 1.21.1 on Java 21
+		Report fabric = PerformanceMods.report(PerformanceMods.FABRIC, Set.of("c2me", "noisiumed", "lithium", "modernfix", "sodium")::contains, 21);
+		assertEquals(5, fabric.available());
+		assertEquals(Light.GREEN, fabric.light());
+		assertTrue(!status(fabric, "c2meOpenCl").isAvailable());
+		assertEquals(6, PerformanceMods.report(PerformanceMods.NEOFORGE, (id) -> false, 21).available());
+	}
+
+	@Test
+	void theModsThemselvesAreRecommended() {
+		assertEquals("Lithium", status(neoforge(), "lithium").recommended().name());
+		assertEquals("Sodium", status(neoforge(), "sodium").recommended().name());
 		assertEquals("Noisiumed", status(fabric(), "noisium").recommended().name());
-		PerformanceMods.Status canary = status(forge("canary"), "lithium");
-		assertNotNull(canary.installed());
-		assertEquals("Canary", canary.installed().name());
-		assertNull(status(fabric(), "c2meOpenCl").recommended());
+		PerformanceMods.Status noisium = status(neoforge("noisium"), "noisium");
+		assertNotNull(noisium.installed());
+		assertEquals("Noisium", noisium.installed().name());
+		assertNull(status(fabric(), "allTheLeaks").recommended());
 	}
 }

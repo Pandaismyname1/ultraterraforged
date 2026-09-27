@@ -4,7 +4,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.toasts.SystemToast.SystemToastIds;
+import net.minecraft.client.gui.components.toasts.SystemToast.SystemToastId;
 import net.minecraft.network.chat.Component;
 import com.pandaismyname1.ultraterraforged.UTFCommon;
 import com.pandaismyname1.ultraterraforged.client.data.UTFTranslationKeys;
@@ -21,16 +21,16 @@ public final class PresetSharing {
 
 	public static void copy(Preset preset) {
 		Minecraft.getInstance().keyboardHandler.setClipboard(PresetShareCode.encode(preset));
-		Toasts.notify(UTFTranslationKeys.GUI_SHARE_COPIED, Component.empty(), SystemToastIds.PERIODIC_NOTIFICATION);
+		Toasts.notify(UTFTranslationKeys.GUI_SHARE_COPIED, Component.empty(), SystemToastId.PERIODIC_NOTIFICATION);
 	}
 
 	public static Optional<Preset> paste() {
 		String clipboard = Minecraft.getInstance().keyboardHandler.getClipboard();
 		return PresetShareCode.decode(clipboard).resultOrPartial((error) -> {
 			UTFCommon.LOGGER.warn("Couldn't read the preset code in the clipboard: {}", error);
-			Toasts.notify(UTFTranslationKeys.GUI_SHARE_INVALID, Component.literal(error), SystemToastIds.PACK_LOAD_FAILURE);
+			Toasts.notify(UTFTranslationKeys.GUI_SHARE_INVALID, Component.literal(error), SystemToastId.PACK_LOAD_FAILURE);
 		}).map((preset) -> {
-			Toasts.notify(UTFTranslationKeys.GUI_SHARE_PASTED, Component.empty(), SystemToastIds.PERIODIC_NOTIFICATION);
+			Toasts.notify(UTFTranslationKeys.GUI_SHARE_PASTED, Component.empty(), SystemToastId.PERIODIC_NOTIFICATION);
 			return preset;
 		});
 	}

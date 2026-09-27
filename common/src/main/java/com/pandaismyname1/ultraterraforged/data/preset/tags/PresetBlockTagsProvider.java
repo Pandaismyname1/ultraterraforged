@@ -36,13 +36,13 @@ public class PresetBlockTagsProvider extends IntrinsicHolderTagsProvider<Block> 
 			.addOptionalTag(BlockTags.STONE_ORE_REPLACEABLES.location())
 			.addOptionalTag(BlockTags.BASE_STONE_OVERWORLD.location())
 			// Create's decorative stones, which it doesn't tag as stone
-			.addOptional(new ResourceLocation("create", "asurine"))
-			.addOptional(new ResourceLocation("create", "crimsite"))
-			.addOptional(new ResourceLocation("create", "limestone"))
-			.addOptional(new ResourceLocation("create", "ochrum"))
-			.addOptional(new ResourceLocation("create", "scorchia"))
-			.addOptional(new ResourceLocation("create", "scoria"))
-			.addOptional(new ResourceLocation("create", "veridium"));
+			.addOptional(ResourceLocation.fromNamespaceAndPath("create", "asurine"))
+			.addOptional(ResourceLocation.fromNamespaceAndPath("create", "crimsite"))
+			.addOptional(ResourceLocation.fromNamespaceAndPath("create", "limestone"))
+			.addOptional(ResourceLocation.fromNamespaceAndPath("create", "ochrum"))
+			.addOptional(ResourceLocation.fromNamespaceAndPath("create", "scorchia"))
+			.addOptional(ResourceLocation.fromNamespaceAndPath("create", "scoria"))
+			.addOptional(ResourceLocation.fromNamespaceAndPath("create", "veridium"));
 		// deepslate is layered on its own, with the rocks ores turn into deepslate ores in
 		this.tag(UTFBlockTags.DEEP_ROCK).addOptionalTag(BlockTags.DEEPSLATE_ORE_REPLACEABLES.location());
 		this.tag(UTFBlockTags.STRATA_EXCLUDED).add(Blocks.DEEPSLATE);

@@ -107,7 +107,7 @@ public class OptionPage implements LinkedPageScreen.Page {
 			}
 		});
 		this.options = new WidgetList<>(screen.minecraft, leftWidth, screen.height, TOP + ROW + GAP, bottom, 25);
-		this.options.setLeftPos(MARGIN);
+		this.options.setX(MARGIN);
 		this.add(this.options);
 		// after the list, which paints over everything above it
 		this.add(search);

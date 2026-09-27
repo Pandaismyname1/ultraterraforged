@@ -13,8 +13,9 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 public class WidgetList<T extends AbstractWidget> extends ContainerObjectSelectionList<WidgetList.Entry<T>> {
 	private boolean renderSelected;
 	
-    public WidgetList(Minecraft minecraft, int i, int j, int k, int l, int slotHeight) {
-        super(minecraft, i, j, k, l, slotHeight);
+    // the list spans top to bottom; the screen height isn't needed any more, and stays for the callers
+    public WidgetList(Minecraft minecraft, int width, int screenHeight, int top, int bottom, int slotHeight) {
+        super(minecraft, width, bottom - top, top, slotHeight);
     }
     
     public void select(T widget) {

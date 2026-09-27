@@ -1,5 +1,6 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.densityfunction;
 
+import com.pandaismyname1.ultraterraforged.data.UTFCodecs;
 import com.mojang.serialization.Codec;
 
 import net.minecraft.core.Holder;
@@ -31,6 +32,6 @@ public class UTFDensityFunctions {
 	}
 	
 	private static void register(String name, Codec<? extends DensityFunction> type) {
-		RegistryUtil.register(BuiltInRegistries.DENSITY_FUNCTION_TYPE, name, type);
+		RegistryUtil.register(BuiltInRegistries.DENSITY_FUNCTION_TYPE, name, UTFCodecs.entry(type));
 	}
 }

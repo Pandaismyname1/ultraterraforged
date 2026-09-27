@@ -19,7 +19,7 @@ import net.minecraft.client.Screenshot;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.screens.GenericDirtMessageScreen;
+import net.minecraft.client.gui.screens.GenericMessageScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
@@ -198,12 +198,12 @@ public class ClientTest implements ClientModInitializer {
 			this.log("worldgen settings lifecycle: " + server.getWorldData().worldGenSettingsLifecycle());
 			this.worldFolder = server.getWorldPath(LevelResource.ROOT).toAbsolutePath().normalize().getFileName().toString();
 			mc.level.disconnect();
-			mc.clearLevel(new GenericDirtMessageScreen(Component.literal("leaving")));
+			mc.disconnect(new GenericMessageScreen(Component.literal("leaving")));
 			mc.setScreen(new TitleScreen());
 		});
 		this.step("back at title", () -> mc.level == null && mc.screen instanceof TitleScreen, 40, () -> {
 			this.log("reopening world " + this.worldFolder);
-			mc.createWorldOpenFlows().loadLevel(mc.screen, this.worldFolder);
+			mc.createWorldOpenFlows().openWorld(this.worldFolder, () -> mc.setScreen(new TitleScreen()));
 		});
 		this.step("after reopening", () -> true, 100, () -> {
 			this.log("screen after reopening: " + (mc.screen == null ? "none (in world)" : mc.screen.getClass().getSimpleName() + " '" + mc.screen.getTitle().getString() + "'"));

@@ -27,7 +27,7 @@ import com.pandaismyname1.ultraterraforged.preset.option.Page;
 import com.pandaismyname1.ultraterraforged.preset.option.StructureOptions;
 
 public class StructureOptionsTest {
-	private static final ResourceLocation VILLAGES = new ResourceLocation("villages");
+	private static final ResourceLocation VILLAGES = ResourceLocation.parse("villages");
 	private static Map<String, Option<?>> options;
 
 	@BeforeAll
@@ -80,8 +80,8 @@ public class StructureOptionsTest {
 
 	@Test
 	void displayNamesAreReadable() {
-		assertEquals("Woodland Mansions", StructureOptions.displayName(new ResourceLocation("woodland_mansions")).getString());
-		assertEquals("Big Towers (somemod)", StructureOptions.displayName(new ResourceLocation("somemod", "big_towers")).getString());
+		assertEquals("Woodland Mansions", StructureOptions.displayName(ResourceLocation.parse("woodland_mansions")).getString());
+		assertEquals("Big Towers (somemod)", StructureOptions.displayName(ResourceLocation.fromNamespaceAndPath("somemod", "big_towers")).getString());
 	}
 
 	@Test
@@ -90,12 +90,10 @@ public class StructureOptionsTest {
 		JsonObject json = PresetOptionsTest.encode(preset());
 		json.remove("version");
 		json.add("structures", JsonParser.parseString("{\"structures\": {\"minecraft:villages\": {\"spacing\": 40, \"separation\": 10, \"salt\": 10387312, \"disabled\": false}, \"minecraft:igloos\": {\"spacing\": 32, \"separation\": 8, \"salt\": 14357618, \"disabled\": true}}}"));
-		Preset preset = Preset.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow(false, (error) -> {
-			throw new AssertionError(error);
-		});
+		Preset preset = Preset.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow((error) -> new AssertionError(error));
 		assertEquals(40, preset.structures().get(VILLAGES).orElseThrow().spacing);
 		assertEquals(null, preset.structures().get(VILLAGES).orElseThrow().enabled);
-		assertEquals(Boolean.FALSE, preset.structures().get(new ResourceLocation("igloos")).orElseThrow().enabled);
+		assertEquals(Boolean.FALSE, preset.structures().get(ResourceLocation.parse("igloos")).orElseThrow().enabled);
 	}
 
 	private static Preset preset() {

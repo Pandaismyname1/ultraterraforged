@@ -14,7 +14,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Gradle and Loom run on Java 21; the mod itself targets Java 17
+      # Gradle, Loom and the mod run on Java 21
       - name: Setup JDK 21
         uses: actions/setup-java@v4
         with:
@@ -34,9 +34,8 @@ jobs:
       - name: Build Fabric
         run: ./gradlew :fabric:build -Putf.perfMods=false
 
-      # the Forge jar also runs on NeoForge 47.1
-      - name: Build Forge
-        run: ./gradlew :forge:build -Putf.perfMods=false
+      - name: Build NeoForge
+        run: ./gradlew :neoforge:build -Putf.perfMods=false
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
@@ -44,5 +43,5 @@ jobs:
           name: Artifacts
           path: |
             fabric/build/libs/
-            forge/build/libs/
+            neoforge/build/libs/
 

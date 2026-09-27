@@ -524,6 +524,7 @@ public class UTFLanguageProvider {
 			this.add(UTFTranslationKeys.GUI_PERFORMANCE_MODS_INSTALLED, "Installed");
 			this.add(UTFTranslationKeys.GUI_PERFORMANCE_MODS_MISSING, "Not installed");
 			this.add(UTFTranslationKeys.GUI_PERFORMANCE_MODS_NEEDS_VERSION, "Needs %s+");
+			this.add(UTFTranslationKeys.GUI_PERFORMANCE_MODS_NEEDS_JAVA, "Needs Java %s");
 			this.add(UTFTranslationKeys.GUI_PERFORMANCE_MODS_NOT_ON_LOADER, "Not on %s");
 			this.add(UTFTranslationKeys.GUI_PERFORMANCE_MODS_NEEDS_CONNECTOR, "Needs Sinytra Connector");
 			this.add(UTFTranslationKeys.GUI_PERFORMANCE_MODS_VIA_CONNECTOR, "%s has no %s build, but its Fabric build runs through Sinytra Connector, together with Forgified Fabric API.");

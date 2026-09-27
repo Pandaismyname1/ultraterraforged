@@ -1,6 +1,6 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.feature.template.placement;
 
-import java.util.function.Function;
+import com.pandaismyname1.ultraterraforged.data.UTFCodecs;
 
 import com.mojang.serialization.Codec;
 
@@ -11,7 +11,7 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.feature.template.templ
 import com.pandaismyname1.ultraterraforged.world.worldgen.feature.template.template.TemplateContext;
 
 public interface TemplatePlacement<T extends TemplateContext> {
-    public static final Codec<TemplatePlacement<?>> CODEC = UTFBuiltInRegistries.TEMPLATE_PLACEMENT_TYPE.byNameCodec().dispatch(TemplatePlacement::codec, Function.identity());
+    public static final Codec<TemplatePlacement<?>> CODEC = UTFCodecs.dispatch(UTFBuiltInRegistries.TEMPLATE_PLACEMENT_TYPE, TemplatePlacement::codec);
     
     boolean canPlaceAt(LevelAccessor world, BlockPos pos, Dimensions dimensions);
 

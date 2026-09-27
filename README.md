@@ -7,7 +7,8 @@ UltraTerraForged is a continuation of [ReTerraForged](https://github.com/racoonm
 continued [TerraForged](https://github.com/TerraForged/TerraForged). It only shapes the world: it adds no biomes, and
 works alongside the mods that do.
 
-- Minecraft 1.20.1, on Fabric (with Fabric API), Forge 47.1+ and NeoForge 47.1
+- Minecraft 1.21.1, on Fabric (with Fabric API) and NeoForge 21.1. For Minecraft 1.20.1 (Fabric, Forge and
+  NeoForge 47.1), see the [`1.20.1` branch](https://github.com/Pandaismyname1/ultraterraforged/tree/1.20.1).
 - Maintained by pandaismyname1
 
 ## Credits
@@ -99,9 +100,9 @@ rather than in flat fields.
 
 ### Performance
 
-- The Terrain tab recommends performance mods and shows with a light which of them are installed: C2ME, Noisium(ed),
-  Lithium (Radium or Canary on Forge), ModernFix, AllTheLeaks and Sodium (Embeddium on Forge). On Forge, C2ME also runs
-  through Sinytra Connector. With them, UltraTerraForged generates new land as fast as vanilla, or faster.
+- The Terrain tab recommends performance mods and shows with a light which of them are installed: C2ME, C2ME OpenCL,
+  Noisium(ed), Lithium, ModernFix, AllTheLeaks (NeoForge) and Sodium. With them, UltraTerraForged generates new land
+  as fast as vanilla, or faster.
 - Tested and benchmarked with each; see [docs/porting/performance-mods.md](docs/porting/performance-mods.md).
 
 ### Fixes over ReTerraForged
@@ -156,8 +157,8 @@ presets. Dedicated servers seed `config/ultraterraforged/server-preset.json` fro
 ## Maven
 
 Builds are published to the `maven` branch of this repository on every release: `ultraterraforged-fabric` and
-`ultraterraforged-forge` (the Forge jar also serves NeoForge 1.20.1), each with a `sources` classifier, under the group
-`com.pandaismyname1.ultraterraforged`. Versions look like `0.1.0-alpha.1+1.20.1`.
+`ultraterraforged-neoforge` (`ultraterraforged-forge` for 1.20.1), each with a `sources` classifier, under the group
+`com.pandaismyname1.ultraterraforged`. Versions look like `0.1.0-alpha.1+1.21.1`.
 
 ```groovy
 repositories {
@@ -173,14 +174,14 @@ repositories {
 }
 
 dependencies {
-    modImplementation "com.pandaismyname1.ultraterraforged:ultraterraforged-fabric:0.1.0-alpha.1+1.20.1"
+    modImplementation "com.pandaismyname1.ultraterraforged:ultraterraforged-fabric:0.1.0-alpha.1+1.21.1"
 }
 ```
 
 ## Building
 
-Gradle runs on Java 21 (the mod targets Java 17): `./gradlew build`. The Fabric and Forge dev games include the
-recommended performance mods; `-Putf.perfMods=false` leaves them out. `./gradlew :common:test` runs the tests, which
+Gradle and the mod use Java 21: `./gradlew build`. The Fabric and NeoForge dev games include the recommended
+performance mods; `-Putf.perfMods=false` leaves them out. `./gradlew :common:test` runs the tests, which
 include checks that the built-in presets still generate the same terrain. Notes for porting to newer Minecraft
 versions are in [docs/porting](docs/porting).
 

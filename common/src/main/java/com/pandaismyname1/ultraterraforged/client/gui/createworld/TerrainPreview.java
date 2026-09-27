@@ -209,7 +209,7 @@ public class TerrainPreview extends AbstractWidget {
 	}
 
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
+	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double delta) {
 		if (!this.isMouseOver(mouseX, mouseY)) {
 			return false;
 		}

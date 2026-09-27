@@ -1,7 +1,7 @@
 ### UltraTerraForged
 * UltraTerraForged is a continuation of ReTerraForged (by raccoonman, Steveplays28 and EdoEquin0x), which continued TerraForged (by dags and Won-Ton). Full credit and history are in the README and this repository, a fork of ReTerraForged.
 * It has its own mod id, `ultraterraforged`, and isn't compatible with worlds made with ReTerraForged. The first start copies `config/reterraforged` to `config/ultraterraforged`, keeping saved presets and modpack setups. Dedicated servers use `level-type=ultraterraforged:ultraterraforged`.
-* Minecraft 1.20.1 on Fabric, Forge and NeoForge.
+* Minecraft 1.21.1 on Fabric and NeoForge; Minecraft 1.20.1 (Fabric, Forge and NeoForge 47.1) has its own build.
 
 ### Creating worlds
 * A Terrain tab in Create World: presets, the main settings as sliders, and a live map of the result. UltraTerraForged is the default world type (configurable).
@@ -19,7 +19,7 @@
 * `/utf locate <terrain>` finds landforms and puts you on their surface.
 
 ### Performance
-* The Terrain tab recommends performance mods and shows which are installed: C2ME (also on Forge through Sinytra Connector), Noisium(ed), Lithium (Radium or Canary on Forge), ModernFix, AllTheLeaks, Sodium (Embeddium on Forge). With them, new land generates as fast as vanilla or faster.
+* The Terrain tab recommends performance mods and shows which are installed: C2ME, C2ME OpenCL, Noisium(ed), Lithium, ModernFix, AllTheLeaks (NeoForge), Sodium. With them, new land generates as fast as vanilla or faster.
 * Rock shelters no longer recompute the terrain for every block around a chunk (up to a third faster chunk generation in badlands and plateaus).
 
 ### Fixes
