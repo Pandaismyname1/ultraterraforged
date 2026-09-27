@@ -44,6 +44,8 @@ public class TerrainType {
     public static final Terrain MUSHROOM_FIELDS = register("mushroom_fields", TerrainCategory.ISLAND);
     // the rolling land around a volcano's cone; the cone itself is VOLCANO
     public static final Terrain VOLCANIC_LOWLANDS = registerVolcano("volcanic_lowlands", TerrainCategory.HIGHLAND);
+    // sand dune fields in deserts; their steep faces stay sand
+    public static final Terrain DUNES = register("dunes", TerrainCategory.FLATLAND);
     
     public static void forEach(Consumer<Terrain> action) {
         TerrainType.REGISTRY.forEach(action);

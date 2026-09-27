@@ -634,6 +634,7 @@ public final class PresetOptions {
 	private static final Predicate<Preset> SEA_CLIFFS = (preset) -> preset.landforms().seaCliffs.enabled;
 	private static final Predicate<Preset> FJORDS = (preset) -> preset.landforms().fjords.enabled;
 	private static final Predicate<Preset> ATOLLS = (preset) -> preset.landforms().atolls.enabled;
+	private static final Predicate<Preset> DUNES = (preset) -> preset.landforms().dunes.enabled;
 
 	public static final Page LANDFORMS = Page.of("landforms", RTFTranslationKeys.GUI_LANDFORM_SETTINGS_TITLE,
 		Category.of("buttes", RTFTranslationKeys.GUI_LABEL_BUTTES,
@@ -741,6 +742,24 @@ public final class PresetOptions {
 				.range(0.5F, 2.0F)
 				.activeWhen(ATOLLS)
 				.bind((p) -> p.landforms().atolls.size, (p, v) -> p.landforms().atolls.size = v)
+				.build()
+		),
+		Category.of("dunes", RTFTranslationKeys.GUI_LABEL_DUNES,
+			BoolOption.builder("landforms.dunes.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_DUNES)
+				.bind((p) -> p.landforms().dunes.enabled, (p, v) -> p.landforms().dunes.enabled = v)
+				.build(),
+			IntOption.builder("landforms.dunes.height")
+				.translation(RTFTranslationKeys.GUI_SLIDER_DUNE_HEIGHT)
+				.range(3, 30)
+				.activeWhen(DUNES)
+				.bind((p) -> p.landforms().dunes.height, (p, v) -> p.landforms().dunes.height = v)
+				.build(),
+			FloatOption.builder("landforms.dunes.coverage")
+				.translation(RTFTranslationKeys.GUI_SLIDER_DUNE_COVERAGE)
+				.range(0.0F, 1.0F)
+				.activeWhen(DUNES)
+				.bind((p) -> p.landforms().dunes.coverage, (p, v) -> p.landforms().dunes.coverage = v)
 				.build()
 		),
 		Category.of("volcanoes", RTFTranslationKeys.GUI_LABEL_VOLCANOES,

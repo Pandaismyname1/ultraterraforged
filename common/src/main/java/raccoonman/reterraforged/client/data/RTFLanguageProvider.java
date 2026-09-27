@@ -105,6 +105,13 @@ public class RTFLanguageProvider {
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_FJORD_DEPTH), "How many blocks the high ground by the coast sinks; the more it sinks, the further the sea floods up the valleys");
 			this.add(RTFTranslationKeys.GUI_SLIDER_FJORD_REACH, "Reach");
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_FJORD_REACH), "How far inland the fjords reach");
+			this.add(RTFTranslationKeys.GUI_LABEL_DUNES, "Sand Dunes");
+			this.add(RTFTranslationKeys.GUI_BUTTON_DUNES, "Sand Dunes");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_DUNES), "Fields of sand dunes on the flat land of hot deserts, with long, wavy crests across the prevailing wind");
+			this.add(RTFTranslationKeys.GUI_SLIDER_DUNE_HEIGHT, "Height");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_DUNE_HEIGHT), "How many blocks the tallest dunes rise");
+			this.add(RTFTranslationKeys.GUI_SLIDER_DUNE_COVERAGE, "Coverage");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_DUNE_COVERAGE), "How much of the flat desert is covered in dunes");
 			this.add(RTFTranslationKeys.GUI_BUTTON_VOLCANIC_SURFACE, "Volcanic Rock & Lava");
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_VOLCANIC_SURFACE), "Lava over magma in volcano craters, basalt, blackstone and tuff on their cones, and patches of old lava flows on the land around them");
 

@@ -8,8 +8,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import raccoonman.reterraforged.data.preset.settings.Preset;
+import raccoonman.reterraforged.world.worldgen.biome.type.BiomeType;
 import raccoonman.reterraforged.world.worldgen.cell.Cell;
 import raccoonman.reterraforged.world.worldgen.terrain.TerrainType;
+import raccoonman.reterraforged.world.worldgen.util.PosUtil;
 
 /**
  * Each landform is measured by generating the same place with it on and off.
@@ -328,6 +330,52 @@ public class LandformTest {
 		assertTrue(cold == 0, "atolls made " + cold + " cells of land in cold seas");
 	}
 
+	@Test
+	void dunesRiseInHotDesertsOnly() {
+		Preset preset = preset("default", (p) -> {});
+		Preset flat = preset.copy();
+		flat.landforms().dunes.enabled = false;
+		// deserts are rare in the default preset, so look for the dunes over a wide area first
+		long place = TerrainViews.mostChanged(TerrainViews.view(preset, 0.0F, 0.0F, 16.0F), TerrainViews.view(flat, 0.0F, 0.0F, 16.0F));
+		float x = PosUtil.unpackLeft(place);
+		float z = PosUtil.unpackRight(place);
+		int[] hot = duneRise(preset, flat, x, z, 2.0F);
+		System.out.println("dunes by " + x + ", " + z + ": " + hot[0] + " cells raised, " + hot[1] + " of them outside deserts, up to " + hot[2] + " blocks");
+		assertTrue(hot[0] > 500, "dunes raised only " + hot[0] + " cells");
+		assertTrue(hot[1] <= hot[0] / 20, hot[1] + " of " + hot[0] + " dune cells lie outside deserts");
+		assertTrue(hot[2] >= 8 && hot[2] <= 13, "the tallest dune is " + hot[2] + " blocks");
+		Preset cold = preset("frozen_north", (p) -> {});
+		Preset coldFlat = cold.copy();
+		coldFlat.landforms().dunes.enabled = false;
+		int[] frozen = duneRise(cold, coldFlat, 0.0F, 0.0F, 16.0F);
+		System.out.println("dunes in the frozen north: " + frozen[0] + " cells raised");
+		assertTrue(frozen[0] == 0, "dunes raised " + frozen[0] + " cells in the frozen north");
+	}
+
+	// cells dunes raise by more than 2 blocks, how many of those aren't desert, and the tallest rise
+	private static int[] duneRise(Preset preset, Preset flat, float centerX, float centerZ, float zoom) {
+		TerrainViews.View with = TerrainViews.view(preset, centerX, centerZ, zoom);
+		TerrainViews.View without = TerrainViews.view(flat, centerX, centerZ, zoom);
+		int raised = 0;
+		int elsewhere = 0;
+		int tallest = 0;
+		for (int x = 0; x < with.size(); x++) {
+			for (int z = 0; z < with.size(); z++) {
+				int rise = with.blockY(x, z) - without.blockY(x, z);
+				// the erosion filter nudges the ground a little around anything that changes
+				assertTrue(rise >= -2, "dunes lowered the ground by " + -rise + " at " + x + ", " + z);
+				if (rise > 2) {
+					raised++;
+					if (with.cell(x, z).biomeType != BiomeType.DESERT) {
+						elsewhere++;
+					}
+				}
+				tallest = Math.max(tallest, rise);
+			}
+		}
+		return new int[] { raised, elsewhere, tallest };
+	}
+
 	// cells that are land with atolls and sea without, over a wide area
 	private static int newLand(String name) {
 		Preset preset = preset(name, (p) -> {});
@@ -431,6 +479,7 @@ public class LandformTest {
 			assertTrue(!BuiltinPresetRenderTest.presets().get(name).get().landforms().seaCliffs.enabled, name);
 			assertTrue(!BuiltinPresetRenderTest.presets().get(name).get().landforms().fjords.enabled, name);
 			assertTrue(!BuiltinPresetRenderTest.presets().get(name).get().landforms().atolls.enabled, name);
+			assertTrue(!BuiltinPresetRenderTest.presets().get(name).get().landforms().dunes.enabled, name);
 			assertTrue(!BuiltinPresetRenderTest.presets().get(name).get().landforms().volcanicSurface, name);
 		}
 	}

@@ -208,6 +208,24 @@ public class TerrainViewTest {
 	}
 
 	@Test
+	void dunes() throws Exception {
+		for (String name : new String[] { "default", "badlands" }) {
+			Preset preset = preset(name);
+			Preset without = preset.copy();
+			without.landforms().dunes.enabled = false;
+			long place = TerrainViews.mostChanged(TerrainViews.view(preset, 0.0F, 0.0F, 16.0F), TerrainViews.view(without, 0.0F, 0.0F, 16.0F));
+			float x = PosUtil.unpackLeft(place);
+			float z = PosUtil.unpackRight(place);
+			System.out.println(name + ": dunes at " + x + ", " + z);
+			TerrainViews.write(TerrainViews.view(preset, x, z, 4.0F), "dunes_" + name + "_wide");
+			TerrainViews.View close = TerrainViews.view(preset, x, z, 1.0F);
+			TerrainViews.write(close, "dunes_" + name + "_close");
+			TerrainViews.writeProfile(close, "dunes_" + name + "_profile");
+			TerrainViews.writePerspective(close, "dunes_" + name + "_3d");
+		}
+	}
+
+	@Test
 	void atolls() throws Exception {
 		Preset preset = preset("tropics");
 		Preset without = preset.copy();

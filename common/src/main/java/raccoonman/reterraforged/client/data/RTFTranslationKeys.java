@@ -53,6 +53,10 @@ public class RTFTranslationKeys {
 	public static final String GUI_SLIDER_FJORD_REACH = resolve("gui.slider.fjordReach");
 	public static final String GUI_SLIDER_FJORD_DEPTH = resolve("gui.slider.fjordDepth");
 	public static final String GUI_BUTTON_VOLCANIC_SURFACE = resolve("gui.button.volcanicSurface");
+	public static final String GUI_LABEL_DUNES = resolve("gui.label.dunes");
+	public static final String GUI_BUTTON_DUNES = resolve("gui.button.dunes");
+	public static final String GUI_SLIDER_DUNE_HEIGHT = resolve("gui.slider.duneHeight");
+	public static final String GUI_SLIDER_DUNE_COVERAGE = resolve("gui.slider.duneCoverage");
 
 	public static final String GUI_BUTTON_TRUE = resolve("gui.button.true");
 	public static final String GUI_BUTTON_FALSE = resolve("gui.button.false");

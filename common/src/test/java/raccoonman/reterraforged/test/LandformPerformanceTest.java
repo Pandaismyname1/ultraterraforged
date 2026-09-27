@@ -26,6 +26,7 @@ public class LandformPerformanceTest {
 			without.landforms().seaCliffs.enabled = false;
 			without.landforms().fjords.enabled = false;
 			without.landforms().atolls.enabled = false;
+			without.landforms().dunes.enabled = false;
 			// warm up
 			time(with);
 			time(without);

@@ -14,7 +14,8 @@ public class LandformSettings {
 		PresetCodecs.defaulted(SeaCliffs.CODEC, "seaCliffs", SeaCliffs.makeDefault()).forGetter((o) -> o.seaCliffs),
 		PresetCodecs.defaulted(Codec.BOOL, "volcanicSurface", true).forGetter((o) -> o.volcanicSurface),
 		PresetCodecs.defaulted(Fjords.CODEC, "fjords", Fjords.makeDefault()).forGetter((o) -> o.fjords),
-		PresetCodecs.defaulted(Atolls.CODEC, "atolls", Atolls.makeDefault()).forGetter((o) -> o.atolls)
+		PresetCodecs.defaulted(Atolls.CODEC, "atolls", Atolls.makeDefault()).forGetter((o) -> o.atolls),
+		PresetCodecs.defaulted(Dunes.CODEC, "dunes", Dunes.makeDefault()).forGetter((o) -> o.dunes)
 	).apply(instance, LandformSettings::new));
 
 	public Buttes buttes;
@@ -24,22 +25,24 @@ public class LandformSettings {
 	public boolean volcanicSurface;
 	public Fjords fjords;
 	public Atolls atolls;
+	public Dunes dunes;
 
-	public LandformSettings(Buttes buttes, Canyons canyons, SeaCliffs seaCliffs, boolean volcanicSurface, Fjords fjords, Atolls atolls) {
+	public LandformSettings(Buttes buttes, Canyons canyons, SeaCliffs seaCliffs, boolean volcanicSurface, Fjords fjords, Atolls atolls, Dunes dunes) {
 		this.buttes = buttes;
 		this.canyons = canyons;
 		this.seaCliffs = seaCliffs;
 		this.volcanicSurface = volcanicSurface;
 		this.fjords = fjords;
 		this.atolls = atolls;
+		this.dunes = dunes;
 	}
 
 	public LandformSettings copy() {
-		return new LandformSettings(this.buttes.copy(), this.canyons.copy(), this.seaCliffs.copy(), this.volcanicSurface, this.fjords.copy(), this.atolls.copy());
+		return new LandformSettings(this.buttes.copy(), this.canyons.copy(), this.seaCliffs.copy(), this.volcanicSurface, this.fjords.copy(), this.atolls.copy(), this.dunes.copy());
 	}
 
 	public static LandformSettings makeDefault() {
-		return new LandformSettings(Buttes.makeDefault(), Canyons.makeDefault(), SeaCliffs.makeDefault(), true, Fjords.makeDefault(), Atolls.makeDefault());
+		return new LandformSettings(Buttes.makeDefault(), Canyons.makeDefault(), SeaCliffs.makeDefault(), true, Fjords.makeDefault(), Atolls.makeDefault(), Dunes.makeDefault());
 	}
 
 	// how the original TerraForged generated: none of the added landforms
@@ -51,7 +54,41 @@ public class LandformSettings {
 		settings.volcanicSurface = false;
 		settings.fjords.enabled = false;
 		settings.atolls.enabled = false;
+		settings.dunes.enabled = false;
 		return settings;
+	}
+
+	/**
+	 * Fields of sand dunes on the flat land of hot deserts, with long, wavy crests across the wind.
+	 */
+	public static class Dunes {
+		private static final Dunes DEFAULT = new Dunes(true, 12, 0.6F);
+
+		public static final Codec<Dunes> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+			PresetCodecs.defaulted(Codec.BOOL, "enabled", DEFAULT.enabled).forGetter((o) -> o.enabled),
+			PresetCodecs.defaulted(Codec.INT, "height", DEFAULT.height).forGetter((o) -> o.height),
+			PresetCodecs.defaulted(Codec.FLOAT, "coverage", DEFAULT.coverage).forGetter((o) -> o.coverage)
+		).apply(instance, Dunes::new));
+
+		public boolean enabled;
+		// the tallest crests rise this many blocks above the ground
+		public int height;
+		// share of the flat desert covered in dune fields
+		public float coverage;
+
+		public Dunes(boolean enabled, int height, float coverage) {
+			this.enabled = enabled;
+			this.height = height;
+			this.coverage = coverage;
+		}
+
+		public Dunes copy() {
+			return new Dunes(this.enabled, this.height, this.coverage);
+		}
+
+		public static Dunes makeDefault() {
+			return DEFAULT.copy();
+		}
 	}
 
 	/**

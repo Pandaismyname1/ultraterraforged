@@ -109,9 +109,13 @@ public class PresetSurfaceRuleData {
         SurfaceRules.ConditionSource steep = SurfaceRules.steep();
         // steep slopes wear down to bare rock and coarse dirt, unless the preset turns erosion off
         // (and everything above the rock line, which the default presets set above the build limit)
-        SurfaceRules.ConditionSource erodedRock = miscellaneousSettings.erosionDecorator ? RTFSurfaceConditions.any(
-        	RTFSurfaceConditions.steepness(erosion.rockSteepness, noise.getOrThrow(PresetSurfaceNoise.STEEPNESS_VARIANCE)),
-        	RTFSurfaceConditions.height(noise.getOrThrow(PresetSurfaceNoise.ERODED_ROCK), noise.getOrThrow(PresetSurfaceNoise.HEIGHT_VARIANCE))
+        // (sand dunes are steep but loose, so they stay sand)
+        SurfaceRules.ConditionSource erodedRock = miscellaneousSettings.erosionDecorator ? and(
+        	SurfaceRules.not(RTFSurfaceConditions.terrain(TerrainType.DUNES)),
+        	RTFSurfaceConditions.any(
+        		RTFSurfaceConditions.steepness(erosion.rockSteepness, noise.getOrThrow(PresetSurfaceNoise.STEEPNESS_VARIANCE)),
+        		RTFSurfaceConditions.height(noise.getOrThrow(PresetSurfaceNoise.ERODED_ROCK), noise.getOrThrow(PresetSurfaceNoise.HEIGHT_VARIANCE))
+        	)
         ) : NEVER;
         SurfaceRules.RuleSource erodedDirt = miscellaneousSettings.erosionDecorator ? makeErodedDirtRule(noise, erosion) : SurfaceRules.ifTrue(NEVER, COARSE_DIRT);
         SurfaceRules.RuleSource grass = SurfaceRules.sequence(
@@ -417,7 +421,10 @@ public class PresetSurfaceRuleData {
         	preset.landforms().volcanicSurface ? makeVolcanoRule(noise) : SurfaceRules.ifTrue(NEVER, STONE),
         	SurfaceRules.ifTrue(
         		y4BelowSurface, 
-        		makeDesertRule(scaling, noise)
+        		SurfaceRules.ifTrue(
+        			SurfaceRules.not(RTFSurfaceConditions.terrain(TerrainType.DUNES)),
+        			makeDesertRule(scaling, noise)
+        		)
         	),
         	SurfaceRules.ifTrue(
         		SurfaceRules.ON_FLOOR, 
@@ -799,6 +806,11 @@ public class PresetSurfaceRuleData {
     	);
     }
 	
+    // both conditions hold: neither fails
+    private static SurfaceRules.ConditionSource and(SurfaceRules.ConditionSource a, SurfaceRules.ConditionSource b) {
+    	return SurfaceRules.not(RTFSurfaceConditions.any(SurfaceRules.not(a), SurfaceRules.not(b)));
+    }
+
     private static SurfaceRules.ConditionSource surfaceNoiseAbove(double target) {
         return SurfaceRules.noiseCondition(Noises.SURFACE, target / 8.25D, Double.MAX_VALUE);
     }
