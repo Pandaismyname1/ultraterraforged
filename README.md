@@ -195,7 +195,8 @@ GitHub Actions builds both loaders on every push (`build.yml`); the tests take l
 from [CHANGELOG.md](CHANGELOG.md), then upload the Fabric and Forge jars to Modrinth (`LpyUCfpY`) and CurseForge
 (`1715379`), using the `MODRINTH_TOKEN` and `CURSEFORGE_TOKEN` repository secrets; a platform whose secret is missing is
 skipped. Bump `mod_version` in `gradle.properties` and update the changelog first: the version tag must be new.
-Publishing a release also pushes the Maven artifacts to the `maven` branch (`publish-maven.yml`).
+Publishing a release also adds its Maven artifacts to the `maven` branch (`publish-maven.yml`), next to those of
+earlier releases and other Minecraft versions.
 
 ## License
 
