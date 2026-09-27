@@ -3,7 +3,7 @@
   "plugin": "com.pandaismyname1.ultraterraforged.mixin.plugin.MixinPlugin",
   "package": "com.pandaismyname1.ultraterraforged.mixin",
   "minVersion": "0.8",
-  "compatibilityLevel": "JAVA_17",
+  "compatibilityLevel": "JAVA_21",
   "mixins": [
   	"MixinNoiseChunk",
   	"MixinRandomState",
