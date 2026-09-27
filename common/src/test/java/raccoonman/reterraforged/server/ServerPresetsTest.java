@@ -11,6 +11,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import raccoonman.reterraforged.data.preset.PresetLibrary;
+import raccoonman.reterraforged.data.preset.settings.BuiltinPresets;
 import raccoonman.reterraforged.data.preset.settings.Preset;
 import raccoonman.reterraforged.test.TestBootstrap;
 
@@ -37,10 +39,13 @@ public class ServerPresetsTest {
 	@Test
 	void writesTheDefaultPresetOnceAndReadsEditsBack(@TempDir Path dir) throws Exception {
 		Path file = dir.resolve("reterraforged").resolve(ServerPresets.PRESET_FILE);
-		Preset created = ServerPresets.loadOrCreatePreset(file);
+		// e.g. the modpack's default
+		PresetLibrary.Entry highlands = PresetLibrary.find("highlands", PresetLibrary.builtins()).orElseThrow();
+		Preset created = ServerPresets.loadOrCreatePreset(file, () -> highlands);
 		assertTrue(Files.exists(file));
+		assertEquals(BuiltinPresets.makeHighlands().terrain().mountains.weight, created.terrain().mountains.weight);
 
 		Files.writeString(file, Files.readString(file).replace("\"riverCount\": " + created.rivers().riverCount, "\"riverCount\": 3"));
-		assertEquals(3, ServerPresets.loadOrCreatePreset(file).rivers().riverCount);
+		assertEquals(3, ServerPresets.loadOrCreatePreset(file, () -> highlands).rivers().riverCount);
 	}
 }

@@ -189,7 +189,8 @@ class PresetListPage extends BisectedPage<PresetConfigScreen, PresetEntry, Abstr
 		for (PresetLibrary.Entry entry : PresetLibrary.files(PRESET_PATH, LEGACY_PRESET_PATH)) {
 			entries.add(new PresetEntry(entry.name(), entry.create(), false, this));
 		}
-		for (PresetLibrary.Entry entry : PresetLibrary.builtins()) {
+		// the modpack's presets are read-only like the built-in ones
+		for (PresetLibrary.Entry entry : PresetLibrary.shipped()) {
 			entries.add(new PresetEntry(entry.name(), entry.create(), true, this));
 		}
 		this.left.replaceEntries(entries.stream().map(WidgetList.Entry::new).toList());

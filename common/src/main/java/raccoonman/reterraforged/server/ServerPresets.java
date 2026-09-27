@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.function.Supplier;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -16,16 +17,16 @@ import com.mojang.serialization.JsonOps;
 import net.minecraft.data.registries.VanillaRegistries;
 import raccoonman.reterraforged.RTFCommon;
 import raccoonman.reterraforged.data.PresetPacks;
+import raccoonman.reterraforged.data.preset.PresetLibrary;
 import raccoonman.reterraforged.data.preset.RTFWorldPresets;
-import raccoonman.reterraforged.data.preset.settings.BuiltinPresets;
 import raccoonman.reterraforged.data.preset.settings.Preset;
 import raccoonman.reterraforged.platform.ConfigUtil;
 
 /**
  * Dedicated server support: a new world whose server.properties has {@code level-type=reterraforged:reterraforged}
  * gets the preset from {@code config/reterraforged/server-preset.json} installed as a datapack before the world's
- * datapacks load. Vanilla enables new packs in a world's datapacks folder automatically, and the pack then stays
- * with the world like any other.
+ * datapacks load. The file is created from the modpack's default preset if it doesn't exist yet. Vanilla enables new
+ * packs in a world's datapacks folder automatically, and the pack then stays with the world like any other.
  */
 public final class ServerPresets {
 	public static final String PRESET_FILE = "server-preset.json";
@@ -42,7 +43,7 @@ public final class ServerPresets {
 			return;
 		}
 		try {
-			Preset preset = loadOrCreatePreset(ConfigUtil.rtf(PRESET_FILE));
+			Preset preset = loadOrCreatePreset(ConfigUtil.rtf(PRESET_FILE), PresetLibrary::defaultPreset);
 			// the server hasn't loaded its registries yet, so generate against vanilla's built-in worldgen
 			PresetPacks.export(preset, VanillaRegistries.createLookup(), datapackDir.resolve(PresetPacks.WORLD_PACK_NAME));
 			RTFCommon.LOGGER.info("Creating a ReTerraForged world with the preset from {}", ConfigUtil.rtf(PRESET_FILE));
@@ -67,15 +68,16 @@ public final class ServerPresets {
 		return levelType.equals(RTFWorldPresets.RETERRAFORGED.location().toString());
 	}
 
-	static Preset loadOrCreatePreset(Path file) throws IOException {
+	static Preset loadOrCreatePreset(Path file, Supplier<PresetLibrary.Entry> defaultPreset) throws IOException {
 		if (!Files.exists(file)) {
-			Preset preset = BuiltinPresets.makeDefault();
+			PresetLibrary.Entry defaults = defaultPreset.get();
+			Preset preset = defaults.create();
 			Files.createDirectories(file.getParent());
 			try (Writer writer = Files.newBufferedWriter(file)) {
 				JsonElement json = Preset.CODEC.encodeStart(JsonOps.INSTANCE, preset).getOrThrow(false, RTFCommon.LOGGER::error);
 				new GsonBuilder().setPrettyPrinting().create().toJson(json, writer);
 			}
-			RTFCommon.LOGGER.info("Wrote the default preset to {}; edit it to change the terrain of new worlds", file);
+			RTFCommon.LOGGER.info("Wrote the {} preset to {}; edit it to change the terrain of new worlds", defaults.id(), file);
 			return preset;
 		}
 		try (Reader reader = Files.newBufferedReader(file)) {

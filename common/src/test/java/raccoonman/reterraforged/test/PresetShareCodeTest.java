@@ -21,6 +21,7 @@ import com.mojang.serialization.JsonOps;
 
 import raccoonman.reterraforged.data.preset.PresetLibrary;
 import raccoonman.reterraforged.data.preset.PresetShareCode;
+import raccoonman.reterraforged.data.preset.settings.BuiltinPresets;
 import raccoonman.reterraforged.data.preset.settings.Preset;
 
 public class PresetShareCodeTest {
@@ -48,7 +49,7 @@ public class PresetShareCodeTest {
 
 	@Test
 	void editsSurviveACode() {
-		Preset preset = PresetLibrary.defaultPreset().create();
+		Preset preset = BuiltinPresets.makeDefault();
 		preset.world().continent.continentScale = 1234;
 		preset.rivers().riverCount = 17;
 		Preset decoded = PresetShareCode.decode(PresetShareCode.encode(preset)).getOrThrow(false, (error) -> {});
@@ -58,14 +59,14 @@ public class PresetShareCodeTest {
 
 	@Test
 	void whitespaceFromCopyingIsIgnored() {
-		String code = PresetShareCode.encode(PresetLibrary.defaultPreset().create());
+		String code = PresetShareCode.encode(BuiltinPresets.makeDefault());
 		String wrapped = "  " + code.substring(0, 20) + "\n" + code.substring(20, 40) + " \r\n" + code.substring(40) + "\n";
 		assertTrue(PresetShareCode.decode(wrapped).result().isPresent());
 	}
 
 	@Test
 	void invalidCodesAreRejected() {
-		String code = PresetShareCode.encode(PresetLibrary.defaultPreset().create());
+		String code = PresetShareCode.encode(BuiltinPresets.makeDefault());
 		for (String invalid : List.of("", "hello", "RTF1:", "RTF1:!!!!", "RTF2:" + code.substring(5), code.substring(0, code.length() / 2), "RTF1:" + Base64.getUrlEncoder().encodeToString("not deflated".getBytes(StandardCharsets.UTF_8)))) {
 			assertTrue(PresetShareCode.decode(invalid).result().isEmpty(), "accepted " + invalid);
 		}
@@ -90,7 +91,7 @@ public class PresetShareCodeTest {
 
 	@Test
 	void savedPresetsAreListed(@TempDir Path folder) throws Exception {
-		Preset preset = PresetLibrary.defaultPreset().create();
+		Preset preset = BuiltinPresets.makeDefault();
 		preset.rivers().riverCount = 21;
 		PresetLibrary.Entry saved = PresetLibrary.save(folder, "My World", preset);
 		assertTrue(Files.exists(folder.resolve("My World.json")));

@@ -78,7 +78,7 @@ public class TerrainTab implements Tab {
 			.tooltip(Tooltip.create(Component.translatable(RTFTranslationKeys.GUI_SHARE_COPY_TOOLTIP))).build();
 		this.pasteButton = Button.builder(Component.translatable(RTFTranslationKeys.GUI_SHARE_PASTE), (button) -> {
 			PresetSharing.paste().ifPresent((preset) -> {
-				this.state.select(new PresetLibrary.Entry("shared", Component.translatable(RTFTranslationKeys.GUI_SHARE_PASTED_NAME), null, preset::copy, null));
+				this.state.select(new PresetLibrary.Entry("shared", Component.translatable(RTFTranslationKeys.GUI_SHARE_PASTED_NAME), null, preset::copy, null, PresetLibrary.Source.OTHER));
 				this.state.selectReTerraForged();
 				this.rebuildSliders();
 				this.updateLabels();
@@ -162,7 +162,7 @@ public class TerrainTab implements Tab {
 
 	private void reloadPresets() {
 		this.presets.clear();
-		this.presets.addAll(PresetLibrary.builtins());
+		this.presets.addAll(PresetLibrary.shipped());
 		this.presets.addAll(PresetLibrary.files(PresetSharing.presetFolder()));
 	}
 

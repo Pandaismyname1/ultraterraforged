@@ -11,15 +11,17 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import raccoonman.reterraforged.RTFCommon;
+import raccoonman.reterraforged.config.ModpackConfig;
 import raccoonman.reterraforged.platform.ConfigUtil;
 
-// config/reterraforged/client.json
+// config/reterraforged/client.json; a player's own choices, which take precedence over the modpack's in modpack.json
 public record ClientConfig(boolean defaultWorldType) {
 	private static final String DEFAULT_WORLD_TYPE = "useAsDefaultWorldType";
 
 	public static ClientConfig load() {
 		Path file = ConfigUtil.rtf("client.json");
-		ClientConfig defaults = new ClientConfig(true);
+		Boolean modpackWorldType = ModpackConfig.load().defaultWorldType();
+		ClientConfig defaults = new ClientConfig(modpackWorldType == null || modpackWorldType);
 		if (!Files.exists(file)) {
 			defaults.save(file);
 			return defaults;
