@@ -1,6 +1,7 @@
 package raccoonman.reterraforged.world.worldgen.tile;
 
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import raccoonman.reterraforged.concurrent.Resource;
 import raccoonman.reterraforged.concurrent.cache.SafeCloseable;
@@ -18,6 +19,8 @@ public class Tile implements SafeCloseable, CellLookup {
 	private Resource<Chunk[]> chunkResource;
 	private Cell[] cache;
 	private Chunk[] chunks;
+	// once closed, the arrays go back to the pool for other tiles, so nothing may be written to them through this one
+	private final AtomicBoolean closed = new AtomicBoolean();
 	
 	public Tile(int x, int z, int size, int border, Size blockSize, Size chunkSize, Resource<Cell[]> cacheResource, Resource<Chunk[]> chunkResource) {
 		this.x = x;
@@ -60,7 +63,7 @@ public class Tile implements SafeCloseable, CellLookup {
         int relChunkX = this.chunkSize.border() + this.chunkSize.mask(chunkX);
         int relChunkZ = this.chunkSize.border() + this.chunkSize.mask(chunkZ);
         int index = this.chunkSize.indexOf(relChunkX, relChunkZ);
-        return this.computeChunk(index, chunkX, chunkZ);
+        return this.computeChunk(index, relChunkX, relChunkZ);
 	}
 	
     public void iterate(Cell.Visitor visitor) {
@@ -105,6 +108,10 @@ public class Tile implements SafeCloseable, CellLookup {
 
 	@Override
 	public void close() {
+		// closing twice would wipe the arrays after another tile had taken them from the pool
+		if (!this.closed.compareAndSet(false, true)) {
+			return;
+		}
         for (Cell cell : this.cache) {
         	cell.reset();
         }
@@ -113,11 +120,15 @@ public class Tile implements SafeCloseable, CellLookup {
 		this.chunkResource.close();
 	}
 	
+    // chunkX and chunkZ are relative to the tile, border included
     private Chunk computeChunk(int index, int chunkX, int chunkZ) {
         Chunk chunk = this.chunks[index];
-        if (chunk == null) {
+        // the arrays are pooled: a chunk left by another tile reads that tile's cells
+        if (chunk == null || chunk.tile() != this) {
             chunk = new Chunk(chunkX, chunkZ);
-            this.chunks[index] = chunk;
+            if (!this.closed.get()) {
+            	this.chunks[index] = chunk;
+            }
         }
         return chunk;
     }
@@ -143,6 +154,10 @@ public class Tile implements SafeCloseable, CellLookup {
             this.highestPoint = Float.MIN_VALUE;
 		}
 		
+		Tile tile() {
+			return Tile.this;
+		}
+
 		public void updateHighestPoint(Cell cell) {
             if(cell.height > this.highestPoint) {
             	this.highestPoint = cell.height;

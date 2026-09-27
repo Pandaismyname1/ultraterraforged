@@ -56,7 +56,9 @@ public class TileCache implements TileFactory {
 		long packedTilePos = PosUtil.pack(tileX, tileZ);
 		CacheEntry<Entry> entry = this.cache.get(packedTilePos);
 		if(entry != null && entry.get().drop()) {
+			// out of the cache first, so nothing new picks the tile up while it's being closed
 			this.cache.remove(packedTilePos);
+			entry.get().tile.close();
 		}
 	}
 
@@ -83,13 +85,9 @@ public class TileCache implements TileFactory {
 			this.tile = tile;
 		}
 		
+		// whether every chunk of the tile is done with it; true once only
 		public boolean drop() {
-			if(this.refCount.incrementAndGet() >= this.chunkCount) {
-				this.tile.close();
-				return true;
-			} else {
-				return false;
-			}
+			return this.refCount.incrementAndGet() == this.chunkCount;
 		}
 	}
 }

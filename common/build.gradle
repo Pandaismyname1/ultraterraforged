@@ -6,6 +6,14 @@ loom {
     accessWidenerPath = file("src/main/resources/reterraforged.accesswidener")
 }
 
+// Fabric's Mixin 0.17.4 turned the "at" of @Redirect, @ModifyArg, @ModifyArgs and @ModifyVariable into an array. Common
+// code compiled against it carries arrays there, which the Mixin on Forge accepts but MixinExtras up to 0.5.0 (bundled
+// by ModernFix, AllTheLeaks, Noisium and many others) doesn't: Forge crashes at startup with a ClassCastException. So
+// common code compiles against 0.17.3, the last with a single @At, which every loader reads. MixinAnnotationsTest checks.
+configurations.compileClasspath {
+    resolutionStrategy.force "net.fabricmc:sponge-mixin:0.17.3+mixin.0.8.7"
+}
+
 dependencies {
     // Fabric loader provides the @Environment annotations and the Mixin library for common code.
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
