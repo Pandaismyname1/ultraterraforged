@@ -2,6 +2,7 @@ package raccoonman.reterraforged.world.worldgen.tile.filter;
 
 import raccoonman.reterraforged.world.worldgen.cell.Cell;
 import raccoonman.reterraforged.world.worldgen.heightmap.Levels;
+import raccoonman.reterraforged.world.worldgen.terrain.TerrainType;
 import raccoonman.reterraforged.world.worldgen.tile.Tile;
 
 /**
@@ -25,8 +26,9 @@ public record WaterRim(Levels levels) implements Filter {
 						continue;
 					}
 				}
-				// wet ground, and ground under the sea, stay as they are
-				if (this.wet(cell) || y < this.levels.waterY) {
+				// wet ground, and ground under the sea, stay as they are; so does the lip of a cirque, where its lake spills
+				// over down the mountain
+				if (this.wet(cell) || y < this.levels.waterY || cell.terrain == TerrainType.CIRQUE) {
 					continue;
 				}
 				float water = 0.0F;

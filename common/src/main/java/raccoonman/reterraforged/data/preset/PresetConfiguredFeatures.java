@@ -128,9 +128,9 @@ public class PresetConfiguredFeatures {
 		TerrainSettings terrain = preset.terrain();
 		TerrainSettings.General general = terrain.general;
 		
-		if(miscellaneous.naturalSnowDecorator || miscellaneous.smoothLayerDecorator) {
+		if(miscellaneous.naturalSnowDecorator || miscellaneous.smoothLayerDecorator || preset.surface().erosion().snowAspect > 0) {
 //			ErodeFeature.Config erodeConfig = new ErodeFeature.Config(miscellaneous.rockTag(), erosion.rockVariance, erosion.rockMin, erosion.dirtVariance, erosion.dirtMin, erosion.rockSteepness, erosion.dirtSteepness, erosion.screeSteepness, erosion.heightModifier / 255F, erosion.slopeModifier / 255F, 256, 3F / 255F, 0.55F);
-			FeatureUtils.register(ctx, ERODE_SNOW, RTFFeatures.ERODE_SNOW, new ErodeSnowFeature.Config(erosion.snowSteepness, (float) erosion.snowHeight / 255.0F, miscellaneous.naturalSnowDecorator, miscellaneous.smoothLayerDecorator, erosion.heightModifier / 255F, erosion.slopeModifier / 255F));
+			FeatureUtils.register(ctx, ERODE_SNOW, RTFFeatures.ERODE_SNOW, new ErodeSnowFeature.Config(erosion.snowSteepness, (float) erosion.snowHeight / 255.0F, miscellaneous.naturalSnowDecorator, miscellaneous.smoothLayerDecorator, erosion.heightModifier / 255F, erosion.slopeModifier / 255F, erosion.snowAspect));
 		}
 		
 		FeatureUtils.register(ctx, SWAMP_SURFACE, RTFFeatures.SWAMP_SURFACE, new SwampSurfaceFeature.Config(Blocks.CLAY.defaultBlockState(), Blocks.MUD.defaultBlockState(), Blocks.MUD.defaultBlockState()));

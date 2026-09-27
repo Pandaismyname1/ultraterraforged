@@ -105,7 +105,7 @@ public class PresetPlacedFeatures {
 
 		PlacementModifier blacklistOverworld = RTFPlacementModifiers.dimensionFilter(LevelStem.OVERWORLD);
 		
-		if(miscellaneous.naturalSnowDecorator || miscellaneous.smoothLayerDecorator) {
+		if(miscellaneous.naturalSnowDecorator || miscellaneous.smoothLayerDecorator || preset.surface().erosion().snowAspect > 0) {
 			PlacementUtils.register(ctx, ERODE_SNOW, features.getOrThrow(PresetConfiguredFeatures.ERODE_SNOW));
 		}
 		

@@ -1,11 +1,17 @@
 package raccoonman.reterraforged.world.worldgen.rivermap;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import raccoonman.reterraforged.concurrent.cache.ExpiringEntry;
 import raccoonman.reterraforged.world.worldgen.cell.Cell;
 import raccoonman.reterraforged.world.worldgen.heightmap.Heightmap;
 import raccoonman.reterraforged.world.worldgen.noise.domain.Domain;
 import raccoonman.reterraforged.world.worldgen.rivermap.gen.GenWarp;
 import raccoonman.reterraforged.world.worldgen.rivermap.river.Network;
+import raccoonman.reterraforged.world.worldgen.rivermap.river.River;
+import raccoonman.reterraforged.world.worldgen.terrain.populator.RiverPopulator;
+import raccoonman.reterraforged.world.worldgen.util.PosUtil;
 
 public class Rivermap implements ExpiringEntry {
     private int x;
@@ -17,6 +23,7 @@ public class Rivermap implements ExpiringEntry {
     private boolean raisedWater;
     private int gorgeDepth;
     private volatile boolean levelled;
+    private volatile List<Mouth> mouths;
     
     public Rivermap(int x, int z, Network[] networks, GenWarp warp, boolean raisedWater, int gorgeDepth) {
         this.timestamp = System.currentTimeMillis();
@@ -55,6 +62,44 @@ public class Rivermap implements ExpiringEntry {
                 network.carve(cell, rx, rz, lx, lz);
             }
         }
+    }
+    
+    /**
+     * Where the main rivers of this map flow into the sea, in the rivers' space: see {@link #riverX}.
+     */
+    public List<Mouth> mouths() {
+    	List<Mouth> mouths = this.mouths;
+    	if (mouths == null) {
+    		mouths = new ArrayList<>();
+    		for (Network network : this.networks) {
+    			RiverPopulator carver = network.riverCarver();
+    			if (!carver.main || carver.junction >= 0.0F) {
+    				continue;
+    			}
+    			River river = carver.river;
+    			long mouth = WaterLevels.channel(river, carver.warp, 1.0F);
+    			mouths.add(new Mouth(PosUtil.unpackLeftf(mouth), PosUtil.unpackRightf(mouth), river.ndx, river.ndz, carver.config.bankWidth, river.length));
+    		}
+    		this.mouths = mouths = List.copyOf(mouths);
+    	}
+    	return mouths;
+    }
+    
+    // a place in the world in the rivers' space, where they're laid out as straight lines
+    public float riverX(float x, float z) {
+    	return this.riverWarp.getX(x, z, 0);
+    }
+    
+    public float riverZ(float x, float z) {
+    	return this.riverWarp.getZ(x, z, 0);
+    }
+    
+    /**
+     * @param dirX the way the river flows, into the sea
+     * @param width the width of its banks at the mouth, in blocks either side of its middle
+     * @param length the length of its last straight stretch
+     */
+    public record Mouth(float x, float z, float dirX, float dirZ, float width, float length) {
     }
     
     @Override

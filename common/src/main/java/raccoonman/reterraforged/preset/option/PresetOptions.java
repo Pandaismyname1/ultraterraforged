@@ -295,6 +295,11 @@ public final class PresetOptions {
 				.range(0.0F, 1.0F)
 				.bind((p) -> p.surface().erosion().snowSteepness, (p, v) -> p.surface().erosion().snowSteepness = v)
 				.build(),
+			IntOption.builder("surface.erosion.snowAspect")
+				.translation(RTFTranslationKeys.GUI_SLIDER_SNOW_ASPECT)
+				.range(0, 60)
+				.bind((p) -> p.surface().erosion().snowAspect, (p, v) -> p.surface().erosion().snowAspect = v)
+				.build(),
 			FloatOption.builder("surface.erosion.heightModifier")
 				.translation(RTFTranslationKeys.GUI_SLIDER_HEIGHT_MODIFIER)
 				.range(0.0F, 255.0F)
@@ -606,6 +611,10 @@ public final class PresetOptions {
 				.translation(RTFTranslationKeys.GUI_BUTTON_NATURAL_SNOW_DECORATOR)
 				.bind((p) -> p.miscellaneous().naturalSnowDecorator, (p, v) -> p.miscellaneous().naturalSnowDecorator = v)
 				.build(),
+			BoolOption.builder("miscellaneous.riverBanks")
+				.translation(RTFTranslationKeys.GUI_BUTTON_RIVER_BANKS)
+				.bind((p) -> p.miscellaneous().riverBanks, (p, v) -> p.miscellaneous().riverBanks = v)
+				.build(),
 			BoolOption.builder("miscellaneous.customBiomeFeatures")
 				.translation(RTFTranslationKeys.GUI_BUTTON_CUSTOM_BIOME_FEATURES)
 				.bind((p) -> p.miscellaneous().customBiomeFeatures, (p, v) -> p.miscellaneous().customBiomeFeatures = v)
@@ -646,6 +655,13 @@ public final class PresetOptions {
 	private static final Predicate<Preset> ATOLLS = (preset) -> preset.landforms().atolls.enabled;
 	private static final Predicate<Preset> DUNES = (preset) -> preset.landforms().dunes.enabled;
 	private static final Predicate<Preset> TORS = (preset) -> preset.landforms().tors.enabled;
+	private static final Predicate<Preset> SALT_FLATS = (preset) -> preset.landforms().saltFlats.enabled;
+	private static final Predicate<Preset> ALLUVIAL_FANS = (preset) -> preset.landforms().alluvialFans.enabled;
+	private static final Predicate<Preset> GLACIAL_VALLEYS = (preset) -> preset.landforms().glacialValleys.enabled;
+	private static final Predicate<Preset> DRUMLINS = (preset) -> preset.landforms().drumlins.enabled;
+	private static final Predicate<Preset> BARRIER_ISLANDS = (preset) -> preset.landforms().barrierIslands.enabled;
+	private static final Predicate<Preset> KARST = (preset) -> preset.landforms().karst.enabled;
+	private static final Predicate<Preset> DELTAS = (preset) -> preset.landforms().deltas.enabled;
 
 	public static final Page LANDFORMS = Page.of("landforms", RTFTranslationKeys.GUI_LANDFORM_SETTINGS_TITLE,
 		Category.of("buttes", RTFTranslationKeys.GUI_LABEL_BUTTES,
@@ -795,6 +811,114 @@ public final class PresetOptions {
 				.range(3, 20)
 				.activeWhen(TORS)
 				.bind((p) -> p.landforms().tors.height, (p, v) -> p.landforms().tors.height = v)
+				.build()
+		),
+		Category.of("saltFlats", RTFTranslationKeys.GUI_LABEL_SALT_FLATS,
+			BoolOption.builder("landforms.saltFlats.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_SALT_FLATS)
+				.bind((p) -> p.landforms().saltFlats.enabled, (p, v) -> p.landforms().saltFlats.enabled = v)
+				.build(),
+			FloatOption.builder("landforms.saltFlats.coverage")
+				.translation(RTFTranslationKeys.GUI_SLIDER_SALT_FLAT_COVERAGE)
+				.range(0.0F, 1.0F)
+				.activeWhen(SALT_FLATS)
+				.bind((p) -> p.landforms().saltFlats.coverage, (p, v) -> p.landforms().saltFlats.coverage = v)
+				.build()
+		),
+		Category.of("alluvialFans", RTFTranslationKeys.GUI_LABEL_ALLUVIAL_FANS,
+			BoolOption.builder("landforms.alluvialFans.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_ALLUVIAL_FANS)
+				.bind((p) -> p.landforms().alluvialFans.enabled, (p, v) -> p.landforms().alluvialFans.enabled = v)
+				.build(),
+			FloatOption.builder("landforms.alluvialFans.density")
+				.translation(RTFTranslationKeys.GUI_SLIDER_ALLUVIAL_FAN_DENSITY)
+				.range(0.0F, 1.0F)
+				.activeWhen(ALLUVIAL_FANS)
+				.bind((p) -> p.landforms().alluvialFans.density, (p, v) -> p.landforms().alluvialFans.density = v)
+				.build(),
+			FloatOption.builder("landforms.alluvialFans.size")
+				.translation(RTFTranslationKeys.GUI_SLIDER_ALLUVIAL_FAN_SIZE)
+				.range(0.5F, 2.0F)
+				.activeWhen(ALLUVIAL_FANS)
+				.bind((p) -> p.landforms().alluvialFans.size, (p, v) -> p.landforms().alluvialFans.size = v)
+				.build()
+		),
+		Category.of("glacialValleys", RTFTranslationKeys.GUI_LABEL_GLACIAL_VALLEYS,
+			BoolOption.builder("landforms.glacialValleys.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_GLACIAL_VALLEYS)
+				.bind((p) -> p.landforms().glacialValleys.enabled, (p, v) -> p.landforms().glacialValleys.enabled = v)
+				.build(),
+			FloatOption.builder("landforms.glacialValleys.strength")
+				.translation(RTFTranslationKeys.GUI_SLIDER_GLACIAL_VALLEY_STRENGTH)
+				.range(0.2F, 1.5F)
+				.activeWhen(GLACIAL_VALLEYS)
+				.bind((p) -> p.landforms().glacialValleys.strength, (p, v) -> p.landforms().glacialValleys.strength = v)
+				.build(),
+			FloatOption.builder("landforms.glacialValleys.cirques")
+				.translation(RTFTranslationKeys.GUI_SLIDER_CIRQUE_DENSITY)
+				.range(0.0F, 1.0F)
+				.activeWhen(GLACIAL_VALLEYS)
+				.bind((p) -> p.landforms().glacialValleys.cirques, (p, v) -> p.landforms().glacialValleys.cirques = v)
+				.build()
+		),
+		Category.of("drumlins", RTFTranslationKeys.GUI_LABEL_DRUMLINS,
+			BoolOption.builder("landforms.drumlins.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_DRUMLINS)
+				.bind((p) -> p.landforms().drumlins.enabled, (p, v) -> p.landforms().drumlins.enabled = v)
+				.build(),
+			FloatOption.builder("landforms.drumlins.density")
+				.translation(RTFTranslationKeys.GUI_SLIDER_DRUMLIN_DENSITY)
+				.range(0.0F, 1.0F)
+				.activeWhen(DRUMLINS)
+				.bind((p) -> p.landforms().drumlins.density, (p, v) -> p.landforms().drumlins.density = v)
+				.build(),
+			IntOption.builder("landforms.drumlins.height")
+				.translation(RTFTranslationKeys.GUI_SLIDER_DRUMLIN_HEIGHT)
+				.range(3, 20)
+				.activeWhen(DRUMLINS)
+				.bind((p) -> p.landforms().drumlins.height, (p, v) -> p.landforms().drumlins.height = v)
+				.build()
+		),
+		Category.of("barrierIslands", RTFTranslationKeys.GUI_LABEL_BARRIER_ISLANDS,
+			BoolOption.builder("landforms.barrierIslands.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_BARRIER_ISLANDS)
+				.bind((p) -> p.landforms().barrierIslands.enabled, (p, v) -> p.landforms().barrierIslands.enabled = v)
+				.build(),
+			FloatOption.builder("landforms.barrierIslands.frequency")
+				.translation(RTFTranslationKeys.GUI_SLIDER_BARRIER_ISLAND_FREQUENCY)
+				.range(0.0F, 1.0F)
+				.activeWhen(BARRIER_ISLANDS)
+				.bind((p) -> p.landforms().barrierIslands.frequency, (p, v) -> p.landforms().barrierIslands.frequency = v)
+				.build()
+		),
+		Category.of("karst", RTFTranslationKeys.GUI_LABEL_KARST,
+			BoolOption.builder("landforms.karst.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_KARST)
+				.bind((p) -> p.landforms().karst.enabled, (p, v) -> p.landforms().karst.enabled = v)
+				.build(),
+			FloatOption.builder("landforms.karst.coverage")
+				.translation(RTFTranslationKeys.GUI_SLIDER_KARST_COVERAGE)
+				.range(0.0F, 1.0F)
+				.activeWhen(KARST)
+				.bind((p) -> p.landforms().karst.coverage, (p, v) -> p.landforms().karst.coverage = v)
+				.build(),
+			IntOption.builder("landforms.karst.height")
+				.translation(RTFTranslationKeys.GUI_SLIDER_KARST_HEIGHT)
+				.range(10, 90)
+				.activeWhen(KARST)
+				.bind((p) -> p.landforms().karst.height, (p, v) -> p.landforms().karst.height = v)
+				.build()
+		),
+		Category.of("deltas", RTFTranslationKeys.GUI_LABEL_DELTAS,
+			BoolOption.builder("landforms.deltas.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_DELTAS)
+				.bind((p) -> p.landforms().deltas.enabled, (p, v) -> p.landforms().deltas.enabled = v)
+				.build(),
+			FloatOption.builder("landforms.deltas.size")
+				.translation(RTFTranslationKeys.GUI_SLIDER_DELTA_SIZE)
+				.range(0.5F, 2.0F)
+				.activeWhen(DELTAS)
+				.bind((p) -> p.landforms().deltas.size, (p, v) -> p.landforms().deltas.size = v)
 				.build()
 		),
 		Category.of("volcanoes", RTFTranslationKeys.GUI_LABEL_VOLCANOES,

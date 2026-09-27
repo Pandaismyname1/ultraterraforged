@@ -30,7 +30,7 @@ public class BuiltinPresets {
 				new ControlPoints(IslandPopulator.DEFAULT_INLAND_POINT, IslandPopulator.DEFAULT_COAST_POINT, 0.1F, 0.25F, 0.327F, 0.448F, 0.502F, 1.327F, 2.758F), 
 				new Properties(SpawnType.CONTINENT_CENTER, 512, 64, 63, -54)
 			), 
-			new SurfaceSettings(new SurfaceSettings.Erosion(30, 1024, 40, 95, 95, 0.65F, 0.475F, 0.4F, 0.45F, 6.0F, 3.0F)),
+			new SurfaceSettings(new SurfaceSettings.Erosion(30, 1024, 40, 95, 95, 0.65F, 0.475F, 0.4F, 0.45F, 6.0F, 3.0F, SurfaceSettings.Erosion.DEFAULT_SNOW_ASPECT)),
 			new CaveSettings(0.0F, 1.5625F, 1.0F, 1.0F, 1.0F, 0.14285715F, 0.07F, 0.01F, true, true),
 			new ClimateSettings(
 				new RangeValue(0, 6, 2, 0.0F, 0.98F, 0.05F), 
@@ -62,7 +62,7 @@ public class BuiltinPresets {
 				new Smoothing(1, 1.8F, 0.9F)
 			), 
 			new StructureSettings(),
-			new MiscellaneousSettings(true, 600, true, true, true, false, true, true, true, true, true, 0.4F, 0.4F),
+			new MiscellaneousSettings(true, 600, true, true, true, false, true, true, true, true, true, 0.4F, 0.4F, true),
 			LandformSettings.makeDefault()
 		); 
 	}
@@ -75,7 +75,7 @@ public class BuiltinPresets {
 				new ControlPoints(IslandPopulator.DEFAULT_INLAND_POINT, IslandPopulator.DEFAULT_COAST_POINT, 0.1F, 0.25F, 0.327F, 0.448F, 0.502F, 1.327F, 2.758F), 
 				new Properties(SpawnType.CONTINENT_CENTER, 320, 64, 63, -54)
 			), 
-			new SurfaceSettings(new SurfaceSettings.Erosion(30, 140, 40, 95, 95, 0.65F, 0.475F, 0.4F, 0.45F, 6.0F, 3.0F)),
+			new SurfaceSettings(new SurfaceSettings.Erosion(30, 140, 40, 95, 95, 0.65F, 0.475F, 0.4F, 0.45F, 6.0F, 3.0F, 0)),
 			new CaveSettings(0.0F, 1.5625F, 1.0F, 1.0F, 1.0F, 0.14285715F, 0.07F, 0.02F, true, false),
 			new ClimateSettings(
 				new RangeValue(0, 6, 2, 0.0F, 0.98F, 0.05F), 
@@ -107,7 +107,7 @@ public class BuiltinPresets {
 				new Smoothing(1, 1.8F, 0.9F)
 			), 
 			new StructureSettings(),
-			new MiscellaneousSettings(true, 600, true, true, true, false, true, true, true, true, true, 0.4F, 0.4F),
+			new MiscellaneousSettings(true, 600, true, true, true, false, true, true, true, true, true, 0.4F, 0.4F, false),
 			LandformSettings.makeNone()
 		); 
 	}
@@ -120,7 +120,7 @@ public class BuiltinPresets {
 				new ControlPoints(IslandPopulator.DEFAULT_INLAND_POINT, IslandPopulator.DEFAULT_COAST_POINT, 0.1F, 0.25F, 0.326F, 0.448F, 0.5F, 1.327F, 2.758F), 
 				new Properties(SpawnType.WORLD_ORIGIN, 320, 64, 63, -54)
 			), 
-			new SurfaceSettings(new SurfaceSettings.Erosion(30, 140, 40, 95, 95, 0.65F, 0.475F, 0.4F, 0.45F, 6.0F, 3.0F)),
+			new SurfaceSettings(new SurfaceSettings.Erosion(30, 140, 40, 95, 95, 0.65F, 0.475F, 0.4F, 0.45F, 6.0F, 3.0F, 0)),
 			new CaveSettings(1.0F, 1.5625F, 1.0F, 1.0F, 1.0F, 0.15F, 0.07F, 0.021F, true, false),
 			new ClimateSettings(
 				new RangeValue(0, 4, 1, 0.0F, 0.98F, 0.05F), 
@@ -152,7 +152,7 @@ public class BuiltinPresets {
 				new Smoothing(2, 1.8F, 0.75F)
 			), 
 			new StructureSettings(),
-			new MiscellaneousSettings(false, 600, false, true, false, false, false, false, true, true, true, 1.0F, 0.75F),
+			new MiscellaneousSettings(false, 600, false, true, false, false, false, false, true, true, true, 1.0F, 0.75F, false),
 			LandformSettings.makeNone()
 		); 
 	}
@@ -165,7 +165,7 @@ public class BuiltinPresets {
 				new ControlPoints(IslandPopulator.DEFAULT_INLAND_POINT, IslandPopulator.DEFAULT_COAST_POINT, 0.1F, 0.25F, 0.326F, 0.448F, 0.5F, 1.327F, 2.758F), 
 				new Properties(SpawnType.CONTINENT_CENTER, 320, 64, 63, -54)
 			), 
-			new SurfaceSettings(new SurfaceSettings.Erosion(30, 140, 40, 95, 95, 0.65F, 0.475F, 0.4F, 0.45F, 6.0F, 3.0F)),
+			new SurfaceSettings(new SurfaceSettings.Erosion(30, 140, 40, 95, 95, 0.65F, 0.475F, 0.4F, 0.45F, 6.0F, 3.0F, 0)),
 			new CaveSettings(0.0F, 1.5625F, 1.0F, 1.0F, 1.0F, 0.14285715F, 0.07F, 0.02F, true, false),
 			new ClimateSettings(
 				new RangeValue(0, 7, 1, 0.0F, 1.0F, -0.004F), 
@@ -197,7 +197,7 @@ public class BuiltinPresets {
 				new Smoothing(1, 1.855F, 0.916F)
 			), 
 			new StructureSettings(),
-			new MiscellaneousSettings(true, 684, true, true, true, false, true, true, true, true, false, 0.853F, 0.855F),
+			new MiscellaneousSettings(true, 684, true, true, true, false, true, true, true, true, false, 0.853F, 0.855F, false),
 			LandformSettings.makeNone()
 		); 
 	}
@@ -210,7 +210,7 @@ public class BuiltinPresets {
 				new ControlPoints(-1.0F, -1.0F, 0.1F, 0.25F, 0.326F, 0.448F, 0.5F, 1.327F, 2.758F), 
 				new Properties(SpawnType.CONTINENT_CENTER, 320, 64, 63, -54)
 			),
-			new SurfaceSettings(new SurfaceSettings.Erosion(30, 140, 40, 95, 95, 0.65F, 0.475F, 0.4F, 0.45F, 6.0F, 3.0F)),
+			new SurfaceSettings(new SurfaceSettings.Erosion(30, 140, 40, 95, 95, 0.65F, 0.475F, 0.4F, 0.45F, 6.0F, 3.0F, 0)),
 			new CaveSettings(0.0F, 1.5625F, 1.0F, 1.0F, 1.0F, 0.14285715F, 0.07F, 0.02F, false, false),
 			new ClimateSettings(
 				new RangeValue(0, 4, 1, 0.0F, 0.98F, 0.05F),
@@ -242,7 +242,7 @@ public class BuiltinPresets {
 				new Smoothing(2, 1.799F, 0.75F)
 			), 
 			new StructureSettings(),
-			new MiscellaneousSettings(true, 600, false, true, true, false, true, true, true, true, true, 1.0F, 0.75F),
+			new MiscellaneousSettings(true, 600, false, true, true, false, true, true, true, true, true, 1.0F, 0.75F, false),
 			LandformSettings.makeNone()
 		);
 	}
@@ -255,7 +255,7 @@ public class BuiltinPresets {
 				new ControlPoints(-1.0F, -1.0F, 0.1F, 0.25F, 0.326F, 0.448F, 0.5F, 1.327F, 2.758F), 
 				new Properties(SpawnType.CONTINENT_CENTER, 320, 64, 63, -54)
 			), 
-			new SurfaceSettings(new SurfaceSettings.Erosion(30, 140, 40, 95, 95, 0.65F, 0.475F, 0.4F, 0.45F, 6.0F, 3.0F)),
+			new SurfaceSettings(new SurfaceSettings.Erosion(30, 140, 40, 95, 95, 0.65F, 0.475F, 0.4F, 0.45F, 6.0F, 3.0F, 0)),
 			new CaveSettings(0.0F, 1.5625F, 1.0F, 1.0F, 1.0F, 0.14285715F, 0.07F, 0.02F, true, false),
 			new ClimateSettings(
 				new RangeValue(0, 4, 2, 0.0F, 1.0F, 0.097F), 
@@ -287,7 +287,7 @@ public class BuiltinPresets {
 				new Smoothing(1, 1.799F, 0.898F)
 			), 
 			new StructureSettings(),
-			new MiscellaneousSettings(true, 721, true, true, true, false, true, true, true, true, false, 0.902F, 0.945F),
+			new MiscellaneousSettings(true, 721, true, true, true, false, true, true, true, true, false, 0.902F, 0.945F, false),
 			LandformSettings.makeNone()
 		);
 	}

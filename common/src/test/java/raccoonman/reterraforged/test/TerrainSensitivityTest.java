@@ -41,7 +41,12 @@ public class TerrainSensitivityTest {
 		// a few blocks across, too small to show at the sampled resolution; LandformTest checks them
 		"landforms.seaCliffs.seaStacks",
 		// only changes the blocks on volcanoes, not their shape
-		"landforms.volcanicSurface"
+		"landforms.volcanicSurface",
+		// only in hot deserts, and there are none in the sampled area; NewLandformsTest checks them
+		"landforms.saltFlats.enabled",
+		"landforms.saltFlats.coverage",
+		// a few dozen blocks across, high in cold mountains; NewLandformsTest checks them
+		"landforms.glacialValleys.cirques"
 	);
 
 	@Test

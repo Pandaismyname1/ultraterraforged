@@ -62,6 +62,13 @@ public class PresetSurfaceRuleData {
     private static final SurfaceRules.RuleSource SMOOTH_BASALT = PresetSurfaceRuleData.makeStateRule(Blocks.SMOOTH_BASALT);
     private static final SurfaceRules.RuleSource BLACKSTONE = PresetSurfaceRuleData.makeStateRule(Blocks.BLACKSTONE);
     private static final SurfaceRules.RuleSource TUFF = PresetSurfaceRuleData.makeStateRule(Blocks.TUFF);
+    private static final SurfaceRules.RuleSource CLAY = PresetSurfaceRuleData.makeStateRule(Blocks.CLAY);
+    private static final SurfaceRules.RuleSource COBBLESTONE = PresetSurfaceRuleData.makeStateRule(Blocks.COBBLESTONE);
+    private static final SurfaceRules.RuleSource MOSSY_COBBLESTONE = PresetSurfaceRuleData.makeStateRule(Blocks.MOSSY_COBBLESTONE);
+    // rivers this many blocks above the sea run over gravel and cobbles rather than sand
+    private static final int MOUNTAIN_RIVER_HEIGHT = 45;
+    // where the salt crust noise is above this, it's a crack between the crust's polygons
+    private static final float SALT_CRACK = 0.9F;
 
     private static final ResourceLocation STRATA_CACHE_ID = RTFCommon.location("default");
     private static final ResourceLocation DEEP_STRATA_CACHE_ID = RTFCommon.location("deep");
@@ -424,6 +431,9 @@ public class PresetSurfaceRuleData {
         		RTFSurfaceConditions.terrain(TerrainType.SHINGLE_BEACH),
         		SurfaceRules.ifTrue(SurfaceRules.UNDER_FLOOR, gravel)
         	),
+        	makeLandformSurfaceRule(noise, yOnSurface, sand, gravel),
+        	// river and lake beds and banks that suit their setting
+        	miscellaneousSettings.riverBanks ? makeRiverBankRule(scaling, noise, yOnSurface, sand, gravel) : SurfaceRules.ifTrue(NEVER, STONE),
         	SurfaceRules.ifTrue(
         		y4BelowSurface, 
         		SurfaceRules.ifTrue(
@@ -705,6 +715,100 @@ public class PresetSurfaceRuleData {
     	);
     }
     
+    // salt crust on salt flats, sand on barrier islands, mud in deltas, and gravel and rubble where rock was broken up
+    // and carried down: alluvial fans, moraines and cirques
+    private static SurfaceRules.RuleSource makeLandformSurfaceRule(HolderGetter<Noise> noise, SurfaceRules.ConditionSource dry, SurfaceRules.RuleSource sand, SurfaceRules.RuleSource gravel) {
+    	Holder<Noise> debris = noise.getOrThrow(PresetSurfaceNoise.GLACIAL_DEBRIS);
+    	SurfaceRules.ConditionSource topLayers = SurfaceRules.stoneDepthCheck(2, false, CaveSurface.FLOOR);
+    	return SurfaceRules.sequence(
+    		SurfaceRules.ifTrue(
+    			RTFSurfaceConditions.terrain(TerrainType.SALT_FLAT),
+    			SurfaceRules.sequence(
+    				SurfaceRules.ifTrue(
+    					SurfaceRules.ON_FLOOR,
+    					RTFSurfaceRules.noise(noise.getOrThrow(PresetSurfaceNoise.SALT_FLAT), List.of(Pair.of(SALT_CRACK, WHITE_TERRACOTTA), Pair.of(-1.0F, CALCITE)))
+    				),
+    				SurfaceRules.ifTrue(SurfaceRules.UNDER_FLOOR, sand)
+    			)
+    		),
+    		SurfaceRules.ifTrue(
+    			RTFSurfaceConditions.terrain(TerrainType.BARRIER_ISLAND),
+    			SurfaceRules.ifTrue(SurfaceRules.UNDER_FLOOR, sand)
+    		),
+    		SurfaceRules.ifTrue(
+    			RTFSurfaceConditions.terrain(TerrainType.DELTA),
+    			SurfaceRules.ifTrue(
+    				topLayers,
+    				SurfaceRules.sequence(
+    					SurfaceRules.ifTrue(SurfaceRules.not(dry), RTFSurfaceRules.noise(debris, List.of(Pair.of(0.65F, CLAY), Pair.of(0.4F, MUD), Pair.of(-1.0F, sand)))),
+    					RTFSurfaceRules.noise(debris, List.of(Pair.of(0.62F, MUD), Pair.of(0.54F, sand)))
+    				)
+    			)
+    		),
+    		SurfaceRules.ifTrue(
+    			RTFSurfaceConditions.terrain(TerrainType.ALLUVIAL_FAN),
+    			SurfaceRules.ifTrue(
+    				topLayers,
+    				RTFSurfaceRules.noise(debris, List.of(Pair.of(0.56F, gravel), Pair.of(0.44F, COARSE_DIRT)))
+    			)
+    		),
+    		SurfaceRules.ifTrue(
+    			RTFSurfaceConditions.terrain(TerrainType.MORAINE),
+    			SurfaceRules.ifTrue(
+    				SurfaceRules.ON_FLOOR,
+    				RTFSurfaceRules.noise(debris, List.of(Pair.of(0.74F, MOSSY_COBBLESTONE), Pair.of(0.64F, COBBLESTONE), Pair.of(0.48F, gravel), Pair.of(0.36F, COARSE_DIRT)))
+    			)
+    		),
+    		SurfaceRules.ifTrue(
+    			RTFSurfaceConditions.terrain(TerrainType.CIRQUE),
+    			SurfaceRules.ifTrue(
+    				SurfaceRules.ON_FLOOR,
+    				RTFSurfaceRules.noise(debris, List.of(Pair.of(0.5F, gravel), Pair.of(0.32F, STONE)))
+    			)
+    		)
+    	);
+    }
+
+    // beds and banks of gravel and cobbles in the mountains; sand, with patches of gravel and clay, in the lowlands; and
+    // mud and clay in wetlands and deltas. Steep banks, like the sides of gorges, keep their rock
+    private static SurfaceRules.RuleSource makeRiverBankRule(Scaling scaling, HolderGetter<Noise> noise, SurfaceRules.ConditionSource dry, SurfaceRules.RuleSource sand, SurfaceRules.RuleSource gravel) {
+    	Holder<Noise> bed = noise.getOrThrow(PresetSurfaceNoise.RIVER_BED);
+    	SurfaceRules.ConditionSource underwater = SurfaceRules.not(dry);
+    	SurfaceRules.ConditionSource wet = RTFSurfaceConditions.any(RTFSurfaceConditions.terrain(TerrainType.WETLAND, TerrainType.DELTA), SurfaceRules.isBiome(Biomes.SWAMP, Biomes.MANGROVE_SWAMP));
+    	SurfaceRules.ConditionSource high = RTFSurfaceConditions.height(scaling.ground(MOUNTAIN_RIVER_HEIGHT));
+    	SurfaceRules.RuleSource wetBanks = SurfaceRules.sequence(
+    		SurfaceRules.ifTrue(underwater, RTFSurfaceRules.noise(bed, List.of(Pair.of(0.62F, CLAY), Pair.of(-1.0F, MUD)))),
+    		SurfaceRules.ifTrue(RTFSurfaceConditions.riverSide(0.9F), RTFSurfaceRules.noise(bed, List.of(Pair.of(0.4F, MUD))))
+    	);
+    	SurfaceRules.RuleSource mountainBanks = SurfaceRules.sequence(
+    		SurfaceRules.ifTrue(underwater, RTFSurfaceRules.noise(bed, List.of(Pair.of(0.7F, MOSSY_COBBLESTONE), Pair.of(0.6F, COBBLESTONE), Pair.of(-1.0F, gravel)))),
+    		SurfaceRules.ifTrue(RTFSurfaceConditions.riverSide(0.9F), RTFSurfaceRules.noise(bed, List.of(Pair.of(0.5F, gravel), Pair.of(0.4F, COARSE_DIRT))))
+    	);
+    	SurfaceRules.RuleSource lowlandBanks = SurfaceRules.sequence(
+    		SurfaceRules.ifTrue(underwater, RTFSurfaceRules.noise(bed, List.of(Pair.of(0.7F, CLAY), Pair.of(0.58F, gravel), Pair.of(-1.0F, sand)))),
+    		SurfaceRules.ifTrue(RTFSurfaceConditions.riverSide(0.85F), RTFSurfaceRules.noise(bed, List.of(Pair.of(0.45F, sand))))
+    	);
+    	return SurfaceRules.ifTrue(
+    		RTFSurfaceConditions.riverSide(1.0F),
+    		SurfaceRules.ifTrue(
+    			SurfaceRules.not(RTFSurfaceConditions.steepness(0.45F)),
+    			SurfaceRules.ifTrue(
+    				SurfaceRules.stoneDepthCheck(2, false, CaveSurface.FLOOR),
+    				SurfaceRules.sequence(
+    					SurfaceRules.ifTrue(wet, wetBanks),
+    					SurfaceRules.ifTrue(
+    						SurfaceRules.not(wet),
+    						SurfaceRules.sequence(
+    							SurfaceRules.ifTrue(high, mountainBanks),
+    							SurfaceRules.ifTrue(SurfaceRules.not(high), lowlandBanks)
+    						)
+    					)
+    				)
+    			)
+    		)
+    	);
+    }
+
     // lava over magma in the crater; basalt, blackstone and tuff all over the cone; patches of old lava flows on the
     // land around it, with the usual surface in between
     private static SurfaceRules.RuleSource makeVolcanoRule(HolderGetter<Noise> noise) {

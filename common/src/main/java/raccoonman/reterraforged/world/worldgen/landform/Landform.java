@@ -2,7 +2,11 @@ package raccoonman.reterraforged.world.worldgen.landform;
 
 import raccoonman.reterraforged.world.worldgen.cell.Cell;
 import raccoonman.reterraforged.world.worldgen.heightmap.Heightmap;
+import raccoonman.reterraforged.world.worldgen.noise.NoiseUtil;
 import raccoonman.reterraforged.world.worldgen.noise.module.Noise;
+import raccoonman.reterraforged.world.worldgen.terrain.Terrain;
+import raccoonman.reterraforged.world.worldgen.terrain.TerrainCategory;
+import raccoonman.reterraforged.world.worldgen.terrain.TerrainType;
 
 /**
  * A distinct feature of the land, like a butte or a sea stack, shaped into the heightmap after the terrain types and
@@ -33,6 +37,18 @@ public interface Landform {
 		java.util.Arrays.sort(values);
 		int index = Math.max(0, Math.min(values.length - 1, Math.round(share * (values.length - 1))));
 		return values[index];
+	}
+
+	// 0 to 1, fixed for each grid cell and purpose
+	static float random(int seed, int gridX, int gridZ, int purpose) {
+		return (NoiseUtil.valCoord2D(seed + purpose * 1013, gridX, gridZ) + 1.0F) * 0.5F;
+	}
+
+	// rolling land: not the badlands and plateaus where buttes stand, volcanoes, mountains, rivers, lakes or the sea
+	static boolean isRollingLand(Terrain terrain) {
+		TerrainCategory category = terrain.getCategory();
+		boolean rolling = category == TerrainCategory.FLATLAND || category == TerrainCategory.LOWLAND;
+		return rolling && !terrain.isVolcano() && !terrain.isWetland() && !terrain.includes(TerrainType.BADLANDS) && !terrain.includes(TerrainType.PLATEAU);
 	}
 
 	static float smoothstep(float value, float from, float to) {

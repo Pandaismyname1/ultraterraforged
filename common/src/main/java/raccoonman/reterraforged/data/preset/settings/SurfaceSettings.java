@@ -13,6 +13,9 @@ public record SurfaceSettings(Erosion erosion) {
     }
     
     public static class Erosion {
+    	// how many blocks lower the snow reaches on steep slopes facing north, into the shade, and how many higher it
+    	// stays on those facing south, into the sun
+    	public static final int DEFAULT_SNOW_ASPECT = 20;
     	public static final Codec<Erosion> CODEC = RecordCodecBuilder.create(instance -> instance.group(
     		Codec.INT.fieldOf("rockVariance").forGetter((o) -> o.rockVariance),
     		Codec.INT.fieldOf("rockMin").forGetter((o) -> o.rockMin),
@@ -24,7 +27,8 @@ public record SurfaceSettings(Erosion erosion) {
     		Codec.FLOAT.fieldOf("screeSteepness").forGetter((o) -> o.screeSteepness),
     		Codec.FLOAT.fieldOf("snowSteepness").forGetter((o) -> o.snowSteepness),
     		Codec.FLOAT.fieldOf("heightModifier").forGetter((o) -> o.heightModifier),
-    		Codec.FLOAT.fieldOf("slopeModifier").forGetter((o) -> o.slopeModifier)
+    		Codec.FLOAT.fieldOf("slopeModifier").forGetter((o) -> o.slopeModifier),
+    		PresetCodecs.defaulted(Codec.INT, "snowAspect", DEFAULT_SNOW_ASPECT).forGetter((o) -> o.snowAspect)
     	).apply(instance, Erosion::new));
     	
     	public int rockVariance; 
@@ -38,10 +42,11 @@ public record SurfaceSettings(Erosion erosion) {
     	public float snowSteepness;
     	public float heightModifier; 
     	public float slopeModifier;
+    	public int snowAspect;
 
     	public float screeValue; //TODO
 
-        public Erosion(int rockVariance, int rockMin, int dirtVariance, int dirtMin, int snowHeight, float rockSteepness, float dirtSteepness, float screeSteepness, float snowSteepness, float heightModifier, float slopeModifier) {
+        public Erosion(int rockVariance, int rockMin, int dirtVariance, int dirtMin, int snowHeight, float rockSteepness, float dirtSteepness, float screeSteepness, float snowSteepness, float heightModifier, float slopeModifier, int snowAspect) {
         	this.rockVariance = rockVariance;
         	this.rockMin = rockMin;
         	this.dirtVariance = dirtVariance;
@@ -53,10 +58,11 @@ public record SurfaceSettings(Erosion erosion) {
         	this.snowSteepness = snowSteepness;
         	this.heightModifier = heightModifier;
         	this.slopeModifier = slopeModifier;
+        	this.snowAspect = snowAspect;
         }
         
         public Erosion copy() {
-        	return new Erosion(this.rockVariance, this.rockMin, this.dirtVariance, this.dirtMin, this.snowHeight, this.rockSteepness, this.dirtSteepness, this.screeSteepness, this.snowSteepness, this.heightModifier, this.slopeModifier);
+        	return new Erosion(this.rockVariance, this.rockMin, this.dirtVariance, this.dirtMin, this.snowHeight, this.rockSteepness, this.dirtSteepness, this.screeSteepness, this.snowSteepness, this.heightModifier, this.slopeModifier, this.snowAspect);
         }
     }
 }

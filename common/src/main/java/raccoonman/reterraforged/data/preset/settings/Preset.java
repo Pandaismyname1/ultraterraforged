@@ -51,7 +51,7 @@ public record Preset(WorldSettings world, SurfaceSettings surface, CaveSettings 
 	public static final Codec<Preset> CODEC = PresetFormat.versioned(UNVERSIONED_CODEC);
 
 	private static SurfaceSettings defaultSurface() {
-		return new SurfaceSettings(new SurfaceSettings.Erosion(30, 140, 40, 95, 95, 0.65F, 0.475F, 0.4F, 0.45F, 6.0F, 3.0F));
+		return new SurfaceSettings(new SurfaceSettings.Erosion(30, 140, 40, 95, 95, 0.65F, 0.475F, 0.4F, 0.45F, 6.0F, 3.0F, SurfaceSettings.Erosion.DEFAULT_SNOW_ASPECT));
 	}
 	
 	public Preset copy() {

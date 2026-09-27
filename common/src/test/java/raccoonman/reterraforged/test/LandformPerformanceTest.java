@@ -28,6 +28,13 @@ public class LandformPerformanceTest {
 			without.landforms().atolls.enabled = false;
 			without.landforms().dunes.enabled = false;
 			without.landforms().tors.enabled = false;
+			without.landforms().saltFlats.enabled = false;
+			without.landforms().alluvialFans.enabled = false;
+			without.landforms().glacialValleys.enabled = false;
+			without.landforms().drumlins.enabled = false;
+			without.landforms().barrierIslands.enabled = false;
+			without.landforms().karst.enabled = false;
+			without.landforms().deltas.enabled = false;
 			// warm up
 			time(with);
 			time(without);

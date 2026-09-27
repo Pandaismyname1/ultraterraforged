@@ -21,7 +21,8 @@ public class MiscellaneousSettings {
 		Codec.BOOL.fieldOf("vanillaLavaLakes").forGetter((s) -> s.vanillaLavaLakes),
 		Codec.BOOL.fieldOf("vanillaLavaSprings").forGetter((s) -> s.vanillaLavaSprings),
 		Codec.FLOAT.fieldOf("mountainBiomeUsage").forGetter((s) -> s.mountainBiomeUsage),
-		Codec.FLOAT.fieldOf("volcanoBiomeUsage").forGetter((s) -> s.volcanoBiomeUsage)
+		Codec.FLOAT.fieldOf("volcanoBiomeUsage").forGetter((s) -> s.volcanoBiomeUsage),
+		PresetCodecs.defaulted(Codec.BOOL, "riverBanks", true).forGetter((s) -> s.riverBanks)
 	).apply(instance, MiscellaneousSettings::new));
 	
 	public boolean smoothLayerDecorator;
@@ -37,6 +38,8 @@ public class MiscellaneousSettings {
 	public boolean vanillaLavaSprings;
     public float mountainBiomeUsage;
     public float volcanoBiomeUsage;
+    // river and lake beds and banks of gravel in the mountains, sand and clay in the lowlands, and mud in wetlands
+    public boolean riverBanks;
 	
 	public MiscellaneousSettings(
 		boolean smoothLayerDecorator,
@@ -51,7 +54,8 @@ public class MiscellaneousSettings {
 		boolean vanillaLavaLakes,
 		boolean vanillaLavaSprings,
 	    float mountainBiomeUsage,
-	    float volcanoBiomeUsage
+	    float volcanoBiomeUsage,
+	    boolean riverBanks
 	) {
 		this.smoothLayerDecorator = smoothLayerDecorator;
 		this.strataRegionSize = strataRegionSize;
@@ -66,10 +70,11 @@ public class MiscellaneousSettings {
 		this.vanillaLavaSprings = vanillaLavaSprings;
 		this.mountainBiomeUsage = mountainBiomeUsage;
 		this.volcanoBiomeUsage = volcanoBiomeUsage;
+		this.riverBanks = riverBanks;
 	}
 	
 	public MiscellaneousSettings copy() {
-		return new MiscellaneousSettings(this.smoothLayerDecorator, this.strataRegionSize, this.strataDecorator, this.oreCompatibleStoneOnly, this.erosionDecorator, this.plainStoneErosion, this.naturalSnowDecorator, this.customBiomeFeatures, this.vanillaSprings, this.vanillaLavaLakes, this.vanillaLavaSprings, this.mountainBiomeUsage, this.volcanoBiomeUsage);
+		return new MiscellaneousSettings(this.smoothLayerDecorator, this.strataRegionSize, this.strataDecorator, this.oreCompatibleStoneOnly, this.erosionDecorator, this.plainStoneErosion, this.naturalSnowDecorator, this.customBiomeFeatures, this.vanillaSprings, this.vanillaLavaLakes, this.vanillaLavaSprings, this.mountainBiomeUsage, this.volcanoBiomeUsage, this.riverBanks);
 	}
 	
 	public TagKey<Block> rockTag() {

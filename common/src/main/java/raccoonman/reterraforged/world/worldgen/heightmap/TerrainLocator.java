@@ -38,11 +38,14 @@ public final class TerrainLocator {
 
 	// how far around a place the terrain must reach too, so the search leads inside it rather than to its edge
 	private static int coreRadius(Terrain terrain) {
-		if (terrain == TerrainType.SHINGLE_BEACH) {
+		if (terrain == TerrainType.SHINGLE_BEACH || terrain == TerrainType.MORAINE) {
 			return 0;
 		}
 		if (isSmall(terrain) || isNarrow(terrain)) {
 			return 2;
+		}
+		if (terrain == TerrainType.KARST || terrain == TerrainType.DRUMLINS || terrain == TerrainType.CIRQUE) {
+			return 4;
 		}
 		if (isLandform(terrain)) {
 			return 12;
@@ -51,19 +54,20 @@ public final class TerrainLocator {
 	}
 
 	private static boolean isSmall(Terrain terrain) {
-		return terrain == TerrainType.TOR || terrain == TerrainType.SHINGLE_BEACH || terrain == TerrainType.VOLCANO_PIPE;
+		return terrain == TerrainType.TOR || terrain == TerrainType.SHINGLE_BEACH || terrain == TerrainType.VOLCANO_PIPE || terrain == TerrainType.SINKHOLE;
 	}
 
 	// strips along rivers and shores
 	private static boolean isNarrow(Terrain terrain) {
-		return terrain.isRiver() || terrain == TerrainType.RIVER_BANKS || terrain == TerrainType.BEACH || terrain == TerrainType.COAST;
+		return terrain.isRiver() || terrain == TerrainType.RIVER_BANKS || terrain == TerrainType.BEACH || terrain == TerrainType.COAST || terrain == TerrainType.BARRIER_ISLAND || terrain == TerrainType.MORAINE;
 	}
 
 	// landforms and features a few hundred blocks across
 	private static boolean isLandform(Terrain terrain) {
-		return terrain.isLake() || terrain.isWetland() || terrain == TerrainType.DUNES || terrain == TerrainType.VOLCANO || terrain == TerrainType.LAGOON || terrain == TerrainType.DEEP_LAGOON;
+		return terrain.isLake() || terrain.isWetland() || terrain == TerrainType.DUNES || terrain == TerrainType.VOLCANO || terrain == TerrainType.LAGOON || terrain == TerrainType.DEEP_LAGOON
+			|| terrain == TerrainType.SALT_FLAT || terrain == TerrainType.ALLUVIAL_FAN || terrain == TerrainType.GLACIAL_VALLEY || terrain == TerrainType.CIRQUE || terrain == TerrainType.DRUMLINS || terrain == TerrainType.KARST || terrain == TerrainType.DELTA;
 	}
-	
+
 	/**
 	 * @param step blocks between the positions tested
 	 * @param minRadius places closer than this many blocks are skipped

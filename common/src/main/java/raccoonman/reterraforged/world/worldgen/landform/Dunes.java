@@ -41,7 +41,7 @@ public record Dunes(float height, float cosWind, float sinWind, Noise field, flo
 
 	@Override
 	public void apply(Cell cell, float x, float z, Heightmap heightmap) {
-		if (cell.terrain.isRiver() || cell.terrain.isLake() || cell.terrain.isWetland() || cell.terrain.isVolcano() || cell.terrain.includes(TerrainType.BADLANDS) || cell.terrain.includes(TerrainType.PLATEAU)) {
+		if (cell.terrain.isRiver() || cell.terrain.isLake() || cell.terrain.isWetland() || cell.terrain.isVolcano() || cell.terrain.includes(TerrainType.BADLANDS) || cell.terrain.includes(TerrainType.PLATEAU) || cell.terrain == TerrainType.SALT_FLAT) {
 			return;
 		}
 		TerrainCategory category = cell.terrain.getCategory();

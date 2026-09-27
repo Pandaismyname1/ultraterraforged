@@ -27,6 +27,8 @@ test {
     testLogging.showStandardStreams = Boolean.getBoolean("rtf.showOutput")
     systemProperty "rtf.showOutput", System.getProperty("rtf.showOutput", "false")
     systemProperty "rtf.render", System.getProperty("rtf.render", "false")
+    // hand-run surveys and measurements
+    System.properties.findAll { it.key.startsWith("rtf.survey") }.each { systemProperty it.key, it.value }
     testLogging {
         events "failed"
         exceptionFormat "full"

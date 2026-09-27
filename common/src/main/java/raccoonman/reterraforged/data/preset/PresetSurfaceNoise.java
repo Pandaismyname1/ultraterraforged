@@ -6,6 +6,8 @@ import raccoonman.reterraforged.data.preset.settings.MiscellaneousSettings;
 import raccoonman.reterraforged.data.preset.settings.Preset;
 import raccoonman.reterraforged.data.preset.settings.SurfaceSettings;
 import raccoonman.reterraforged.data.preset.settings.WorldSettings;
+import raccoonman.reterraforged.world.worldgen.noise.function.DistanceFunction;
+import raccoonman.reterraforged.world.worldgen.noise.function.EdgeFunction;
 import raccoonman.reterraforged.world.worldgen.noise.module.Noise;
 import raccoonman.reterraforged.world.worldgen.noise.module.Noises;
 import raccoonman.reterraforged.world.worldgen.util.Scaling;
@@ -25,6 +27,9 @@ public class PresetSurfaceNoise {
 	public static final ResourceKey<Noise> VOLCANIC_ROCK = createKey("volcanic_rock");
 	public static final ResourceKey<Noise> LAVA_FIELDS = createKey("lava_fields");
 	public static final ResourceKey<Noise> RIVER_BANK = createKey("river_bank");
+	public static final ResourceKey<Noise> RIVER_BED = createKey("river_bed");
+	public static final ResourceKey<Noise> SALT_FLAT = createKey("salt_flat");
+	public static final ResourceKey<Noise> GLACIAL_DEBRIS = createKey("glacial_debris");
 		
 	public static final ResourceKey<Noise> ICEBERG_DEEP_SHAPE = createKey("iceberg/deep/shape");
 	public static final ResourceKey<Noise> ICEBERG_DEEP_MASK = createKey("iceberg/deep/mask");
@@ -71,6 +76,12 @@ public class PresetSurfaceNoise {
 		ctx.register(VOLCANIC_ROCK, Noises.map(Noises.warpPerlin(Noises.perlin(4127, 18, 2), 4128, 12, 1, 8.0F), 0.0F, 1.0F));
 		ctx.register(LAVA_FIELDS, Noises.map(Noises.warpPerlin(Noises.perlin(4129, 70, 3), 4130, 30, 1, 25.0F), 0.0F, 1.0F));
 		ctx.register(RIVER_BANK, makeRiverBank());
+		// patches of different sediment on river beds and banks
+		ctx.register(RIVER_BED, Noises.map(Noises.warpPerlin(Noises.perlin(4131, 9, 2), 4132, 5, 1, 4.0F), 0.0F, 1.0F));
+		// the cracks between the polygons of a salt crust
+		ctx.register(SALT_FLAT, makeSaltFlat());
+		// gravel, coarse dirt and cobbles left by the ice
+		ctx.register(GLACIAL_DEBRIS, Noises.map(Noises.warpPerlin(Noises.perlin(4134, 14, 2), 4135, 8, 1, 6.0F), 0.0F, 1.0F));
 		
 		registerIceberg(ctx, ICEBERG_DEEP_SHAPE, ICEBERG_DEEP_MASK, ICEBERG_DEEP_FADE_DOWN, ICEBERG_DEEP_FADE_UP, ICEBERG_DEEP_UP, ICEBERG_DEEP_DOWN, ICEBERG_DEEP_TOP, scaling, 30, 30, 0);
 		registerIceberg(ctx, ICEBERG_SHALLOW_SHAPE, ICEBERG_SHALLOW_MASK, ICEBERG_SHALLOW_FADE_DOWN, ICEBERG_SHALLOW_FADE_UP, ICEBERG_SHALLOW_UP, ICEBERG_SHALLOW_DOWN, ICEBERG_SHALLOW_TOP, scaling, 20, 15, 6);
@@ -106,6 +117,12 @@ public class PresetSurfaceNoise {
 		Noise noise = Noises.simplex(seed++, 50, 2);
 		noise = Noises.warpWhite(noise, seed, 2, 3);
 		return generatorResource(noise);
+	}
+
+	// 1 on the cracks between the polygons of a salt crust, falling away from them
+	public static Noise makeSaltFlat() {
+		Noise edge = Noises.worleyEdge(4133, 7, EdgeFunction.DISTANCE_2_SUB, DistanceFunction.EUCLIDEAN);
+		return Noises.add(Noises.mul(edge, -1.0F), 1.0F);
 	}
 
 	private static Noise makeRiverBank() {

@@ -73,6 +73,7 @@ public record Heightmap(CellSampler.Provider cellProvider, CellPopulator terrain
 	private void applyTerrainTypes(Cell cell, float x, float z) {
         cell.terrain = TerrainType.PLAINS;
         cell.riverDistance = 1.0F;
+        cell.riverBank = Cell.FAR;
         cell.mountainChainAlpha = this.mountainChainAlpha.compute(x, z, 0);
         
         this.region.apply(cell, x, z);

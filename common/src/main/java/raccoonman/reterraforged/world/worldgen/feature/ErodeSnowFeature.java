@@ -15,6 +15,8 @@ import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.GrassBlock;
 import net.minecraft.world.level.block.SnowLayerBlock;
+import net.minecraft.world.level.block.SnowyDirtBlock;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.SpreadingSnowyDirtBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
@@ -39,6 +41,11 @@ import raccoonman.reterraforged.world.worldgen.tile.Tile;
 public class ErodeSnowFeature extends Feature<Config> {
     private static final float MIN = min(SnowLayerBlock.LAYERS);
     private static final float MAX = max(SnowLayerBlock.LAYERS);
+    // the slope is measured over this many blocks either side
+    private static final int ASPECT_REACH = 3;
+    // slopes gentler than this, in blocks per block, get no change to their snow; from this one on they get it all
+    private static final float ASPECT_MIN_SLOPE = 0.15F;
+    private static final float ASPECT_FULL_SLOPE = 1.0F;
 
 	public ErodeSnowFeature(Codec<Config> codec) {
 		super(codec);
@@ -63,6 +70,14 @@ public class ErodeSnowFeature extends Feature<Config> {
 			Noise rand = Noises.white(heightmap.climate().randomSeed(), 1);
 			BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 			Config config = placeContext.config();
+			
+			if (config.aspect() > 0.0F) {
+				for (int x = 0; x < 16; x++) {
+					for (int z = 0; z < 16; z++) {
+						aspectSnow(level, chunk, tileChunk, chunkPos.getBlockX(x), chunkPos.getBlockZ(z), x, z, config.aspect() * shade(tileChunk, x, z, levels), pos);
+					}
+				}
+			}
 			
 			for(int x = 0; x < 16; x++) {
 				for(int z = 0; z < 16; z++) {
@@ -121,6 +136,57 @@ public class ErodeSnowFeature extends Feature<Config> {
 			throw new IllegalStateException();
 		}
 	}
+
+    // where facing north, into the shade, 1 on steep slopes; where facing south, into the sun, -1; 0 on flat ground
+    static float shade(Tile.Chunk tileChunk, int x, int z, Levels levels) {
+    	int x0 = Math.max(0, x - ASPECT_REACH);
+    	int x1 = Math.min(15, x + ASPECT_REACH);
+    	int z0 = Math.max(0, z - ASPECT_REACH);
+    	int z1 = Math.min(15, z + ASPECT_REACH);
+    	// in blocks per block; the ground rising towards the south faces north
+    	float slopeX = (tileChunk.getCell(x1, z).height - tileChunk.getCell(x0, z).height) * levels.worldHeight / (x1 - x0);
+    	float slopeZ = (tileChunk.getCell(x, z1).height - tileChunk.getCell(x, z0).height) * levels.worldHeight / (z1 - z0);
+    	return shade(slopeX, slopeZ);
+    }
+
+    static float shade(float slopeX, float slopeZ) {
+    	float slope = (float) Math.sqrt(slopeX * slopeX + slopeZ * slopeZ);
+    	if (slope < 1.0E-4F) {
+    		return 0.0F;
+    	}
+    	float steepness = NoiseUtil.clamp((slope - ASPECT_MIN_SLOPE) / (ASPECT_FULL_SLOPE - ASPECT_MIN_SLOPE), 0.0F, 1.0F);
+    	return slopeZ / slope * steepness;
+    }
+
+    // snow as the climate a given number of blocks higher up would have it: lower down on slopes in the shade, and
+    // higher up on those in the sun
+    private static void aspectSnow(WorldGenLevel level, ChunkAccess chunk, Tile.Chunk tileChunk, int worldX, int worldZ, int x, int z, float shift, BlockPos.MutableBlockPos pos) {
+    	int blocks = Math.round(shift);
+    	if (blocks == 0) {
+    		return;
+    	}
+    	int top = chunk.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z) + 1;
+    	pos.set(worldX, top, worldZ);
+    	Biome biome = level.getBiome(pos).value();
+    	if (!biome.hasPrecipitation()) {
+    		return;
+    	}
+    	boolean cold = biome.coldEnoughToSnow(pos.offset(0, blocks, 0));
+    	BlockState state = chunk.getBlockState(pos);
+    	if (cold && state.isAir()) {
+    		BlockState snow = Blocks.SNOW.defaultBlockState();
+    		if (snow.canSurvive(level, pos)) {
+    			chunk.setBlockState(pos, snow, false);
+    			pos.setY(top - 1);
+    			BlockState below = chunk.getBlockState(pos);
+    			if (below.hasProperty(SnowyDirtBlock.SNOWY)) {
+    				chunk.setBlockState(pos, below.setValue(SnowyDirtBlock.SNOWY, true), false);
+    			}
+    		}
+    	} else if (!cold && state.is(Blocks.SNOW)) {
+    		erodeSnow(chunk, pos);
+    	}
+    }
 
     private static boolean snowErosion(Config config, float x, float z, float steepness, float height) {
         return /*steepness > erodeConfig.rockSteepness() ||*/ (steepness * 0.55F > config.steepness());// && height > config.height() || (steepness > erodeConfig.dirtSteepness() && height > ColumnDecorator.sampleNoise(x, z, erodeConfig.dirtVar(), erodeConfig.dirtMin()));
@@ -197,14 +263,18 @@ public class ErodeSnowFeature extends Feature<Config> {
         return property.getPossibleValues().stream().max(Integer::compareTo).orElse(0);
     }
 
-	public record Config(float steepness, float height, boolean erode, boolean smooth, float slopeModifier, float heightModifier) implements FeatureConfiguration {
+	/**
+	 * @param aspect how many blocks lower the snow reaches on steep slopes in the shade, and higher on those in the sun
+	 */
+	public record Config(float steepness, float height, boolean erode, boolean smooth, float slopeModifier, float heightModifier, float aspect) implements FeatureConfiguration {
 		public static final Codec<Config> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Codec.FLOAT.fieldOf("steepness").forGetter(Config::steepness),
 			Codec.FLOAT.fieldOf("height").forGetter(Config::height),
 			Codec.BOOL.fieldOf("erode").forGetter(Config::erode),
 			Codec.BOOL.fieldOf("smooth").forGetter(Config::smooth),
 			Codec.FLOAT.fieldOf("slope_modifier").forGetter(Config::slopeModifier),
-			Codec.FLOAT.fieldOf("height_modifier").forGetter(Config::heightModifier)
+			Codec.FLOAT.fieldOf("height_modifier").forGetter(Config::heightModifier),
+			Codec.FLOAT.optionalFieldOf("aspect", 0.0F).forGetter(Config::aspect)
 		).apply(instance, Config::new));
 	}
 }

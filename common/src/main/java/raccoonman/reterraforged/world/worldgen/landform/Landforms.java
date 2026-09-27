@@ -26,9 +26,23 @@ public record Landforms(List<Landform> landforms) implements Landform {
 		int atollsSeed = seed.next();
 		int dunesSeed = seed.next();
 		int torsSeed = seed.next();
+		int saltFlatsSeed = seed.next();
+		int alluvialFansSeed = seed.next();
+		int glacialValleysSeed = seed.next();
+		int drumlinsSeed = seed.next();
+		int barrierIslandsSeed = seed.next();
+		int karstSeed = seed.next();
+		int deltasSeed = seed.next();
 		// canyons cut first, so buttes can stand in them
 		if (settings.canyons.enabled) {
 			landforms.add(Canyons.make(canyonsSeed, settings.canyons, levels));
+		}
+		if (settings.karst.enabled) {
+			landforms.add(Karst.make(karstSeed, settings.karst, levels));
+		}
+		// before the dunes, which keep off them
+		if (settings.saltFlats.enabled) {
+			landforms.add(SaltFlats.make(saltFlatsSeed, settings.saltFlats, levels));
 		}
 		// before the buttes, so their flat tops stay flat
 		if (settings.dunes.enabled) {
@@ -40,6 +54,16 @@ public record Landforms(List<Landform> landforms) implements Landform {
 		if (settings.tors.enabled) {
 			landforms.add(Tors.make(torsSeed, settings.tors, levels));
 		}
+		if (settings.glacialValleys.enabled) {
+			landforms.add(GlacialValleys.make(glacialValleysSeed, settings.glacialValleys, levels));
+		}
+		// at the foot of the mountains, as the valleys leave them
+		if (settings.alluvialFans.enabled) {
+			landforms.add(AlluvialFans.make(alluvialFansSeed, settings.alluvialFans, levels));
+		}
+		if (settings.drumlins.enabled) {
+			landforms.add(Drumlins.make(drumlinsSeed, settings.drumlins, levels));
+		}
 		if (settings.seaCliffs.enabled) {
 			landforms.add(SeaCliffs.make(seaCliffsSeed, settings.seaCliffs, shoreline, levels));
 		}
@@ -49,6 +73,13 @@ public record Landforms(List<Landform> landforms) implements Landform {
 		}
 		if (settings.atolls.enabled) {
 			landforms.add(Atolls.make(atollsSeed, settings.atolls, shoreline, levels));
+		}
+		if (settings.barrierIslands.enabled) {
+			landforms.add(BarrierIslands.make(barrierIslandsSeed, settings.barrierIslands, shoreline, levels));
+		}
+		// last, over the coast the others shaped
+		if (settings.deltas.enabled) {
+			landforms.add(Deltas.make(deltasSeed, settings.deltas, shoreline, levels));
 		}
 		return new Landforms(List.copyOf(landforms));
 	}

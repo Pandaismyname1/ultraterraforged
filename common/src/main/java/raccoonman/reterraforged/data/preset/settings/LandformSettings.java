@@ -16,7 +16,14 @@ public class LandformSettings {
 		PresetCodecs.defaulted(Fjords.CODEC, "fjords", Fjords.makeDefault()).forGetter((o) -> o.fjords),
 		PresetCodecs.defaulted(Atolls.CODEC, "atolls", Atolls.makeDefault()).forGetter((o) -> o.atolls),
 		PresetCodecs.defaulted(Dunes.CODEC, "dunes", Dunes.makeDefault()).forGetter((o) -> o.dunes),
-		PresetCodecs.defaulted(Tors.CODEC, "tors", Tors.makeDefault()).forGetter((o) -> o.tors)
+		PresetCodecs.defaulted(Tors.CODEC, "tors", Tors.makeDefault()).forGetter((o) -> o.tors),
+		PresetCodecs.defaulted(SaltFlats.CODEC, "saltFlats", SaltFlats.makeDefault()).forGetter((o) -> o.saltFlats),
+		PresetCodecs.defaulted(AlluvialFans.CODEC, "alluvialFans", AlluvialFans.makeDefault()).forGetter((o) -> o.alluvialFans),
+		PresetCodecs.defaulted(GlacialValleys.CODEC, "glacialValleys", GlacialValleys.makeDefault()).forGetter((o) -> o.glacialValleys),
+		PresetCodecs.defaulted(Drumlins.CODEC, "drumlins", Drumlins.makeDefault()).forGetter((o) -> o.drumlins),
+		PresetCodecs.defaulted(BarrierIslands.CODEC, "barrierIslands", BarrierIslands.makeDefault()).forGetter((o) -> o.barrierIslands),
+		PresetCodecs.defaulted(Karst.CODEC, "karst", Karst.makeDefault()).forGetter((o) -> o.karst),
+		PresetCodecs.defaulted(Deltas.CODEC, "deltas", Deltas.makeDefault()).forGetter((o) -> o.deltas)
 	).apply(instance, LandformSettings::new));
 
 	public Buttes buttes;
@@ -28,8 +35,15 @@ public class LandformSettings {
 	public Atolls atolls;
 	public Dunes dunes;
 	public Tors tors;
+	public SaltFlats saltFlats;
+	public AlluvialFans alluvialFans;
+	public GlacialValleys glacialValleys;
+	public Drumlins drumlins;
+	public BarrierIslands barrierIslands;
+	public Karst karst;
+	public Deltas deltas;
 
-	public LandformSettings(Buttes buttes, Canyons canyons, SeaCliffs seaCliffs, boolean volcanicSurface, Fjords fjords, Atolls atolls, Dunes dunes, Tors tors) {
+	public LandformSettings(Buttes buttes, Canyons canyons, SeaCliffs seaCliffs, boolean volcanicSurface, Fjords fjords, Atolls atolls, Dunes dunes, Tors tors, SaltFlats saltFlats, AlluvialFans alluvialFans, GlacialValleys glacialValleys, Drumlins drumlins, BarrierIslands barrierIslands, Karst karst, Deltas deltas) {
 		this.buttes = buttes;
 		this.canyons = canyons;
 		this.seaCliffs = seaCliffs;
@@ -38,14 +52,21 @@ public class LandformSettings {
 		this.atolls = atolls;
 		this.dunes = dunes;
 		this.tors = tors;
+		this.saltFlats = saltFlats;
+		this.alluvialFans = alluvialFans;
+		this.glacialValleys = glacialValleys;
+		this.drumlins = drumlins;
+		this.barrierIslands = barrierIslands;
+		this.karst = karst;
+		this.deltas = deltas;
 	}
 
 	public LandformSettings copy() {
-		return new LandformSettings(this.buttes.copy(), this.canyons.copy(), this.seaCliffs.copy(), this.volcanicSurface, this.fjords.copy(), this.atolls.copy(), this.dunes.copy(), this.tors.copy());
+		return new LandformSettings(this.buttes.copy(), this.canyons.copy(), this.seaCliffs.copy(), this.volcanicSurface, this.fjords.copy(), this.atolls.copy(), this.dunes.copy(), this.tors.copy(), this.saltFlats.copy(), this.alluvialFans.copy(), this.glacialValleys.copy(), this.drumlins.copy(), this.barrierIslands.copy(), this.karst.copy(), this.deltas.copy());
 	}
 
 	public static LandformSettings makeDefault() {
-		return new LandformSettings(Buttes.makeDefault(), Canyons.makeDefault(), SeaCliffs.makeDefault(), true, Fjords.makeDefault(), Atolls.makeDefault(), Dunes.makeDefault(), Tors.makeDefault());
+		return new LandformSettings(Buttes.makeDefault(), Canyons.makeDefault(), SeaCliffs.makeDefault(), true, Fjords.makeDefault(), Atolls.makeDefault(), Dunes.makeDefault(), Tors.makeDefault(), SaltFlats.makeDefault(), AlluvialFans.makeDefault(), GlacialValleys.makeDefault(), Drumlins.makeDefault(), BarrierIslands.makeDefault(), Karst.makeDefault(), Deltas.makeDefault());
 	}
 
 	// how the original TerraForged generated: none of the added landforms
@@ -59,7 +80,233 @@ public class LandformSettings {
 		settings.atolls.enabled = false;
 		settings.dunes.enabled = false;
 		settings.tors.enabled = false;
+		settings.saltFlats.enabled = false;
+		settings.alluvialFans.enabled = false;
+		settings.glacialValleys.enabled = false;
+		settings.drumlins.enabled = false;
+		settings.barrierIslands.enabled = false;
+		settings.karst.enabled = false;
+		settings.deltas.enabled = false;
 		return settings;
+	}
+
+	/**
+	 * Dead flat basins of pale salt crust on the low ground of hot, dry deserts.
+	 */
+	public static class SaltFlats {
+		private static final SaltFlats DEFAULT = new SaltFlats(true, 0.5F);
+
+		public static final Codec<SaltFlats> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+			PresetCodecs.defaulted(Codec.BOOL, "enabled", DEFAULT.enabled).forGetter((o) -> o.enabled),
+			PresetCodecs.defaulted(Codec.FLOAT, "coverage", DEFAULT.coverage).forGetter((o) -> o.coverage)
+		).apply(instance, SaltFlats::new));
+
+		public boolean enabled;
+		// share of the low, flat desert ground covered
+		public float coverage;
+
+		public SaltFlats(boolean enabled, float coverage) {
+			this.enabled = enabled;
+			this.coverage = coverage;
+		}
+
+		public SaltFlats copy() {
+			return new SaltFlats(this.enabled, this.coverage);
+		}
+
+		public static SaltFlats makeDefault() {
+			return DEFAULT.copy();
+		}
+	}
+
+	/**
+	 * Cones of gravel and sand spread out at the foot of mountains, where steep ground meets flat land.
+	 */
+	public static class AlluvialFans {
+		private static final AlluvialFans DEFAULT = new AlluvialFans(true, 0.6F, 1.0F);
+
+		public static final Codec<AlluvialFans> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+			PresetCodecs.defaulted(Codec.BOOL, "enabled", DEFAULT.enabled).forGetter((o) -> o.enabled),
+			PresetCodecs.defaulted(Codec.FLOAT, "density", DEFAULT.density).forGetter((o) -> o.density),
+			PresetCodecs.defaulted(Codec.FLOAT, "size", DEFAULT.size).forGetter((o) -> o.size)
+		).apply(instance, AlluvialFans::new));
+
+		public boolean enabled;
+		// share of the suitable spots at the foot of mountains that get one
+		public float density;
+		// scales how far they spread
+		public float size;
+
+		public AlluvialFans(boolean enabled, float density, float size) {
+			this.enabled = enabled;
+			this.density = density;
+			this.size = size;
+		}
+
+		public AlluvialFans copy() {
+			return new AlluvialFans(this.enabled, this.density, this.size);
+		}
+
+		public static AlluvialFans makeDefault() {
+			return DEFAULT.copy();
+		}
+	}
+
+	/**
+	 * U-shaped valleys with flat floors and steep walls in cold mountains, with cirques: round bowls under the peaks holding small lakes.
+	 */
+	public static class GlacialValleys {
+		private static final GlacialValleys DEFAULT = new GlacialValleys(true, 1.0F, 0.5F);
+
+		public static final Codec<GlacialValleys> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+			PresetCodecs.defaulted(Codec.BOOL, "enabled", DEFAULT.enabled).forGetter((o) -> o.enabled),
+			PresetCodecs.defaulted(Codec.FLOAT, "strength", DEFAULT.strength).forGetter((o) -> o.strength),
+			PresetCodecs.defaulted(Codec.FLOAT, "cirques", DEFAULT.cirques).forGetter((o) -> o.cirques)
+		).apply(instance, GlacialValleys::new));
+
+		public boolean enabled;
+		// how strongly the valleys are worn into U shapes
+		public float strength;
+		// share of the suitable high slopes that get a cirque
+		public float cirques;
+
+		public GlacialValleys(boolean enabled, float strength, float cirques) {
+			this.enabled = enabled;
+			this.strength = strength;
+			this.cirques = cirques;
+		}
+
+		public GlacialValleys copy() {
+			return new GlacialValleys(this.enabled, this.strength, this.cirques);
+		}
+
+		public static GlacialValleys makeDefault() {
+			return DEFAULT.copy();
+		}
+	}
+
+	/**
+	 * Swarms of smooth oval hills, all lying the same way, and long low ridges of rubble on cold lowlands.
+	 */
+	public static class Drumlins {
+		private static final Drumlins DEFAULT = new Drumlins(true, 0.5F, 8);
+
+		public static final Codec<Drumlins> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+			PresetCodecs.defaulted(Codec.BOOL, "enabled", DEFAULT.enabled).forGetter((o) -> o.enabled),
+			PresetCodecs.defaulted(Codec.FLOAT, "density", DEFAULT.density).forGetter((o) -> o.density),
+			PresetCodecs.defaulted(Codec.INT, "height", DEFAULT.height).forGetter((o) -> o.height)
+		).apply(instance, Drumlins::new));
+
+		public boolean enabled;
+		// how thickly they cover the cold lowlands
+		public float density;
+		// the tallest hills rise this many blocks
+		public int height;
+
+		public Drumlins(boolean enabled, float density, int height) {
+			this.enabled = enabled;
+			this.density = density;
+			this.height = height;
+		}
+
+		public Drumlins copy() {
+			return new Drumlins(this.enabled, this.density, this.height);
+		}
+
+		public static Drumlins makeDefault() {
+			return DEFAULT.copy();
+		}
+	}
+
+	/**
+	 * Long thin sandy islands off flat coasts, with a calm shallow lagoon behind them.
+	 */
+	public static class BarrierIslands {
+		private static final BarrierIslands DEFAULT = new BarrierIslands(true, 0.4F);
+
+		public static final Codec<BarrierIslands> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+			PresetCodecs.defaulted(Codec.BOOL, "enabled", DEFAULT.enabled).forGetter((o) -> o.enabled),
+			PresetCodecs.defaulted(Codec.FLOAT, "frequency", DEFAULT.frequency).forGetter((o) -> o.frequency)
+		).apply(instance, BarrierIslands::new));
+
+		public boolean enabled;
+		// roughly the share of flat coastline with them
+		public float frequency;
+
+		public BarrierIslands(boolean enabled, float frequency) {
+			this.enabled = enabled;
+			this.frequency = frequency;
+		}
+
+		public BarrierIslands copy() {
+			return new BarrierIslands(this.enabled, this.frequency);
+		}
+
+		public static BarrierIslands makeDefault() {
+			return DEFAULT.copy();
+		}
+	}
+
+	/**
+	 * Steep limestone tower hills, sinkholes and cenotes in warm, wet lands.
+	 */
+	public static class Karst {
+		private static final Karst DEFAULT = new Karst(true, 0.5F, 40);
+
+		public static final Codec<Karst> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+			PresetCodecs.defaulted(Codec.BOOL, "enabled", DEFAULT.enabled).forGetter((o) -> o.enabled),
+			PresetCodecs.defaulted(Codec.FLOAT, "coverage", DEFAULT.coverage).forGetter((o) -> o.coverage),
+			PresetCodecs.defaulted(Codec.INT, "height", DEFAULT.height).forGetter((o) -> o.height)
+		).apply(instance, Karst::new));
+
+		public boolean enabled;
+		// share of the warm, wet lowland covered
+		public float coverage;
+		// the tallest towers rise this many blocks
+		public int height;
+
+		public Karst(boolean enabled, float coverage, int height) {
+			this.enabled = enabled;
+			this.coverage = coverage;
+			this.height = height;
+		}
+
+		public Karst copy() {
+			return new Karst(this.enabled, this.coverage, this.height);
+		}
+
+		public static Karst makeDefault() {
+			return DEFAULT.copy();
+		}
+	}
+
+	/**
+	 * Where big rivers meet the sea on flat coasts: a fan of branching channels between marshy islands and sandbars.
+	 */
+	public static class Deltas {
+		private static final Deltas DEFAULT = new Deltas(true, 1.0F);
+
+		public static final Codec<Deltas> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+			PresetCodecs.defaulted(Codec.BOOL, "enabled", DEFAULT.enabled).forGetter((o) -> o.enabled),
+			PresetCodecs.defaulted(Codec.FLOAT, "size", DEFAULT.size).forGetter((o) -> o.size)
+		).apply(instance, Deltas::new));
+
+		public boolean enabled;
+		// scales how far they spread
+		public float size;
+
+		public Deltas(boolean enabled, float size) {
+			this.enabled = enabled;
+			this.size = size;
+		}
+
+		public Deltas copy() {
+			return new Deltas(this.enabled, this.size);
+		}
+
+		public static Deltas makeDefault() {
+			return DEFAULT.copy();
+		}
 	}
 
 	/**

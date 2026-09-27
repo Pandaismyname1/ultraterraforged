@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import raccoonman.reterraforged.data.preset.settings.LandformSettings;
 import raccoonman.reterraforged.data.preset.settings.Preset;
 import raccoonman.reterraforged.world.worldgen.biome.type.BiomeType;
 import raccoonman.reterraforged.world.worldgen.cell.Cell;
@@ -552,6 +553,8 @@ public class LandformTest {
 			assertTrue(!BuiltinPresetRenderTest.presets().get(name).get().landforms().atolls.enabled, name);
 			assertTrue(!BuiltinPresetRenderTest.presets().get(name).get().landforms().dunes.enabled, name);
 			assertTrue(!BuiltinPresetRenderTest.presets().get(name).get().landforms().tors.enabled, name);
+			LandformSettings landforms = BuiltinPresetRenderTest.presets().get(name).get().landforms();
+			assertTrue(!landforms.saltFlats.enabled && !landforms.alluvialFans.enabled && !landforms.glacialValleys.enabled && !landforms.drumlins.enabled && !landforms.barrierIslands.enabled && !landforms.karst.enabled && !landforms.deltas.enabled, name);
 			assertTrue(!BuiltinPresetRenderTest.presets().get(name).get().landforms().volcanicSurface, name);
 		}
 	}

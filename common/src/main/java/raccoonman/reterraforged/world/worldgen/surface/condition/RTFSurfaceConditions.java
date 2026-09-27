@@ -28,6 +28,7 @@ public class RTFSurfaceConditions {
 		register("erosion", ErosionCondition.Source.CODEC);
 		register("sediment", SedimentCondition.Source.CODEC);
 		register("river_bank", RiverBankCondition.Source.CODEC);
+		register("river_side", RiverSideCondition.Source.CODEC);
 		register("height_modification_detection", HeightModificationDetection.Source.CODEC);
 		register("any", AnyCondition.CODEC);
 	}
@@ -102,6 +103,14 @@ public class RTFSurfaceConditions {
 	
 	public static RiverBankCondition.Source riverBank(Holder<Noise> threshold, Holder<Noise> variance) {
 		return new RiverBankCondition.Source(threshold, variance);
+	}
+	
+	/**
+	 * On the bed or banks of a river or lake: within this share of the width of its water and banks from its middle,
+	 * 1 being their outer edge.
+	 */
+	public static RiverSideCondition.Source riverSide(float within) {
+		return new RiverSideCondition.Source(within);
 	}
 	
 	public static HeightModificationDetection.Source heightModificationDetection(HeightModificationDetection.Target target) {

@@ -43,6 +43,10 @@ public class Cell {
     public float riverDistance;
     // the surface of a river, lake or wetland above the sea, as a height; 0 elsewhere
     public float waterLevel;
+    // how far from the middle of the nearest river or lake, as a share of the width of its water and banks: below 1 on
+    // the bed and banks, 1 at their outer edge, and FAR away from any
+    public float riverBank;
+    public static final float FAR = 100.0F;
     public int continentX;
     public int continentZ;
     public boolean erosionMask;
@@ -63,6 +67,7 @@ public class Cell {
         this.regionTemperature = 0.5F;
         this.biomeRegionEdge = 1.0F;
         this.riverDistance = 1.0F;
+        this.riverBank = FAR;
         this.erosionMask = false;
         this.terrain = TerrainType.NONE;
         this.terrainMask = 1.0F;
@@ -90,6 +95,7 @@ public class Cell {
         this.macroBiomeId = other.macroBiomeId;
         this.riverDistance = other.riverDistance;
         this.waterLevel = other.waterLevel;
+        this.riverBank = other.riverBank;
         this.continentX = other.continentX;
         this.continentZ = other.continentZ;
         this.erosionMask = other.erosionMask;

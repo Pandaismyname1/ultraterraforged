@@ -66,6 +66,7 @@ public class LakePopulator {
         }
         float level = this.water + this.shift;
         boolean raised = this.shift > this.unit;
+        cell.riverBank = Math.min(cell.riverBank, (float) Math.sqrt(distance2 / this.lakeDistance2));
         float bankHeight = this.getBankHeight(cell);
         if (distance2 <= this.lakeDistance2) {
             cell.height = Math.min(bankHeight, cell.height);

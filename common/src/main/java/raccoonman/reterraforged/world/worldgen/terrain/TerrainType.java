@@ -50,6 +50,22 @@ public class TerrainType {
     public static final Terrain SHINGLE_BEACH = registerLandform("shingle_beach", TerrainCategory.BEACH);
     // outcrops of bare rock on hilltops, and the boulders strewn around them
     public static final Terrain TOR = registerLandform("tor", TerrainCategory.LOWLAND);
+    // dead flat salt crust in desert basins
+    public static final Terrain SALT_FLAT = registerLandform("salt_flat", TerrainCategory.FLATLAND);
+    // cones of gravel and sand at the foot of mountains
+    public static final Terrain ALLUVIAL_FAN = registerLandform("alluvial_fan", TerrainCategory.LOWLAND);
+    // the flat floors of U-shaped valleys, and the bowls of cirques, in cold mountains
+    public static final Terrain GLACIAL_VALLEY = registerLandform("glacial_valley", TerrainCategory.HIGHLAND);
+    public static final Terrain CIRQUE = registerLandform("cirque", TerrainCategory.HIGHLAND);
+    // oval hills, and ridges of rubble, left by ice sheets on cold lowlands
+    public static final Terrain DRUMLINS = registerLandform("drumlins", TerrainCategory.LOWLAND);
+    public static final Terrain MORAINE = registerLandform("moraine", TerrainCategory.LOWLAND);
+    public static final Terrain BARRIER_ISLAND = registerLandform("barrier_island", TerrainCategory.BEACH);
+    // limestone tower hills and sinkholes
+    public static final Terrain KARST = registerLandform("karst", TerrainCategory.LOWLAND);
+    public static final Terrain SINKHOLE = registerLandform("sinkhole", TerrainCategory.LOWLAND);
+    // the marshy islands and channels where a river fans out into the sea
+    public static final Terrain DELTA = registerLandform("delta", TerrainCategory.WETLAND);
     
     public static void forEach(Consumer<Terrain> action) {
         TerrainType.REGISTRY.forEach(action);

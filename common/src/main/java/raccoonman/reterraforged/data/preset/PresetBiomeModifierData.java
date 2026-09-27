@@ -66,7 +66,7 @@ public class PresetBiomeModifierData {
 		
 		ctx.register(SWAMP_SURFACE, prepend(GenerationStep.Decoration.RAW_GENERATION, Filter.Behavior.WHITELIST, hasSwampSurface, placedFeatures.getOrThrow(PresetPlacedFeatures.SWAMP_SURFACE)));
 		
-		if(miscellaneous.naturalSnowDecorator || miscellaneous.smoothLayerDecorator) {
+		if(miscellaneous.naturalSnowDecorator || miscellaneous.smoothLayerDecorator || preset.surface().erosion().snowAspect > 0) {
 			ctx.register(ERODE_SNOW, append(GenerationStep.Decoration.TOP_LAYER_MODIFICATION, placedFeatures.getOrThrow(PresetPlacedFeatures.ERODE_SNOW)));
 		}
 		
