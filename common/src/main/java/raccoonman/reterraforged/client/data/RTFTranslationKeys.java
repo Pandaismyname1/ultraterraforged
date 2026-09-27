@@ -147,6 +147,8 @@ public class RTFTranslationKeys {
 	public static final String GUI_SLIDER_CAVE_MOUTH_STRENGTH = resolve("gui.slider.caveMouthStrength");
 
 	public static final String GUI_OCEANS_SETTINGS_TITLE = resolve("gui.oceans.title");
+	public static final String GUI_LABEL_SEA_FLOOR_SEDIMENT = resolve("gui.label.seaFloorSediment");
+	public static final String GUI_BUTTON_SEA_FLOOR_SEDIMENT = resolve("gui.button.seaFloorSediment");
 	public static final String GUI_LABEL_SHELVES = resolve("gui.label.shelves");
 	public static final String GUI_BUTTON_SHELVES = resolve("gui.button.shelves");
 	public static final String GUI_SLIDER_SHELF_WIDTH = resolve("gui.slider.shelfWidth");

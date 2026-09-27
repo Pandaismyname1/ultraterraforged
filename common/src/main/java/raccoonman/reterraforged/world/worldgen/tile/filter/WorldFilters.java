@@ -23,7 +23,8 @@ public class WorldFilters {
         this.settings = context.preset.filters();
         this.beach = BeachDetect.make(context);
         this.smoothing = Smoothing.make(context.preset.filters().smoothing, context.levels);
-        this.steepness = Steepness.make(1, 10.0F, context.levels);
+        // the sea floor's own slopes, with sediment on it
+        this.steepness = Steepness.make(1, 10.0F, context.levels, context.preset.oceans().sediment);
         this.processing = new PostProcessing(heightmap, context.levels);
         this.waterRim = new WaterRim(context.levels);
         this.erosion = new WorldErosion<>(factory, (e, size) -> e.getSize() == size);

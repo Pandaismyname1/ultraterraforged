@@ -29,6 +29,7 @@ public class RTFSurfaceConditions {
 		register("sediment", SedimentCondition.Source.CODEC);
 		register("river_bank", RiverBankCondition.Source.CODEC);
 		register("river_side", RiverSideCondition.Source.CODEC);
+		register("near_ground", NearGroundCondition.Source.CODEC);
 		register("height_modification_detection", HeightModificationDetection.Source.CODEC);
 		register("any", AnyCondition.CODEC);
 	}
@@ -111,6 +112,14 @@ public class RTFSurfaceConditions {
 	 */
 	public static RiverSideCondition.Source riverSide(float within) {
 		return new RiverSideCondition.Source(within);
+	}
+	
+	/**
+	 * Within this many blocks under the ground the terrain was generated with: the surface of the land or the sea
+	 * floor, not the floor of a cave.
+	 */
+	public static NearGroundCondition.Source nearGround(int depth) {
+		return new NearGroundCondition.Source(depth);
 	}
 	
 	public static HeightModificationDetection.Source heightModificationDetection(HeightModificationDetection.Target target) {

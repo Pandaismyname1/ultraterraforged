@@ -17,7 +17,8 @@ public class OceanSettings {
 		PresetCodecs.defaulted(BlueHoles.CODEC, "blueHoles", BlueHoles.makeDefault()).forGetter((o) -> o.blueHoles),
 		PresetCodecs.defaulted(CoralReefs.CODEC, "coralReefs", CoralReefs.makeDefault()).forGetter((o) -> o.coralReefs),
 		PresetCodecs.defaulted(SandWaves.CODEC, "sandWaves", SandWaves.makeDefault()).forGetter((o) -> o.sandWaves),
-		PresetCodecs.defaulted(WhaleFalls.CODEC, "whaleFalls", WhaleFalls.makeDefault()).forGetter((o) -> o.whaleFalls)
+		PresetCodecs.defaulted(WhaleFalls.CODEC, "whaleFalls", WhaleFalls.makeDefault()).forGetter((o) -> o.whaleFalls),
+		PresetCodecs.defaulted(Codec.BOOL, "sediment", true).forGetter((o) -> o.sediment)
 	).apply(instance, OceanSettings::new));
 
 	public Shelves shelves;
@@ -29,8 +30,10 @@ public class OceanSettings {
 	public CoralReefs coralReefs;
 	public SandWaves sandWaves;
 	public WhaleFalls whaleFalls;
+	// sand, gravel and clay on the sea floor rather than bare rock, the rock showing only on steep slopes
+	public boolean sediment;
 
-	public OceanSettings(Shelves shelves, SubmarineCanyons submarineCanyons, Trenches trenches, Seamounts seamounts, Ridges ridges, BlueHoles blueHoles, CoralReefs coralReefs, SandWaves sandWaves, WhaleFalls whaleFalls) {
+	public OceanSettings(Shelves shelves, SubmarineCanyons submarineCanyons, Trenches trenches, Seamounts seamounts, Ridges ridges, BlueHoles blueHoles, CoralReefs coralReefs, SandWaves sandWaves, WhaleFalls whaleFalls, boolean sediment) {
 		this.shelves = shelves;
 		this.submarineCanyons = submarineCanyons;
 		this.trenches = trenches;
@@ -40,14 +43,15 @@ public class OceanSettings {
 		this.coralReefs = coralReefs;
 		this.sandWaves = sandWaves;
 		this.whaleFalls = whaleFalls;
+		this.sediment = sediment;
 	}
 
 	public OceanSettings copy() {
-		return new OceanSettings(this.shelves.copy(), this.submarineCanyons.copy(), this.trenches.copy(), this.seamounts.copy(), this.ridges.copy(), this.blueHoles.copy(), this.coralReefs.copy(), this.sandWaves.copy(), this.whaleFalls.copy());
+		return new OceanSettings(this.shelves.copy(), this.submarineCanyons.copy(), this.trenches.copy(), this.seamounts.copy(), this.ridges.copy(), this.blueHoles.copy(), this.coralReefs.copy(), this.sandWaves.copy(), this.whaleFalls.copy(), this.sediment);
 	}
 
 	public static OceanSettings makeDefault() {
-		return new OceanSettings(Shelves.makeDefault(), SubmarineCanyons.makeDefault(), Trenches.makeDefault(), Seamounts.makeDefault(), Ridges.makeDefault(), BlueHoles.makeDefault(), CoralReefs.makeDefault(), SandWaves.makeDefault(), WhaleFalls.makeDefault());
+		return new OceanSettings(Shelves.makeDefault(), SubmarineCanyons.makeDefault(), Trenches.makeDefault(), Seamounts.makeDefault(), Ridges.makeDefault(), BlueHoles.makeDefault(), CoralReefs.makeDefault(), SandWaves.makeDefault(), WhaleFalls.makeDefault(), true);
 	}
 
 	// how the original TerraForged generated: none of them
@@ -62,6 +66,7 @@ public class OceanSettings {
 		settings.coralReefs.enabled = false;
 		settings.sandWaves.enabled = false;
 		settings.whaleFalls.enabled = false;
+		settings.sediment = false;
 		return settings;
 	}
 

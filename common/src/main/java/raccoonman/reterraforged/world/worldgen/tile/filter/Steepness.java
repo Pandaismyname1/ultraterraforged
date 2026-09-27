@@ -5,7 +5,12 @@ import raccoonman.reterraforged.world.worldgen.heightmap.Levels;
 import raccoonman.reterraforged.world.worldgen.tile.Tile;
 import raccoonman.reterraforged.world.worldgen.tile.filter.Filter.Visitor;
 
-public record Steepness(int radius, float scaler, float waterLevel) implements Filter, Visitor {
+/**
+ * How steep the ground is. On land the sea counts as a flat surface at its level. Under the sea, with seaFloor, the
+ * slope of the sea floor itself: without it, every place under the sea came out as steep as can be, since its
+ * neighbours were measured at the sea's level.
+ */
+public record Steepness(int radius, float scaler, float waterLevel, boolean seaFloor) implements Filter, Visitor {
 
 	@Override
 	public void apply(Tile tile, int seedX, int seedZ, int iterations) {
@@ -14,6 +19,7 @@ public record Steepness(int radius, float scaler, float waterLevel) implements F
 
 	@Override
 	public void visit(Tile tile, Cell cell, int cx, int cz) {
+		boolean underwater = this.seaFloor && cell.height < this.waterLevel;
 		float totalHeightDif = 0.0F;
 		for (int dz = -1; dz <= 2; ++dz) {
 			for (int dx = -1; dx <= 2; ++dx) {
@@ -22,7 +28,7 @@ public record Steepness(int radius, float scaler, float waterLevel) implements F
 					int z = cz + dz * this.radius;
 					Cell neighbour = tile.getCellRaw(x, z);
 					if (!neighbour.isAbsent()) {
-						float height = Math.max(neighbour.height, this.waterLevel);
+						float height = underwater ? neighbour.height : Math.max(neighbour.height, this.waterLevel);
 						totalHeightDif += Math.abs(cell.height - height) / this.radius;
 					}
 				}
@@ -31,7 +37,7 @@ public record Steepness(int radius, float scaler, float waterLevel) implements F
 		cell.gradient = Math.min(1.0F, totalHeightDif * this.scaler);
 	}
 	
-	public static Steepness make(int radius, float scaler, Levels levels) {
-		return new Steepness(radius, scaler, levels.water);
+	public static Steepness make(int radius, float scaler, Levels levels, boolean seaFloor) {
+		return new Steepness(radius, scaler, levels.water, seaFloor);
 	}
 }

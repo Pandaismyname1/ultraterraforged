@@ -70,6 +70,9 @@ public class PresetSurfaceRuleData {
     private static final SurfaceRules.RuleSource HORN_CORAL = PresetSurfaceRuleData.makeStateRule(Blocks.HORN_CORAL_BLOCK);
     private static final SurfaceRules.RuleSource COBBLESTONE = PresetSurfaceRuleData.makeStateRule(Blocks.COBBLESTONE);
     private static final SurfaceRules.RuleSource MOSSY_COBBLESTONE = PresetSurfaceRuleData.makeStateRule(Blocks.MOSSY_COBBLESTONE);
+    // the sea floor is sandy down to this many blocks below the sea, and mixed down to MIDDLE_SEA
+    private static final int SHALLOW_SEA = 14;
+    private static final int MIDDLE_SEA = 30;
     // rivers this many blocks above the sea run over gravel and cobbles rather than sand
     private static final int MOUNTAIN_RIVER_HEIGHT = 45;
     // where the salt crust noise is above this, it's a crack between the crust's polygons
@@ -657,6 +660,9 @@ public class PresetSurfaceRuleData {
         		SurfaceRules.verticalGradient("bedrock_floor", VerticalAnchor.bottom(), VerticalAnchor.aboveBottom(5)),
         		BEDROCK
         	),
+        	// sediment on the sea floor: before the preliminary surface check, which doesn't hold on the deep sea floor
+        	// (but not where the surface has floors of its own: reefs, deltas, lagoons, and river and lake beds)
+        	preset.oceans().sediment ? SurfaceRules.ifTrue(RTFSurfaceConditions.nearGround(3), SurfaceRules.ifTrue(SurfaceRules.not(RTFSurfaceConditions.any(RTFSurfaceConditions.terrain(TerrainType.CORAL_REEF, TerrainType.DELTA, TerrainType.WETLAND, TerrainType.LAGOON, TerrainType.BARRIER_ISLAND, TerrainType.SAND_BAR, TerrainType.LAKE, TerrainType.RIVER), RTFSurfaceConditions.riverSide(1.0F))), makeSeaFloorRule(properties.seaLevel, noise, yOnSurface, sand, gravel))) : SurfaceRules.ifTrue(NEVER, STONE),
         	SurfaceRules.ifTrue(
         		SurfaceRules.abovePreliminarySurface(),
         		// tors and skerries are bare rock: the rock layers, or plain stone without them
@@ -776,6 +782,32 @@ public class PresetSurfaceRuleData {
     			SurfaceRules.ifTrue(
     				SurfaceRules.ON_FLOOR,
     				RTFSurfaceRules.noise(debris, List.of(Pair.of(0.5F, gravel), Pair.of(0.32F, STONE)))
+    			)
+    		)
+    	);
+    }
+
+    // sand in the shallows; sand, gravel and clay further out; bare rock only on the steepest slopes, like the walls of
+    // canyons and trenches
+    private static SurfaceRules.RuleSource makeSeaFloorRule(int seaLevel, HolderGetter<Noise> noise, SurfaceRules.ConditionSource dry, SurfaceRules.RuleSource sand, SurfaceRules.RuleSource gravel) {
+    	Holder<Noise> patches = noise.getOrThrow(PresetSurfaceNoise.RIVER_BED);
+    	SurfaceRules.ConditionSource underSea = SurfaceRules.not(SurfaceRules.yBlockCheck(VerticalAnchor.absolute(seaLevel - 1), 0));
+    	SurfaceRules.ConditionSource shallow = SurfaceRules.yBlockCheck(VerticalAnchor.absolute(seaLevel - SHALLOW_SEA), 0);
+    	SurfaceRules.ConditionSource middle = SurfaceRules.yBlockCheck(VerticalAnchor.absolute(seaLevel - MIDDLE_SEA), 0);
+    	return SurfaceRules.ifTrue(
+    		SurfaceRules.not(dry),
+    		SurfaceRules.ifTrue(
+    			underSea,
+    			SurfaceRules.ifTrue(
+    				SurfaceRules.not(RTFSurfaceConditions.steepness(0.85F)),
+    				SurfaceRules.ifTrue(
+    					SurfaceRules.stoneDepthCheck(1, false, CaveSurface.FLOOR),
+    					SurfaceRules.sequence(
+    						SurfaceRules.ifTrue(shallow, RTFSurfaceRules.noise(patches, List.of(Pair.of(0.74F, gravel), Pair.of(-1.0F, sand)))),
+    						SurfaceRules.ifTrue(middle, RTFSurfaceRules.noise(patches, List.of(Pair.of(0.7F, CLAY), Pair.of(0.46F, gravel), Pair.of(-1.0F, sand)))),
+    						RTFSurfaceRules.noise(patches, List.of(Pair.of(0.58F, CLAY), Pair.of(0.32F, gravel), Pair.of(-1.0F, sand)))
+    					)
+    				)
     			)
     		)
     	);

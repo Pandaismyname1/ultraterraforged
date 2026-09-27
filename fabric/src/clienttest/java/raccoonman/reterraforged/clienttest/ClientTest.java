@@ -306,6 +306,19 @@ public class ClientTest implements ClientModInitializer {
 		}
 		this.log("surface at " + name + " " + center + ": " + top);
 		this.log("under water at " + name + ": " + floor);
+		// the ground as generated against the ground the heightmap was made with, for a few columns
+		if ((Object) level.getChunkSource().randomState() instanceof raccoonman.reterraforged.world.worldgen.RTFRandomState state && state.generatorContext() != null) {
+			StringBuilder line = new StringBuilder("floor against heightmap at " + name + ":");
+			for (int i = 0; i < 8; i++) {
+				int x = center.getX() + i * 7 - 24;
+				int z = center.getZ() + i * 5 - 20;
+				raccoonman.reterraforged.world.worldgen.cell.Cell cell = new raccoonman.reterraforged.world.worldgen.cell.Cell();
+				state.generatorContext().lookup.apply(cell, x, z, true);
+				int ground = level.getChunk(x >> 4, z >> 4).getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.OCEAN_FLOOR, x & 15, z & 15);
+				line.append(" ").append(ground).append("/").append(state.generatorContext().levels.scale(cell.height)).append(String.format(" g%.2f ", cell.gradient)).append(cell.terrain.getName()).append(" ").append(this.name(level.getBlockState(new BlockPos(x, ground, z)))).append(";");
+			}
+			this.log(line.toString());
+		}
 	}
 
 	// how much of the ground has snow, on slopes facing north and south, by height

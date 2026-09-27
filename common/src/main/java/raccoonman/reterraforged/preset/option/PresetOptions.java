@@ -1197,6 +1197,12 @@ public final class PresetOptions {
 	private static final Predicate<Preset> WHALE_FALLS = (preset) -> preset.oceans().whaleFalls.enabled;
 
 	public static final Page OCEANS = Page.of("oceans", RTFTranslationKeys.GUI_OCEANS_SETTINGS_TITLE,
+		Category.of("sediment", RTFTranslationKeys.GUI_LABEL_SEA_FLOOR_SEDIMENT,
+			BoolOption.builder("oceans.sediment")
+				.translation(RTFTranslationKeys.GUI_BUTTON_SEA_FLOOR_SEDIMENT)
+				.bind((p) -> p.oceans().sediment, (p, v) -> p.oceans().sediment = v)
+				.build()
+		),
 		Category.of("shelves", RTFTranslationKeys.GUI_LABEL_SHELVES,
 			BoolOption.builder("oceans.shelves.enabled")
 				.translation(RTFTranslationKeys.GUI_BUTTON_SHELVES)

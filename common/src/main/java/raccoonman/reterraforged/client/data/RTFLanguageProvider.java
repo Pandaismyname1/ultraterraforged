@@ -263,6 +263,9 @@ public class RTFLanguageProvider {
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_CAVE_MOUTH_STRENGTH), "How strongly cave entrances keep off flat ground and gather on slopes");
 
 			this.add(RTFTranslationKeys.GUI_OCEANS_SETTINGS_TITLE, "Oceans");
+			this.add(RTFTranslationKeys.GUI_LABEL_SEA_FLOOR_SEDIMENT, "Sea Floor");
+			this.add(RTFTranslationKeys.GUI_BUTTON_SEA_FLOOR_SEDIMENT, "Sand, Gravel & Clay");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_SEA_FLOOR_SEDIMENT), "Sand in the shallows, and sand, gravel and clay further out, over the sea floor, rather than bare rock; the rock still shows on steep slopes");
 			this.add(RTFTranslationKeys.GUI_LABEL_SHELVES, "Continental Shelves");
 			this.add(RTFTranslationKeys.GUI_BUTTON_SHELVES, "Continental Shelves");
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_SHELVES), "A broad, shallow shelf off every coast, ending in a clear drop-off into the deep sea");

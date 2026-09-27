@@ -56,7 +56,9 @@ public class TerrainSensitivityTest {
 		"oceans.coralReefs.enabled",
 		// bones on the sea floor, not its shape; CavesTest checks them
 		"oceans.whaleFalls.enabled",
-		"oceans.whaleFalls.frequency"
+		"oceans.whaleFalls.frequency",
+		// the sea floor's blocks and slope, not its shape
+		"oceans.sediment"
 	);
 
 	@Test
