@@ -3,8 +3,8 @@
 # to get a list of compile errors ("compile census"). Nothing in the repo is changed.
 #
 #   docs/porting/tools/census-build.sh <mc-version> <terrablender-common-version> <work-dir>
-#   e.g. census-build.sh 1.21.1 1.21.1-4.1.0.8 /tmp/rtf-census
-#        census-build.sh 26.3   26.3-26.3.0.0.7 /tmp/rtf-census
+#   e.g. census-build.sh 1.21.1 1.21.1-4.1.0.8 /tmp/utf-census
+#        census-build.sh 26.3   26.3-26.3.0.0.7 /tmp/utf-census
 #
 # Then: python docs/porting/tools/census.py <out> 1.21.1=<work>/1.21.1.log 26.1=<work>/26.1.log ...
 #
@@ -40,7 +40,7 @@ EOF
     echo "toolchainVersion=25" > gradle/gradle-daemon-jvm.properties
     sed -i 's/gradle-9\.[0-9.]*-bin/gradle-9.5.0-bin/' gradle/wrapper/gradle-wrapper.properties
     # no mappings: the access widener must use the "official" namespace
-    sed -i '1s/.*/accessWidener\tv2\tofficial/' common/src/main/resources/reterraforged.accesswidener
+    sed -i '1s/.*/accessWidener\tv2\tofficial/' common/src/main/resources/ultraterraforged.accesswidener
     cat > build.gradle <<'EOF'
 plugins {
     id "architectury-plugin" version "3.5.170"
@@ -62,7 +62,7 @@ EOF
     cat > common/build.gradle <<EOF
 apply plugin: "dev.architectury.loom-no-remap"
 architectury { common("fabric", "neoforge") }
-loom { accessWidenerPath = file("src/main/resources/reterraforged.accesswidener") }
+loom { accessWidenerPath = file("src/main/resources/ultraterraforged.accesswidener") }
 dependencies {
     minecraft "com.mojang:minecraft:\${rootProject.minecraft_version}"
     implementation "net.fabricmc:fabric-loader:\${rootProject.fabric_loader_version}"

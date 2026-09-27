@@ -38,7 +38,7 @@ Keep `dev.architectury.loom` and Mojang mappings. What changes:
   - `neoforge/gradle.properties`: `loom.platform=neoforge`.
   - `neoforge/build.gradle`: `architectury { platformSetupLoomIde(); neoForge() }`, `neoForge "net.neoforged:neoforge:${neoforge_version}"`, `developmentNeoForge.extendsFrom common`, `shadowBundle(project(path: ":common", configuration: "transformProductionNeoForge"))`.
   - Metadata moves to `META-INF/neoforge.mods.toml`. See [neoforge.md](neoforge.md) for the loader-side details.
-- Access widener on NeoForge: Forge used `forge { convertAccessWideners = true }`, which has no NeoForge equivalent. On 1.21.1, use `remapJar { atAccessWideners.add("reterraforged.accesswidener") }` or the experimental `loom.neoForge.convertAccessWideners(tasks.remapJar, "reterraforged.accesswidener")`. From 26.1 the conversion is broken on loom-no-remap ([architectury-loom#337](https://github.com/architectury/architectury-loom/issues/337)); see [neoforge.md](neoforge.md#build-neoforge). Stale AT lines silently match nothing, so check them with `tools/checkaw.py` like the widener.
+- Access widener on NeoForge: Forge used `forge { convertAccessWideners = true }`, which has no NeoForge equivalent. On 1.21.1, use `remapJar { atAccessWideners.add("ultraterraforged.accesswidener") }` or the experimental `loom.neoForge.convertAccessWideners(tasks.remapJar, "ultraterraforged.accesswidener")`. From 26.1 the conversion is broken on loom-no-remap ([architectury-loom#337](https://github.com/architectury/architectury-loom/issues/337)); see [neoforge.md](neoforge.md#build-neoforge). Stale AT lines silently match nothing, so check them with `tools/checkaw.py` like the widener.
 - The 1.20.1 note about NeoForge 47.1 reporting as `forge` no longer applies. NeoForge 20.2+ is its own loader id (`neoforge`).
 - TerraBlender: compile common against `TerraBlender-common:1.21.1-4.1.0.8` instead of the Forge jar. That's what the census build used, and it resolves from `maven.minecraftforge.net`.
 - **Loom silently ignores access-widener entries whose target doesn't exist** (the 1.21.1 census build carried 3 dead entries without a warning). Run `tools/checkaw.py` on every bump.
@@ -62,7 +62,7 @@ From 26.1 to 26.2 to 26.3, the build files only change version numbers. One exce
 
 ### `@ExpectPlatform` under loom-no-remap: untested
 
-EMI doesn't use `@ExpectPlatform` (it picks its platform class with `Class.forName`), so the EMI port proves nothing here. RTF has 12 `@ExpectPlatform` methods in 6 classes. Make it the **first spike of the 26.1 port**: build the Fabric and NeoForge jars with one `@ExpectPlatform` method and call it at runtime. If the transformer misbehaves without remapping, the fallback is a `ServiceLoader`, or EMI's `Class.forName` lookup of `raccoonman.reterraforged.platform.<loader>.*Impl`.
+EMI doesn't use `@ExpectPlatform` (it picks its platform class with `Class.forName`), so the EMI port proves nothing here. UTF has 12 `@ExpectPlatform` methods in 6 classes. Make it the **first spike of the 26.1 port**: build the Fabric and NeoForge jars with one `@ExpectPlatform` method and call it at runtime. If the transformer misbehaves without remapping, the fallback is a `ServiceLoader`, or EMI's `Class.forName` lookup of `com.pandaismyname1.ultraterraforged.platform.<loader>.*Impl`.
 
 ## Stonecutter
 
@@ -75,7 +75,7 @@ The roadmap picked Stonecutter (latest 0.9.8) for multi-version. What this explo
   - the mixins
   - on 26.3, all of `world/worldgen/{densityfunction,surface,feature,feature/placement}`
 
-  The rest of RTF (noise library, tiles, rivers, continents, cache, `preset/option`) touches almost no Minecraft API. Keep it version-free.
+  The rest of UTF (noise library, tiles, rivers, continents, cache, `preset/option`) touches almost no Minecraft API. Keep it version-free.
 - **26.3 needs class-level swaps, not line-level `//? if` blocks.** Its worldgen classes have no line-by-line resemblance to 26.2's. See the bridge suggestion in [26.3.md](26.3.md#strategy-options).
 
 ## CI

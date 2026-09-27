@@ -2,20 +2,20 @@
 
 Baseline: commit `036d949` on the 1.20.1 line. The build uses Architectury Loom 1.17.493 with Mojang mappings, Java release 17, Fabric Loader 0.19.5, Fabric API 0.92.12+1.20.1, Forge 47.4.23 (the minimum loader is 47.1, which also covers NeoForge 47.1.x), and TerraBlender 3.0.1.2 as a compile-only dependency. Line numbers are as of that commit.
 
-Paths are relative to the repo root. `C/` means `common/src/main/java/raccoonman/reterraforged/`, `F/` means `fabric/src/main/java/raccoonman/reterraforged/`, and `FG/` means `forge/src/main/java/raccoonman/reterraforged/`. Line numbers are the real file lines.
+Paths are relative to the repo root. `C/` means `common/src/main/java/com/pandaismyname1/ultraterraforged/`, `F/` means `fabric/src/main/java/com/pandaismyname1/ultraterraforged/`, and `FG/` means `forge/src/main/java/com/pandaismyname1/ultraterraforged/`. Line numbers are the real file lines.
 
-The mod has no custom ChunkGenerator, BiomeSource, Structure, StructureType, StructurePlacement(Type), network packet or custom ArgumentType. All terrain goes through **vanilla `NoiseBasedChunkGenerator` + `MultiNoiseBiomeSource`**, driven by a datapack that RTF generates. That datapack overrides `noise_settings/overworld`, density functions, `dimension_type/overworld` and similar entries. On top of that, mixins into RandomState, NoiseChunk, NoiseBasedChunkGenerator, ChunkStatus and SurfaceSystem swap in RTF's heightmap engine.
+The mod has no custom ChunkGenerator, BiomeSource, Structure, StructureType, StructurePlacement(Type), network packet or custom ArgumentType. All terrain goes through **vanilla `NoiseBasedChunkGenerator` + `MultiNoiseBiomeSource`**, driven by a datapack that UTF generates. That datapack overrides `noise_settings/overworld`, density functions, `dimension_type/overworld` and similar entries. On top of that, mixins into RandomState, NoiseChunk, NoiseBasedChunkGenerator, ChunkStatus and SurfaceSystem swap in UTF's heightmap engine.
 
 ---
 
 ## 1. Mixins
 
 The config files are:
-- `common/src/main/resources/reterraforged-common.mixins.json`: plugin `raccoonman.reterraforged.mixin.plugin.MixinPlugin`, `compatibilityLevel JAVA_17`, `minVersion 0.8`, `injectors.defaultRequire: 1`.
+- `common/src/main/resources/ultraterraforged-common.mixins.json`: plugin `com.pandaismyname1.ultraterraforged.mixin.plugin.MixinPlugin`, `compatibilityLevel JAVA_17`, `minVersion 0.8`, `injectors.defaultRequire: 1`.
   - The `mixins` list is MixinNoiseChunk, MixinRandomState, MixinChunkMap, MixinUtil, MixinBiomeGenerationSettings, MixinSurfaceSystem, MixinStructure, MixinMinecraftServer, MixinSpawnFinder, MixinClimateSampler, MixinChunkStatus, MixinServerPacksSource, MixinRegistryDataLoader, MixinNoiseBasedChunkGenerator, MixinContext, MixinSurfaceRules$BiomeConditionSource, terrablender.MixinParameterList, terrablender.MixinClimateSampler, terrablender.MixinTargetPoint, terrablender.MixinNoiseChunk and worldpreview.SampleUtilsMixin.
   - The `client` list is ScreenInvoker and MixinCreateWorldScreen.
-- `fabric/src/main/resources/reterraforged-fabric.mixins.json` lists `mixins` MixinMinecraftServer, MixinBiomeModificationImpl and MixinFabricDataGenerator$Pack, plus `client` MixinPresetEditor. It has no plugin.
-- `forge/src/main/resources/reterraforged-forge.mixins.json` lists `mixins` MixinTagsProvider, MixinBiomeGenerationSettingsPlainsBuilder, MixinMinecraftServer and MixinServerLifecycleHooks. It is registered in `forge/build.gradle` through `mixinConfig`.
+- `fabric/src/main/resources/ultraterraforged-fabric.mixins.json` lists `mixins` MixinMinecraftServer, MixinBiomeModificationImpl and MixinFabricDataGenerator$Pack, plus `client` MixinPresetEditor. It has no plugin.
+- `forge/src/main/resources/ultraterraforged-forge.mixins.json` lists `mixins` MixinTagsProvider, MixinBiomeGenerationSettingsPlainsBuilder, MixinMinecraftServer and MixinServerLifecycleHooks. It is registered in `forge/build.gradle` through `mixinConfig`.
 
 ### MixinPlugin (`C/mixin/plugin/MixinPlugin.java`)
 - `TB_MIXINS` = terrablender.{MixinClimateSampler, MixinNoiseChunk, MixinParameterList, MixinTargetPoint}. These apply only if `TBCompat.isEnabled()`, which is `ModLoaderUtil.isLoaded("terrablender")` (the `TerraBlender.MOD_ID` constant).
@@ -29,21 +29,21 @@ The config files are:
 | Mixin (file:line) | Target | Injectors (method / descriptor / @At) | Purpose |
 |---|---|---|---|
 | `C/mixin/MixinBiomeGenerationSettings.java:16` (interface, `@Deprecated`) | `BiomeGenerationSettings` | `@Accessor getFeatures()` gives `List<HolderSet<PlacedFeature>> features` (l.18). `@Accessor setFlowerFeatures(Supplier<List<ConfiguredFeature<?,?>>>)` (l.21) sets the private final `flowerFeatures` field. | Used only by the Fabric biome modifiers (`F/world/worldgen/biome/modifier/fabric/FabricBiomeModifier.java:20-25`) to rebuild the flower list after they mutate the features. |
-| `C/mixin/MixinChunkMap.java:28` | `ChunkMap` | `@Inject <init>` TAIL (l.33). The handler signature is `(ServerLevel, LevelStorageSource.LevelStorageAccess, DataFixer, StructureTemplateManager, Executor, BlockableEventLoop<Runnable>, LightChunkGetter, ChunkGenerator, ChunkProgressListener, ChunkStatusUpdateListener, Supplier<DimensionDataStorage>, int, boolean)`. `@Shadow randomState`. | Initializes `RTFRandomState` with `serverLevel.registryAccess()` (this loads the preset and builds the GeneratorContext) and sets `WorldGenFlags.setCullNoiseSections(true)`. **The full constructor signature is pinned.** |
+| `C/mixin/MixinChunkMap.java:28` | `ChunkMap` | `@Inject <init>` TAIL (l.33). The handler signature is `(ServerLevel, LevelStorageSource.LevelStorageAccess, DataFixer, StructureTemplateManager, Executor, BlockableEventLoop<Runnable>, LightChunkGetter, ChunkGenerator, ChunkProgressListener, ChunkStatusUpdateListener, Supplier<DimensionDataStorage>, int, boolean)`. `@Shadow randomState`. | Initializes `UTFRandomState` with `serverLevel.registryAccess()` (this loads the preset and builds the GeneratorContext) and sets `WorldGenFlags.setCullNoiseSections(true)`. **The full constructor signature is pinned.** |
 | `C/mixin/MixinChunkStatus.java:31` | `ChunkStatus` | `@Inject` HEAD (l.35) and TAIL (l.55) on `{"method_39464","m_289181_"}` with `remap=false`. This is the STRUCTURE_STARTS generation lambda, signature `static (ChunkStatus, Executor, ServerLevel, ChunkGenerator, StructureTemplateManager, ThreadedLevelLightEngine, Function<ChunkAccess,CompletableFuture<Either<ChunkAccess,ChunkHolder.ChunkLoadingFailure>>>, List<ChunkAccess>, ChunkAccess) -> CompletableFuture<ChunkAccess>`. A second `@Inject` TAIL (l.72) on `{"method_51375","m_279978_"}` with `remap=false` targets the FEATURES simple lambda `static (ChunkStatus, ServerLevel, ChunkGenerator, List<ChunkAccess>, ChunkAccess) -> void`. | STRUCTURE_STARTS HEAD calls `cache.queueAtChunk` and turns fast cell lookups off; TAIL turns them back on. FEATURES TAIL calls `cache.dropAtChunk`. **FRAGILE: these are hard-coded intermediary and SRG lambda names.** ChunkStatus was reworked into ChunkStep/ChunkPyramid in 1.20.5+, so these targets disappear. |
-| `C/mixin/MixinClimateSampler.java:11` | `Climate.Sampler` (a record) | `@Implements(RTFClimateSampler, prefix "reterraforged$RTFClimateSampler$")` and adds the field `spawnSearchCenter`. | Stores the spawn search center that `MixinMinecraftServer` sets. |
-| `C/mixin/MixinContext.java:27` | `SurfaceRules.Context` | `@Implements(RTFSurfaceContext)`. `@Inject <init>` TAIL (l.36), with no parameters captured. `@Shadow @Final chunk`. | Gathers the biome keys of the surrounding 3x3 chunks from `SurfaceRegion` (a ThreadLocal `WorldGenRegion`), using `LevelChunkSection.getBiomes().getAll(...)`. |
-| `C/mixin/MixinCreateWorldScreen.java:28` (client) | `CreateWorldScreen`. The mixin extends `Screen` and implements `TerrainState.Holder` | `@Shadow @Final WorldCreationUiState uiState`, `@Shadow boolean recreated`, `@Shadow onCreate()`.<br>1) `@Inject init` HEAD (l.54).<br>2) `@ModifyArg init`, `@At INVOKE "Lnet/minecraft/client/gui/components/tabs/TabNavigationBar$Builder;addTabs([Lnet/minecraft/client/gui/components/tabs/Tab;)Lnet/minecraft/client/gui/components/tabs/TabNavigationBar$Builder;"` (l.70).<br>3) `@Inject onCreate` HEAD, cancellable (l.84).<br>4) `@Inject tick` TAIL (l.100). | (1) selects the RTF world type by default and handles the dev creative flag. (2) appends `TerrainTab`. (3) builds and applies the preset datapack before the world is created (it may cancel and wait for the datapack reload). (4) calls `onCreate()` again via `minecraft.tell` once the packs have loaded. Also uses `SystemToast.addOrUpdate(..., SystemToastIds.PACK_LOAD_FAILURE, ...)` (l.95). |
-| `C/mixin/MixinMinecraftServer.java:19` | `MinecraftServer` | `@Inject setInitialSpawn` (static, `(ServerLevel, ServerLevelData, boolean, boolean)V`), `@At INVOKE "Lnet/minecraft/world/level/biome/Climate$Sampler;findSpawnPosition()Lnet/minecraft/core/BlockPos;"` (l.22). | Sets the sampler's spawn search center from `preset.world().properties.spawnType`. It reads `registryAccess().lookup(RTFRegistries.PRESET)`. |
-| `C/mixin/MixinNoiseBasedChunkGenerator.java:40` (priority 9001, "don't break noisium") | `NoiseBasedChunkGenerator` | `@Shadow @Final Holder<NoiseGeneratorSettings> settings`.<br>`@Inject buildSurface` HEAD and TAIL (l.47, l.52) with handler `(WorldGenRegion, StructureManager, RandomState, ChunkAccess)`.<br>`@Redirect {"fillFromNoise","populateNoise"}` (l.57), `@At INVOKE "Lnet/minecraft/world/level/levelgen/NoiseSettings;height()I"`, handler `(NoiseSettings, Executor, Blender, RandomState, StructureManager, ChunkAccess)`.<br>`@Redirect {"iterateNoiseColumn","sampleHeightmap"}`, `require=2` (l.74), same `NoiseSettings.height()` target, handler `(NoiseSettings, LevelHeightAccessor, RandomState, int, int, MutableObject<NoiseColumn>, Predicate<BlockState>)`.<br>`@Inject addDebugScreenInfo` TAIL (l.91) with `(List<String>, RandomState, BlockPos)`. | Sets and clears the ThreadLocal `SurfaceRegion`. Caps the generation height at the RTF-computed column height (a perf cull). Adds F3 debug lines. `populateNoise` and `sampleHeightmap` are Yarn-style alias names that do not exist under Mojmap; the arrays rely on the Mojmap names matching. |
-| `C/mixin/MixinNoiseChunk.java:33` | `NoiseChunk` | `@Shadow`: `initialDensityNoJaggedness`, `firstNoiseX`, `firstNoiseZ`, `cellCountXZ`, `cellCountY` (made mutable by the AW), `cellHeight`.<br>`@Redirect <init>` (l.65), `@At INVOKE "Lnet/minecraft/world/level/levelgen/RandomState;router()Lnet/minecraft/world/level/levelgen/NoiseRouter;"`. The handler captures the ctor args `(int cellCountXZ, RandomState, int minBlockX, int minBlockZ, NoiseSettings, DensityFunctions.BeardifierOrMarker, NoiseGeneratorSettings)`.<br>`@ModifyVariable <init>` HEAD, `name="fluidPicker"`, `index=7`, `ordinal=0`, `argsOnly` (l.100).<br>`@Inject wrapNew` HEAD, cancellable (l.131), with `(DensityFunction)DensityFunction`.<br>`@Redirect computePreliminarySurfaceLevel` (l.141), target `NoiseSettings.height()I`, handler `(NoiseSettings, long)`. | Computes the generation height and shrinks `cellCountY`. Supplies the RTF lava-level fluid picker. Replaces `CellSampler` density functions with the chunk-cached `CacheChunk`. Caps the preliminary surface level. **Pinned to the 1.20.1 NoiseChunk ctor layout and the local index 7.** |
-| `C/mixin/MixinRandomState.java:43` | `RandomState` | `@Implements(RTFRandomState)`. `@Shadow @Final Climate.Sampler sampler` and `SurfaceSystem surfaceSystem`. `@Redirect <init>` (l.69), `@At INVOKE "Lnet/minecraft/world/level/levelgen/NoiseRouter;mapAll(Lnet/minecraft/world/level/levelgen/DensityFunction$Visitor;)Lnet/minecraft/world/level/levelgen/NoiseRouter;"`, handler `(NoiseRouter, DensityFunction.Visitor, NoiseGeneratorSettings, HolderGetter<NormalNoise.NoiseParameters>, long seed)`. | Wraps the vanilla visitor so that the `NoiseSampler.Marker` and `CellSampler.Marker` density functions become seeded samplers. `initialize(RegistryAccess)` (l.~101) reads the `RTFRegistries.PRESET` and `Registries.DENSITY_FUNCTION` lookups, wires TerraBlender's uniqueness function and builds the `GeneratorContext`. It overrides `DensityFunction.Visitor.apply` and `visitNoise(NoiseHolder)`. |
-| `C/mixin/MixinRegistryDataLoader.java:11` | `RegistryDataLoader` | `@Redirect loadRegistryContents` (static), `@At INVOKE "Lnet/minecraft/server/packs/resources/Resource;isBuiltin()Z"`, `require=1` (l.19). | Makes RTF preset packs (`file/reterraforged-preset*.zip`) count as built in, which avoids the experimental worldgen warning. Uses `Resource.sourcePackId()`. |
-| `C/mixin/MixinServerPacksSource.java:21` | `ServerPacksSource` | `@Inject "createPackRepository(Ljava/nio/file/Path;)Lnet/minecraft/server/packs/repository/PackRepository;"` HEAD (l.25).<br>`@Redirect` on the same method, `@At NEW "Lnet/minecraft/server/packs/repository/PackRepository;"`, `require=1` (l.35), handler `(RepositorySource[], Path)`. | On a dedicated server, installs the preset datapack for a new world (`ServerPresets.installIfNewWorld`). Adds `RTFBuiltinPackSource` to the pack repository. |
-| `C/mixin/MixinSpawnFinder.java:19` | `Climate` (the comment notes that targeting `Climate$SpawnFinder` did not work) | `@Inject findSpawnPosition` HEAD, cancellable (l.22), `static (List<ParameterPoint>, Sampler) -> BlockPos`. | **Replaces vanilla spawn finding for every world** with `SpawnFinderFix`, which searches around `RTFClimateSampler.getSpawnSearchCenter()` (default 0,0). Uses the AW'd `ParameterPoint.fitness`. |
-| `C/mixin/MixinStructure.java:17` | `Structure` | `@Inject isValidBiome` HEAD, cancellable (l.20), `static (Structure.GenerationStub, Structure.GenerationContext) -> boolean`. | Vetoes structure starts with RTF `StructureRule`s from the `RTFRegistries.STRUCTURE_RULE` datapack registry. |
+| `C/mixin/MixinClimateSampler.java:11` | `Climate.Sampler` (a record) | `@Implements(UTFClimateSampler, prefix "ultraterraforged$UTFClimateSampler$")` and adds the field `spawnSearchCenter`. | Stores the spawn search center that `MixinMinecraftServer` sets. |
+| `C/mixin/MixinContext.java:27` | `SurfaceRules.Context` | `@Implements(UTFSurfaceContext)`. `@Inject <init>` TAIL (l.36), with no parameters captured. `@Shadow @Final chunk`. | Gathers the biome keys of the surrounding 3x3 chunks from `SurfaceRegion` (a ThreadLocal `WorldGenRegion`), using `LevelChunkSection.getBiomes().getAll(...)`. |
+| `C/mixin/MixinCreateWorldScreen.java:28` (client) | `CreateWorldScreen`. The mixin extends `Screen` and implements `TerrainState.Holder` | `@Shadow @Final WorldCreationUiState uiState`, `@Shadow boolean recreated`, `@Shadow onCreate()`.<br>1) `@Inject init` HEAD (l.54).<br>2) `@ModifyArg init`, `@At INVOKE "Lnet/minecraft/client/gui/components/tabs/TabNavigationBar$Builder;addTabs([Lnet/minecraft/client/gui/components/tabs/Tab;)Lnet/minecraft/client/gui/components/tabs/TabNavigationBar$Builder;"` (l.70).<br>3) `@Inject onCreate` HEAD, cancellable (l.84).<br>4) `@Inject tick` TAIL (l.100). | (1) selects the UTF world type by default and handles the dev creative flag. (2) appends `TerrainTab`. (3) builds and applies the preset datapack before the world is created (it may cancel and wait for the datapack reload). (4) calls `onCreate()` again via `minecraft.tell` once the packs have loaded. Also uses `SystemToast.addOrUpdate(..., SystemToastIds.PACK_LOAD_FAILURE, ...)` (l.95). |
+| `C/mixin/MixinMinecraftServer.java:19` | `MinecraftServer` | `@Inject setInitialSpawn` (static, `(ServerLevel, ServerLevelData, boolean, boolean)V`), `@At INVOKE "Lnet/minecraft/world/level/biome/Climate$Sampler;findSpawnPosition()Lnet/minecraft/core/BlockPos;"` (l.22). | Sets the sampler's spawn search center from `preset.world().properties.spawnType`. It reads `registryAccess().lookup(UTFRegistries.PRESET)`. |
+| `C/mixin/MixinNoiseBasedChunkGenerator.java:40` (priority 9001, "don't break noisium") | `NoiseBasedChunkGenerator` | `@Shadow @Final Holder<NoiseGeneratorSettings> settings`.<br>`@Inject buildSurface` HEAD and TAIL (l.47, l.52) with handler `(WorldGenRegion, StructureManager, RandomState, ChunkAccess)`.<br>`@Redirect {"fillFromNoise","populateNoise"}` (l.57), `@At INVOKE "Lnet/minecraft/world/level/levelgen/NoiseSettings;height()I"`, handler `(NoiseSettings, Executor, Blender, RandomState, StructureManager, ChunkAccess)`.<br>`@Redirect {"iterateNoiseColumn","sampleHeightmap"}`, `require=2` (l.74), same `NoiseSettings.height()` target, handler `(NoiseSettings, LevelHeightAccessor, RandomState, int, int, MutableObject<NoiseColumn>, Predicate<BlockState>)`.<br>`@Inject addDebugScreenInfo` TAIL (l.91) with `(List<String>, RandomState, BlockPos)`. | Sets and clears the ThreadLocal `SurfaceRegion`. Caps the generation height at the UTF-computed column height (a perf cull). Adds F3 debug lines. `populateNoise` and `sampleHeightmap` are Yarn-style alias names that do not exist under Mojmap; the arrays rely on the Mojmap names matching. |
+| `C/mixin/MixinNoiseChunk.java:33` | `NoiseChunk` | `@Shadow`: `initialDensityNoJaggedness`, `firstNoiseX`, `firstNoiseZ`, `cellCountXZ`, `cellCountY` (made mutable by the AW), `cellHeight`.<br>`@Redirect <init>` (l.65), `@At INVOKE "Lnet/minecraft/world/level/levelgen/RandomState;router()Lnet/minecraft/world/level/levelgen/NoiseRouter;"`. The handler captures the ctor args `(int cellCountXZ, RandomState, int minBlockX, int minBlockZ, NoiseSettings, DensityFunctions.BeardifierOrMarker, NoiseGeneratorSettings)`.<br>`@ModifyVariable <init>` HEAD, `name="fluidPicker"`, `index=7`, `ordinal=0`, `argsOnly` (l.100).<br>`@Inject wrapNew` HEAD, cancellable (l.131), with `(DensityFunction)DensityFunction`.<br>`@Redirect computePreliminarySurfaceLevel` (l.141), target `NoiseSettings.height()I`, handler `(NoiseSettings, long)`. | Computes the generation height and shrinks `cellCountY`. Supplies the UTF lava-level fluid picker. Replaces `CellSampler` density functions with the chunk-cached `CacheChunk`. Caps the preliminary surface level. **Pinned to the 1.20.1 NoiseChunk ctor layout and the local index 7.** |
+| `C/mixin/MixinRandomState.java:43` | `RandomState` | `@Implements(UTFRandomState)`. `@Shadow @Final Climate.Sampler sampler` and `SurfaceSystem surfaceSystem`. `@Redirect <init>` (l.69), `@At INVOKE "Lnet/minecraft/world/level/levelgen/NoiseRouter;mapAll(Lnet/minecraft/world/level/levelgen/DensityFunction$Visitor;)Lnet/minecraft/world/level/levelgen/NoiseRouter;"`, handler `(NoiseRouter, DensityFunction.Visitor, NoiseGeneratorSettings, HolderGetter<NormalNoise.NoiseParameters>, long seed)`. | Wraps the vanilla visitor so that the `NoiseSampler.Marker` and `CellSampler.Marker` density functions become seeded samplers. `initialize(RegistryAccess)` (l.~101) reads the `UTFRegistries.PRESET` and `Registries.DENSITY_FUNCTION` lookups, wires TerraBlender's uniqueness function and builds the `GeneratorContext`. It overrides `DensityFunction.Visitor.apply` and `visitNoise(NoiseHolder)`. |
+| `C/mixin/MixinRegistryDataLoader.java:11` | `RegistryDataLoader` | `@Redirect loadRegistryContents` (static), `@At INVOKE "Lnet/minecraft/server/packs/resources/Resource;isBuiltin()Z"`, `require=1` (l.19). | Makes UTF preset packs (`file/ultraterraforged-preset*.zip`) count as built in, which avoids the experimental worldgen warning. Uses `Resource.sourcePackId()`. |
+| `C/mixin/MixinServerPacksSource.java:21` | `ServerPacksSource` | `@Inject "createPackRepository(Ljava/nio/file/Path;)Lnet/minecraft/server/packs/repository/PackRepository;"` HEAD (l.25).<br>`@Redirect` on the same method, `@At NEW "Lnet/minecraft/server/packs/repository/PackRepository;"`, `require=1` (l.35), handler `(RepositorySource[], Path)`. | On a dedicated server, installs the preset datapack for a new world (`ServerPresets.installIfNewWorld`). Adds `UTFBuiltinPackSource` to the pack repository. |
+| `C/mixin/MixinSpawnFinder.java:19` | `Climate` (the comment notes that targeting `Climate$SpawnFinder` did not work) | `@Inject findSpawnPosition` HEAD, cancellable (l.22), `static (List<ParameterPoint>, Sampler) -> BlockPos`. | **Replaces vanilla spawn finding for every world** with `SpawnFinderFix`, which searches around `UTFClimateSampler.getSpawnSearchCenter()` (default 0,0). Uses the AW'd `ParameterPoint.fitness`. |
+| `C/mixin/MixinStructure.java:17` | `Structure` | `@Inject isValidBiome` HEAD, cancellable (l.20), `static (Structure.GenerationStub, Structure.GenerationContext) -> boolean`. | Vetoes structure starts with UTF `StructureRule`s from the `UTFRegistries.STRUCTURE_RULE` datapack registry. |
 | `C/mixin/MixinSurfaceRules$BiomeConditionSource.java:18` | string target `net.minecraft.world.level.levelgen.SurfaceRules$BiomeConditionSource` (a private record) | `@Shadow @Final Predicate<ResourceKey<Biome>> biomeNameTest`. `@Inject apply` HEAD, cancellable (l.24), `(SurfaceRules.Context) -> SurfaceRules.Condition`. | Short-circuits biome conditions using the chunk's surrounding-biome set from `MixinContext`. |
-| `C/mixin/MixinSurfaceSystem.java:29` | `SurfaceSystem` | `@Implements(RTFSurfaceSystem, prefix "reterraforged$RTFSurfaceSystem$")`.<br>`@Inject <init>` TAIL (l.36), handler `(RandomState, BlockState, int, PositionalRandomFactory)`.<br>`@ModifyVariable buildSurface` HEAD, `name="ruleSource"`, `index=7`, `ordinal=0`, `argsOnly` (l.45). | Creates a strata RNG from `randomState.random.fromHashOf(...)`, where `random` is AW'd. Adds a strata cache. The `@ModifyVariable` is currently a no-op pass-through (its TerraBlender code is commented out). **Pinned to the buildSurface parameter index 7.** |
+| `C/mixin/MixinSurfaceSystem.java:29` | `SurfaceSystem` | `@Implements(UTFSurfaceSystem, prefix "ultraterraforged$UTFSurfaceSystem$")`.<br>`@Inject <init>` TAIL (l.36), handler `(RandomState, BlockState, int, PositionalRandomFactory)`.<br>`@ModifyVariable buildSurface` HEAD, `name="ruleSource"`, `index=7`, `ordinal=0`, `argsOnly` (l.45). | Creates a strata RNG from `randomState.random.fromHashOf(...)`, where `random` is AW'd. Adds a strata cache. The `@ModifyVariable` is currently a no-op pass-through (its TerraBlender code is commented out). **Pinned to the buildSurface parameter index 7.** |
 | `C/mixin/MixinUtil.java:15` | `Util` | `@Inject "shutdownExecutors()V"` TAIL (l.18). `@Shadow static shutdownExecutor(ExecutorService)`. | Shuts down the `ThreadPools.WORLD_GEN` and `Cache.SCHEDULER` pools. |
 | `C/mixin/ScreenInvoker.java:13` (client, `@Deprecated`) | `Screen` | `@Invoker("addRenderableWidget")` gives `<T extends GuiEventListener & Renderable> T invokeAddRenderableWidget(T)` (l.16). | Used by `C/client/gui/ColumnAlignment.java:31` and `C/client/gui/screen/presetconfig/OptionPage.java:162`. |
 
@@ -53,33 +53,33 @@ The config files are:
 |---|---|---|---|
 | `C/mixin/terrablender/MixinClimateSampler.java:18` | `Climate.Sampler` | `@Implements(TBClimateSampler)`. `@Inject sample` RETURN with **`locals = LocalCapture.CAPTURE_FAILHARD`** (l.24). The handler captures locals `(int i,int j,int k, CIR<TargetPoint>, int l,int m,int n, DensityFunction.SinglePointContext ctx)`. | Stores the TB "uniqueness" value on the returned TargetPoint. **FRAGILE: depends on the exact local-variable layout of `Climate.Sampler.sample(III)`.** |
 | `C/mixin/terrablender/MixinNoiseChunk.java:24` | `NoiseChunk` | `@Inject <init>` TAIL (l.28), handler `(int, RandomState, int, int, NoiseSettings, DensityFunctions.BeardifierOrMarker, NoiseGeneratorSettings, Aquifer.FluidPicker, Blender)`. `@Inject cachedClimateSampler` RETURN (l.36), `(NoiseRouter, List<Climate.ParameterPoint>) -> Climate.Sampler`. `@Shadow wrap(DensityFunction)`. | Copies the uniqueness function to the chunk-cached sampler. **Pinned to the full ctor signature.** |
-| `C/mixin/terrablender/MixinParameterList.java:17` (priority 1001) | `Climate.ParameterList` | `@Inject initializeForTerraBlender` HEAD (l.24), `(RegistryAccess, RegionType, long)`. This method is added by TerraBlender's own mixin. `@Redirect findValuePositional` (l.41), `@At INVOKE "Lnet/minecraft/world/level/biome/Climate$ParameterList;getUniqueness(III)I"` (also added by TB). `@Shadow getUniqueness(III)`. | Replaces TB's region index with RTF's `CellField.BIOME_REGION` uniqueness. Uses `terrablender.api.Regions.getCount(RegionType)`. **Depends on TB's internal method names.** |
+| `C/mixin/terrablender/MixinParameterList.java:17` (priority 1001) | `Climate.ParameterList` | `@Inject initializeForTerraBlender` HEAD (l.24), `(RegistryAccess, RegionType, long)`. This method is added by TerraBlender's own mixin. `@Redirect findValuePositional` (l.41), `@At INVOKE "Lnet/minecraft/world/level/biome/Climate$ParameterList;getUniqueness(III)I"` (also added by TB). `@Shadow getUniqueness(III)`. | Replaces TB's region index with UTF's `CellField.BIOME_REGION` uniqueness. Uses `terrablender.api.Regions.getCount(RegionType)`. **Depends on TB's internal method names.** |
 | `C/mixin/terrablender/MixinTargetPoint.java:10` | `Climate.TargetPoint` (a record) | `@Implements(TBTargetPoint)` and adds the field `uniqueness`. | Carries the uniqueness value through. |
 
 ### World Preview mixin
 - `C/mixin/worldpreview/SampleUtilsMixin.java:29` is `@Pseudo @Mixin(targets="caeruleusTait.world.preview.backend.worker.SampleUtils", remap=false)`.
   - It shadows `randomState` and `registryAccess`.
   - `@Inject` TAIL hits two constructors through `@Desc`: `<init>(MinecraftServer, BiomeSource, ChunkGenerator, WorldOptions, LevelStem, LevelHeightAccessor)` (l.39) and `<init>(BiomeSource, ChunkGenerator, LayeredRegistryAccess, WorldOptions, LevelStem, LevelHeightAccessor, WorldDataConfiguration, Proxy, Path)` (l.53).
-  - It calls `RTFRandomState.initialize` with cull disabled.
+  - It calls `UTFRandomState.initialize` with cull disabled.
   - **Pinned to World Preview's internal constructor signatures.**
 
 ### Fabric mixins
 
 | Mixin | Target | Injectors | Purpose |
 |---|---|---|---|
-| `F/fabric/mixin/MixinBiomeModificationImpl.java:28` | `net.fabricmc.fabric.impl.biome.modification.BiomeModificationImpl` (**Fabric API internal `impl` class**) | `@Shadow(remap=false) static Comparator<Object> MODIFIER_ORDER_COMPARATOR` and `getSortedModifiers()`. `@Redirect finalizeWorldGen` with `remap=false`, `@At INVOKE target "getSortedModifiers"` (l.36). | Injects RTF biome modifiers from the `RTFRegistries.BIOME_MODIFIER` datapack registry as POST_PROCESSING modifier records. It builds `BiomeModificationImpl$ModifierRecord` **by reflection** with the ctor `(ModificationPhase, ResourceLocation, Predicate, BiConsumer)` (l.74). **Very fragile.** |
+| `F/fabric/mixin/MixinBiomeModificationImpl.java:28` | `net.fabricmc.fabric.impl.biome.modification.BiomeModificationImpl` (**Fabric API internal `impl` class**) | `@Shadow(remap=false) static Comparator<Object> MODIFIER_ORDER_COMPARATOR` and `getSortedModifiers()`. `@Redirect finalizeWorldGen` with `remap=false`, `@At INVOKE target "getSortedModifiers"` (l.36). | Injects UTF biome modifiers from the `UTFRegistries.BIOME_MODIFIER` datapack registry as POST_PROCESSING modifier records. It builds `BiomeModificationImpl$ModifierRecord` **by reflection** with the ctor `(ModificationPhase, ResourceLocation, Predicate, BiConsumer)` (l.74). **Very fragile.** |
 | `F/fabric/mixin/MixinFabricDataGenerator$Pack.java:9` | `FabricDataGenerator.Pack` | `@Invoker(value="<init>", remap=false)` gives `invokeNew(FabricDataGenerator, boolean, String, FabricDataOutput)` (l.12). | **Unused**: nothing calls `invokeNew`. |
-| `F/fabric/mixin/MixinMinecraftServer.java:17` | `MinecraftServer` | `@Implements(RTFMinecraftServer)`. `@Inject <init>` TAIL (l.21), no args. `@Inject "method_29440"` TAIL (l.33). `@Shadow getResourceManager()`. | Creates `FeatureTemplateManager` and reloads it after `/reload`. **FRAGILE: `method_29440` is an intermediary lambda name**, the `thenAcceptAsync` lambda inside `reloadResources`. |
-| `F/fabric/mixin/MixinPresetEditor.java:16` (client, `@Deprecated`) | `PresetEditor` (interface) | `@Redirect <clinit>`, `remap=false`, `@At INVOKE "Ljava/util/Map;of(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/Map;"` (l.20). | Adds the RTF world preset's edit button (`PresetConfigScreen`) to `PresetEditor.EDITORS`. **FRAGILE: depends on vanilla building the map with a 2-entry `Map.of`.** |
+| `F/fabric/mixin/MixinMinecraftServer.java:17` | `MinecraftServer` | `@Implements(UTFMinecraftServer)`. `@Inject <init>` TAIL (l.21), no args. `@Inject "method_29440"` TAIL (l.33). `@Shadow getResourceManager()`. | Creates `FeatureTemplateManager` and reloads it after `/reload`. **FRAGILE: `method_29440` is an intermediary lambda name**, the `thenAcceptAsync` lambda inside `reloadResources`. |
+| `F/fabric/mixin/MixinPresetEditor.java:16` (client, `@Deprecated`) | `PresetEditor` (interface) | `@Redirect <clinit>`, `remap=false`, `@At INVOKE "Ljava/util/Map;of(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/Map;"` (l.20). | Adds the UTF world preset's edit button (`PresetConfigScreen`) to `PresetEditor.EDITORS`. **FRAGILE: depends on vanilla building the map with a 2-entry `Map.of`.** |
 
 ### Forge mixins
 
 | Mixin | Target | Injectors | Purpose |
 |---|---|---|---|
 | `FG/forge/mixin/MixinBiomeGenerationSettingsPlainsBuilder.java:12` | `BiomeGenerationSettings.PlainBuilder` | `@Accessor getFeatures()` gives `List<List<Holder<PlacedFeature>>>` (l.14). | Used by the Forge `AddModifier` and `ReplaceModifier`. |
-| `FG/forge/mixin/MixinMinecraftServer.java:26` | `MinecraftServer` | `@Implements(RTFMinecraftServer)`. `@Inject <init>` with the explicit descriptor `(Ljava/lang/Thread;Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;Lnet/minecraft/server/packs/repository/PackRepository;Lnet/minecraft/server/WorldStem;Ljava/net/Proxy;Lcom/mojang/datafixers/DataFixer;Lnet/minecraft/server/Services;Lnet/minecraft/server/level/progress/ChunkProgressListenerFactory;)V`, TAIL (l.30). `@Inject "lambda$reloadResources$26"`, `remap=false`, TAIL (l.42). | Same purpose as the Fabric version. **FRAGILE: javac lambda index `$26` (Forge 47.4 / NeoForge 47.1).** |
-| `FG/forge/mixin/MixinServerLifecycleHooks.java:16` | `net.minecraftforge.server.ServerLifecycleHooks` | `@ModifyVariable runModifiers`, `remap=false`, `@At(INVOKE "Ljava/util/stream/Stream;toList()Ljava/util/List;", shift AFTER)`, `index=2`, `name="biomeModifiers"` (l.19). | Appends RTF biome modifiers to Forge's biome-modifier list. **Depends on Forge internals.** |
-| `FG/forge/mixin/MixinTagsProvider.java:14` | `TagsProvider` | `@Redirect "lambda$getOrCreateRawBuilder$9"`, `remap=false`, `@At INVOKE "Lnet/minecraftforge/common/data/ExistingFileHelper;trackGenerated(Lnet/minecraft/resources/ResourceLocation;Lnet/minecraftforge/common/data/ExistingFileHelper$IResourceType;)V"` (l.17). | Null-guards `ExistingFileHelper`, because RTF runs tag providers at runtime without one. **FRAGILE: Forge-patched lambda name.** |
+| `FG/forge/mixin/MixinMinecraftServer.java:26` | `MinecraftServer` | `@Implements(UTFMinecraftServer)`. `@Inject <init>` with the explicit descriptor `(Ljava/lang/Thread;Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;Lnet/minecraft/server/packs/repository/PackRepository;Lnet/minecraft/server/WorldStem;Ljava/net/Proxy;Lcom/mojang/datafixers/DataFixer;Lnet/minecraft/server/Services;Lnet/minecraft/server/level/progress/ChunkProgressListenerFactory;)V`, TAIL (l.30). `@Inject "lambda$reloadResources$26"`, `remap=false`, TAIL (l.42). | Same purpose as the Fabric version. **FRAGILE: javac lambda index `$26` (Forge 47.4 / NeoForge 47.1).** |
+| `FG/forge/mixin/MixinServerLifecycleHooks.java:16` | `net.minecraftforge.server.ServerLifecycleHooks` | `@ModifyVariable runModifiers`, `remap=false`, `@At(INVOKE "Ljava/util/stream/Stream;toList()Ljava/util/List;", shift AFTER)`, `index=2`, `name="biomeModifiers"` (l.19). | Appends UTF biome modifiers to Forge's biome-modifier list. **Depends on Forge internals.** |
+| `FG/forge/mixin/MixinTagsProvider.java:14` | `TagsProvider` | `@Redirect "lambda$getOrCreateRawBuilder$9"`, `remap=false`, `@At INVOKE "Lnet/minecraftforge/common/data/ExistingFileHelper;trackGenerated(Lnet/minecraft/resources/ResourceLocation;Lnet/minecraftforge/common/data/ExistingFileHelper$IResourceType;)V"` (l.17). | Null-guards `ExistingFileHelper`, because UTF runs tag providers at runtime without one. **FRAGILE: Forge-patched lambda name.** |
 
 ### Fragile and synthetic targets (summary)
 - `MixinChunkStatus` targets `method_39464` / `m_289181_` and `method_51375` / `m_279978_`.
@@ -96,7 +96,7 @@ The config files are:
 
 ---
 
-## 2. Access widener (`common/src/main/resources/reterraforged.accesswidener`, v2 named)
+## 2. Access widener (`common/src/main/resources/ultraterraforged.accesswidener`, v2 named)
 
 The widener is wired through `architectury.common.json`, `common/build.gradle:6`, the Fabric `remapJar.injectAccessWidener`, and the Forge `convertAccessWideners`/`extraAccessWideners` (`forge/build.gradle:21-22`). "Used by" lists non-mixin usages. **Unused** means no usage was found in main code.
 
@@ -110,7 +110,7 @@ The widener is wired through `architectury.common.json`, `common/build.gradle:6`
 | OreVeinifier (28-30) | class `VeinType`, fields `minY` and `maxY` | `PresetNoiseRouterData.java:71-72` |
 | NoiseRouterData (49-64) | fields SPAGHETTI_2D, SPAGHETTI_ROUGHNESS_FUNCTION, PILLARS, SLOPED_CHEESE, NOODLE, Y, BASE_3D_NOISE_OVERWORLD, ENTRANCES, SPAGHETTI_2D_THICKNESS_MODULATOR; methods underground, yLimitedInterpolatable, entrances, postProcess, noiseGradientDensity, getFunction, registerAndWrap(**BootstapContext**, ...) | `PresetNoiseRouterData.java:41-113` (about 30 sites; it is a re-implementation of the vanilla overworld router) and `data/preset/settings/Preset.java:80-81` |
 | Client GUI (34-40, 65) | `AbstractWidget.height`, `AbstractSelectionList.replaceEntries(Collection)`, `Screen.minecraft`, `Screen.font`, `Screen.rebuildWidgets()`, `CreateWorldScreen.getDataPackSelectionSettings(WorldDataConfiguration)Pair`, `CreateWorldScreen.tryApplyNewDataPacks(PackRepository, boolean, Consumer)`, `CreateWorldScreen.tabNavigationBar` | height writes: `ScrollingPanel.java:45,64`, `TerrainPreview.java:84`, `TerrainTab.java:125,151`, `OptionPage.java:148`, `WidgetList.java:77`. replaceEntries: `OptionPage.java:189`, `PresetListPage.java:195`. Screen.minecraft: `BisectedPage.java:28`, `OptionPage.java:109,136`, `PresetConfigScreen.java:35`, `SavePresetScreen.java:108`. Screen.font: `OptionPage.java:100`, `PresetListPage.java:82`, `SavePresetScreen.java:47,101-102`. rebuildWidgets: `LinkedPageScreen.java:26`. getDataPackSelectionSettings: `PresetApplier.java:38`. tryApplyNewDataPacks: `PresetApplier.java:63`. tabNavigationBar: only `fabric/src/clienttest/.../ClientTest.java:83`. |
-| Datagen (41-42) | `DataGenerator.vanillaPackOutput`, `DataGenerator$PackGenerator.<init>(DataGenerator, boolean, String, PackOutput)` | PackGenerator ctor: `C/data/RTFDataGen.java:36` and `common/src/test/.../PresetBlockTagsTest.java:28`. **vanillaPackOutput is unused.** |
+| Datagen (41-42) | `DataGenerator.vanillaPackOutput`, `DataGenerator$PackGenerator.<init>(DataGenerator, boolean, String, PackOutput)` | PackGenerator ctor: `C/data/UTFDataGen.java:36` and `common/src/test/.../PresetBlockTagsTest.java:28`. **vanillaPackOutput is unused.** |
 | StructurePlacement (43, 67-71) | `salt()`, fields locateOffset, frequencyReductionMethod, frequency, salt, exclusionZone | Fields: `C/data/preset/PresetStructureSets.java:56-58,66,72`. **`salt()` is unused.** |
 | Biome (44) | `getTemperature(BlockPos)` | **Unused** (only commented out at `ErodeSnowFeature.java:78`). |
 | StructureManager (45) | `level` | **Unused.** |
@@ -134,14 +134,14 @@ The widener is wired through `architectury.common.json`, `common/build.gradle:6`
 | `C/platform/RegistryUtil.java:25` `static <T> WritableRegistry<T> getWritable(Registry<T>)` | Casts the vanilla registry to `WritableRegistry`. This relies on vanilla built-in registries being unfrozen during mod init, which Fabric allows. | Wraps a `DeferredRegister.create(key, MOD_ID)` in `FG/platform/forge/DeferredRegistry.Writable`, a hand-written `Registry<T>`/`WritableRegistry<T>` delegate over `GameData.getWrapper(key, Lifecycle.stable())`. `register()` creates a stand-alone `Holder.Reference` and calls `DeferredRegister.register(path, supplier)`. It overrides `registerMapping` (1.20.1 only) and about 35 `Registry` methods. |
 | `C/platform/RegistryUtil.java:30` `static <T> Registry<T> createRegistry(ResourceKey<? extends Registry<T>>)` | `FabricRegistryBuilder.createSimple(key).buildAndRegister()` | `DeferredRegister.create(...)` with `makeRegistry(() -> new RegistryBuilder().hasTags())`, returned as a memoized `DeferredRegistry` over `GameData.getWrapper`. |
 | `C/platform/RegistryUtil.java:35` `static <T> void createDataRegistry(ResourceKey, Codec<T>)` | `DynamicRegistries.register(key, codec)`. Not synced to the client (no network codec). | Queued, then registered in `DataPackRegistryEvent.NewRegistry` → `event.dataPackRegistry(key, codec)` (`FG/platform/forge/RegistryUtilImpl.java:36-40`). Not synced. |
-| `C/server/commands/RTFCommands.java:17` `static void register(BiConsumer<CommandDispatcher<CommandSourceStack>, CommandBuildContext>)` | `F/server/commands/fabric/RTFCommandsImpl.java`: `CommandRegistrationCallback.EVENT` (fabric-command-api-v2) | `FG/server/commands/forge/RTFCommandsImpl.java`: `@EventBusSubscriber` + `@SubscribeEvent RegisterCommandsEvent` |
-| `C/world/worldgen/biome/modifier/BiomeModifiers.java:21` `static void bootstrap()` | `F/world/worldgen/biome/modifier/fabric/BiomeModifiersImpl.java`: registers `add`/`replace` codecs into `RTFBuiltInRegistries.BIOME_MODIFIER_TYPE` | Same, in `FG/.../forge/BiomeModifiersImpl.java` |
+| `C/server/commands/UTFCommands.java:17` `static void register(BiConsumer<CommandDispatcher<CommandSourceStack>, CommandBuildContext>)` | `F/server/commands/fabric/UTFCommandsImpl.java`: `CommandRegistrationCallback.EVENT` (fabric-command-api-v2) | `FG/server/commands/forge/UTFCommandsImpl.java`: `@EventBusSubscriber` + `@SubscribeEvent RegisterCommandsEvent` |
+| `C/world/worldgen/biome/modifier/BiomeModifiers.java:21` `static void bootstrap()` | `F/world/worldgen/biome/modifier/fabric/BiomeModifiersImpl.java`: registers `add`/`replace` codecs into `UTFBuiltInRegistries.BIOME_MODIFIER_TYPE` | Same, in `FG/.../forge/BiomeModifiersImpl.java` |
 | `BiomeModifiers.java:44` `static BiomeModifier add(Order, GenerationStep.Decoration, Optional<Pair<Filter.Behavior, HolderSet<Biome>>>, HolderSet<PlacedFeature>)` | `fabric/AddModifier` implements `FabricBiomeModifier`. It uses `BiomeSelectionContext`/`BiomeModificationContext` (fabric-biome-api-v1), directly mutates `BiomeGenerationSettings.features()` and rebuilds flower features through the accessor mixin. Applied by `MixinBiomeModificationImpl`, not through the public `BiomeModifications` API. | `forge/AddModifier` implements `ForgeBiomeModifier`, which extends `net.minecraftforge.common.world.BiomeModifier`. It implements `modify(Holder<Biome>, Phase, ModifiableBiomeInfo.BiomeInfo.Builder)` in `Phase.AFTER_EVERYTHING` and mutates `PlainBuilder.features` through the accessor. Applied by `MixinServerLifecycleHooks`; Forge's `ForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS` is not used. |
 | `BiomeModifiers.java:57` `static BiomeModifier replace(GenerationStep.Decoration, Optional<HolderSet<Biome>>, Map<ResourceKey<PlacedFeature>, Holder<PlacedFeature>>)` | `fabric/ReplaceModifier` (same approach) | `forge/ReplaceModifier` (same approach) |
 
 Loader entrypoints:
-- Fabric: `F/fabric/RTFFabric.java` implements `ModInitializer.onInitialize()`, which runs `RTFCommon.bootstrap()`. It also implements `DataGeneratorEntrypoint.onInitializeDataGenerator`, but `fabric.mod.json` declares **only** `main`, not the `fabric-datagen` entrypoint.
-- Forge: `FG/forge/RTFForge.java` is `@Mod`. Its ctor runs `RTFCommon.bootstrap()`, `RegistryUtilImpl.register(modBus)`, a `GatherDataEvent` listener (`PackMetadataGenerator.forFeaturePack` plus the lang provider) and, on the client dist, `RegisterPresetEditorsEvent` (`FG/forge/RTFForgeClient.java`) through `FMLJavaModLoadingContext.get().getModEventBus()`. `FMLEnvironment.dist` is used as well.
+- Fabric: `F/fabric/UTFFabric.java` implements `ModInitializer.onInitialize()`, which runs `UTFCommon.bootstrap()`. It also implements `DataGeneratorEntrypoint.onInitializeDataGenerator`, but `fabric.mod.json` declares **only** `main`, not the `fabric-datagen` entrypoint.
+- Forge: `FG/forge/UTFForge.java` is `@Mod`. Its ctor runs `UTFCommon.bootstrap()`, `RegistryUtilImpl.register(modBus)`, a `GatherDataEvent` listener (`PackMetadataGenerator.forFeaturePack` plus the lang provider) and, on the client dist, `RegisterPresetEditorsEvent` (`FG/forge/UTFForgeClient.java`) through `FMLJavaModLoadingContext.get().getModEventBus()`. `FMLEnvironment.dist` is used as well.
 
 ---
 
@@ -149,47 +149,47 @@ Loader entrypoints:
 
 All vanilla registry writes go through `RegistryUtil.register(registry, name, value)`, which calls `getWritable(registry).register(ResourceKey, value, Lifecycle.stable())`. There are **no direct `Registry.register(` calls**.
 
-### Custom static ("built-in") registries: `C/registries/RTFRegistries.java` and `RTFBuiltInRegistries.java`
+### Custom static ("built-in") registries: `C/registries/UTFRegistries.java` and `UTFBuiltInRegistries.java`
 Each is created with `RegistryUtil.createRegistry`. The element type is `Codec<? extends X>`: every type registry stores **`Codec` values, not `MapCodec`**. Dispatch uses `REG.byNameCodec().dispatch(X::codec, Function.identity())`.
 
 | Key | Element | Registered entries (file) |
 |---|---|---|
-| `reterraforged:worldgen/noise_type` | `Codec<? extends Noise>` | 42 entries (`C/world/worldgen/noise/module/Noises.java:419`): constant, sin, white, perlin, perlin2, perlin_ridge, simplex, simplex2, simplex_ridge, worley, worley_edge, billow, cubic, line, shift, frequency, add, multiply, power, power_curve, curve, gradient, terrace, advanced_terrace, invert, blend, alpha, boost, steps, abs, map, clamp, threshold, min, max, warp, erosion, linear_spline, cache, cell, legacy_temperature, legacy_moisture |
-| `reterraforged:worldgen/domain_type` | `Codec<? extends Domain>` | domain, direction, compound, add, direct (`noise/domain/Domains.java:57`) |
-| `reterraforged:worldgen/curve_function_type` | `Codec<? extends CurveFunction>` | interpolation, scurve, terrace (`noise/function/CurveFunctions.java`) |
-| `reterraforged:worldgen/chance_modifier_type` | `Codec<? extends ChanceModifier>` | elevation, biome_edge (`feature/chance/RTFChanceModifiers.java`) |
-| `reterraforged:worldgen/template_placement_type` | `Codec<? extends TemplatePlacement<?>>` | any, tree (`feature/template/placement/TemplatePlacements.java`; both use `Codec.unit`) |
-| `reterraforged:worldgen/template_decorator_type` | `Codec<? extends TemplateDecorator<?>>` | tree (`feature/template/decorator/TemplateDecorators.java`) |
-| `reterraforged:worldgen/biome_modifier_type` | `Codec<? extends BiomeModifier>` | add, replace (per-loader `BiomeModifiersImpl`) |
-| `reterraforged:worldgen/structure_rule_type` | `Codec<? extends StructureRule>` | cell_test (`structure/rule/StructureRules.java`) |
+| `ultraterraforged:worldgen/noise_type` | `Codec<? extends Noise>` | 42 entries (`C/world/worldgen/noise/module/Noises.java:419`): constant, sin, white, perlin, perlin2, perlin_ridge, simplex, simplex2, simplex_ridge, worley, worley_edge, billow, cubic, line, shift, frequency, add, multiply, power, power_curve, curve, gradient, terrace, advanced_terrace, invert, blend, alpha, boost, steps, abs, map, clamp, threshold, min, max, warp, erosion, linear_spline, cache, cell, legacy_temperature, legacy_moisture |
+| `ultraterraforged:worldgen/domain_type` | `Codec<? extends Domain>` | domain, direction, compound, add, direct (`noise/domain/Domains.java:57`) |
+| `ultraterraforged:worldgen/curve_function_type` | `Codec<? extends CurveFunction>` | interpolation, scurve, terrace (`noise/function/CurveFunctions.java`) |
+| `ultraterraforged:worldgen/chance_modifier_type` | `Codec<? extends ChanceModifier>` | elevation, biome_edge (`feature/chance/UTFChanceModifiers.java`) |
+| `ultraterraforged:worldgen/template_placement_type` | `Codec<? extends TemplatePlacement<?>>` | any, tree (`feature/template/placement/TemplatePlacements.java`; both use `Codec.unit`) |
+| `ultraterraforged:worldgen/template_decorator_type` | `Codec<? extends TemplateDecorator<?>>` | tree (`feature/template/decorator/TemplateDecorators.java`) |
+| `ultraterraforged:worldgen/biome_modifier_type` | `Codec<? extends BiomeModifier>` | add, replace (per-loader `BiomeModifiersImpl`) |
+| `ultraterraforged:worldgen/structure_rule_type` | `Codec<? extends StructureRule>` | cell_test (`structure/rule/StructureRules.java`) |
 
-### Custom datapack (dynamic) registries (`C/RTFCommon.java:63-67`, `RegistryUtil.createDataRegistry`)
+### Custom datapack (dynamic) registries (`C/UTFCommon.java:63-67`, `RegistryUtil.createDataRegistry`)
 
 | Key | Codec |
 |---|---|
-| `reterraforged:worldgen/noise` | `Noise.DIRECT_CODEC` (`Codec.either(floatRange, dispatch)`). `Holder<Noise>` fields use `RegistryFileCodec.create(RTFRegistries.NOISE, DIRECT_CODEC)` (`Noise.java:11`). |
-| `reterraforged:worldgen/biome_modifier` | `BiomeModifier.CODEC` |
-| `reterraforged:worldgen/structure_rule` | `StructureRule.CODEC` |
-| `reterraforged:worldgen/surface_layers` | `LayeredSurfaceRule.Layer.CODEC` |
-| `reterraforged:worldgen/preset` | `Preset.CODEC` (`PresetFormat.versioned(UNVERSIONED_CODEC)`) |
+| `ultraterraforged:worldgen/noise` | `Noise.DIRECT_CODEC` (`Codec.either(floatRange, dispatch)`). `Holder<Noise>` fields use `RegistryFileCodec.create(UTFRegistries.NOISE, DIRECT_CODEC)` (`Noise.java:11`). |
+| `ultraterraforged:worldgen/biome_modifier` | `BiomeModifier.CODEC` |
+| `ultraterraforged:worldgen/structure_rule` | `StructureRule.CODEC` |
+| `ultraterraforged:worldgen/surface_layers` | `LayeredSurfaceRule.Layer.CODEC` |
+| `ultraterraforged:worldgen/preset` | `Preset.CODEC` (`PresetFormat.versioned(UNVERSIONED_CODEC)`) |
 
-These are registered with Fabric `DynamicRegistries.register` and Forge `DataPackRegistryEvent.NewRegistry`. Neither loader syncs them to clients; they are server-only. On disk they load from `data/<ns>/reterraforged/worldgen/<name>/…`, because modded datapack registries have their path prefixed by the registry namespace. The test asserts `data/reterraforged/reterraforged/worldgen/preset/preset.json` (`common/src/test/.../PresetDatapackTest.java:24`).
+These are registered with Fabric `DynamicRegistries.register` and Forge `DataPackRegistryEvent.NewRegistry`. Neither loader syncs them to clients; they are server-only. On disk they load from `data/<ns>/ultraterraforged/worldgen/<name>/…`, because modded datapack registries have their path prefixed by the registry namespace. The test asserts `data/ultraterraforged/ultraterraforged/worldgen/preset/preset.json` (`common/src/test/.../PresetDatapackTest.java:24`).
 
-### Vanilla registries RTF registers into
+### Vanilla registries UTF registers into
 
 | Registry | Entries | Codec form | File |
 |---|---|---|---|
-| `BuiltInRegistries.DENSITY_FUNCTION_TYPE` | noise_sampler, cell, clamp_to_nearest_unit, linear_spline | `Codec<? extends DensityFunction>`. Each DF's `codec()` returns `new KeyDispatchDataCodec<>(CODEC)` | `C/world/worldgen/densityfunction/RTFDensityFunctions.java:14-34` |
-| `BuiltInRegistries.MATERIAL_CONDITION` | mod, biome_tag, noise, terrain, height, steepness, erosion, sediment, river_bank, height_modification_detection, any | `Codec<? extends SurfaceRules.ConditionSource>` plus `KeyDispatchDataCodec` in `codec()` | `C/world/worldgen/surface/condition/RTFSurfaceConditions.java:21-112` |
-| `BuiltInRegistries.MATERIAL_RULE` | layered, strata, noise, plus `terrablender` (only if TB is loaded, `TBSurfaceRules.java:24`) | same as above | `C/world/worldgen/surface/rule/RTFSurfaceRules.java:19-34` |
-| `BuiltInRegistries.FEATURE` | template, bush, disk, chance, erode_snow, swamp_surface | `new XFeature(Config.CODEC)` (Codec) | `C/world/worldgen/feature/RTFFeatures.java:12-23` |
-| `BuiltInRegistries.PLACEMENT_MODIFIER_TYPE` | dimension_filter, terrain_filter, macro_biome_filter, noise_filter, fast_poission (sic), legacy_count_extra | `PlacementModifierType<P>` built as the lambda `() -> codec` from a `Codec<P>` | `C/world/worldgen/feature/placement/RTFPlacementModifiers.java:19-61` |
-| `BuiltInRegistries.FLOAT_PROVIDER_TYPE` | legacy_canyon_y_scale (`Codec.unit`) | `FloatProviderType<T>` lambda from a Codec | `C/world/worldgen/floatproviders/RTFFloatProviderTypes.java` |
-| `BuiltInRegistries.HEIGHT_PROVIDER_TYPE` | legacy_carver | `HeightProviderType<T>` lambda from a Codec | `C/world/worldgen/heightproviders/RTFHeightProviderTypes.java` |
+| `BuiltInRegistries.DENSITY_FUNCTION_TYPE` | noise_sampler, cell, clamp_to_nearest_unit, linear_spline | `Codec<? extends DensityFunction>`. Each DF's `codec()` returns `new KeyDispatchDataCodec<>(CODEC)` | `C/world/worldgen/densityfunction/UTFDensityFunctions.java:14-34` |
+| `BuiltInRegistries.MATERIAL_CONDITION` | mod, biome_tag, noise, terrain, height, steepness, erosion, sediment, river_bank, height_modification_detection, any | `Codec<? extends SurfaceRules.ConditionSource>` plus `KeyDispatchDataCodec` in `codec()` | `C/world/worldgen/surface/condition/UTFSurfaceConditions.java:21-112` |
+| `BuiltInRegistries.MATERIAL_RULE` | layered, strata, noise, plus `terrablender` (only if TB is loaded, `TBSurfaceRules.java:24`) | same as above | `C/world/worldgen/surface/rule/UTFSurfaceRules.java:19-34` |
+| `BuiltInRegistries.FEATURE` | template, bush, disk, chance, erode_snow, swamp_surface | `new XFeature(Config.CODEC)` (Codec) | `C/world/worldgen/feature/UTFFeatures.java:12-23` |
+| `BuiltInRegistries.PLACEMENT_MODIFIER_TYPE` | dimension_filter, terrain_filter, macro_biome_filter, noise_filter, fast_poission (sic), legacy_count_extra | `PlacementModifierType<P>` built as the lambda `() -> codec` from a `Codec<P>` | `C/world/worldgen/feature/placement/UTFPlacementModifiers.java:19-61` |
+| `BuiltInRegistries.FLOAT_PROVIDER_TYPE` | legacy_canyon_y_scale (`Codec.unit`) | `FloatProviderType<T>` lambda from a Codec | `C/world/worldgen/floatproviders/UTFFloatProviderTypes.java` |
+| `BuiltInRegistries.HEIGHT_PROVIDER_TYPE` | legacy_carver | `HeightProviderType<T>` lambda from a Codec | `C/world/worldgen/heightproviders/UTFHeightProviderTypes.java` |
 
-- **No** RTF registrations exist for structure types, structure placement types, biome sources, chunk generators, carvers, blocks, items or argument types.
+- **No** UTF registrations exist for structure types, structure placement types, biome sources, chunk generators, carvers, blocks, items or argument types.
 - `VolatileAirBlock` (`C/blocks/VolatileAirBlock.java`) is never registered and is dead code.
-- The world preset is not registered in code. It is the static JSON `data/reterraforged/worldgen/world_preset/reterraforged.json` plus the `data/minecraft/tags/worldgen/world_preset/normal.json` tag. `RTFWorldPresets.RETERRAFORGED` is only a `ResourceKey`.
+- The world preset is not registered in code. It is the static JSON `data/ultraterraforged/worldgen/world_preset/ultraterraforged.json` plus the `data/minecraft/tags/worldgen/world_preset/normal.json` tag. `UTFWorldPresets.RETERRAFORGED` is only a `ResourceKey`.
 
 Codec style: 154 `static final Codec<…> CODEC` declarations, **0 `MapCodec` CODECs** (the one `MapCodec` import is the `PresetCodecs.defaulted` helper), 121 `RecordCodecBuilder.create` calls and 0 `RecordCodecBuilder.mapCodec`. There are 20 `KeyDispatchDataCodec` users.
 
@@ -215,7 +215,7 @@ Codec style: 154 `static final Codec<…> CODEC` declarations, **0 `MapCodec` CO
 **Features** (`Feature<C>.place(FeaturePlaceContext<C>)`):
 - `BushFeature`, `DiskFeature` (uses vanilla `DiskConfiguration`), `ErodeSnowFeature`, `SwampSurfaceFeature`, `ChanceFeature` and `TemplateFeature`.
 - The config records implement `FeatureConfiguration`.
-- `TemplateFeature` loads NBT through `FeatureTemplate.load` (`NbtIo.readCompressed(InputStream)`, `NbtUtils.readBlockState(HolderLookup<Block>, CompoundTag)`, `ListTag.getCompound` and `CompoundTag.getList(name, type)`, in `C/world/worldgen/feature/template/template/FeatureTemplate.java:310-341`). It uses `world.getServer()` cast to `RTFMinecraftServer`.
+- `TemplateFeature` loads NBT through `FeatureTemplate.load` (`NbtIo.readCompressed(InputStream)`, `NbtUtils.readBlockState(HolderLookup<Block>, CompoundTag)`, `ListTag.getCompound` and `CompoundTag.getList(name, type)`, in `C/world/worldgen/feature/template/template/FeatureTemplate.java:310-341`). It uses `world.getServer()` cast to `UTFMinecraftServer`.
 
 **Placement**:
 - `CellFilter` (abstract), `DimensionFilter` and `NoiseFilter` extend `PlacementFilter` and override `shouldPlace(PlacementContext, RandomSource, BlockPos)` and `type()`. `TerrainFilter` and `MacroBiomeFilter` extend CellFilter.
@@ -228,7 +228,7 @@ Codec style: 154 `static final Codec<…> CODEC` declarations, **0 `MapCodec` CO
 **Other**:
 - `BlockReader implements BlockGetter` overrides getHeight, **getMinBuildHeight**, getBlockEntity, getBlockState and getFluidState.
 - `VolatileAirBlock extends AirBlock` overrides updateShape (it is unregistered).
-- `RTFBuiltinPackSource extends BuiltInPackSource` overrides createVanillaPack(PackResources), getPackTitle(String) and createBuiltinPack(String, Pack.ResourcesSupplier, Component). It uses `VanillaPackResourcesBuilder` (exposeNamespace, pushAssetPath, applyDevelopmentConfig) and `Pack.readMetaAndCreate(title, desc, false, supplier, PackType.SERVER_DATA, Pack.Position.TOP, PackSource.FEATURE)`.
+- `UTFBuiltinPackSource extends BuiltInPackSource` overrides createVanillaPack(PackResources), getPackTitle(String) and createBuiltinPack(String, Pack.ResourcesSupplier, Component). It uses `VanillaPackResourcesBuilder` (exposeNamespace, pushAssetPath, applyDevelopmentConfig) and `Pack.readMetaAndCreate(title, desc, false, supplier, PackType.SERVER_DATA, Pack.Position.TOP, PackSource.FEATURE)`.
 - Tag providers: `PresetBiomeTagsProvider extends TagsProvider<Biome>`, `PresetBlockTagsProvider extends IntrinsicHolderTagsProvider<Block>` and `PresetSurfaceLayerProvider extends TagsProvider<LayeredSurfaceRule.Layer>` override `addTags(HolderLookup.Provider)`. PresetBlockTagsProvider uses `.addOptional(new ResourceLocation("create", ...))` and `.addOptionalTag`.
 - `LanguageProvider implements DataProvider` (run(CachedOutput), getName). The Fabric `DataGenUtilImpl.Provider` also implements DataProvider.
 - About 14 enums implement `StringRepresentable`.
@@ -275,11 +275,11 @@ Codec style: 154 `static final Codec<…> CODEC` declarations, **0 `MapCodec` CO
 - No `RenderSystem`, `PoseStack`, `BufferBuilder`/`Tesselator` or shaders are used in main code.
 - Clienttest uses `Screenshot.takeScreenshot(RenderTarget)` and `NativeImage`.
 
-**Threading in the GUI**: TerrainPreview renders on a `ScheduledExecutorService` (`RTF-Preview`, l.50) and hands back with `Minecraft.getInstance().execute`.
+**Threading in the GUI**: TerrainPreview renders on a `ScheduledExecutorService` (`UTF-Preview`, l.50) and hands back with `Minecraft.getInstance().execute`.
 
-**Client config**: `C/client/ClientConfig.java` stores `config/reterraforged/client.json` (Gson) with the key `useAsDefaultWorldType`.
+**Client config**: `C/client/ClientConfig.java` stores `config/ultraterraforged/client.json` (Gson) with the key `useAsDefaultWorldType`.
 
-**Lang datagen**: `C/client/data/LanguageProvider.java` implements DataProvider and `RTFLanguageProvider.EnglishUS`, with output in `assets/reterraforged/lang/en_us.json`.
+**Lang datagen**: `C/client/data/LanguageProvider.java` implements DataProvider and `UTFLanguageProvider.EnglishUS`, with output in `assets/ultraterraforged/lang/en_us.json`.
 
 ---
 
@@ -287,12 +287,12 @@ Codec style: 154 `static final Codec<…> CODEC` declarations, **0 `MapCodec` CO
 
 - **Runtime preset → datapack** is the core mechanism:
   1. `Preset.buildPatch(HolderLookup.Provider)` (`C/data/preset/settings/Preset.java:45-68`) builds a `new RegistrySetBuilder()`. For each registry it calls `builder.add(key, ctx -> patch.apply(preset, ctx))` with a `BootstapContext<T>`.
-     - The RTF registries are PRESET, NOISE, BIOME_MODIFIER, STRUCTURE_RULE and SURFACE_LAYERS.
+     - The UTF registries are PRESET, NOISE, BIOME_MODIFIER, STRUCTURE_RULE and SURFACE_LAYERS.
      - The vanilla registries are CONFIGURED_FEATURE, CONFIGURED_CARVER, STRUCTURE_SET, PLACED_FEATURE, BIOME, DIMENSION_TYPE, NOISE, DENSITY_FUNCTION (including `TBNoiseRouterData`, always) and NOISE_SETTINGS.
      - It finishes with `builder.buildPatch(RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY), registries)`.
-  2. `RTFDataGen.makePreset` (`C/data/RTFDataGen.java:34-56`, `@Deprecated`) does `new DataGenerator(path, SharedConstants.getCurrentVersion(), true)`, then `dataGenerator.new PackGenerator(true, "preset", new PackOutput(out))` (AW ctor). It adds the providers `DataGenUtil.createRegistryProvider`, `PresetBlockTagsProvider`, `PresetSurfaceLayerProvider`, `PresetBiomeTagsProvider` and `PackMetadataGenerator.forFeaturePack(output, Component)`. `pack_format` comes implicitly from the current version.
-  3. `PresetPacks.export` (`C/data/PresetPacks.java:34`) runs the generator, zips the result with the JDK zipfs and moves it to `reterraforged-preset[-<sha1>].zip` in the world's `datapacks/`.
-  4. The pack is detected by the id prefix `file/reterraforged-preset` (`PresetPacks.isPresetPack`), which the RegistryDataLoader mixin relies on.
+  2. `UTFDataGen.makePreset` (`C/data/UTFDataGen.java:34-56`, `@Deprecated`) does `new DataGenerator(path, SharedConstants.getCurrentVersion(), true)`, then `dataGenerator.new PackGenerator(true, "preset", new PackOutput(out))` (AW ctor). It adds the providers `DataGenUtil.createRegistryProvider`, `PresetBlockTagsProvider`, `PresetSurfaceLayerProvider`, `PresetBiomeTagsProvider` and `PackMetadataGenerator.forFeaturePack(output, Component)`. `pack_format` comes implicitly from the current version.
+  3. `PresetPacks.export` (`C/data/PresetPacks.java:34`) runs the generator, zips the result with the JDK zipfs and moves it to `ultraterraforged-preset[-<sha1>].zip` in the world's `datapacks/`.
+  4. The pack is detected by the id prefix `file/ultraterraforged-preset` (`PresetPacks.isPresetPack`), which the RegistryDataLoader mixin relies on.
 - The client uses `PresetApplier` (section 6), called from the CreateWorldScreen mixin, with `worldgenLoadContext()` as the base registries.
 - The dedicated server uses `ServerPresets.installIfNewWorld` from the ServerPacksSource mixin, with `VanillaRegistries.createLookup()` as the base (`C/server/ServerPresets.java:29`).
 - **Bootstrap classes** take `BootstapContext<T>` (misspelled in 1.20.1; 45 occurrences in 21 files). Examples are PresetData, PresetNoiseData, PresetNoiseParameters, PresetNoiseRouterData, PresetNoiseGeneratorSettings, PresetSurfaceRuleData, PresetSurfaceLayerData, PresetBiomeModifierData, PresetConfiguredFeatures, PresetPlacedFeatures, PresetConfiguredCarvers, PresetStructureRuleData, PresetStructureSets, PresetDimensionTypes, PresetBiomeData, PresetTerrainNoise, PresetClimateNoise, PresetSurfaceNoise, PresetStrataNoise, PresetFeatureNoise and TBNoiseRouterData.
@@ -301,41 +301,41 @@ Codec style: 154 `static final Codec<…> CODEC` declarations, **0 `MapCodec` CO
   - `PresetNoiseRouterData` re-implements the overworld NoiseRouter and uses AW'd `NoiseRouterData` internals, `OreVeinifier.VeinType` and `DensityFunctions.weirdScaledSampler`.
   - `PresetNoiseGeneratorSettings` does `new NoiseGeneratorSettings(NoiseSettings.create(...), stone, water, router, surfaceRule, spawnTarget, seaLevel, false, true, largeOreVeins, false)` (10-arg ctor).
   - `PresetDimensionTypes` does `new DimensionType(OptionalLong, ..., BlockTags.INFINIBURN_OVERWORLD, BuiltinDimensionTypes.OVERWORLD_EFFECTS, 0f, new MonsterSettings(false, true, UniformInt.of(0,7), 0))`.
-  - `PresetSurfaceRuleData` (802 lines) is the vanilla overworld surface rules plus RTF rules.
+  - `PresetSurfaceRuleData` (802 lines) is the vanilla overworld surface rules plus UTF rules.
   - `PresetConfiguredFeatures` and `PresetPlacedFeatures` use `FeatureUtils`, `PlacementUtils`, `TreeFeatures`, `OreFeatures`, `MiscOverworldFeatures`, `VegetationPlacements`, `TreePlacements`, `OrePlacements`, `MiscOverworldPlacements`, `Carvers` and the configuration classes RandomPatch, RandomFeature, SimpleBlock and Disk. They also use the carver configs Cave and Canyon (`CarverDebugSettings`) and the tree decorators Beehive and AlterGround.
   - `PresetStructureSets` builds `new RandomSpreadStructurePlacement(...)` and `new ConcentricRingsStructurePlacement(...)` from AW'd StructurePlacement fields.
 - **Mod-jar resource datagen**:
-  - `RTFDataGen.generateResourcePacks(ResourcePackFactory)` (lang plus metadata). On Fabric it is only called from `DataGeneratorEntrypoint`, which `fabric.mod.json` does not declare.
-  - On Forge it runs through `GatherDataEvent` (`FG/forge/RTFForge.java:34-41`) with the `forge/build.gradle` `dataGen { mod "reterraforged" }`.
+  - `UTFDataGen.generateResourcePacks(ResourcePackFactory)` (lang plus metadata). On Fabric it is only called from `DataGeneratorEntrypoint`, which `fabric.mod.json` does not declare.
+  - On Forge it runs through `GatherDataEvent` (`FG/forge/UTFForge.java:34-41`) with the `forge/build.gradle` `dataGen { mod "ultraterraforged" }`.
 - **pack.mcmeta**: `forge/src/main/resources/pack.mcmeta` has `pack_format: 15` (hard-coded, 1.20.1) and a translate description. There is no pack.mcmeta in common or Fabric.
 - **Static resources** under `common/src/main/resources`:
-  - `data/minecraft/tags/worldgen/world_preset/normal.json` adds `reterraforged:reterraforged` to the normal world types tag.
-  - `data/reterraforged/worldgen/world_preset/reterraforged.json` is a copy of vanilla's default preset (noise, multi_noise, preset `overworld`/`nether`, `the_end`).
-  - `data/reterraforged/structures/{mushrooms/{brown,red}, trees/{acacia,birch,dark_oak,jungle,meadow,oak,pine,redwood,spruce,willow}/...}/*.nbt` holds 109 `.nbt` templates. They are loaded by RTF's own `FeatureTemplateManager` through `ResourceManager.getResource(reterraforged:structures/…nbt)`; the path is built in `C/data/preset/PresetTemplatePaths.java:48`. They are not loaded through the vanilla StructureTemplateManager.
-  - `assets/reterraforged/lang/en_us.json`.
+  - `data/minecraft/tags/worldgen/world_preset/normal.json` adds `ultraterraforged:ultraterraforged` to the normal world types tag.
+  - `data/ultraterraforged/worldgen/world_preset/ultraterraforged.json` is a copy of vanilla's default preset (noise, multi_noise, preset `overworld`/`nether`, `the_end`).
+  - `data/ultraterraforged/structures/{mushrooms/{brown,red}, trees/{acacia,birch,dark_oak,jungle,meadow,oak,pine,redwood,spruce,willow}/...}/*.nbt` holds 109 `.nbt` templates. They are loaded by UTF's own `FeatureTemplateManager` through `ResourceManager.getResource(ultraterraforged:structures/…nbt)`; the path is built in `C/data/preset/PresetTemplatePaths.java:48`. They are not loaded through the vanilla StructureTemplateManager.
+  - `assets/ultraterraforged/lang/en_us.json`.
   - `biomes.png` and `biomes.txt` (classpath root, read by `BiomeTypeLoader`/`BiomeTypeColors` with `getResourceAsStream`).
   - `architectury.common.json`, the mixin JSONs and the AW.
-- **Generated tag paths** use 1.20.1 directory names, for example `data/reterraforged/tags/blocks/rock.json` (asserted in `PresetBlockTagsTest.java:32`).
-- **`RTFBuiltinPackSource`** reads `/data/` from the mod classpath with `PACKS_DIR = reterraforged:datapacks`. `RTFDataGen.DATAPACK_PATH = "data/reterraforged/datapacks"` exists, but no such directory is in resources, so the source currently finds no packs.
+- **Generated tag paths** use 1.20.1 directory names, for example `data/ultraterraforged/tags/blocks/rock.json` (asserted in `PresetBlockTagsTest.java:32`).
+- **`UTFBuiltinPackSource`** reads `/data/` from the mod classpath with `PACKS_DIR = ultraterraforged:datapacks`. `UTFDataGen.DATAPACK_PATH = "data/ultraterraforged/datapacks"` exists, but no such directory is in resources, so the source currently finds no packs.
 
 ---
 
 ## 8. Commands, config, networking and server lifecycle
 
-- **Commands**: `C/server/commands/LocateTerrainCommand.java` registers `/rtf locate <terrain>` with permission 2.
+- **Commands**: `C/server/commands/LocateTerrainCommand.java` registers `/utf locate <terrain>` with permission 2.
   - It uses Brigadier (`CommandDispatcher`, `Commands.literal/argument`, `StringArgumentType.word()`), `SharedSuggestionProvider.suggest`, `DynamicCommandExceptionType` and `CommandSourceStack.sendSuccess(Supplier<Component>, boolean)`.
   - It builds `ClickEvent(SUGGEST_COMMAND)` and `HoverEvent(SHOW_TEXT)` components and uses `ComponentUtils.wrapInSquareBrackets`, `BlockPos.containing(Vec3)` and `commandSourceStack.getLevel().getChunkSource().randomState()`.
   - `TerrainArgument` is a plain word argument with suggestions, not a custom `ArgumentType`, so nothing is registered in ArgumentTypeInfos.
   - Registration happens per loader (section 3) with `CommandBuildContext`.
 - **Config**: there is no night-config or loader config API. `night-config:toml` is only `compileOnly` in `common/build.gradle:13` and is unused in code.
-  - `ConfigUtil.rtf(path)` resolves to `<configDir>/reterraforged/` and is created in a static init.
+  - `ConfigUtil.utf(path)` resolves to `<configDir>/ultraterraforged/` and is created in a static init.
   - `PerformanceConfig` (`C/config/PerformanceConfig.java`) is a stub: `read()` returns defaults (`DataResult.success`).
   - `ClientConfig` (JSON), `server-preset.json` (JSON through `Preset.CODEC`) and the `PresetLibrary` user presets and export folder are all Gson plus Codec files.
 - **Networking**: none. No packets, `FriendlyByteBuf`, payloads or channels. The datapack registries are not synced.
 - **Server lifecycle and level type**:
-  - `ServerPresets.isReTerraForgedLevelType` reads `server.properties` directly with `java.util.Properties` and checks for `level-type=reterraforged:reterraforged`.
+  - `ServerPresets.isReTerraForgedLevelType` reads `server.properties` directly with `java.util.Properties` and checks for `level-type=ultraterraforged:ultraterraforged`.
   - The install hook is the `ServerPacksSource.createPackRepository(Path)` HEAD inject, and it only runs when `level.dat` is missing.
-  - Other hooks: the `MinecraftServer` ctor and reload-lambda injects (template manager), `ChunkMap.<init>` (RTF RandomState init), `MinecraftServer.setInitialSpawn`, `Util.shutdownExecutors`, and the Forge `ServerLifecycleHooks.runModifiers`.
+  - Other hooks: the `MinecraftServer` ctor and reload-lambda injects (template manager), `ChunkMap.<init>` (UTF RandomState init), `MinecraftServer.setInitialSpawn`, `Util.shutdownExecutors`, and the Forge `ServerLifecycleHooks.runModifiers`.
   - No loader lifecycle events such as ServerStarting or ServerLifecycleEvents are used.
 
 ---
@@ -359,7 +359,7 @@ Codec style: 154 `static final Codec<…> CODEC` declarations, **0 `MapCodec` CO
 ## 10. Other vanilla APIs of note (counts are occurrences / files across all source sets)
 
 - **`new ResourceLocation(`**: 16 occurrences in 5 files.
-  - Main code: `C/RTFCommon.java:71-72` (the central `RTFCommon.location()`, 18 call sites in 16 files), `C/compat/terrablender/TBNoiseRouterData.java:11` and `C/data/preset/tags/PresetBlockTagsProvider.java:39-45` (7 occurrences).
+  - Main code: `C/UTFCommon.java:71-72` (the central `UTFCommon.location()`, 18 call sites in 16 files), `C/compat/terrablender/TBNoiseRouterData.java:11` and `C/data/preset/tags/PresetBlockTagsProvider.java:39-45` (7 occurrences).
   - Tests: `PresetDatapackTest.java:76,79` and `StructureOptionsTest.java:30,83,84,98`.
   - There are no `ResourceLocation.tryParse/of/parse/fromNamespaceAndPath` calls yet.
 - **DataResult and DFU**:
@@ -384,15 +384,15 @@ Codec style: 154 `static final Codec<…> CODEC` declarations, **0 `MapCodec` CO
   - `HolderLookup.RegistryLookup.filterFeatures(FeatureFlagSet)` (FeatureTemplateManager:29).
   - `VanillaRegistries.createLookup()`: 4 main and test sites (`ServerPresets.java:29`, tests).
   - `Holder<`: 127 occurrences in 34 files. `HolderSet`: 88 in 13 files (mostly `PresetBiomeModifierData.java`). `HolderGetter`: 61 in 14. `HolderLookup`: 43 in 19. `Holder.Reference`: 8 in 5 (plus `Holder.Reference.createStandAlone` in the Forge DeferredRegistry:223).
-  - `TagKey.create`: 7 sites (`C/tags/RTFBiomeTags.java`, `RTFBlockTags.java`, `RTFSurfaceLayerTags.java`, …). `TagKey`: 74 occurrences in 11 files.
-  - `ResourceKey.create`: 12 occurrences in 11 files. `ResourceKey.createRegistryKey` in `RTFRegistries.java:40`.
+  - `TagKey.create`: 7 sites (`C/tags/UTFBiomeTags.java`, `UTFBlockTags.java`, `UTFSurfaceLayerTags.java`, …). `TagKey`: 74 occurrences in 11 files.
+  - `ResourceKey.create`: 12 occurrences in 11 files. `ResourceKey.createRegistryKey` in `UTFRegistries.java:40`.
 - **`BootstapContext`** (renamed in later versions): 45 occurrences in 21 files (section 7). `RegistrySetBuilder`: `Preset.java:46-68` only.
 - **Worldgen internals**:
   - `ChunkStatus`: 9 occurrences, only in MixinChunkStatus.
   - `Blender`: MixinNoiseBasedChunkGenerator and the TB MixinNoiseChunk.
   - `Beardifier` and `DensityFunctions.BeardifierOrMarker`: MixinNoiseChunk (commented) and the TB MixinNoiseChunk.
   - `NoiseChunk`: 11 occurrences in 4 files.
-  - `RandomState`: 138 occurrences in 22 files. The central pattern is `(Object) randomState instanceof RTFRandomState`, with `level.getChunkSource().randomState()`, `randomState.sampler()` and `randomState.router()`.
+  - `RandomState`: 138 occurrences in 22 files. The central pattern is `(Object) randomState instanceof UTFRandomState`, with `level.getChunkSource().randomState()`, `randomState.sampler()` and `randomState.router()`.
   - `WorldGenRegion`: `SurfaceRegion.java` ThreadLocal, MixinContext and MixinNoiseBasedChunkGenerator.
   - `Climate.*`: 31 occurrences in 11 files (Sampler, TargetPoint, ParameterPoint, ParameterList, `findSpawnPosition`). SpawnFinderFix is a copy of `Climate.SpawnFinder`.
   - `SurfaceSystem`: 13 occurrences in 4 files.
@@ -405,11 +405,11 @@ Codec style: 154 `static final Codec<…> CODEC` declarations, **0 `MapCodec` CO
   - `NbtIo.readCompressed(InputStream)`: `FeatureTemplate.java:310`.
   - `Block`, `BlockState` and `Blocks.*`: 155 `Blocks.X` or `BlockBehaviour.Properties` references.
 - **Threading**: no `Util.backgroundExecutor()`.
-  - Own pools: `ThreadPools.WORLD_GEN = Executors.newFixedThreadPool(availableProcessors, daemon "RTF-WorldGen")` (`C/concurrent/ThreadPools.java:9`), `Cache.SCHEDULER` (single-thread scheduled, `C/concurrent/cache/Cache.java:14`) and `TerrainPreview.EXECUTOR` (`RTF-Preview`).
+  - Own pools: `ThreadPools.WORLD_GEN = Executors.newFixedThreadPool(availableProcessors, daemon "UTF-WorldGen")` (`C/concurrent/ThreadPools.java:9`), `Cache.SCHEDULER` (single-thread scheduled, `C/concurrent/cache/Cache.java:14`) and `TerrainPreview.EXECUTOR` (`UTF-Preview`).
   - The pools are shut down through the `MixinUtil` inject into `Util.shutdownExecutors`.
-  - `CompletableFuture`, `ForkJoinPool` and `Executors`: 59 occurrences in 15 files. `ThreadLocal`: 48 occurrences in 16 files (the RTF cell and pool caches, `SurfaceRegion`).
+  - `CompletableFuture`, `ForkJoinPool` and `Executors`: 59 occurrences in 15 files. `ThreadLocal`: 48 occurrences in 16 files (the UTF cell and pool caches, `SurfaceRegion`).
   - Worldgen state is thread-confined through the `WorldGenFlags` static flags (fast lookups and cull toggled from the ChunkStatus mixin).
-- **Other**: `Util.getPlatform().openUri` (PresetListPage:112,116). `SharedConstants.getCurrentVersion()` (RTFDataGen:35, test). `Component.translatable/literal`: 91 occurrences in 23 files. `GsonHelper` appears twice. `CubicSpline` and `ToFloatFunction` are used by the noise router. `Mth` is used in 9 files.
+- **Other**: `Util.getPlatform().openUri` (PresetListPage:112,116). `SharedConstants.getCurrentVersion()` (UTFDataGen:35, test). `Component.translatable/literal`: 91 occurrences in 23 files. `GsonHelper` appears twice. `CubicSpline` and `ToFloatFunction` are used by the noise router. `Mth` is used in 9 files.
 
 ---
 
@@ -426,26 +426,26 @@ Codec style: 154 `static final Codec<…> CODEC` declarations, **0 `MapCodec` CO
 - **common/build.gradle**:
   - `architectury { common("forge","fabric") }` and the AW path.
   - `modImplementation fabric-loader`, `compileOnly TerraBlender-forge:1.20.1-3.0.1.2` and `compileOnly night-config:toml:3.6.7` (unused).
-  - JUnit 5.11.4 and Mockito 5.14.2. The tests take the system props `rtf.updateGolden`, `rtf.showOutput` and `rtf.render`, with 2G heap.
+  - JUnit 5.11.4 and Mockito 5.14.2. The tests take the system props `utf.updateGolden`, `utf.showOutput` and `utf.render`, with 2G heap.
 - **fabric/build.gradle**:
   - Shadow common with `transformProductionFabric`. `remapJar.injectAccessWidener = true`.
-  - The `clienttest` source set has a `clientTest` loom run (`run-clienttest`, `-Dreterraforged.clienttest.out`, `-Dreterraforged.dev.creative`).
+  - The `clienttest` source set has a `clientTest` loom run (`run-clienttest`, `-Dultraterraforged.clienttest.out`, `-Dultraterraforged.dev.creative`).
   - The processResources expansion into `fabric.mod.json` requires `fabricloader >=0.15.0`, `fabric-api >=${fabric_api_version}`, `minecraft ~${minecraft_version}` and `java >=17`.
-  - The `main` entrypoint is RTFFabric, and the mixins are common plus fabric.
+  - The `main` entrypoint is UTFFabric, and the mixins are common plus fabric.
 - **forge/build.gradle**:
   - `forge "net.minecraftforge:forge:1.20.1-47.4.23"` with `convertAccessWideners` and `extraAccessWideners`.
-  - It registers the two mixin configs, `dataGen { mod "reterraforged" }` and runs with `reterraforged.dev.creative`.
+  - It registers the two mixin configs, `dataGen { mod "ultraterraforged" }` and runs with `ultraterraforged.dev.creative`.
   - `mods.toml` sets `loaderVersion="[47,)"` and dependencies `forge [${forge_min_version},)` and `minecraft [${minecraft_version}]`. The comment says NeoForge 1.20.1 reports itself as "forge".
 - **CI** (`.github/workflows/build.yml`): ubuntu, temurin **Java 21**, `gradle/actions/setup-gradle@v4` and `./gradlew build`. It uploads `fabric/build/libs/*-fabric.jar` and `forge/build/libs/*-forge.jar`.
-- **Headless tests** (`common/src/test/java/raccoonman/reterraforged/test/*`, 17 files, plus `server/ServerPresetsTest.java`):
+- **Headless tests** (`common/src/test/java/com/pandaismyname1/ultraterraforged/test/*`, 17 files, plus `server/ServerPresetsTest.java`):
   - `TestBootstrap.init()` (`TestBootstrap.java:46-77`):
     1. Calls `SharedConstants.tryDetectVersion()` and `Bootstrap.bootStrap()`.
     2. **Unfreezes every `MappedRegistry` in `BuiltInRegistries.REGISTRY` by reflecting the private field `MappedRegistry.frozen`**.
-    3. Uses Mockito `mockStatic` on `RegistryUtil` (createRegistry becomes `new MappedRegistry<>(key, Lifecycle.stable())`, getWritable is identity, register calls `WritableRegistry.register(key, value, Lifecycle.stable())`, and createDataRegistry records into `DATA_REGISTRIES`), on `ModLoaderUtil` (`isLoaded → false`), on `RTFCommands` and on `BiomeModifiers`.
-    4. Runs `RTFCommon.bootstrap()` and re-freezes the registries.
+    3. Uses Mockito `mockStatic` on `RegistryUtil` (createRegistry becomes `new MappedRegistry<>(key, Lifecycle.stable())`, getWritable is identity, register calls `WritableRegistry.register(key, value, Lifecycle.stable())`, and createDataRegistry records into `DATA_REGISTRIES`), on `ModLoaderUtil` (`isLoaded → false`), on `UTFCommands` and on `BiomeModifiers`.
+    4. Runs `UTFCommon.bootstrap()` and re-freezes the registries.
   - Other tests use `VanillaRegistries.createLookup()`, `Preset.buildPatch`, `DataGenerator`/`PackGenerator` (AW), `RegistryOps` and `JsonOps`.
   - Fixtures are `fixtures/0.0.6_{default,beautiful}.json` and `golden/preset-fingerprints.properties`.
-- **Fabric clienttest** (`fabric/src/clienttest/java/raccoonman/reterraforged/clienttest/ClientTest.java`, 379 lines, plus its own `fabric.mod.json` with a `client` entrypoint depending on `fabric-lifecycle-events-v1`):
+- **Fabric clienttest** (`fabric/src/clienttest/java/com/pandaismyname1/ultraterraforged/clienttest/ClientTest.java`, 379 lines, plus its own `fabric.mod.json` with a `client` entrypoint depending on `fabric-lifecycle-events-v1`):
   - It is driven by `ClientTickEvents.END_CLIENT_TICK`.
   - It uses `CreateWorldScreen.openFresh`, the AW'd `tabNavigationBar.selectTab(3,false)`, `TitleScreen`, `GenericDirtMessageScreen`, `mc.clearLevel(Screen)`, `mc.createWorldOpenFlows().loadLevel(...)`, `IntegratedServer`, `LevelResource`, `Screenshot.takeScreenshot(RenderTarget)` and `NativeImage`.
   - It also reads `level.getMinBuildHeight/getMaxBuildHeight`, implements `CommandSource` (the `LoggingSource` record) and reads `BuiltInRegistries`.
@@ -606,13 +606,13 @@ SurfaceRules$Condition, $Context, $SurfaceRule, $LazyCondition, $LazyYCondition,
 ## Dead code and oddities spotted (relevant when deciding what to port)
 - `RegistryUtil.getBiomeModifierRegistry()` is `@ExpectPlatform` with no impl on either loader, and it is never called.
 - The `MixinFabricDataGenerator$Pack` invoker is never called.
-- `RTFFabric` implements `DataGeneratorEntrypoint`, but `fabric.mod.json` has no `fabric-datagen` entrypoint.
+- `UTFFabric` implements `DataGeneratorEntrypoint`, but `fabric.mod.json` has no `fabric-datagen` entrypoint.
 - `VolatileAirBlock` is never registered. `PresetPackSource` is an empty class.
 - About 20 AW entries are unused (section 2).
 - `MixinSurfaceSystem`'s `@ModifyVariable` is a no-op.
 - `MixinSpawnFinder` affects all worlds.
 - TB and WP mixins are declared both in the JSON and in `MixinPlugin.getMixins()`.
-- `RTFBuiltinPackSource` points at a `datapacks` dir that doesn't exist in resources.
+- `UTFBuiltinPackSource` points at a `datapacks` dir that doesn't exist in resources.
 - `PerformanceConfig.read` is a stub.
 - `night-config` is an unused compileOnly dependency.
 - `TBNoiseRouterData` always writes `terrablender:uniqueness` into preset packs.

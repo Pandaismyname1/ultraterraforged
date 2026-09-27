@@ -14,7 +14,9 @@ import re
 import sys
 
 BS = chr(92)
-ERR = re.compile(r'raccoonman[/' + BS + BS + r']reterraforged[/' + BS + BS + r'](.*?\.java):(\d+): error: (.*)')
+SEP = '[/' + BS + BS + ']'
+# the package was raccoonman.reterraforged before the UltraTerraForged rename
+ERR = re.compile('(?:raccoonman' + SEP + 'reterraforged|pandaismyname1' + SEP + 'ultraterraforged)' + SEP + r'(.*?\.java):(\d+): error: (.*)')
 
 
 def load(fn):
@@ -45,7 +47,7 @@ def write(path, title, errs):
         by[f].append((int(ln), msg, sym, code))
     with open(path, 'w', encoding='utf-8', newline='\n') as o:
         o.write(f'# {title}\n\n{len(errs)} distinct errors in {len(by)} files. '
-                'Paths are relative to `common/src/main/java/raccoonman/reterraforged/`. '
+                'Paths are relative to `common/src/main/java/com/pandaismyname1/ultraterraforged/`. '
                 'javac only reports the first wave; fixing these will surface more (override checks, generics).\n\n')
         for f in sorted(by):
             o.write(f'## {f}\n\n')
