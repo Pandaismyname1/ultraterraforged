@@ -26,6 +26,7 @@ import raccoonman.reterraforged.world.worldgen.RTFRandomState;
 import raccoonman.reterraforged.world.worldgen.cell.Cell;
 import raccoonman.reterraforged.world.worldgen.heightmap.WorldLookup;
 import raccoonman.reterraforged.world.worldgen.terrain.Terrain;
+import raccoonman.reterraforged.world.worldgen.terrain.TerrainType;
 
 public class LocateTerrainCommand {
     private static final DynamicCommandExceptionType ERROR_TERRAIN_NOT_FOUND = new DynamicCommandExceptionType(terrain -> Component.translatable(RTFTranslationKeys.TERRAIN_NOT_FOUND, terrain));
@@ -40,7 +41,9 @@ public class LocateTerrainCommand {
 	    				String terrainName = terrain.getName();
 	    				BlockPos origin = BlockPos.containing(stack.getPosition());
 	    				@Nullable
-	    				BlockPos result = locate(stack, terrain, 256, 256, 24000, 30L);
+	    				// small landforms slip between the samples of a coarse search
+	    				boolean small = isSmall(terrain);
+	    				BlockPos result = locate(stack, terrain, small ? 8 : 256, small ? 0 : 256, 24000, 30L);
 	    				if(result != null) {
 	    			        int distance = Mth.floor(dist(origin.getX(), origin.getZ(), result.getX(), result.getZ()));
 		    			    stack.sendSuccess(() -> Component.translatable(RTFTranslationKeys.TERRAIN_FOUND, terrainName, createTeleportMessage(result), distance), false);
@@ -51,6 +54,10 @@ public class LocateTerrainCommand {
     			)
 	    	)
     	);
+    }
+    
+    private static boolean isSmall(Terrain terrain) {
+    	return terrain == TerrainType.TOR || terrain == TerrainType.SHINGLE_BEACH || terrain == TerrainType.VOLCANO_PIPE;
     }
     
     private static Component createTeleportMessage(BlockPos pos) {
