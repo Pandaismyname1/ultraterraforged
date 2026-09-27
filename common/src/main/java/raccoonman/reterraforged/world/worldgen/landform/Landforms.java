@@ -5,6 +5,7 @@ import java.util.List;
 
 import raccoonman.reterraforged.data.preset.settings.CoastSettings;
 import raccoonman.reterraforged.data.preset.settings.LandformSettings;
+import raccoonman.reterraforged.data.preset.settings.OceanSettings;
 import raccoonman.reterraforged.world.worldgen.cell.Cell;
 import raccoonman.reterraforged.world.worldgen.heightmap.Heightmap;
 import raccoonman.reterraforged.world.worldgen.heightmap.Levels;
@@ -17,7 +18,7 @@ public record Landforms(List<Landform> landforms) implements Landform {
 	/**
 	 * @param shoreline the continent edge value at which the land meets the sea
 	 */
-	public static Landforms make(Seed seed, LandformSettings settings, CoastSettings coasts, Levels levels, float shoreline) {
+	public static Landforms make(Seed seed, LandformSettings settings, CoastSettings coasts, OceanSettings oceans, Levels levels, float shoreline) {
 		List<Landform> landforms = new ArrayList<>();
 		// each landform gets its own seed, whether or not the others are on
 		int buttesSeed = seed.next();
@@ -37,12 +38,32 @@ public record Landforms(List<Landform> landforms) implements Landform {
 		int skerriesSeed = seed.next();
 		int islandArcsSeed = seed.next();
 		int riverIslandsSeed = seed.next();
+		int oceansSeed = seed.next();
 		// canyons cut first, so buttes can stand in them
 		if (settings.canyons.enabled) {
 			landforms.add(Canyons.make(canyonsSeed, settings.canyons, levels));
 		}
 		if (settings.karst.enabled) {
 			landforms.add(Karst.make(karstSeed, settings.karst, levels));
+		}
+		// the sea floor, before the coast's features stand on it
+		if (oceans.shelves.enabled) {
+			landforms.add(Shelves.make(oceansSeed, oceans.shelves, shoreline, levels));
+		}
+		if (oceans.submarineCanyons.enabled) {
+			landforms.add(SubmarineCanyons.make(oceansSeed + 1, oceans.submarineCanyons, shoreline, levels));
+		}
+		if (oceans.trenches.enabled) {
+			landforms.add(Trenches.make(oceansSeed + 2, oceans.trenches, shoreline, levels));
+		}
+		if (oceans.seamounts.enabled) {
+			landforms.add(Seamounts.make(oceansSeed + 3, oceans.seamounts, shoreline, levels));
+		}
+		if (oceans.ridges.enabled) {
+			landforms.add(OceanRidges.make(oceansSeed + 4, oceans.ridges, shoreline, levels));
+		}
+		if (oceans.blueHoles.enabled) {
+			landforms.add(BlueHoles.make(oceansSeed + 5, oceans.blueHoles, levels));
 		}
 		// before the dunes, which keep off them
 		if (settings.saltFlats.enabled) {
@@ -88,6 +109,12 @@ public record Landforms(List<Landform> landforms) implements Landform {
 		}
 		if (coasts.islandArcs.enabled) {
 			landforms.add(IslandArcs.make(islandArcsSeed, coasts.islandArcs, shoreline, levels));
+		}
+		if (oceans.coralReefs.enabled) {
+			landforms.add(CoralReefs.make(oceansSeed + 6, oceans.coralReefs, shoreline, levels));
+		}
+		if (oceans.sandWaves.enabled) {
+			landforms.add(SandWaves.make(oceansSeed + 7, oceans.sandWaves, levels));
 		}
 		// last, over the coast the others shaped
 		if (settings.deltas.enabled) {

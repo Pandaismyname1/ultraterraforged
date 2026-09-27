@@ -42,7 +42,7 @@ public class ClientTest implements ClientModInitializer {
 	private static final int TIMEOUT_TICKS = 20 * 60 * 5;
 	// with -Dreterraforged.clienttest.tour=true: a default world, visiting each of these, as /rtf locate finds them
 	private static final boolean TOUR = Boolean.getBoolean("reterraforged.clienttest.tour");
-	private static final String[] TOUR_STOPS = System.getProperty("reterraforged.clienttest.stops", "river,salt_flat,alluvial_fan,glacial_valley,cirque,drumlins,moraine,barrier_island,karst,sinkhole,delta,wetland,lake").split(",");
+	private static final String[] TOUR_STOPS = System.getProperty("reterraforged.clienttest.stops", "river,salt_flat,alluvial_fan,glacial_valley,cirque,drumlins,moraine,barrier_island,karst,sinkhole,delta,wetland,lake,peninsula,coastal_island,sand_bar,skerry,volcanic_island,river_island,submarine_canyon,seamount,guyot,blue_hole,coral_reef,ocean_trench,ocean_ridge,sand_waves").split(",");
 	private static final String SAVED_PRESET = "ClientTest Preset";
 
 	private final Path out = Path.of(System.getProperty("reterraforged.clienttest.out", "clienttest"));
@@ -248,7 +248,7 @@ public class ClientTest implements ClientModInitializer {
 					return;
 				}
 				IntegratedServer server = mc.getSingleplayerServer();
-				boolean sea = stop.equals("barrier_island") || stop.equals("delta");
+				boolean sea = java.util.Set.of("barrier_island", "delta", "skerry", "volcanic_island", "submarine_canyon", "seamount", "guyot", "blue_hole", "coral_reef", "ocean_trench", "ocean_ridge", "sand_waves", "coastal_island", "sand_bar").contains(stop);
 				int height = sea ? 70 : 40;
 				int back = sea ? 90 : 60;
 				server.execute(() -> this.command(server, "execute as @a run tp @s " + target.getX() + " " + (target.getY() + height) + " " + (target.getZ() + back) + " 180 " + (sea ? 40 : 30)));

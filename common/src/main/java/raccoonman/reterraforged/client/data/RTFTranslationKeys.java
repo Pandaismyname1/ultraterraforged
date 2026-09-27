@@ -146,6 +146,36 @@ public class RTFTranslationKeys {
 	public static final String GUI_BUTTON_CAVE_MOUTHS = resolve("gui.button.caveMouths");
 	public static final String GUI_SLIDER_CAVE_MOUTH_STRENGTH = resolve("gui.slider.caveMouthStrength");
 
+	public static final String GUI_OCEANS_SETTINGS_TITLE = resolve("gui.oceans.title");
+	public static final String GUI_LABEL_SHELVES = resolve("gui.label.shelves");
+	public static final String GUI_BUTTON_SHELVES = resolve("gui.button.shelves");
+	public static final String GUI_SLIDER_SHELF_WIDTH = resolve("gui.slider.shelfWidth");
+	public static final String GUI_LABEL_SUBMARINE_CANYONS = resolve("gui.label.submarineCanyons");
+	public static final String GUI_BUTTON_SUBMARINE_CANYONS = resolve("gui.button.submarineCanyons");
+	public static final String GUI_SLIDER_SUBMARINE_CANYON_FREQUENCY = resolve("gui.slider.submarineCanyonFrequency");
+	public static final String GUI_LABEL_TRENCHES = resolve("gui.label.trenches");
+	public static final String GUI_BUTTON_TRENCHES = resolve("gui.button.trenches");
+	public static final String GUI_SLIDER_TRENCH_FREQUENCY = resolve("gui.slider.trenchFrequency");
+	public static final String GUI_SLIDER_TRENCH_DEPTH = resolve("gui.slider.trenchDepth");
+	public static final String GUI_LABEL_SEAMOUNTS = resolve("gui.label.seamounts");
+	public static final String GUI_BUTTON_SEAMOUNTS = resolve("gui.button.seamounts");
+	public static final String GUI_SLIDER_SEAMOUNT_FREQUENCY = resolve("gui.slider.seamountFrequency");
+	public static final String GUI_LABEL_RIDGES = resolve("gui.label.ridges");
+	public static final String GUI_BUTTON_RIDGES = resolve("gui.button.ridges");
+	public static final String GUI_SLIDER_RIDGE_FREQUENCY = resolve("gui.slider.ridgeFrequency");
+	public static final String GUI_LABEL_BLUE_HOLES = resolve("gui.label.blueHoles");
+	public static final String GUI_BUTTON_BLUE_HOLES = resolve("gui.button.blueHoles");
+	public static final String GUI_SLIDER_BLUE_HOLE_FREQUENCY = resolve("gui.slider.blueHoleFrequency");
+	public static final String GUI_LABEL_CORAL_REEFS = resolve("gui.label.coralReefs");
+	public static final String GUI_BUTTON_CORAL_REEFS = resolve("gui.button.coralReefs");
+	public static final String GUI_SLIDER_CORAL_REEF_COVERAGE = resolve("gui.slider.coralReefCoverage");
+	public static final String GUI_LABEL_SAND_WAVES = resolve("gui.label.sandWaves");
+	public static final String GUI_BUTTON_SAND_WAVES = resolve("gui.button.sandWaves");
+	public static final String GUI_SLIDER_SAND_WAVE_HEIGHT = resolve("gui.slider.sandWaveHeight");
+	public static final String GUI_LABEL_WHALE_FALLS = resolve("gui.label.whaleFalls");
+	public static final String GUI_BUTTON_WHALE_FALLS = resolve("gui.button.whaleFalls");
+	public static final String GUI_SLIDER_WHALE_FALL_FREQUENCY = resolve("gui.slider.whaleFallFrequency");
+
 	public static final String GUI_BUTTON_TRUE = resolve("gui.button.true");
 	public static final String GUI_BUTTON_FALSE = resolve("gui.button.false");
 	public static final String GUI_BUTTON_CREATE = resolve("gui.button.create");

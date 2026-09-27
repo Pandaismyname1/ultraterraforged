@@ -473,8 +473,8 @@ public class LandformTest {
 		// between two worlds' landforms, e.g. through a static field
 		Preset preset = preset("default", (p) -> {});
 		raccoonman.reterraforged.world.worldgen.heightmap.Levels levels = TerrainViews.levels(preset);
-		var first = raccoonman.reterraforged.world.worldgen.landform.Landforms.make(new raccoonman.reterraforged.world.worldgen.util.Seed(1), preset.landforms(), preset.coasts(), levels, 0.34F);
-		var second = raccoonman.reterraforged.world.worldgen.landform.Landforms.make(new raccoonman.reterraforged.world.worldgen.util.Seed(1), preset.landforms(), preset.coasts(), levels, 0.34F);
+		var first = raccoonman.reterraforged.world.worldgen.landform.Landforms.make(new raccoonman.reterraforged.world.worldgen.util.Seed(1), preset.landforms(), preset.coasts(), preset.oceans(), levels, 0.34F);
+		var second = raccoonman.reterraforged.world.worldgen.landform.Landforms.make(new raccoonman.reterraforged.world.worldgen.util.Seed(1), preset.landforms(), preset.coasts(), preset.oceans(), levels, 0.34F);
 		assertTrue(first.landforms().size() >= 5, "expected every landform, got " + first.landforms());
 		for (int i = 0; i < first.landforms().size(); i++) {
 			Object a = first.landforms().get(i);

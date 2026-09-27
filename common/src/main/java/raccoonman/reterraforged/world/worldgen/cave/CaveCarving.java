@@ -173,6 +173,13 @@ public final class CaveCarving {
 		}
 	}
 
+	/**
+	 * The cell of a column of this chunk, as the world was generated from it.
+	 */
+	public Cell tileCell(int dx, int dz) {
+		return this.context.cache.provideAtChunk(this.chunkX, this.chunkZ).getChunkReader(this.chunkX, this.chunkZ).getCell(dx, dz);
+	}
+
 	public BlockState get(int x, int y, int z) {
 		return this.chunk.getBlockState(this.pos.set(x, y, z));
 	}

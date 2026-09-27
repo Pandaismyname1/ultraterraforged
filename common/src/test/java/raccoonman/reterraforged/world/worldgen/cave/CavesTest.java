@@ -333,4 +333,29 @@ public class CavesTest {
 		System.out.printf("%d springs%n", sources);
 		assertTrue(sources > 20, "only " + sources + " springs");
 	}
+
+	@Test
+	void hydrothermalVentsStandInTheRifts() {
+		CaveWorld world = world("default");
+		raccoonman.reterraforged.world.worldgen.heightmap.TerrainLocator.Found found = raccoonman.reterraforged.world.worldgen.heightmap.TerrainLocator.locate(world.context.lookup, raccoonman.reterraforged.world.worldgen.terrain.TerrainType.OCEAN_RIDGE, 0, 0, 12000, 60_000L);
+		assertTrue(found != null, "no mid-ocean ridge found");
+		HydrothermalVents vents = new HydrothermalVents(SEED);
+		world.carve(found.x() - 160, found.z() - 160, found.x() + 160, found.z() + 160, vents);
+		int magma = world.count((state) -> state.is(Blocks.MAGMA_BLOCK));
+		int chimneys = world.count((state) -> state.is(Blocks.BASALT) || state.is(Blocks.BLACKSTONE));
+		System.out.printf("hydrothermal vents by the ridge at %d %d: %d blocks of magma, %d of chimney%n", found.x(), found.z(), magma, chimneys);
+		assertTrue(magma > 5, "only " + magma + " blocks of magma");
+		assertTrue(chimneys > 10, "only " + chimneys + " blocks of chimney");
+	}
+
+	@Test
+	void whaleFallsLieOnTheDeepFloor() {
+		CaveWorld world = world("default");
+		WhaleFalls falls = new WhaleFalls(SEED, 1.0F);
+		// the deep sea off the default preset's first coast
+		world.carve(1600, -1600, 2600, -600, falls);
+		int bones = world.count((state) -> state.is(Blocks.BONE_BLOCK));
+		System.out.printf("whale falls: %d blocks of bone%n", bones);
+		assertTrue(bones > 40, "only " + bones + " blocks of bone");
+	}
 }

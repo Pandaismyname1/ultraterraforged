@@ -48,7 +48,15 @@ public class TerrainSensitivityTest {
 		// a few dozen blocks across, high in cold mountains; NewLandformsTest checks them
 		"landforms.glacialValleys.cirques",
 		// a chain every few thousand blocks of open sea, none of them in the sampled area; CoastsTest checks them
-		"coasts.islandArcs.frequency"
+		"coasts.islandArcs.frequency",
+		// a trench every few thousand blocks of deep ocean, none in the sampled area; OceansTest checks them
+		"oceans.trenches.enabled",
+		"oceans.trenches.depth",
+		// only off warm coasts, and there are none in the sampled area; OceansTest checks them
+		"oceans.coralReefs.enabled",
+		// bones on the sea floor, not its shape; CavesTest checks them
+		"oceans.whaleFalls.enabled",
+		"oceans.whaleFalls.frequency"
 	);
 
 	@Test
@@ -56,7 +64,7 @@ public class TerrainSensitivityTest {
 		TestBootstrap.init();
 		String baseline = fingerprint(defaultPreset());
 		List<String> inert = new ArrayList<>();
-		for (Page page : List.of(PresetOptions.WORLD, PresetOptions.CLIMATE, PresetOptions.TERRAIN, PresetOptions.RIVERS, PresetOptions.LANDFORMS, PresetOptions.COASTS)) {
+		for (Page page : List.of(PresetOptions.WORLD, PresetOptions.CLIMATE, PresetOptions.TERRAIN, PresetOptions.RIVERS, PresetOptions.LANDFORMS, PresetOptions.COASTS, PresetOptions.OCEANS)) {
 			page.options().filter((option) -> !option.isHidden() && option.isActive(defaultPreset()) && !NOT_IN_HEIGHTMAP.contains(option.path())).forEach((option) -> {
 				Preset preset = defaultPreset();
 				if (!change(option, preset)) {

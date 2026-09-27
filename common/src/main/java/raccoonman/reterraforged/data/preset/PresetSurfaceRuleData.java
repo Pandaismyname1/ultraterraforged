@@ -63,6 +63,11 @@ public class PresetSurfaceRuleData {
     private static final SurfaceRules.RuleSource BLACKSTONE = PresetSurfaceRuleData.makeStateRule(Blocks.BLACKSTONE);
     private static final SurfaceRules.RuleSource TUFF = PresetSurfaceRuleData.makeStateRule(Blocks.TUFF);
     private static final SurfaceRules.RuleSource CLAY = PresetSurfaceRuleData.makeStateRule(Blocks.CLAY);
+    private static final SurfaceRules.RuleSource TUBE_CORAL = PresetSurfaceRuleData.makeStateRule(Blocks.TUBE_CORAL_BLOCK);
+    private static final SurfaceRules.RuleSource BRAIN_CORAL = PresetSurfaceRuleData.makeStateRule(Blocks.BRAIN_CORAL_BLOCK);
+    private static final SurfaceRules.RuleSource BUBBLE_CORAL = PresetSurfaceRuleData.makeStateRule(Blocks.BUBBLE_CORAL_BLOCK);
+    private static final SurfaceRules.RuleSource FIRE_CORAL = PresetSurfaceRuleData.makeStateRule(Blocks.FIRE_CORAL_BLOCK);
+    private static final SurfaceRules.RuleSource HORN_CORAL = PresetSurfaceRuleData.makeStateRule(Blocks.HORN_CORAL_BLOCK);
     private static final SurfaceRules.RuleSource COBBLESTONE = PresetSurfaceRuleData.makeStateRule(Blocks.COBBLESTONE);
     private static final SurfaceRules.RuleSource MOSSY_COBBLESTONE = PresetSurfaceRuleData.makeStateRule(Blocks.MOSSY_COBBLESTONE);
     // rivers this many blocks above the sea run over gravel and cobbles rather than sand
@@ -732,8 +737,15 @@ public class PresetSurfaceRuleData {
     			)
     		),
     		SurfaceRules.ifTrue(
-    			RTFSurfaceConditions.terrain(TerrainType.BARRIER_ISLAND, TerrainType.LAGOON, TerrainType.SAND_BAR),
+    			RTFSurfaceConditions.terrain(TerrainType.BARRIER_ISLAND, TerrainType.LAGOON, TerrainType.SAND_BAR, TerrainType.SAND_WAVES),
     			SurfaceRules.ifTrue(SurfaceRules.UNDER_FLOOR, sand)
+    		),
+    		SurfaceRules.ifTrue(
+    			RTFSurfaceConditions.terrain(TerrainType.CORAL_REEF),
+    			SurfaceRules.sequence(
+    				SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, RTFSurfaceRules.noise(noise.getOrThrow(PresetSurfaceNoise.CORAL), List.of(Pair.of(0.82F, FIRE_CORAL), Pair.of(0.66F, BRAIN_CORAL), Pair.of(0.5F, TUBE_CORAL), Pair.of(0.34F, HORN_CORAL), Pair.of(0.2F, BUBBLE_CORAL), Pair.of(-1.0F, sand)))),
+    				SurfaceRules.ifTrue(SurfaceRules.UNDER_FLOOR, sand)
+    			)
     		),
     		SurfaceRules.ifTrue(
     			RTFSurfaceConditions.terrain(TerrainType.DELTA),

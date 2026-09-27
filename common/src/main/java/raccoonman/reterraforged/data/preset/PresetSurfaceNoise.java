@@ -30,6 +30,7 @@ public class PresetSurfaceNoise {
 	public static final ResourceKey<Noise> RIVER_BED = createKey("river_bed");
 	public static final ResourceKey<Noise> SALT_FLAT = createKey("salt_flat");
 	public static final ResourceKey<Noise> GLACIAL_DEBRIS = createKey("glacial_debris");
+	public static final ResourceKey<Noise> CORAL = createKey("coral");
 		
 	public static final ResourceKey<Noise> ICEBERG_DEEP_SHAPE = createKey("iceberg/deep/shape");
 	public static final ResourceKey<Noise> ICEBERG_DEEP_MASK = createKey("iceberg/deep/mask");
@@ -81,6 +82,8 @@ public class PresetSurfaceNoise {
 		// the cracks between the polygons of a salt crust
 		ctx.register(SALT_FLAT, makeSaltFlat());
 		// gravel, coarse dirt and cobbles left by the ice
+		// the kinds of coral on a reef, in patches
+		ctx.register(CORAL, Noises.map(Noises.warpPerlin(Noises.perlin(4136, 6, 1), 4137, 4, 1, 3.0F), 0.0F, 1.0F));
 		ctx.register(GLACIAL_DEBRIS, Noises.map(Noises.warpPerlin(Noises.perlin(4134, 14, 2), 4135, 8, 1, 6.0F), 0.0F, 1.0F));
 		
 		registerIceberg(ctx, ICEBERG_DEEP_SHAPE, ICEBERG_DEEP_MASK, ICEBERG_DEEP_FADE_DOWN, ICEBERG_DEEP_FADE_UP, ICEBERG_DEEP_UP, ICEBERG_DEEP_DOWN, ICEBERG_DEEP_TOP, scaling, 30, 30, 0);

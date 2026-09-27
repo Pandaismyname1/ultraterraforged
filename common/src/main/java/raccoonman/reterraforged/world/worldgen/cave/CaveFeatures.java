@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.minecraft.world.level.chunk.ChunkAccess;
 import raccoonman.reterraforged.data.preset.settings.CaveFeatureSettings;
+import raccoonman.reterraforged.data.preset.settings.OceanSettings;
 import raccoonman.reterraforged.world.worldgen.GeneratorContext;
 
 /**
@@ -52,6 +53,13 @@ public final class CaveFeatures {
 		}
 		if (settings.rockShelters.enabled && settings.rockShelters.frequency > 0.0F) {
 			features.add(new RockShelters(seed + 8, settings.rockShelters.frequency));
+		}
+		OceanSettings oceans = context.preset.oceans();
+		if (oceans.ridges.enabled) {
+			features.add(new HydrothermalVents(seed + 10));
+		}
+		if (oceans.whaleFalls.enabled && oceans.whaleFalls.frequency > 0.0F) {
+			features.add(new WhaleFalls(seed + 11, oceans.whaleFalls.frequency));
 		}
 		// last, so their water isn't carved away
 		if (settings.springs.enabled && settings.springs.frequency > 0.0F) {

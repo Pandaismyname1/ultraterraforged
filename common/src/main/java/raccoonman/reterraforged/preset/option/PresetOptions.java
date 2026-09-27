@@ -1184,7 +1184,136 @@ public final class PresetOptions {
 		)
 	);
 
-	public static final List<Page> PAGES = List.of(WORLD, SURFACE, CAVES, CAVE_FEATURES, CLIMATE, TERRAIN, RIVERS, LANDFORMS, COASTS, FILTERS, MISCELLANEOUS);
+	// Oceans
+
+	private static final Predicate<Preset> SHELVES = (preset) -> preset.oceans().shelves.enabled;
+	private static final Predicate<Preset> SUBMARINE_CANYONS = (preset) -> preset.oceans().submarineCanyons.enabled;
+	private static final Predicate<Preset> TRENCHES = (preset) -> preset.oceans().trenches.enabled;
+	private static final Predicate<Preset> SEAMOUNTS = (preset) -> preset.oceans().seamounts.enabled;
+	private static final Predicate<Preset> RIDGES = (preset) -> preset.oceans().ridges.enabled;
+	private static final Predicate<Preset> BLUE_HOLES = (preset) -> preset.oceans().blueHoles.enabled;
+	private static final Predicate<Preset> CORAL_REEFS = (preset) -> preset.oceans().coralReefs.enabled;
+	private static final Predicate<Preset> SAND_WAVES = (preset) -> preset.oceans().sandWaves.enabled;
+	private static final Predicate<Preset> WHALE_FALLS = (preset) -> preset.oceans().whaleFalls.enabled;
+
+	public static final Page OCEANS = Page.of("oceans", RTFTranslationKeys.GUI_OCEANS_SETTINGS_TITLE,
+		Category.of("shelves", RTFTranslationKeys.GUI_LABEL_SHELVES,
+			BoolOption.builder("oceans.shelves.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_SHELVES)
+				.bind((p) -> p.oceans().shelves.enabled, (p, v) -> p.oceans().shelves.enabled = v)
+				.build(),
+			FloatOption.builder("oceans.shelves.width")
+				.translation(RTFTranslationKeys.GUI_SLIDER_SHELF_WIDTH)
+				.range(0.3F, 2.0F)
+				.activeWhen(SHELVES)
+				.bind((p) -> p.oceans().shelves.width, (p, v) -> p.oceans().shelves.width = v)
+				.build()
+		),
+		Category.of("submarineCanyons", RTFTranslationKeys.GUI_LABEL_SUBMARINE_CANYONS,
+			BoolOption.builder("oceans.submarineCanyons.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_SUBMARINE_CANYONS)
+				.bind((p) -> p.oceans().submarineCanyons.enabled, (p, v) -> p.oceans().submarineCanyons.enabled = v)
+				.build(),
+			FloatOption.builder("oceans.submarineCanyons.frequency")
+				.translation(RTFTranslationKeys.GUI_SLIDER_SUBMARINE_CANYON_FREQUENCY)
+				.range(0.0F, 1.0F)
+				.activeWhen(SUBMARINE_CANYONS)
+				.bind((p) -> p.oceans().submarineCanyons.frequency, (p, v) -> p.oceans().submarineCanyons.frequency = v)
+				.build()
+		),
+		Category.of("trenches", RTFTranslationKeys.GUI_LABEL_TRENCHES,
+			BoolOption.builder("oceans.trenches.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_TRENCHES)
+				.bind((p) -> p.oceans().trenches.enabled, (p, v) -> p.oceans().trenches.enabled = v)
+				.build(),
+			FloatOption.builder("oceans.trenches.frequency")
+				.translation(RTFTranslationKeys.GUI_SLIDER_TRENCH_FREQUENCY)
+				.range(0.0F, 1.0F)
+				.activeWhen(TRENCHES)
+				.bind((p) -> p.oceans().trenches.frequency, (p, v) -> p.oceans().trenches.frequency = v)
+				.build(),
+			IntOption.builder("oceans.trenches.depth")
+				.translation(RTFTranslationKeys.GUI_SLIDER_TRENCH_DEPTH)
+				.range(15, 80)
+				.activeWhen(TRENCHES)
+				.bind((p) -> p.oceans().trenches.depth, (p, v) -> p.oceans().trenches.depth = v)
+				.build()
+		),
+		Category.of("seamounts", RTFTranslationKeys.GUI_LABEL_SEAMOUNTS,
+			BoolOption.builder("oceans.seamounts.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_SEAMOUNTS)
+				.bind((p) -> p.oceans().seamounts.enabled, (p, v) -> p.oceans().seamounts.enabled = v)
+				.build(),
+			FloatOption.builder("oceans.seamounts.frequency")
+				.translation(RTFTranslationKeys.GUI_SLIDER_SEAMOUNT_FREQUENCY)
+				.range(0.0F, 1.0F)
+				.activeWhen(SEAMOUNTS)
+				.bind((p) -> p.oceans().seamounts.frequency, (p, v) -> p.oceans().seamounts.frequency = v)
+				.build()
+		),
+		Category.of("ridges", RTFTranslationKeys.GUI_LABEL_RIDGES,
+			BoolOption.builder("oceans.ridges.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_RIDGES)
+				.bind((p) -> p.oceans().ridges.enabled, (p, v) -> p.oceans().ridges.enabled = v)
+				.build(),
+			FloatOption.builder("oceans.ridges.frequency")
+				.translation(RTFTranslationKeys.GUI_SLIDER_RIDGE_FREQUENCY)
+				.range(0.0F, 1.0F)
+				.activeWhen(RIDGES)
+				.bind((p) -> p.oceans().ridges.frequency, (p, v) -> p.oceans().ridges.frequency = v)
+				.build()
+		),
+		Category.of("blueHoles", RTFTranslationKeys.GUI_LABEL_BLUE_HOLES,
+			BoolOption.builder("oceans.blueHoles.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_BLUE_HOLES)
+				.bind((p) -> p.oceans().blueHoles.enabled, (p, v) -> p.oceans().blueHoles.enabled = v)
+				.build(),
+			FloatOption.builder("oceans.blueHoles.frequency")
+				.translation(RTFTranslationKeys.GUI_SLIDER_BLUE_HOLE_FREQUENCY)
+				.range(0.0F, 1.0F)
+				.activeWhen(BLUE_HOLES)
+				.bind((p) -> p.oceans().blueHoles.frequency, (p, v) -> p.oceans().blueHoles.frequency = v)
+				.build()
+		),
+		Category.of("coralReefs", RTFTranslationKeys.GUI_LABEL_CORAL_REEFS,
+			BoolOption.builder("oceans.coralReefs.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_CORAL_REEFS)
+				.bind((p) -> p.oceans().coralReefs.enabled, (p, v) -> p.oceans().coralReefs.enabled = v)
+				.build(),
+			FloatOption.builder("oceans.coralReefs.coverage")
+				.translation(RTFTranslationKeys.GUI_SLIDER_CORAL_REEF_COVERAGE)
+				.range(0.0F, 1.0F)
+				.activeWhen(CORAL_REEFS)
+				.bind((p) -> p.oceans().coralReefs.coverage, (p, v) -> p.oceans().coralReefs.coverage = v)
+				.build()
+		),
+		Category.of("sandWaves", RTFTranslationKeys.GUI_LABEL_SAND_WAVES,
+			BoolOption.builder("oceans.sandWaves.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_SAND_WAVES)
+				.bind((p) -> p.oceans().sandWaves.enabled, (p, v) -> p.oceans().sandWaves.enabled = v)
+				.build(),
+			IntOption.builder("oceans.sandWaves.height")
+				.translation(RTFTranslationKeys.GUI_SLIDER_SAND_WAVE_HEIGHT)
+				.range(1, 5)
+				.activeWhen(SAND_WAVES)
+				.bind((p) -> p.oceans().sandWaves.height, (p, v) -> p.oceans().sandWaves.height = v)
+				.build()
+		),
+		Category.of("whaleFalls", RTFTranslationKeys.GUI_LABEL_WHALE_FALLS,
+			BoolOption.builder("oceans.whaleFalls.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_WHALE_FALLS)
+				.bind((p) -> p.oceans().whaleFalls.enabled, (p, v) -> p.oceans().whaleFalls.enabled = v)
+				.build(),
+			FloatOption.builder("oceans.whaleFalls.frequency")
+				.translation(RTFTranslationKeys.GUI_SLIDER_WHALE_FALL_FREQUENCY)
+				.range(0.0F, 1.0F)
+				.activeWhen(WHALE_FALLS)
+				.bind((p) -> p.oceans().whaleFalls.frequency, (p, v) -> p.oceans().whaleFalls.frequency = v)
+				.build()
+		)
+	);
+
+	public static final List<Page> PAGES = List.of(WORLD, SURFACE, CAVES, CAVE_FEATURES, CLIMATE, TERRAIN, RIVERS, LANDFORMS, COASTS, OCEANS, FILTERS, MISCELLANEOUS);
 
 	private static final Map<String, Option<?>> BY_PATH = PAGES.stream().flatMap(Page::options).collect(Collectors.toUnmodifiableMap(Option::path, Function.identity()));
 

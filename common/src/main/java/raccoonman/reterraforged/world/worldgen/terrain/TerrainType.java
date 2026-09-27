@@ -76,6 +76,15 @@ public class TerrainType {
     public static final Terrain RIVER_ISLAND = registerLandform("river_island", TerrainCategory.FLATLAND);
     // the cones of volcanic island arcs
     public static final Terrain VOLCANIC_ISLAND = registerVolcano("volcanic_island", TerrainCategory.HIGHLAND);
+    // the sea floor's features
+    public static final Terrain SUBMARINE_CANYON = registerLandform("submarine_canyon", TerrainCategory.SHALLOW_OCEAN);
+    public static final Terrain OCEAN_TRENCH = registerLandform("ocean_trench", TerrainCategory.DEEP_OCEAN);
+    public static final Terrain SEAMOUNT = registerLandform("seamount", TerrainCategory.DEEP_OCEAN);
+    public static final Terrain GUYOT = registerLandform("guyot", TerrainCategory.DEEP_OCEAN);
+    public static final Terrain OCEAN_RIDGE = registerLandform("ocean_ridge", TerrainCategory.DEEP_OCEAN);
+    public static final Terrain BLUE_HOLE = registerLandform("blue_hole", TerrainCategory.SHALLOW_OCEAN);
+    public static final Terrain CORAL_REEF = registerLandform("coral_reef", TerrainCategory.SHALLOW_OCEAN);
+    public static final Terrain SAND_WAVES = registerLandform("sand_waves", TerrainCategory.SHALLOW_OCEAN);
     
     public static void forEach(Consumer<Terrain> action) {
         TerrainType.REGISTRY.forEach(action);

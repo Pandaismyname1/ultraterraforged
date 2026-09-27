@@ -20,6 +20,29 @@ public class LandformSurveyTest {
 	}
 
 	@Test
+	void seaFloor() {
+		if (!Boolean.getBoolean("rtf.survey.sea")) {
+			return;
+		}
+		Preset preset = BuiltinPresetRenderTest.presets().get("default").get();
+		TerrainViews.View view = TerrainViews.view(preset, 0.0F, 0.0F, 32.0F);
+		int water = view.levels().waterLevel;
+		java.util.Map<Integer, Integer> depths = new java.util.TreeMap<>();
+		java.util.Map<Integer, Integer> edges = new java.util.TreeMap<>();
+		for (int x = 0; x < view.size(); x++) {
+			for (int z = 0; z < view.size(); z++) {
+				int y = view.blockY(x, z);
+				if (y < water) {
+					depths.merge((water - y) / 5 * 5, 1, Integer::sum);
+					edges.merge((int) (view.cell(x, z).continentEdge * 20), 1, Integer::sum);
+				}
+			}
+		}
+		System.out.println("SURVEY sea depths by 5 blocks " + depths);
+		System.out.println("SURVEY sea continent edge by 0.05 " + edges);
+	}
+
+	@Test
 	void shorelineEdge() {
 		if (!Boolean.getBoolean("rtf.survey.shore")) {
 			return;
