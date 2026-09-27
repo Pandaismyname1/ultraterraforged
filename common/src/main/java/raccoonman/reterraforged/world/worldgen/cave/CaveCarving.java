@@ -1,5 +1,7 @@
 package raccoonman.reterraforged.world.worldgen.cave;
 
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Blocks;
@@ -9,6 +11,7 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import raccoonman.reterraforged.world.worldgen.GeneratorContext;
 import raccoonman.reterraforged.world.worldgen.cell.Cell;
 import raccoonman.reterraforged.world.worldgen.heightmap.Levels;
+import raccoonman.reterraforged.world.worldgen.tile.Tile;
 
 /**
  * Carving caves into one chunk, once its surface is built: hollowing out ellipsoids, lining them with other rock, and
@@ -33,6 +36,11 @@ public final class CaveCarving {
 	private final int[] ground = new int[256];
 	private final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 	private final Cell cell = new Cell();
+	// the chunk around this one that ground last read from its tile, or null if its tile wasn't there
+	@Nullable
+	private Tile.Chunk near;
+	private int nearX = Integer.MIN_VALUE;
+	private int nearZ = Integer.MIN_VALUE;
 
 	CaveCarving(ChunkAccess chunk, GeneratorContext context) {
 		this.chunk = chunk;
@@ -63,7 +71,18 @@ public final class CaveCarving {
 		if (dx >= 0 && dz >= 0 && dx < 16 && dz < 16) {
 			return this.ground[dz << 4 | dx];
 		}
-		return this.levels.scale(this.cell(bx, bz).height);
+		// the chunks next to this one are nearly always in tiles already generated: reading those is far cheaper than
+		// working out the terrain afresh, which rock shelters would otherwise do over a thousand times a chunk. A chunk
+		// can't finish its features, which lets its tile go, while one next to it is still being carved.
+		int cx = bx >> 4;
+		int cz = bz >> 4;
+		if (this.near == null || cx != this.nearX || cz != this.nearZ) {
+			Tile tile = this.context.cache != null ? this.context.cache.provideAtChunkIfPresent(cx, cz) : null;
+			this.near = tile != null ? tile.getChunkReader(cx, cz) : null;
+			this.nearX = cx;
+			this.nearZ = cz;
+		}
+		return this.levels.scale(this.near != null ? this.near.getCell(bx & 15, bz & 15).height : this.cell(bx, bz).height);
 	}
 
 	/**

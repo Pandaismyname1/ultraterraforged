@@ -27,6 +27,12 @@ test {
     testLogging.showStandardStreams = Boolean.getBoolean("rtf.showOutput")
     systemProperty "rtf.showOutput", System.getProperty("rtf.showOutput", "false")
     systemProperty "rtf.render", System.getProperty("rtf.render", "false")
+    systemProperty "rtf.bench", System.getProperty("rtf.bench", "false")
+    if (System.getProperty("rtf.profile") != null) systemProperty "rtf.profile", "true"
+    // a flight recording of the tests, for finding where the time goes: -Drtf.jfr=<file>
+    if (System.getProperty("rtf.jfr") != null) {
+        jvmArgs "-XX:StartFlightRecording=filename=" + System.getProperty("rtf.jfr") + ",settings=profile"
+    }
     // hand-run surveys and measurements
     System.properties.findAll { it.key.startsWith("rtf.survey") }.each { systemProperty it.key, it.value }
     testLogging {
