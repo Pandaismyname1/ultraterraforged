@@ -233,7 +233,15 @@ public final class TerrainViews {
 			}
 		}
 		int water = view.levels().waterLevel;
-		float cameraHeight = water + 70.0F;
+		// above the high ground, so mountains don't swallow the camera
+		float[] heights = new float[size * size];
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j < size; j++) {
+				heights[i * size + j] = view.exactY(i, j);
+			}
+		}
+		java.util.Arrays.sort(heights);
+		float cameraHeight = Math.max(water + 70.0F, heights[heights.length * 95 / 100] + 45.0F);
 		float horizon = height * 0.3F;
 		float scale = 220.0F;
 		for (int column = 0; column < width; column++) {

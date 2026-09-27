@@ -91,6 +91,13 @@ public class RTFLanguageProvider {
 			this.add(RTFTranslationKeys.GUI_BUTTON_SEA_STACKS, "Sea Stacks");
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_SEA_STACKS), "Pillars of rock standing in the sea off the cliffs");
 			this.add(RTFTranslationKeys.GUI_LABEL_VOLCANOES, "Volcanoes");
+			this.add(RTFTranslationKeys.GUI_LABEL_FJORDS, "Fjords");
+			this.add(RTFTranslationKeys.GUI_BUTTON_FJORDS, "Fjords");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_FJORDS), "On cold and rainy coasts the sea floods up the valleys between the mountains, in long, branching inlets between steep ridges");
+			this.add(RTFTranslationKeys.GUI_SLIDER_FJORD_DEPTH, "Depth");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_FJORD_DEPTH), "How many blocks the high ground by the coast sinks; the more it sinks, the further the sea floods up the valleys");
+			this.add(RTFTranslationKeys.GUI_SLIDER_FJORD_REACH, "Reach");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_FJORD_REACH), "How far inland the fjords reach");
 			this.add(RTFTranslationKeys.GUI_BUTTON_VOLCANIC_SURFACE, "Volcanic Rock & Lava");
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_VOLCANIC_SURFACE), "Lava over magma in volcano craters, basalt, blackstone and tuff on their cones, and patches of old lava flows on the land around them");
 

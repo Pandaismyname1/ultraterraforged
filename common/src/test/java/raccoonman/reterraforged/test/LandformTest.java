@@ -278,11 +278,55 @@ public class LandformTest {
 	}
 
 	@Test
+	void fjordsFloodValleysOnColdCoasts() {
+		Preset preset = preset("frozen_north", (p) -> {});
+		Preset flat = preset.copy();
+		flat.landforms().fjords.enabled = false;
+		TerrainViews.View with = TerrainViews.view(preset, 0.0F, 0.0F, 12.0F);
+		TerrainViews.View without = TerrainViews.view(flat, 0.0F, 0.0F, 12.0F);
+		int water = with.levels().waterLevel;
+		int flooded = 0;
+		for (int x = 0; x < with.size(); x++) {
+			for (int z = 0; z < with.size(); z++) {
+				int change = with.blockY(x, z) - without.blockY(x, z);
+				// the erosion filter nudges the ground a little everywhere once anything changes
+				assertTrue(change <= 2, "fjords raised the ground by " + change + " at " + x + ", " + z);
+				if (with.blockY(x, z) < water && without.blockY(x, z) >= water) {
+					flooded++;
+				}
+			}
+		}
+		System.out.println("fjords flooded " + flooded + " cells of a cold coast");
+		assertTrue(flooded > 20, "fjords flooded only " + flooded + " cells");
+	}
+
+	@Test
+	void noFjordsInTheTropics() {
+		Preset preset = preset("tropics", (p) -> {});
+		Preset flat = preset.copy();
+		flat.landforms().fjords.enabled = false;
+		TerrainViews.View with = TerrainViews.view(preset, 0.0F, 0.0F, 12.0F);
+		TerrainViews.View without = TerrainViews.view(flat, 0.0F, 0.0F, 12.0F);
+		int water = with.levels().waterLevel;
+		int flooded = 0;
+		for (int x = 0; x < with.size(); x++) {
+			for (int z = 0; z < with.size(); z++) {
+				if (with.blockY(x, z) < water && without.blockY(x, z) >= water) {
+					flooded++;
+				}
+			}
+		}
+		assertTrue(flooded < 5, "fjords flooded " + flooded + " cells of a tropical coast");
+	}
+
+	@Test
 	void legacyPresetsHaveNoLandforms() {
 		for (String name : new String[] { "legacy_default", "beautiful", "huge_biomes", "lite", "vanillaish" }) {
 			assertTrue(!BuiltinPresetRenderTest.presets().get(name).get().landforms().buttes.enabled, name);
 			assertTrue(!BuiltinPresetRenderTest.presets().get(name).get().landforms().canyons.enabled, name);
 			assertTrue(!BuiltinPresetRenderTest.presets().get(name).get().landforms().seaCliffs.enabled, name);
+			assertTrue(!BuiltinPresetRenderTest.presets().get(name).get().landforms().fjords.enabled, name);
+			assertTrue(!BuiltinPresetRenderTest.presets().get(name).get().landforms().volcanicSurface, name);
 		}
 	}
 }

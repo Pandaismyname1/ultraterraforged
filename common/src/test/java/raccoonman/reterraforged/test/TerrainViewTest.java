@@ -188,4 +188,22 @@ public class TerrainViewTest {
 		}
 		TerrainViews.write(TerrainViews.view(preset, x, z, 4.0F), "sea_cliffs_wide");
 	}
+
+	@Test
+	void fjords() throws Exception {
+		Preset preset = preset("frozen_north");
+		Preset without = preset.copy();
+		without.landforms().fjords.enabled = false;
+		long place = TerrainViews.mostChanged(TerrainViews.view(preset, 0.0F, 0.0F, 12.0F), TerrainViews.view(without, 0.0F, 0.0F, 12.0F));
+		float x = PosUtil.unpackLeft(place);
+		float z = PosUtil.unpackRight(place);
+		System.out.println("fjord at " + x + ", " + z);
+		TerrainViews.View wide = TerrainViews.view(preset, x, z, 3.0F);
+		TerrainViews.write(wide, "fjords_wide");
+		TerrainViews.write(TerrainViews.view(without, x, z, 3.0F), "fjords_wide_without");
+		TerrainViews.View close = TerrainViews.view(preset, x, z, 2.0F);
+		for (int turns = 0; turns < 4; turns++) {
+			TerrainViews.writePerspective(close, "fjords_3d_" + turns, turns);
+		}
+	}
 }

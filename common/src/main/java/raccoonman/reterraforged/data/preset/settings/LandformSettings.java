@@ -12,7 +12,8 @@ public class LandformSettings {
 		PresetCodecs.defaulted(Buttes.CODEC, "buttes", Buttes.makeDefault()).forGetter((o) -> o.buttes),
 		PresetCodecs.defaulted(Canyons.CODEC, "canyons", Canyons.makeDefault()).forGetter((o) -> o.canyons),
 		PresetCodecs.defaulted(SeaCliffs.CODEC, "seaCliffs", SeaCliffs.makeDefault()).forGetter((o) -> o.seaCliffs),
-		PresetCodecs.defaulted(Codec.BOOL, "volcanicSurface", true).forGetter((o) -> o.volcanicSurface)
+		PresetCodecs.defaulted(Codec.BOOL, "volcanicSurface", true).forGetter((o) -> o.volcanicSurface),
+		PresetCodecs.defaulted(Fjords.CODEC, "fjords", Fjords.makeDefault()).forGetter((o) -> o.fjords)
 	).apply(instance, LandformSettings::new));
 
 	public Buttes buttes;
@@ -20,20 +21,22 @@ public class LandformSettings {
 	public SeaCliffs seaCliffs;
 	// lava in volcano craters, dark volcanic rock on their cones and old lava flows around them
 	public boolean volcanicSurface;
+	public Fjords fjords;
 
-	public LandformSettings(Buttes buttes, Canyons canyons, SeaCliffs seaCliffs, boolean volcanicSurface) {
+	public LandformSettings(Buttes buttes, Canyons canyons, SeaCliffs seaCliffs, boolean volcanicSurface, Fjords fjords) {
 		this.buttes = buttes;
 		this.canyons = canyons;
 		this.seaCliffs = seaCliffs;
 		this.volcanicSurface = volcanicSurface;
+		this.fjords = fjords;
 	}
 
 	public LandformSettings copy() {
-		return new LandformSettings(this.buttes.copy(), this.canyons.copy(), this.seaCliffs.copy(), this.volcanicSurface);
+		return new LandformSettings(this.buttes.copy(), this.canyons.copy(), this.seaCliffs.copy(), this.volcanicSurface, this.fjords.copy());
 	}
 
 	public static LandformSettings makeDefault() {
-		return new LandformSettings(Buttes.makeDefault(), Canyons.makeDefault(), SeaCliffs.makeDefault(), true);
+		return new LandformSettings(Buttes.makeDefault(), Canyons.makeDefault(), SeaCliffs.makeDefault(), true, Fjords.makeDefault());
 	}
 
 	// how the original TerraForged generated: none of the added landforms
@@ -43,7 +46,41 @@ public class LandformSettings {
 		settings.canyons.enabled = false;
 		settings.seaCliffs.enabled = false;
 		settings.volcanicSurface = false;
+		settings.fjords.enabled = false;
 		return settings;
+	}
+
+	/**
+	 * Drowned valleys on cold and rainy coasts: long, branching arms of the sea between steep ridges.
+	 */
+	public static class Fjords {
+		private static final Fjords DEFAULT = new Fjords(true, 40, 1.0F);
+
+		public static final Codec<Fjords> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+			PresetCodecs.defaulted(Codec.BOOL, "enabled", DEFAULT.enabled).forGetter((o) -> o.enabled),
+			PresetCodecs.defaulted(Codec.INT, "depth", DEFAULT.depth).forGetter((o) -> o.depth),
+			PresetCodecs.defaulted(Codec.FLOAT, "reach", DEFAULT.reach).forGetter((o) -> o.reach)
+		).apply(instance, Fjords::new));
+
+		public boolean enabled;
+		// how many blocks high ground at the coast sinks; the more, the further the sea floods up the valleys
+		public int depth;
+		// how far inland the land sinks
+		public float reach;
+
+		public Fjords(boolean enabled, int depth, float reach) {
+			this.enabled = enabled;
+			this.depth = depth;
+			this.reach = reach;
+		}
+
+		public Fjords copy() {
+			return new Fjords(this.enabled, this.depth, this.reach);
+		}
+
+		public static Fjords makeDefault() {
+			return DEFAULT.copy();
+		}
 	}
 
 	/**

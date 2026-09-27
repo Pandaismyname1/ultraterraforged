@@ -632,6 +632,7 @@ public final class PresetOptions {
 	private static final Predicate<Preset> BUTTES = (preset) -> preset.landforms().buttes.enabled;
 	private static final Predicate<Preset> CANYONS = (preset) -> preset.landforms().canyons.enabled;
 	private static final Predicate<Preset> SEA_CLIFFS = (preset) -> preset.landforms().seaCliffs.enabled;
+	private static final Predicate<Preset> FJORDS = (preset) -> preset.landforms().fjords.enabled;
 
 	public static final Page LANDFORMS = Page.of("landforms", RTFTranslationKeys.GUI_LANDFORM_SETTINGS_TITLE,
 		Category.of("buttes", RTFTranslationKeys.GUI_LABEL_BUTTES,
@@ -703,6 +704,24 @@ public final class PresetOptions {
 				.translation(RTFTranslationKeys.GUI_BUTTON_SEA_STACKS)
 				.activeWhen(SEA_CLIFFS)
 				.bind((p) -> p.landforms().seaCliffs.seaStacks, (p, v) -> p.landforms().seaCliffs.seaStacks = v)
+				.build()
+		),
+		Category.of("fjords", RTFTranslationKeys.GUI_LABEL_FJORDS,
+			BoolOption.builder("landforms.fjords.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_FJORDS)
+				.bind((p) -> p.landforms().fjords.enabled, (p, v) -> p.landforms().fjords.enabled = v)
+				.build(),
+			IntOption.builder("landforms.fjords.depth")
+				.translation(RTFTranslationKeys.GUI_SLIDER_FJORD_DEPTH)
+				.range(10, 80)
+				.activeWhen(FJORDS)
+				.bind((p) -> p.landforms().fjords.depth, (p, v) -> p.landforms().fjords.depth = v)
+				.build(),
+			FloatOption.builder("landforms.fjords.reach")
+				.translation(RTFTranslationKeys.GUI_SLIDER_FJORD_REACH)
+				.range(0.3F, 2.5F)
+				.activeWhen(FJORDS)
+				.bind((p) -> p.landforms().fjords.reach, (p, v) -> p.landforms().fjords.reach = v)
 				.build()
 		),
 		Category.of("volcanoes", RTFTranslationKeys.GUI_LABEL_VOLCANOES,
