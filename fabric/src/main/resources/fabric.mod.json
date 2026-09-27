@@ -20,6 +20,7 @@
     "issues": "https://github.com/Pandaismyname1/ultraterraforged/issues"
   },
   "license": "MIT",
+  "icon": "assets/ultraterraforged/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [

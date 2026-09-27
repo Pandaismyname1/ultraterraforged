@@ -10,6 +10,12 @@ works alongside the mods that do.
 - Minecraft 1.21.1, on Fabric (with Fabric API) and NeoForge 21.1. For Minecraft 1.20.1 (Fabric, Forge and
   NeoForge 47.1), see the [`1.20.1` branch](https://github.com/Pandaismyname1/ultraterraforged/tree/1.20.1).
 - Maintained by pandaismyname1
+- Download: [Modrinth](https://modrinth.com/mod/ultraterraforged),
+  [CurseForge](https://www.curseforge.com/minecraft/mc-mods/ultraterraforged) (both awaiting moderation until the first
+  release), or the [GitHub releases](https://github.com/Pandaismyname1/ultraterraforged/releases)
+
+UltraTerraForged is an unofficial continuation, not made or endorsed by the TerraForged or ReTerraForged authors, and is
+developed with the help of AI so it can keep up with new Minecraft releases.
 
 ## Credits
 
@@ -186,9 +192,12 @@ include checks that the built-in presets still generate the same terrain. Notes 
 versions are in [docs/porting](docs/porting).
 
 GitHub Actions builds both loaders on every push (`build.yml`); the tests take long, so they run locally only. Releases are started by hand
-(`release.yml`): they create the GitHub release from [CHANGELOG.md](CHANGELOG.md), then upload to Modrinth and
-CurseForge once their project ids are set in the workflow and `MODRINTH_TOKEN` / `CURSEFORGE_TOKEN` exist as repository
-secrets. Publishing a release also pushes the Maven artifacts to the `maven` branch (`publish-maven.yml`).
+(`release.yml`, Actions → Release → Run workflow, choosing alpha, beta or release): they create the GitHub release
+from [CHANGELOG.md](CHANGELOG.md), then upload the Fabric and NeoForge jars to Modrinth (`LpyUCfpY`) and CurseForge
+(`1715379`), using the `MODRINTH_TOKEN` and `CURSEFORGE_TOKEN` repository secrets; a platform whose secret is missing is
+skipped. Bump `mod_version` in `gradle.properties` and update the changelog first: the version tag must be new.
+Publishing a release also adds its Maven artifacts to the `maven` branch (`publish-maven.yml`), next to those of
+earlier releases and other Minecraft versions.
 
 ## License
 

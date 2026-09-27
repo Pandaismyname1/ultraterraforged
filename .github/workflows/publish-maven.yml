@@ -1,8 +1,11 @@
 name: Publish Maven
 
+# release.yml calls this directly: a release it creates with GITHUB_TOKEN doesn't trigger the release event.
+# The release event still covers releases published by hand.
 on:
   release:
     types: [published]
+  workflow_call:
   workflow_dispatch:
 
 permissions:
@@ -11,6 +14,10 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    # one publish at a time, so two releases can't race each other to the branch
+    concurrency:
+      group: publish-maven
+      cancel-in-progress: false
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,24 +37,32 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle-wrapper.properties') }}
           restore-keys: ${{ runner.os }}-gradle
 
-      - name: Publish to local maven folder
+      # adds to the maven branch rather than replacing it: every branch (1.20.1, 1.21.1, ...) publishes there
+      - name: Get the maven branch
+        run: |
+          url="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+          rm -rf maven-out
+          if git ls-remote --exit-code --heads "$url" maven > /dev/null; then
+            git clone -q --single-branch --branch maven "$url" maven-out
+          else
+            git init -q -b maven maven-out
+            git -C maven-out remote add origin "$url"
+          fi
+
+      - name: Publish into it
         env:
           RELEASE: true
-        run: ./gradlew :fabric:publish :neoforge:publish -Putf.perfMods=false -PmavenUrl=file://$PWD/build/maven
+        run: ./gradlew :fabric:publish :neoforge:publish -Putf.perfMods=false -PmavenUrl=file://$PWD/maven-out
 
-      - name: Collect maven output
+      - name: Push the maven branch
         run: |
-          rm -rf maven-out
-          mv build/maven maven-out
           cd maven-out
-          git init -q -b maven
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
+          if git diff --cached --quiet; then
+            echo "Nothing new to publish"
+            exit 0
+          fi
           git commit -qm "Maven artifacts for ${GITHUB_SHA::7}"
-
-      - name: Push maven branch (force)
-        run: |
-          cd maven-out
-          git remote add origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
-          git push -qf origin maven
+          git push -q origin maven
