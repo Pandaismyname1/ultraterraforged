@@ -47,17 +47,26 @@ public record Atolls(int seed, float chance, float gridSize, float shoreline, No
 		}
 		int gridX = NoiseUtil.floor(x / this.gridSize);
 		int gridZ = NoiseUtil.floor(z / this.gridSize);
+		// the ring's wobble, worked out once and scaled to each atoll's size
+		float warpX = Float.NaN;
+		float warpZ = 0.0F;
 		for (int dz = -1; dz <= 1; dz++) {
 			for (int dx = -1; dx <= 1; dx++) {
-				this.applyAtoll(cell, x, z, gridX + dx, gridZ + dz, heightmap);
+				int siteX = gridX + dx;
+				int siteZ = gridZ + dz;
+				if (random(this.seed, siteX, siteZ, 0) >= this.chance) {
+					continue;
+				}
+				if (Float.isNaN(warpX)) {
+					warpX = this.warpX.compute(x, z, 0);
+					warpZ = this.warpZ.compute(x, z, 0);
+				}
+				this.applyAtoll(cell, x, z, warpX, warpZ, siteX, siteZ, heightmap);
 			}
 		}
 	}
 
-	private void applyAtoll(Cell cell, float x, float z, int gridX, int gridZ, Heightmap heightmap) {
-		if (random(this.seed, gridX, gridZ, 0) >= this.chance) {
-			return;
-		}
+	private void applyAtoll(Cell cell, float x, float z, float warpX, float warpZ, int gridX, int gridZ, Heightmap heightmap) {
 		float scale = this.gridSize / 520.0F;
 		float radius = NoiseUtil.lerp(MIN_RADIUS, MAX_RADIUS, random(this.seed, gridX, gridZ, 1)) * scale;
 		float reef = NoiseUtil.lerp(7.0F, 13.0F, random(this.seed, gridX, gridZ, 2));
@@ -67,8 +76,8 @@ public record Atolls(int seed, float chance, float gridSize, float shoreline, No
 		float centerZ = gridZ * this.gridSize + extent + random(this.seed, gridX, gridZ, 4) * free;
 		// an uneven ring
 		float wobble = radius * 0.3F;
-		float dx = x + this.warpX.compute(x, z, 0) * wobble - centerX;
-		float dz = z + this.warpZ.compute(x, z, 0) * wobble - centerZ;
+		float dx = x + warpX * wobble - centerX;
+		float dz = z + warpZ * wobble - centerZ;
 		float distance = (float) Math.sqrt(dx * dx + dz * dz);
 		if (distance > extent) {
 			return;

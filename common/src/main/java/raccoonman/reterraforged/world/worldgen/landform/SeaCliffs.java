@@ -108,7 +108,7 @@ public record SeaCliffs(int seed, float shoreline, float threshold, float height
 			float radius = SEA_SEARCH_RADII[r];
 			for (int i = 0; i < (radius == 0.0F ? 1 : 8); i++) {
 				double angle = i * Math.PI / 4.0D;
-				Cell sample = heightmap.sampleTerrain(cornerX + (float) Math.cos(angle) * radius, cornerZ + (float) Math.sin(angle) * radius);
+				Cell sample = heightmap.sampleGround(cornerX + (float) Math.cos(angle) * radius, cornerZ + (float) Math.sin(angle) * radius);
 				if (sample.height < this.levels.water && sample.continentEdge < this.shoreline) {
 					proximity = 1.0F - r / (float) SEA_SEARCH_RADII.length;
 					break search;
@@ -189,7 +189,7 @@ public record SeaCliffs(int seed, float shoreline, float threshold, float height
 		for (float radius : STACK_LAND_SEARCH) {
 			for (int i = 0; i < 8; i++) {
 				double angle = i * Math.PI / 4.0D;
-				Cell sample = heightmap.sampleTerrain(x + (float) Math.cos(angle) * radius, z + (float) Math.sin(angle) * radius);
+				Cell sample = heightmap.sampleGround(x + (float) Math.cos(angle) * radius, z + (float) Math.sin(angle) * radius);
 				if (sample.height >= this.levels.water && !sample.terrain.isRiver()) {
 					return true;
 				}

@@ -115,7 +115,7 @@ public record Fjords(float depth, float reach, float shoreline, Levels levels, C
 		int count = 0;
 		for (int dx = -SURROUNDING_RADIUS; dx <= SURROUNDING_RADIUS; dx++) {
 			for (int dz = -SURROUNDING_RADIUS; dz <= SURROUNDING_RADIUS; dz++) {
-				total += cached(grounds, gridX + dx, gridZ + dz, heightmap, (gx, gz, h) -> h.sampleTerrain(gx * GROUND_GRID, gz * GROUND_GRID).height);
+				total += cached(grounds, gridX + dx, gridZ + dz, heightmap, (gx, gz, h) -> h.sampleGround(gx * GROUND_GRID, gz * GROUND_GRID).height);
 				count++;
 			}
 		}

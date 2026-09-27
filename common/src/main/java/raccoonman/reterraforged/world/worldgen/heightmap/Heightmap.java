@@ -84,6 +84,23 @@ public record Heightmap(CellSampler.Provider cellProvider, CellPopulator terrain
 	}
 
 	/**
+	 * The terrain types alone at another position, without rivers, climate or landforms: cheaper than
+	 * {@link #sampleTerrain}, for landforms that only need the lie of the land.
+	 */
+	public Cell sampleGround(float x, float z) {
+		Cell previous = this.cellProvider.getCacheCell();
+		Cell cell = new Cell();
+		this.cellProvider.setCacheCell(cell);
+		try {
+			this.applyContinent(cell, x, z);
+			this.applyTerrainTypes(cell, x, z);
+			return cell;
+		} finally {
+			this.cellProvider.setCacheCell(previous);
+		}
+	}
+
+	/**
 	 * The terrain types, rivers and climate at another position, without landforms, e.g. for the ground a landform
 	 * stands on.
 	 */
