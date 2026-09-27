@@ -1,7 +1,7 @@
 ### UltraTerraForged
 * UltraTerraForged is a continuation of ReTerraForged (by raccoonman, Steveplays28 and EdoEquin0x), which continued TerraForged (by dags and Won-Ton). Full credit and history are in the README and this repository, a fork of ReTerraForged.
 * It has its own mod id, `ultraterraforged`, and isn't compatible with worlds made with ReTerraForged. The first start copies `config/reterraforged` to `config/ultraterraforged`, keeping saved presets and modpack setups. Dedicated servers use `level-type=ultraterraforged:ultraterraforged`.
-* Minecraft 1.21.1 on Fabric and NeoForge; Minecraft 1.20.1 (Fabric, Forge and NeoForge 47.1) has its own build.
+* The first release for Minecraft 1.21.1, on Fabric (with Fabric API) and NeoForge 21.1. Its terrain generation is the same as in the 1.20.1 release.
 
 ### Creating worlds
 * A Terrain tab in Create World: presets, the main settings as sliders, and a live map of the result. UltraTerraForged is the default world type (configurable).
@@ -19,10 +19,10 @@
 * `/utf locate <terrain>` finds landforms and puts you on their surface.
 
 ### Performance
-* The Terrain tab recommends performance mods and shows which are installed: C2ME, C2ME OpenCL, Noisium(ed), Lithium, ModernFix, AllTheLeaks (NeoForge), Sodium. With them, new land generates as fast as vanilla or faster.
+* The Terrain tab recommends performance mods and shows which are installed: C2ME, Noisium(ed), Lithium, ModernFix, AllTheLeaks (NeoForge) and Sodium. With them, new land generates as fast as vanilla or faster.
+* C2ME OpenCL is listed as optional: it needs Java 25 and a graphics card with OpenCL, and crashes the game together with Noisium(ed), so install one or the other.
 * Rock shelters no longer recompute the terrain for every block around a chunk (up to a third faster chunk generation in badlands and plateaus).
 
 ### Fixes
-* Forge no longer crashes at startup next to mods bundling MixinExtras up to 0.5.0 (ModernFix, Noisium, AllTheLeaks and many others).
 * Fixed an ArrayIndexOutOfBoundsException generating chunks, from terrain tiles reused after being closed.
 * Fixed from ReTerraForged: rivers generated before the terrain (no rivers at all), missing cave and structure settings, presets losing their scales, `/rtf locate` (now `/utf locate`) sending players to random places, bare rock over the sea floor, and a crash placing some trees.
