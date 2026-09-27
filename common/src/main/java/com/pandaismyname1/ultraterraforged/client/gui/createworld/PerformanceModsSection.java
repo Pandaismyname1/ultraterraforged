@@ -178,7 +178,7 @@ final class PerformanceModsSection {
 				this.state = Component.translatable(UTFTranslationKeys.GUI_PERFORMANCE_MODS_INSTALLED);
 				this.stateColor = 0xFF55FF55;
 			} else if (status.recommended() != null) {
-				this.state = Component.translatable(UTFTranslationKeys.GUI_PERFORMANCE_MODS_MISSING);
+				this.state = Component.translatable(mod.optional() ? UTFTranslationKeys.GUI_PERFORMANCE_MODS_OPTIONAL : UTFTranslationKeys.GUI_PERFORMANCE_MODS_MISSING);
 				this.stateColor = 0xFFFFD040;
 			} else if (mod.availableFrom() != null) {
 				this.state = Component.translatable(UTFTranslationKeys.GUI_PERFORMANCE_MODS_NEEDS_VERSION, mod.availableFrom());

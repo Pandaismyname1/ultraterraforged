@@ -33,26 +33,25 @@ public class PerformanceModsTest {
 		assertEquals(Light.RED, fabric().light());
 		assertEquals(Light.ORANGE, fabric("sodium", "lithium", "modernfix").light());
 		assertEquals(Light.YELLOW, fabric("c2me").light());
-		assertEquals(Light.GREEN, fabric("c2me", "c2me-opts-accel-opencl", "noisiumed", "lithium", "modernfix", "sodium").light());
+		assertEquals(Light.GREEN, fabric("c2me", "noisiumed", "lithium", "modernfix", "sodium").light());
 		// Noisium itself counts as much as its fork
-		assertEquals(Light.GREEN, fabric("c2me", "c2me-opts-accel-opencl", "noisium", "lithium", "modernfix", "sodium").light());
+		assertEquals(Light.GREEN, fabric("c2me", "noisium", "lithium", "modernfix", "sodium").light());
 
 		assertEquals(Light.RED, neoforge().light());
 		assertEquals(Light.ORANGE, neoforge("sodium", "lithium", "modernfix", "alltheleaks").light());
 		assertEquals(Light.YELLOW, neoforge("c2me", "noisiumed", "lithium", "modernfix", "alltheleaks", "sodium").light());
-		// the NeoForge build of C2ME OpenCL loads under an id with underscores
-		assertEquals(Light.GREEN, neoforge("c2me", "c2me_opts_accel_opencl", "noisiumed", "lithium", "modernfix", "alltheleaks", "sodium").light());
+		assertEquals(Light.GREEN, neoforge("c2me", "noisiumed", "lithium", "modernfix", "alltheleaks", "sodium").light());
 	}
 
 	@Test
 	void onlyModsWithABuildCount() {
 		Report fabric = fabric();
-		// AllTheLeaks is NeoForge only
-		assertEquals(6, fabric.available());
+		// AllTheLeaks is NeoForge only, and C2ME OpenCL is optional
+		assertEquals(5, fabric.available());
 		assertEquals(PerformanceMods.MODS.size(), fabric.statuses().size());
 		assertTrue(!status(fabric, "allTheLeaks").isAvailable());
 		// every mod has a NeoForge build on 1.21.1, C2ME included, so nothing needs Sinytra Connector
-		assertEquals(7, neoforge().available());
+		assertEquals(6, neoforge().available());
 		assertEquals("C2ME", status(neoforge(), "c2me").recommended().name());
 		assertNotNull(status(neoforge("c2me"), "c2me").installed());
 	}
@@ -65,6 +64,18 @@ public class PerformanceModsTest {
 		assertEquals(Light.GREEN, fabric.light());
 		assertTrue(!status(fabric, "c2meOpenCl").isAvailable());
 		assertEquals(6, PerformanceMods.report(PerformanceMods.NEOFORGE, (id) -> false, 21).available());
+	}
+
+	@Test
+	void optionalModsCountOnceInstalled() {
+		// C2ME OpenCL isn't required for green (it can't run next to Noisium), but counts when it's there
+		assertNotNull(status(fabric(), "c2meOpenCl").recommended());
+		Report withOpenCl = fabric("c2me", "c2me-opts-accel-opencl", "lithium", "modernfix", "sodium");
+		assertEquals(5, withOpenCl.installed());
+		assertEquals(6, withOpenCl.available());
+		assertEquals(Light.YELLOW, withOpenCl.light());
+		// the NeoForge build loads under an id with underscores
+		assertNotNull(status(neoforge("c2me_opts_accel_opencl"), "c2meOpenCl").installed());
 	}
 
 	@Test

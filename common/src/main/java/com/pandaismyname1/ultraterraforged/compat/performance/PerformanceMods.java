@@ -61,8 +61,14 @@ public final class PerformanceMods {
 	 * @param fabric the builds for Fabric, best first
 	 * @param neoforge the builds for NeoForge, best first
 	 * @param availableFrom for a mod with no build for this Minecraft version, the first version it has one for
+	 * @param optional recommended, but only counted towards the light once installed: for mods that don't suit every
+	 *        game, or can't run together with another one on the list
 	 */
-	public record Mod(String key, String name, String url, Category category, List<Build> fabric, List<Build> neoforge, @Nullable String availableFrom) {
+	public record Mod(String key, String name, String url, Category category, List<Build> fabric, List<Build> neoforge, @Nullable String availableFrom, boolean optional) {
+
+		public Mod(String key, String name, String url, Category category, List<Build> fabric, List<Build> neoforge, @Nullable String availableFrom) {
+			this(key, name, url, category, fabric, neoforge, availableFrom, false);
+		}
 
 		public List<Build> builds(String loader) {
 			return loader.equals(FABRIC) ? this.fabric : this.neoforge;
@@ -83,7 +89,9 @@ public final class PerformanceMods {
 			List.of(Build.of("C2ME OpenCL", "c2me-opts-accel-opencl", MODRINTH + "c2me-ocl").needsJava(25)),
 			// the NeoForge build nests a mod with the id spelled with underscores
 			List.of(Build.of("C2ME OpenCL", "c2me_opts_accel_opencl", MODRINTH + "c2me-ocl").needsJava(25)),
-			null),
+			// needs an OpenCL device, and crashes the game together with Noisium(ed) (tested on both loaders): Noisiumed
+			// is the one the light asks for
+			null, true),
 		new Mod("noisium", "Noisium", MODRINTH + "noisiumed", Category.WORLD_GENERATION,
 			// Noisium itself is archived; Noisiumed is the maintained fork, and either does the job
 			List.of(Build.of("Noisiumed", "noisiumed", MODRINTH + "noisiumed"), Build.alternative("Noisium", "noisium", MODRINTH + "noisium")),
@@ -156,7 +164,7 @@ public final class PerformanceMods {
 		}).toList();
 
 		int installed = (int) statuses.stream().filter((status) -> status.installed() != null).count();
-		int available = (int) statuses.stream().filter(Status::isAvailable).count();
+		int available = (int) statuses.stream().filter((status) -> status.isAvailable() && (!status.mod().optional() || status.installed() != null)).count();
 		boolean worldGeneration = statuses.stream().anyMatch((status) -> status.installed() != null && status.mod().category() == Category.WORLD_GENERATION);
 		Light light;
 		if (installed == 0) {

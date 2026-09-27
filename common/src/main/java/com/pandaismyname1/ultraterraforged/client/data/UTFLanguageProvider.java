@@ -523,6 +523,7 @@ public class UTFLanguageProvider {
 			this.add(UTFTranslationKeys.GUI_PERFORMANCE_MODS_HELP, "Mods that make UltraTerraForged worlds faster to generate and play. Click one to open its page.");
 			this.add(UTFTranslationKeys.GUI_PERFORMANCE_MODS_INSTALLED, "Installed");
 			this.add(UTFTranslationKeys.GUI_PERFORMANCE_MODS_MISSING, "Not installed");
+			this.add(UTFTranslationKeys.GUI_PERFORMANCE_MODS_OPTIONAL, "Optional");
 			this.add(UTFTranslationKeys.GUI_PERFORMANCE_MODS_NEEDS_VERSION, "Needs %s+");
 			this.add(UTFTranslationKeys.GUI_PERFORMANCE_MODS_NEEDS_JAVA, "Needs Java %s");
 			this.add(UTFTranslationKeys.GUI_PERFORMANCE_MODS_NOT_ON_LOADER, "Not on %s");
@@ -536,7 +537,7 @@ public class UTFLanguageProvider {
 			this.add(UTFTranslationKeys.performanceModCategory("general"), "Speeds up the game and saves memory");
 			this.add(UTFTranslationKeys.performanceModCategory("client"), "Speeds up rendering");
 			this.add(UTFTranslationKeys.performanceModDescription("c2me"), "Generates, loads and saves chunks on many threads at once: the biggest speed-up for exploring new land.");
-			this.add(UTFTranslationKeys.performanceModDescription("c2meOpenCl"), "An add-on for C2ME that moves parts of world generation onto the graphics card.");
+			this.add(UTFTranslationKeys.performanceModDescription("c2meOpenCl"), "An add-on for C2ME that moves parts of world generation onto the graphics card. Optional: it needs Java 25 and a graphics card with OpenCL, and doesn't work together with Noisium(ed), so install one or the other.");
 			this.add(UTFTranslationKeys.performanceModDescription("noisium"), "Fills new chunks with blocks faster, without changing the terrain. Noisium itself is no longer updated; Noisiumed is its maintained fork.");
 			this.add(UTFTranslationKeys.performanceModDescription("lithium"), "Speeds up ticking, mob AI, physics and parts of world generation, without changing how the game plays.");
 			this.add(UTFTranslationKeys.performanceModDescription("modernFix"), "Cuts loading times and memory use.");

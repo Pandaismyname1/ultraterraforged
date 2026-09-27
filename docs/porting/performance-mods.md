@@ -93,7 +93,8 @@ and Sinytra Connector drop out. What the dev runs use:
 | AllTheLeaks | none | 1.1.13 (`curse.maven:alltheleaks-1091339:8943912`) |
 | Sodium | 0.8.13 (`SMxNOGZ6`) | 0.8.13 (`uMOpc5uV`) |
 
-So six of the seven count on Fabric and all seven on NeoForge, on Java 25; one fewer each on Java 21.
+C2ME OpenCL is `optional` in `PerformanceMods` (see below): it counts towards the light only once installed. So the
+light asks for five mods on Fabric and six on NeoForge.
 
 ### Java 25
 
@@ -104,6 +105,11 @@ The launcher runs 1.21.1 on Java 21, but C2ME's 0.4.0 line (June 2026 on) builds
 - **C2ME OpenCL depends on that module, so it needs Java 25.** On Java 21 Fabric refuses to start
   ("requires version 25 or later of Java") and NeoForge crashes (`UnsupportedClassVersionError`). Hence
   `needsJava(25)` in `PerformanceMods` and its absence from the dev runs, which use the project's Java 21.
+- **On Java 25, C2ME OpenCL and Noisiumed crash the game together**, on both loaders: OpenCL replaces the chunk filling
+  that Noisiumed's Lithium compatibility mixin (`compat.lithium.LithiumNoiseChunkGeneratorMixin`) injects into
+  ("cannot inject into net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator"). Noisiumed is the one the light
+  asks for (a release, on Java 21, no GPU needed); C2ME OpenCL is marked `optional`: shown as "Optional", with its
+  description saying to pick one or the other, and counted only when installed.
 
 ### Tested with UltraTerraForged
 
