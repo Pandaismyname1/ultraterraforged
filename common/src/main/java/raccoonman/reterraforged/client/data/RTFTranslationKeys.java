@@ -58,6 +58,10 @@ public class RTFTranslationKeys {
 	public static final String GUI_BUTTON_DUNES = resolve("gui.button.dunes");
 	public static final String GUI_SLIDER_DUNE_HEIGHT = resolve("gui.slider.duneHeight");
 	public static final String GUI_SLIDER_DUNE_COVERAGE = resolve("gui.slider.duneCoverage");
+	public static final String GUI_LABEL_TORS = resolve("gui.label.tors");
+	public static final String GUI_BUTTON_TORS = resolve("gui.button.tors");
+	public static final String GUI_SLIDER_TOR_DENSITY = resolve("gui.slider.torDensity");
+	public static final String GUI_SLIDER_TOR_HEIGHT = resolve("gui.slider.torHeight");
 
 	public static final String GUI_BUTTON_TRUE = resolve("gui.button.true");
 	public static final String GUI_BUTTON_FALSE = resolve("gui.button.false");

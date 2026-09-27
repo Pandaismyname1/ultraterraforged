@@ -644,7 +644,8 @@ public class PresetSurfaceRuleData {
         	),
         	SurfaceRules.ifTrue(
         		SurfaceRules.abovePreliminarySurface(),
-        		surface
+        		// tors are bare rock: the rock layers, or plain stone without them
+        		SurfaceRules.ifTrue(SurfaceRules.not(RTFSurfaceConditions.terrain(TerrainType.TOR)), surface)
         	)
         );
         // vanilla's gradual change from stone to deepslate; with rock layers the deepslate is layered too

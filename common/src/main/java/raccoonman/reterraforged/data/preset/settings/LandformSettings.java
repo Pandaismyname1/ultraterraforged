@@ -15,7 +15,8 @@ public class LandformSettings {
 		PresetCodecs.defaulted(Codec.BOOL, "volcanicSurface", true).forGetter((o) -> o.volcanicSurface),
 		PresetCodecs.defaulted(Fjords.CODEC, "fjords", Fjords.makeDefault()).forGetter((o) -> o.fjords),
 		PresetCodecs.defaulted(Atolls.CODEC, "atolls", Atolls.makeDefault()).forGetter((o) -> o.atolls),
-		PresetCodecs.defaulted(Dunes.CODEC, "dunes", Dunes.makeDefault()).forGetter((o) -> o.dunes)
+		PresetCodecs.defaulted(Dunes.CODEC, "dunes", Dunes.makeDefault()).forGetter((o) -> o.dunes),
+		PresetCodecs.defaulted(Tors.CODEC, "tors", Tors.makeDefault()).forGetter((o) -> o.tors)
 	).apply(instance, LandformSettings::new));
 
 	public Buttes buttes;
@@ -26,8 +27,9 @@ public class LandformSettings {
 	public Fjords fjords;
 	public Atolls atolls;
 	public Dunes dunes;
+	public Tors tors;
 
-	public LandformSettings(Buttes buttes, Canyons canyons, SeaCliffs seaCliffs, boolean volcanicSurface, Fjords fjords, Atolls atolls, Dunes dunes) {
+	public LandformSettings(Buttes buttes, Canyons canyons, SeaCliffs seaCliffs, boolean volcanicSurface, Fjords fjords, Atolls atolls, Dunes dunes, Tors tors) {
 		this.buttes = buttes;
 		this.canyons = canyons;
 		this.seaCliffs = seaCliffs;
@@ -35,14 +37,15 @@ public class LandformSettings {
 		this.fjords = fjords;
 		this.atolls = atolls;
 		this.dunes = dunes;
+		this.tors = tors;
 	}
 
 	public LandformSettings copy() {
-		return new LandformSettings(this.buttes.copy(), this.canyons.copy(), this.seaCliffs.copy(), this.volcanicSurface, this.fjords.copy(), this.atolls.copy(), this.dunes.copy());
+		return new LandformSettings(this.buttes.copy(), this.canyons.copy(), this.seaCliffs.copy(), this.volcanicSurface, this.fjords.copy(), this.atolls.copy(), this.dunes.copy(), this.tors.copy());
 	}
 
 	public static LandformSettings makeDefault() {
-		return new LandformSettings(Buttes.makeDefault(), Canyons.makeDefault(), SeaCliffs.makeDefault(), true, Fjords.makeDefault(), Atolls.makeDefault(), Dunes.makeDefault());
+		return new LandformSettings(Buttes.makeDefault(), Canyons.makeDefault(), SeaCliffs.makeDefault(), true, Fjords.makeDefault(), Atolls.makeDefault(), Dunes.makeDefault(), Tors.makeDefault());
 	}
 
 	// how the original TerraForged generated: none of the added landforms
@@ -55,7 +58,41 @@ public class LandformSettings {
 		settings.fjords.enabled = false;
 		settings.atolls.enabled = false;
 		settings.dunes.enabled = false;
+		settings.tors.enabled = false;
 		return settings;
+	}
+
+	/**
+	 * Outcrops of bare rock on hilltops: blocky stacks of rock slabs with boulders strewn around them.
+	 */
+	public static class Tors {
+		private static final Tors DEFAULT = new Tors(true, 0.35F, 8);
+
+		public static final Codec<Tors> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+			PresetCodecs.defaulted(Codec.BOOL, "enabled", DEFAULT.enabled).forGetter((o) -> o.enabled),
+			PresetCodecs.defaulted(Codec.FLOAT, "density", DEFAULT.density).forGetter((o) -> o.density),
+			PresetCodecs.defaulted(Codec.INT, "height", DEFAULT.height).forGetter((o) -> o.height)
+		).apply(instance, Tors::new));
+
+		public boolean enabled;
+		// share of possible spots that get one; only hilltops can hold one
+		public float density;
+		// the tallest stacks rise this many blocks above the hilltop
+		public int height;
+
+		public Tors(boolean enabled, float density, int height) {
+			this.enabled = enabled;
+			this.density = density;
+			this.height = height;
+		}
+
+		public Tors copy() {
+			return new Tors(this.enabled, this.density, this.height);
+		}
+
+		public static Tors makeDefault() {
+			return DEFAULT.copy();
+		}
 	}
 
 	/**

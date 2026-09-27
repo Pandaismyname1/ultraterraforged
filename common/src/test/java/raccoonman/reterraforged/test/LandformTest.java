@@ -421,6 +421,32 @@ public class LandformTest {
 		return new int[] { raised, elsewhere, tallest };
 	}
 
+	@Test
+	void torsStandOnHilltops() {
+		Preset preset = preset("default", (p) -> {});
+		Preset flat = preset.copy();
+		flat.landforms().tors.enabled = false;
+		TerrainViews.View with = TerrainViews.view(preset, 0.0F, 0.0F, 8.0F);
+		TerrainViews.View without = TerrainViews.view(flat, 0.0F, 0.0F, 8.0F);
+		int rock = 0;
+		int tallest = 0;
+		for (int x = 0; x < with.size(); x++) {
+			for (int z = 0; z < with.size(); z++) {
+				int rise = with.blockY(x, z) - without.blockY(x, z);
+				// the erosion filter nudges the ground a little around anything that changes
+				assertTrue(rise >= -2, "tors lowered the ground by " + -rise + " at " + x + ", " + z);
+				if (with.cell(x, z).terrain == TerrainType.TOR) {
+					rock++;
+					assertTrue(!without.cell(x, z).terrain.isSubmerged(), "a tor stands in " + without.cell(x, z).terrain);
+				}
+				tallest = Math.max(tallest, rise);
+			}
+		}
+		System.out.println("tors cover " + rock + " cells, rising up to " + tallest + " blocks");
+		assertTrue(rock > 20, "tors cover only " + rock + " cells");
+		assertTrue(tallest >= 4 && tallest <= preset.landforms().tors.height + 2, "the tallest tor rises " + tallest + " blocks");
+	}
+
 	// cells that are land with atolls and sea without, over a wide area
 	private static int newLand(String name) {
 		Preset preset = preset(name, (p) -> {});
@@ -525,6 +551,7 @@ public class LandformTest {
 			assertTrue(!BuiltinPresetRenderTest.presets().get(name).get().landforms().fjords.enabled, name);
 			assertTrue(!BuiltinPresetRenderTest.presets().get(name).get().landforms().atolls.enabled, name);
 			assertTrue(!BuiltinPresetRenderTest.presets().get(name).get().landforms().dunes.enabled, name);
+			assertTrue(!BuiltinPresetRenderTest.presets().get(name).get().landforms().tors.enabled, name);
 			assertTrue(!BuiltinPresetRenderTest.presets().get(name).get().landforms().volcanicSurface, name);
 		}
 	}

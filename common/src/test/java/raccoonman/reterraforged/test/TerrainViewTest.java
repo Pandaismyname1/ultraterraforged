@@ -225,6 +225,24 @@ public class TerrainViewTest {
 	}
 
 	@Test
+	void tors() throws Exception {
+		Preset preset = preset("default");
+		long place = TerrainViews.find(preset, 8.0F, (cell) -> cell.terrain == raccoonman.reterraforged.world.worldgen.terrain.TerrainType.TOR);
+		if (place == Long.MIN_VALUE) {
+			System.out.println("no tor found");
+			return;
+		}
+		float x = PosUtil.unpackLeft(place);
+		float z = PosUtil.unpackRight(place);
+		System.out.println("tor at " + x + ", " + z);
+		TerrainViews.View close = TerrainViews.view(preset, x, z, 0.25F);
+		TerrainViews.write(close, "tor_close");
+		for (int turns = 0; turns < 4; turns++) {
+			TerrainViews.writePerspective(close, "tor_3d_" + turns, turns);
+		}
+	}
+
+	@Test
 	void dunes() throws Exception {
 		for (String name : new String[] { "default", "badlands" }) {
 			Preset preset = preset(name);

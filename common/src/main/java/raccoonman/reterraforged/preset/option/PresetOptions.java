@@ -635,6 +635,7 @@ public final class PresetOptions {
 	private static final Predicate<Preset> FJORDS = (preset) -> preset.landforms().fjords.enabled;
 	private static final Predicate<Preset> ATOLLS = (preset) -> preset.landforms().atolls.enabled;
 	private static final Predicate<Preset> DUNES = (preset) -> preset.landforms().dunes.enabled;
+	private static final Predicate<Preset> TORS = (preset) -> preset.landforms().tors.enabled;
 
 	public static final Page LANDFORMS = Page.of("landforms", RTFTranslationKeys.GUI_LANDFORM_SETTINGS_TITLE,
 		Category.of("buttes", RTFTranslationKeys.GUI_LABEL_BUTTES,
@@ -766,6 +767,24 @@ public final class PresetOptions {
 				.range(0.0F, 1.0F)
 				.activeWhen(DUNES)
 				.bind((p) -> p.landforms().dunes.coverage, (p, v) -> p.landforms().dunes.coverage = v)
+				.build()
+		),
+		Category.of("tors", RTFTranslationKeys.GUI_LABEL_TORS,
+			BoolOption.builder("landforms.tors.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_TORS)
+				.bind((p) -> p.landforms().tors.enabled, (p, v) -> p.landforms().tors.enabled = v)
+				.build(),
+			FloatOption.builder("landforms.tors.density")
+				.translation(RTFTranslationKeys.GUI_SLIDER_TOR_DENSITY)
+				.range(0.0F, 1.0F)
+				.activeWhen(TORS)
+				.bind((p) -> p.landforms().tors.density, (p, v) -> p.landforms().tors.density = v)
+				.build(),
+			IntOption.builder("landforms.tors.height")
+				.translation(RTFTranslationKeys.GUI_SLIDER_TOR_HEIGHT)
+				.range(3, 20)
+				.activeWhen(TORS)
+				.bind((p) -> p.landforms().tors.height, (p, v) -> p.landforms().tors.height = v)
 				.build()
 		),
 		Category.of("volcanoes", RTFTranslationKeys.GUI_LABEL_VOLCANOES,

@@ -114,6 +114,13 @@ public class RTFLanguageProvider {
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_DUNE_HEIGHT), "How many blocks the tallest dunes rise");
 			this.add(RTFTranslationKeys.GUI_SLIDER_DUNE_COVERAGE, "Coverage");
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_DUNE_COVERAGE), "How much of the flat desert is covered in dunes");
+			this.add(RTFTranslationKeys.GUI_LABEL_TORS, "Tors");
+			this.add(RTFTranslationKeys.GUI_BUTTON_TORS, "Tors");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_TORS), "Outcrops of bare rock on hilltops: blocky stacks of rock slabs, with boulders strewn around them");
+			this.add(RTFTranslationKeys.GUI_SLIDER_TOR_DENSITY, "Density");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_TOR_DENSITY), "How many of the hilltops get a tor");
+			this.add(RTFTranslationKeys.GUI_SLIDER_TOR_HEIGHT, "Height");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_TOR_HEIGHT), "How many blocks the tallest tors rise above their hilltop");
 			this.add(RTFTranslationKeys.GUI_BUTTON_VOLCANIC_SURFACE, "Volcanic Rock & Lava");
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_VOLCANIC_SURFACE), "Lava over magma in volcano craters, basalt, blackstone and tuff on their cones, and patches of old lava flows on the land around them");
 
