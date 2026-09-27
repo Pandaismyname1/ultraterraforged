@@ -92,6 +92,13 @@ public class RTFLanguageProvider {
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_SEA_STACKS), "Pillars of rock standing in the sea off the cliffs");
 			this.add(RTFTranslationKeys.GUI_LABEL_VOLCANOES, "Volcanoes");
 			this.add(RTFTranslationKeys.GUI_LABEL_FJORDS, "Fjords");
+			this.add(RTFTranslationKeys.GUI_LABEL_ATOLLS, "Atolls");
+			this.add(RTFTranslationKeys.GUI_BUTTON_ATOLLS, "Atolls");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_ATOLLS), "Rings of coral reef far out in warm seas, with low sandy islets and a shallow lagoon inside");
+			this.add(RTFTranslationKeys.GUI_SLIDER_ATOLL_FREQUENCY, "Frequency");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_ATOLL_FREQUENCY), "How many of the possible spots in warm, open sea get an atoll");
+			this.add(RTFTranslationKeys.GUI_SLIDER_ATOLL_SIZE, "Size");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_ATOLL_SIZE), "Scales how wide atolls are and how far apart they lie");
 			this.add(RTFTranslationKeys.GUI_BUTTON_FJORDS, "Fjords");
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_FJORDS), "On cold and rainy coasts the sea floods up the valleys between the mountains, in long, branching inlets between steep ridges");
 			this.add(RTFTranslationKeys.GUI_SLIDER_FJORD_DEPTH, "Depth");

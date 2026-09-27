@@ -19,8 +19,7 @@ import raccoonman.reterraforged.world.worldgen.terrain.TerrainType;
  * @param reach how far inland the land is lowered, in continent edge units
  * @param shoreline the continent edge value at the natural shoreline
  */
-public record Fjords(float depth, float reach, float shoreline, Levels levels, ThreadLocal<Long2FloatOpenHashMap> climates, ThreadLocal<Long2FloatOpenHashMap> grounds, ThreadLocal<Long2FloatOpenHashMap> surroundings) implements Landform {
-	private static final float CLIMATE_GRID = 64.0F;
+public record Fjords(float depth, float reach, float shoreline, Levels levels, ClimateGrid climate, ThreadLocal<Long2FloatOpenHashMap> grounds, ThreadLocal<Long2FloatOpenHashMap> surroundings) implements Landform {
 	// high ground is lowered fully, ground this many blocks above the sea hardly at all
 	private static final int FULL_HEIGHT = 30;
 	// the drowned valleys are no deeper than this below the sea
@@ -36,7 +35,12 @@ public record Fjords(float depth, float reach, float shoreline, Levels levels, T
 	private static final float HIGH_FULL = 40.0F;
 
 	public static Fjords make(LandformSettings.Fjords settings, float shoreline, Levels levels) {
-		return new Fjords(settings.depth * levels.unit, 0.2F * settings.reach, shoreline, levels, ThreadLocal.withInitial(Long2FloatOpenHashMap::new), ThreadLocal.withInitial(Long2FloatOpenHashMap::new), ThreadLocal.withInitial(Long2FloatOpenHashMap::new));
+		return new Fjords(settings.depth * levels.unit, 0.2F * settings.reach, shoreline, levels, fjordClimate(), ThreadLocal.withInitial(Long2FloatOpenHashMap::new), ThreadLocal.withInitial(Long2FloatOpenHashMap::new));
+	}
+
+	// cold and rainy coasts, like Norway, Alaska or New Zealand; each world gets its own grid, the samples depend on it
+	private static ClimateGrid fjordClimate() {
+		return ClimateGrid.of(64.0F, BiomeType.TUNDRA, BiomeType.TAIGA, BiomeType.COLD_STEPPE, BiomeType.ALPINE, BiomeType.TEMPERATE_RAINFOREST);
 	}
 
 	@Override
@@ -60,7 +64,7 @@ public record Fjords(float depth, float reach, float shoreline, Levels levels, T
 		if (amount <= 0.0F) {
 			return;
 		}
-		amount *= this.climate(x, z, heightmap);
+		amount *= this.climate.get(x, z, heightmap);
 		if (amount <= 0.0F) {
 			return;
 		}
@@ -72,21 +76,6 @@ public record Fjords(float depth, float reach, float shoreline, Levels levels, T
 				cell.terrain = TerrainType.SHALLOW_OCEAN;
 			}
 		}
-	}
-
-	// 1 on cold and rainy coasts, like Norway, Alaska or New Zealand, 0 elsewhere; scored on a grid and blended, so
-	// fjord coasts fade out smoothly at climate borders. The climate isn't worked out yet at this point, so it's
-	// sampled separately.
-	private float climate(float x, float z, Heightmap heightmap) {
-		float gx = x / CLIMATE_GRID;
-		float gz = z / CLIMATE_GRID;
-		int x0 = NoiseUtil.floor(gx);
-		int z0 = NoiseUtil.floor(gz);
-		float tx = gx - x0;
-		float tz = gz - z0;
-		float top = NoiseUtil.lerp(this.cornerClimate(x0, z0, heightmap), this.cornerClimate(x0 + 1, z0, heightmap), tx);
-		float bottom = NoiseUtil.lerp(this.cornerClimate(x0, z0 + 1, heightmap), this.cornerClimate(x0 + 1, z0 + 1, heightmap), tx);
-		return NoiseUtil.lerp(top, bottom, tz);
 	}
 
 	private interface GridValue {
@@ -131,21 +120,6 @@ public record Fjords(float depth, float reach, float shoreline, Levels levels, T
 			}
 		}
 		return total / count;
-	}
-
-	private float cornerClimate(int gridX, int gridZ, Heightmap heightmap) {
-		Long2FloatOpenHashMap cache = this.climates.get();
-		long key = ((long) gridX << 32) | (gridZ & 0xFFFFFFFFL);
-		if (cache.containsKey(key)) {
-			return cache.get(key);
-		}
-		if (cache.size() > 16384) {
-			cache.clear();
-		}
-		BiomeType type = heightmap.sampleTerrain(gridX * CLIMATE_GRID, gridZ * CLIMATE_GRID).biomeType;
-		float value = type == BiomeType.TUNDRA || type == BiomeType.TAIGA || type == BiomeType.COLD_STEPPE || type == BiomeType.ALPINE || type == BiomeType.TEMPERATE_RAINFOREST ? 1.0F : 0.0F;
-		cache.put(key, value);
-		return value;
 	}
 
 	@Override

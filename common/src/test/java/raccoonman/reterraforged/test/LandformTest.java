@@ -320,12 +320,64 @@ public class LandformTest {
 	}
 
 	@Test
+	void atollsRiseInWarmSeasOnly() {
+		int warm = newLand("tropics");
+		int cold = newLand("frozen_north");
+		System.out.println("atolls made " + warm + " cells of land in warm seas, " + cold + " in cold ones");
+		assertTrue(warm > 30, "atolls made only " + warm + " cells of land in warm seas");
+		assertTrue(cold == 0, "atolls made " + cold + " cells of land in cold seas");
+	}
+
+	// cells that are land with atolls and sea without, over a wide area
+	private static int newLand(String name) {
+		Preset preset = preset(name, (p) -> {});
+		Preset flat = preset.copy();
+		flat.landforms().atolls.enabled = false;
+		TerrainViews.View with = TerrainViews.view(preset, 0.0F, 0.0F, 24.0F);
+		TerrainViews.View without = TerrainViews.view(flat, 0.0F, 0.0F, 24.0F);
+		int water = with.levels().waterLevel;
+		int land = 0;
+		for (int x = 0; x < with.size(); x++) {
+			for (int z = 0; z < with.size(); z++) {
+				if (with.blockY(x, z) >= water && without.blockY(x, z) < water - 3) {
+					land++;
+				}
+			}
+		}
+		return land;
+	}
+
+	@Test
+	void worldsDontShareLandformCaches() throws Exception {
+		// landforms cache what they sample per thread; those samples belong to one world, so no cache may be shared
+		// between two worlds' landforms, e.g. through a static field
+		Preset preset = preset("default", (p) -> {});
+		raccoonman.reterraforged.world.worldgen.heightmap.Levels levels = TerrainViews.levels(preset);
+		var first = raccoonman.reterraforged.world.worldgen.landform.Landforms.make(new raccoonman.reterraforged.world.worldgen.util.Seed(1), preset.landforms(), levels, 0.34F);
+		var second = raccoonman.reterraforged.world.worldgen.landform.Landforms.make(new raccoonman.reterraforged.world.worldgen.util.Seed(1), preset.landforms(), levels, 0.34F);
+		assertTrue(first.landforms().size() >= 5, "expected every landform, got " + first.landforms());
+		for (int i = 0; i < first.landforms().size(); i++) {
+			Object a = first.landforms().get(i);
+			Object b = second.landforms().get(i);
+			for (java.lang.reflect.RecordComponent component : a.getClass().getRecordComponents()) {
+				Class<?> type = component.getType();
+				if (type == ThreadLocal.class || type == raccoonman.reterraforged.world.worldgen.landform.ClimateGrid.class) {
+					Object cacheA = component.getAccessor().invoke(a);
+					Object cacheB = component.getAccessor().invoke(b);
+					assertTrue(cacheA != cacheB, a.getClass().getSimpleName() + "." + component.getName() + " is shared between worlds");
+				}
+			}
+		}
+	}
+
+	@Test
 	void legacyPresetsHaveNoLandforms() {
 		for (String name : new String[] { "legacy_default", "beautiful", "huge_biomes", "lite", "vanillaish" }) {
 			assertTrue(!BuiltinPresetRenderTest.presets().get(name).get().landforms().buttes.enabled, name);
 			assertTrue(!BuiltinPresetRenderTest.presets().get(name).get().landforms().canyons.enabled, name);
 			assertTrue(!BuiltinPresetRenderTest.presets().get(name).get().landforms().seaCliffs.enabled, name);
 			assertTrue(!BuiltinPresetRenderTest.presets().get(name).get().landforms().fjords.enabled, name);
+			assertTrue(!BuiltinPresetRenderTest.presets().get(name).get().landforms().atolls.enabled, name);
 			assertTrue(!BuiltinPresetRenderTest.presets().get(name).get().landforms().volcanicSurface, name);
 		}
 	}

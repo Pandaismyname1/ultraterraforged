@@ -633,6 +633,7 @@ public final class PresetOptions {
 	private static final Predicate<Preset> CANYONS = (preset) -> preset.landforms().canyons.enabled;
 	private static final Predicate<Preset> SEA_CLIFFS = (preset) -> preset.landforms().seaCliffs.enabled;
 	private static final Predicate<Preset> FJORDS = (preset) -> preset.landforms().fjords.enabled;
+	private static final Predicate<Preset> ATOLLS = (preset) -> preset.landforms().atolls.enabled;
 
 	public static final Page LANDFORMS = Page.of("landforms", RTFTranslationKeys.GUI_LANDFORM_SETTINGS_TITLE,
 		Category.of("buttes", RTFTranslationKeys.GUI_LABEL_BUTTES,
@@ -722,6 +723,24 @@ public final class PresetOptions {
 				.range(0.3F, 2.5F)
 				.activeWhen(FJORDS)
 				.bind((p) -> p.landforms().fjords.reach, (p, v) -> p.landforms().fjords.reach = v)
+				.build()
+		),
+		Category.of("atolls", RTFTranslationKeys.GUI_LABEL_ATOLLS,
+			BoolOption.builder("landforms.atolls.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_ATOLLS)
+				.bind((p) -> p.landforms().atolls.enabled, (p, v) -> p.landforms().atolls.enabled = v)
+				.build(),
+			FloatOption.builder("landforms.atolls.frequency")
+				.translation(RTFTranslationKeys.GUI_SLIDER_ATOLL_FREQUENCY)
+				.range(0.0F, 1.0F)
+				.activeWhen(ATOLLS)
+				.bind((p) -> p.landforms().atolls.frequency, (p, v) -> p.landforms().atolls.frequency = v)
+				.build(),
+			FloatOption.builder("landforms.atolls.size")
+				.translation(RTFTranslationKeys.GUI_SLIDER_ATOLL_SIZE)
+				.range(0.5F, 2.0F)
+				.activeWhen(ATOLLS)
+				.bind((p) -> p.landforms().atolls.size, (p, v) -> p.landforms().atolls.size = v)
 				.build()
 		),
 		Category.of("volcanoes", RTFTranslationKeys.GUI_LABEL_VOLCANOES,

@@ -206,4 +206,18 @@ public class TerrainViewTest {
 			TerrainViews.writePerspective(close, "fjords_3d_" + turns, turns);
 		}
 	}
+
+	@Test
+	void atolls() throws Exception {
+		Preset preset = preset("tropics");
+		Preset without = preset.copy();
+		without.landforms().atolls.enabled = false;
+		long place = TerrainViews.mostChanged(TerrainViews.view(preset, 0.0F, 0.0F, 24.0F), TerrainViews.view(without, 0.0F, 0.0F, 24.0F));
+		float x = PosUtil.unpackLeft(place);
+		float z = PosUtil.unpackRight(place);
+		System.out.println("atoll at " + x + ", " + z);
+		TerrainViews.View close = TerrainViews.view(preset, x, z, 1.5F);
+		TerrainViews.write(close, "atoll_close");
+		TerrainViews.writePerspective(close, "atoll_3d");
+	}
 }

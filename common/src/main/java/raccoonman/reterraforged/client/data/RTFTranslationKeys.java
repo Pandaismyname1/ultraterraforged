@@ -45,6 +45,10 @@ public class RTFTranslationKeys {
 	public static final String GUI_BUTTON_SEA_STACKS = resolve("gui.button.seaStacks");
 	public static final String GUI_LABEL_VOLCANOES = resolve("gui.label.volcanoes");
 	public static final String GUI_LABEL_FJORDS = resolve("gui.label.fjords");
+	public static final String GUI_LABEL_ATOLLS = resolve("gui.label.atolls");
+	public static final String GUI_BUTTON_ATOLLS = resolve("gui.button.atolls");
+	public static final String GUI_SLIDER_ATOLL_FREQUENCY = resolve("gui.slider.atollFrequency");
+	public static final String GUI_SLIDER_ATOLL_SIZE = resolve("gui.slider.atollSize");
 	public static final String GUI_BUTTON_FJORDS = resolve("gui.button.fjords");
 	public static final String GUI_SLIDER_FJORD_REACH = resolve("gui.slider.fjordReach");
 	public static final String GUI_SLIDER_FJORD_DEPTH = resolve("gui.slider.fjordDepth");

@@ -23,6 +23,7 @@ public record Landforms(List<Landform> landforms) implements Landform {
 		int canyonsSeed = seed.next();
 		int seaCliffsSeed = seed.next();
 		int fjordsSeed = seed.next();
+		int atollsSeed = seed.next();
 		// canyons cut first, so buttes can stand in them
 		if (settings.canyons.enabled) {
 			landforms.add(Canyons.make(canyonsSeed, settings.canyons, levels));
@@ -36,6 +37,9 @@ public record Landforms(List<Landform> landforms) implements Landform {
 		// after the cliffs, so fjords cut through them
 		if (settings.fjords.enabled) {
 			landforms.add(Fjords.make(settings.fjords, shoreline, levels));
+		}
+		if (settings.atolls.enabled) {
+			landforms.add(Atolls.make(atollsSeed, settings.atolls, shoreline, levels));
 		}
 		return new Landforms(List.copyOf(landforms));
 	}

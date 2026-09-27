@@ -13,7 +13,8 @@ public class LandformSettings {
 		PresetCodecs.defaulted(Canyons.CODEC, "canyons", Canyons.makeDefault()).forGetter((o) -> o.canyons),
 		PresetCodecs.defaulted(SeaCliffs.CODEC, "seaCliffs", SeaCliffs.makeDefault()).forGetter((o) -> o.seaCliffs),
 		PresetCodecs.defaulted(Codec.BOOL, "volcanicSurface", true).forGetter((o) -> o.volcanicSurface),
-		PresetCodecs.defaulted(Fjords.CODEC, "fjords", Fjords.makeDefault()).forGetter((o) -> o.fjords)
+		PresetCodecs.defaulted(Fjords.CODEC, "fjords", Fjords.makeDefault()).forGetter((o) -> o.fjords),
+		PresetCodecs.defaulted(Atolls.CODEC, "atolls", Atolls.makeDefault()).forGetter((o) -> o.atolls)
 	).apply(instance, LandformSettings::new));
 
 	public Buttes buttes;
@@ -22,21 +23,23 @@ public class LandformSettings {
 	// lava in volcano craters, dark volcanic rock on their cones and old lava flows around them
 	public boolean volcanicSurface;
 	public Fjords fjords;
+	public Atolls atolls;
 
-	public LandformSettings(Buttes buttes, Canyons canyons, SeaCliffs seaCliffs, boolean volcanicSurface, Fjords fjords) {
+	public LandformSettings(Buttes buttes, Canyons canyons, SeaCliffs seaCliffs, boolean volcanicSurface, Fjords fjords, Atolls atolls) {
 		this.buttes = buttes;
 		this.canyons = canyons;
 		this.seaCliffs = seaCliffs;
 		this.volcanicSurface = volcanicSurface;
 		this.fjords = fjords;
+		this.atolls = atolls;
 	}
 
 	public LandformSettings copy() {
-		return new LandformSettings(this.buttes.copy(), this.canyons.copy(), this.seaCliffs.copy(), this.volcanicSurface, this.fjords.copy());
+		return new LandformSettings(this.buttes.copy(), this.canyons.copy(), this.seaCliffs.copy(), this.volcanicSurface, this.fjords.copy(), this.atolls.copy());
 	}
 
 	public static LandformSettings makeDefault() {
-		return new LandformSettings(Buttes.makeDefault(), Canyons.makeDefault(), SeaCliffs.makeDefault(), true, Fjords.makeDefault());
+		return new LandformSettings(Buttes.makeDefault(), Canyons.makeDefault(), SeaCliffs.makeDefault(), true, Fjords.makeDefault(), Atolls.makeDefault());
 	}
 
 	// how the original TerraForged generated: none of the added landforms
@@ -47,7 +50,40 @@ public class LandformSettings {
 		settings.seaCliffs.enabled = false;
 		settings.volcanicSurface = false;
 		settings.fjords.enabled = false;
+		settings.atolls.enabled = false;
 		return settings;
+	}
+
+	/**
+	 * Rings of coral reef in warm seas, with sandy islets and a shallow lagoon.
+	 */
+	public static class Atolls {
+		private static final Atolls DEFAULT = new Atolls(true, 0.35F, 1.0F);
+
+		public static final Codec<Atolls> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+			PresetCodecs.defaulted(Codec.BOOL, "enabled", DEFAULT.enabled).forGetter((o) -> o.enabled),
+			PresetCodecs.defaulted(Codec.FLOAT, "frequency", DEFAULT.frequency).forGetter((o) -> o.frequency),
+			PresetCodecs.defaulted(Codec.FLOAT, "size", DEFAULT.size).forGetter((o) -> o.size)
+		).apply(instance, Atolls::new));
+
+		public boolean enabled;
+		// share of possible spots in warm, open sea that get one
+		public float frequency;
+		public float size;
+
+		public Atolls(boolean enabled, float frequency, float size) {
+			this.enabled = enabled;
+			this.frequency = frequency;
+			this.size = size;
+		}
+
+		public Atolls copy() {
+			return new Atolls(this.enabled, this.frequency, this.size);
+		}
+
+		public static Atolls makeDefault() {
+			return DEFAULT.copy();
+		}
 	}
 
 	/**
