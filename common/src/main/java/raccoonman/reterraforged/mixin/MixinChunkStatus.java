@@ -26,6 +26,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import raccoonman.reterraforged.world.worldgen.GeneratorContext;
 import raccoonman.reterraforged.world.worldgen.RTFRandomState;
 import raccoonman.reterraforged.world.worldgen.WorldGenFlags;
+import raccoonman.reterraforged.world.worldgen.rivermap.FrozenFalls;
 
 // Targets are ChunkStatus lambdas, which have no Mojang names: method_* is the Fabric intermediary (and dev) name, m_*_ the Forge/NeoForge 1.20.1 SRG name.
 @Mixin(ChunkStatus.class)
@@ -82,6 +83,10 @@ public class MixinChunkStatus {
 			GeneratorContext context = rtfRandomState.generatorContext();
 			
 			if(context != null) {
+				// after freezing, so falls on frozen rivers freeze too
+				if(context.preset.rivers().raisedWater) {
+					FrozenFalls.apply(centerChunk, chunks, context);
+				}
 				context.cache.dropAtChunk(chunkPos.x, chunkPos.z);
 			}
 		}
