@@ -12,4 +12,8 @@ public class ModLoaderUtilImpl {
 	public static boolean isDedicatedServer() {
 		return FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER;
 	}
+
+	public static String loaderName() {
+		return "fabric";
+	}
 }

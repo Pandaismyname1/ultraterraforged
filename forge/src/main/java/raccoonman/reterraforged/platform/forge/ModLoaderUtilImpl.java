@@ -11,4 +11,8 @@ public class ModLoaderUtilImpl {
 	public static boolean isDedicatedServer() {
 		return FMLLoader.getDist().isDedicatedServer();
 	}
+
+	public static String loaderName() {
+		return "forge";
+	}
 }

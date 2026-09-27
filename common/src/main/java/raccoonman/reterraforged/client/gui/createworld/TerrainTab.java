@@ -43,6 +43,7 @@ public class TerrainTab implements Tab {
 	private final List<PresetLibrary.Entry> presets = new ArrayList<>();
 
 	private final StringWidget status;
+	private final AbstractWidget performanceLight;
 	private final Button presetButton;
 	private final Button advancedButton;
 	private final Button saveButton;
@@ -85,6 +86,7 @@ public class TerrainTab implements Tab {
 			});
 		}).tooltip(Tooltip.create(Component.translatable(RTFTranslationKeys.GUI_SHARE_PASTE_TOOLTIP))).build();
 		this.sliders = new ScrollingPanel();
+		this.performanceLight = PerformanceModsSection.light(this.sliders::scrollToBottom);
 		this.preview = new TerrainPreview(this.state);
 		this.viewButton = CycleButton.<RenderMode>builder(OptionWidgets::enumName)
 			.withValues(RenderMode.values())
@@ -102,6 +104,7 @@ public class TerrainTab implements Tab {
 	@Override
 	public void visitChildren(Consumer<AbstractWidget> consumer) {
 		consumer.accept(this.status);
+		consumer.accept(this.performanceLight);
 		consumer.accept(this.presetButton);
 		consumer.accept(this.advancedButton);
 		consumer.accept(this.saveButton);
@@ -121,8 +124,13 @@ public class TerrainTab implements Tab {
 
 		this.status.setX(left);
 		this.status.setY(top);
-		this.status.setWidth(columnWidth);
+		int lightWidth = PerformanceModsSection.lightWidth();
+		this.status.setWidth(columnWidth - lightWidth - GAP);
 		this.status.height = 12;
+		this.performanceLight.setX(left + columnWidth - lightWidth);
+		this.performanceLight.setY(top);
+		this.performanceLight.setWidth(lightWidth);
+		this.performanceLight.height = 12;
 		int y = top + 12 + GAP;
 		this.presetButton.setX(left);
 		this.presetButton.setY(y);
@@ -190,6 +198,7 @@ public class TerrainTab implements Tab {
 		for (PresetOptions.SimpleSetting setting : PresetOptions.SIMPLE) {
 			widgets.add(OptionWidgets.create(setting.option(), this.state.preset(), this.state.baseline(), this::onSettingChanged, Component.translatable(setting.labelKey())));
 		}
+		widgets.addAll(PerformanceModsSection.widgets(this.screen));
 		this.sliders.setChildren(widgets);
 		this.builtRevision = this.state.revision();
 	}

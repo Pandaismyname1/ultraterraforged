@@ -24,6 +24,14 @@ configurations {
         canBeResolved = true
         canBeConsumed = false
     }
+
+    // mods the dev runs load like a mods folder would, unremapped: for mods made of nested jars, which the classpath
+    // doesn't unpack. Fabric loader remaps them itself when the game starts.
+    devModsFolder {
+        canBeResolved = true
+        canBeConsumed = false
+        transitive = false
+    }
 }
 
 dependencies {
@@ -32,6 +40,17 @@ dependencies {
 
     common(project(path: ":common", configuration: "namedElements")) { transitive = false }
     shadowBundle(project(path: ":common", configuration: "transformProductionFabric")) { transitive = false }
+
+    // Performance mods, in the dev runs only: the ones PerformanceMods lists for Fabric on this version, pinned to
+    // Modrinth version ids (the version numbers are shared between loaders). -Prtf.perfMods=false leaves them out, to
+    // measure or debug ReTerraForged on its own. See docs/porting/performance-mods.md.
+    if (project.findProperty("rtf.perfMods") != "false") {
+        devModsFolder "maven.modrinth:c2me-fabric:fyt7FtgA"     // C2ME 0.2.0+alpha.11.18: its modules are nested jars
+        modLocalRuntime "maven.modrinth:noisiumed:vcRbbvYP"     // Noisiumed 3.0.6
+        modLocalRuntime "maven.modrinth:lithium:iEcXOkz4"       // Lithium 0.11.4
+        modLocalRuntime "maven.modrinth:modernfix:rPmgLeZC"     // ModernFix 5.25.2
+        modLocalRuntime "maven.modrinth:sodium:OihdIimA"        // Sodium 0.5.13
+    }
 }
 
 processResources {
@@ -86,8 +105,23 @@ sourceSets {
     }
 }
 
+def devModsDir = layout.buildDirectory.dir("devmods")
+def syncDevMods = tasks.register("syncDevMods", Sync) {
+    from configurations.devModsFolder
+    into devModsDir
+}
+tasks.matching { it.name.startsWith("run") }.configureEach {
+    dependsOn syncDevMods
+}
+
 loom {
     runs {
+        configureEach {
+            property "fabric.addMods", devModsDir.get().asFile.absolutePath
+            // the dev game runs LWJGL 3.3.2, which Sodium refuses at startup; launchers ship 3.3.1, so only turn the
+            // check off here
+            property "sodium.checks.issue2561", "false"
+        }
         // new worlds in the dev game start in creative with cheats, to fly around and inspect terrain
         client {
             property "reterraforged.dev.creative", "true"

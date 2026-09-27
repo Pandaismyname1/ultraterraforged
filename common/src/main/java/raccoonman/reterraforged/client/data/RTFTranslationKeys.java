@@ -369,6 +369,31 @@ public class RTFTranslationKeys {
 	public static final String GUI_TERRAIN_TAB_PREVIEW_LOADING = resolve("gui.terrainTab.preview.loading");
 	public static final String GUI_TERRAIN_TAB_PREVIEW_HINT = resolve("gui.terrainTab.preview.hint");
 	public static final String GUI_TERRAIN_TAB_APPLY_FAILED = resolve("gui.terrainTab.applyFailed");
+	public static final String GUI_PERFORMANCE_MODS_TITLE = resolve("gui.performanceMods.title");
+	public static final String GUI_PERFORMANCE_MODS_COUNT = resolve("gui.performanceMods.count");
+	public static final String GUI_PERFORMANCE_MODS_LIGHT_RED = resolve("gui.performanceMods.light.red");
+	public static final String GUI_PERFORMANCE_MODS_LIGHT_ORANGE = resolve("gui.performanceMods.light.orange");
+	public static final String GUI_PERFORMANCE_MODS_LIGHT_YELLOW = resolve("gui.performanceMods.light.yellow");
+	public static final String GUI_PERFORMANCE_MODS_LIGHT_GREEN = resolve("gui.performanceMods.light.green");
+	public static final String GUI_PERFORMANCE_MODS_HELP = resolve("gui.performanceMods.help");
+	public static final String GUI_PERFORMANCE_MODS_INSTALLED = resolve("gui.performanceMods.installed");
+	public static final String GUI_PERFORMANCE_MODS_MISSING = resolve("gui.performanceMods.missing");
+	public static final String GUI_PERFORMANCE_MODS_NEEDS_VERSION = resolve("gui.performanceMods.needsVersion");
+	public static final String GUI_PERFORMANCE_MODS_NOT_ON_LOADER = resolve("gui.performanceMods.notOnLoader");
+	public static final String GUI_PERFORMANCE_MODS_NEEDS_CONNECTOR = resolve("gui.performanceMods.needsConnector");
+	public static final String GUI_PERFORMANCE_MODS_VIA_CONNECTOR = resolve("gui.performanceMods.viaConnector");
+	public static final String GUI_PERFORMANCE_MODS_RUNNING = resolve("gui.performanceMods.running");
+	public static final String GUI_PERFORMANCE_MODS_GET = resolve("gui.performanceMods.get");
+	public static final String GUI_PERFORMANCE_MODS_STANDS_IN = resolve("gui.performanceMods.standsIn");
+	public static final String GUI_PERFORMANCE_MODS_OPEN = resolve("gui.performanceMods.open");
+
+	public static String performanceModCategory(String category) {
+		return resolve("gui.performanceMods.category." + category);
+	}
+
+	public static String performanceModDescription(String key) {
+		return resolve("gui.performanceMods.mod." + key);
+	}
 	public static final String SIMPLE_CONTINENT_SIZE = resolve("gui.terrainTab.simple.continentSize");
 	public static final String SIMPLE_BIOME_SIZE = resolve("gui.terrainTab.simple.biomeSize");
 	public static final String SIMPLE_TERRAIN_AREA_SIZE = resolve("gui.terrainTab.simple.terrainAreaSize");

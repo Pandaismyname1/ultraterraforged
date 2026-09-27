@@ -46,6 +46,10 @@ public class ScrollingPanel extends AbstractWidget {
 		this.scroll = Mth.clamp(this.scroll, 0.0D, this.maxScroll());
 	}
 
+	public void scrollToBottom() {
+		this.scroll = this.maxScroll();
+	}
+
 	private int contentHeight() {
 		return Math.max(0, this.children.size() * (ROW_HEIGHT + ROW_SPACING) - ROW_SPACING);
 	}
