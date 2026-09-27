@@ -58,6 +58,11 @@ class MixinNoiseBasedChunkGenerator {
 	@Inject(at = @At("TAIL"), method = "buildSurface", require = 1)
     public void buildSurface$TAIL(WorldGenRegion worldGenRegion, StructureManager structureManager, RandomState randomState, ChunkAccess chunkAccess, CallbackInfo callback) {
 		SurfaceRegion.set(null);
+		GeneratorContext generatorContext;
+		if((Object) randomState instanceof RTFRandomState rtfRandomState && (generatorContext = rtfRandomState.generatorContext()) != null) {
+			// caves shaped by the land, carved into the finished surface
+			generatorContext.caveFeatures.carve(chunkAccess);
+		}
     }
 	
 	@Redirect(

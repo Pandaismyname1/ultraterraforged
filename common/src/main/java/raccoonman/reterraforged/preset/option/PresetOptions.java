@@ -1048,7 +1048,143 @@ public final class PresetOptions {
 		)
 	);
 
-	public static final List<Page> PAGES = List.of(WORLD, SURFACE, CAVES, CLIMATE, TERRAIN, RIVERS, LANDFORMS, COASTS, FILTERS, MISCELLANEOUS);
+	// Cave Features
+
+	private static final Predicate<Preset> UNDERGROUND_RIVERS = (preset) -> preset.caveFeatures().undergroundRivers.enabled;
+	private static final Predicate<Preset> SPRINGS = (preset) -> preset.caveFeatures().springs.enabled;
+	private static final Predicate<Preset> KARST_CAVES = (preset) -> preset.caveFeatures().karstCaves.enabled;
+	private static final Predicate<Preset> LAVA_TUBES = (preset) -> preset.caveFeatures().lavaTubes.enabled;
+	private static final Predicate<Preset> SEA_CAVES = (preset) -> preset.caveFeatures().seaCaves.enabled;
+	private static final Predicate<Preset> LAYER_CAVES = (preset) -> preset.caveFeatures().layerCaves.enabled;
+	private static final Predicate<Preset> GIANT_CAVERNS = (preset) -> preset.caveFeatures().giantCaverns.enabled;
+	private static final Predicate<Preset> ROCK_SHELTERS = (preset) -> preset.caveFeatures().rockShelters.enabled;
+	private static final Predicate<Preset> GLACIER_CAVES = (preset) -> preset.caveFeatures().glacierCaves.enabled;
+	private static final Predicate<Preset> CAVE_MOUTHS = (preset) -> preset.caveFeatures().caveMouths.enabled;
+
+	public static final Page CAVE_FEATURES = Page.of("caveFeatures", RTFTranslationKeys.GUI_CAVE_FEATURES_SETTINGS_TITLE,
+		Category.of("undergroundRivers", RTFTranslationKeys.GUI_LABEL_UNDERGROUND_RIVERS,
+			BoolOption.builder("caveFeatures.undergroundRivers.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_UNDERGROUND_RIVERS)
+				.bind((p) -> p.caveFeatures().undergroundRivers.enabled, (p, v) -> p.caveFeatures().undergroundRivers.enabled = v)
+				.build(),
+			FloatOption.builder("caveFeatures.undergroundRivers.frequency")
+				.translation(RTFTranslationKeys.GUI_SLIDER_UNDERGROUND_RIVER_FREQUENCY)
+				.range(0.0F, 1.0F)
+				.activeWhen(UNDERGROUND_RIVERS)
+				.bind((p) -> p.caveFeatures().undergroundRivers.frequency, (p, v) -> p.caveFeatures().undergroundRivers.frequency = v)
+				.build()
+		),
+		Category.of("springs", RTFTranslationKeys.GUI_LABEL_SPRINGS,
+			BoolOption.builder("caveFeatures.springs.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_SPRINGS)
+				.bind((p) -> p.caveFeatures().springs.enabled, (p, v) -> p.caveFeatures().springs.enabled = v)
+				.build(),
+			FloatOption.builder("caveFeatures.springs.frequency")
+				.translation(RTFTranslationKeys.GUI_SLIDER_SPRING_FREQUENCY)
+				.range(0.0F, 1.0F)
+				.activeWhen(SPRINGS)
+				.bind((p) -> p.caveFeatures().springs.frequency, (p, v) -> p.caveFeatures().springs.frequency = v)
+				.build()
+		),
+		Category.of("karstCaves", RTFTranslationKeys.GUI_LABEL_KARST_CAVES,
+			BoolOption.builder("caveFeatures.karstCaves.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_KARST_CAVES)
+				.bind((p) -> p.caveFeatures().karstCaves.enabled, (p, v) -> p.caveFeatures().karstCaves.enabled = v)
+				.build(),
+			FloatOption.builder("caveFeatures.karstCaves.size")
+				.translation(RTFTranslationKeys.GUI_SLIDER_KARST_CAVE_SIZE)
+				.range(0.5F, 2.0F)
+				.activeWhen(KARST_CAVES)
+				.bind((p) -> p.caveFeatures().karstCaves.size, (p, v) -> p.caveFeatures().karstCaves.size = v)
+				.build()
+		),
+		Category.of("lavaTubes", RTFTranslationKeys.GUI_LABEL_LAVA_TUBES,
+			BoolOption.builder("caveFeatures.lavaTubes.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_LAVA_TUBES)
+				.bind((p) -> p.caveFeatures().lavaTubes.enabled, (p, v) -> p.caveFeatures().lavaTubes.enabled = v)
+				.build(),
+			FloatOption.builder("caveFeatures.lavaTubes.frequency")
+				.translation(RTFTranslationKeys.GUI_SLIDER_LAVA_TUBE_FREQUENCY)
+				.range(0.0F, 1.0F)
+				.activeWhen(LAVA_TUBES)
+				.bind((p) -> p.caveFeatures().lavaTubes.frequency, (p, v) -> p.caveFeatures().lavaTubes.frequency = v)
+				.build()
+		),
+		Category.of("seaCaves", RTFTranslationKeys.GUI_LABEL_SEA_CAVES,
+			BoolOption.builder("caveFeatures.seaCaves.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_SEA_CAVES)
+				.bind((p) -> p.caveFeatures().seaCaves.enabled, (p, v) -> p.caveFeatures().seaCaves.enabled = v)
+				.build(),
+			FloatOption.builder("caveFeatures.seaCaves.frequency")
+				.translation(RTFTranslationKeys.GUI_SLIDER_SEA_CAVE_FREQUENCY)
+				.range(0.0F, 1.0F)
+				.activeWhen(SEA_CAVES)
+				.bind((p) -> p.caveFeatures().seaCaves.frequency, (p, v) -> p.caveFeatures().seaCaves.frequency = v)
+				.build()
+		),
+		Category.of("layerCaves", RTFTranslationKeys.GUI_LABEL_LAYER_CAVES,
+			BoolOption.builder("caveFeatures.layerCaves.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_LAYER_CAVES)
+				.bind((p) -> p.caveFeatures().layerCaves.enabled, (p, v) -> p.caveFeatures().layerCaves.enabled = v)
+				.build(),
+			FloatOption.builder("caveFeatures.layerCaves.frequency")
+				.translation(RTFTranslationKeys.GUI_SLIDER_LAYER_CAVE_FREQUENCY)
+				.range(0.0F, 1.0F)
+				.activeWhen(LAYER_CAVES)
+				.bind((p) -> p.caveFeatures().layerCaves.frequency, (p, v) -> p.caveFeatures().layerCaves.frequency = v)
+				.build()
+		),
+		Category.of("giantCaverns", RTFTranslationKeys.GUI_LABEL_GIANT_CAVERNS,
+			BoolOption.builder("caveFeatures.giantCaverns.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_GIANT_CAVERNS)
+				.bind((p) -> p.caveFeatures().giantCaverns.enabled, (p, v) -> p.caveFeatures().giantCaverns.enabled = v)
+				.build(),
+			FloatOption.builder("caveFeatures.giantCaverns.frequency")
+				.translation(RTFTranslationKeys.GUI_SLIDER_GIANT_CAVERN_FREQUENCY)
+				.range(0.0F, 1.0F)
+				.activeWhen(GIANT_CAVERNS)
+				.bind((p) -> p.caveFeatures().giantCaverns.frequency, (p, v) -> p.caveFeatures().giantCaverns.frequency = v)
+				.build()
+		),
+		Category.of("rockShelters", RTFTranslationKeys.GUI_LABEL_ROCK_SHELTERS,
+			BoolOption.builder("caveFeatures.rockShelters.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_ROCK_SHELTERS)
+				.bind((p) -> p.caveFeatures().rockShelters.enabled, (p, v) -> p.caveFeatures().rockShelters.enabled = v)
+				.build(),
+			FloatOption.builder("caveFeatures.rockShelters.frequency")
+				.translation(RTFTranslationKeys.GUI_SLIDER_ROCK_SHELTER_FREQUENCY)
+				.range(0.0F, 1.0F)
+				.activeWhen(ROCK_SHELTERS)
+				.bind((p) -> p.caveFeatures().rockShelters.frequency, (p, v) -> p.caveFeatures().rockShelters.frequency = v)
+				.build()
+		),
+		Category.of("glacierCaves", RTFTranslationKeys.GUI_LABEL_GLACIER_CAVES,
+			BoolOption.builder("caveFeatures.glacierCaves.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_GLACIER_CAVES)
+				.bind((p) -> p.caveFeatures().glacierCaves.enabled, (p, v) -> p.caveFeatures().glacierCaves.enabled = v)
+				.build(),
+			FloatOption.builder("caveFeatures.glacierCaves.frequency")
+				.translation(RTFTranslationKeys.GUI_SLIDER_GLACIER_CAVE_FREQUENCY)
+				.range(0.0F, 1.0F)
+				.activeWhen(GLACIER_CAVES)
+				.bind((p) -> p.caveFeatures().glacierCaves.frequency, (p, v) -> p.caveFeatures().glacierCaves.frequency = v)
+				.build()
+		),
+		Category.of("caveMouths", RTFTranslationKeys.GUI_LABEL_CAVE_MOUTHS,
+			BoolOption.builder("caveFeatures.caveMouths.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_CAVE_MOUTHS)
+				.bind((p) -> p.caveFeatures().caveMouths.enabled, (p, v) -> p.caveFeatures().caveMouths.enabled = v)
+				.build(),
+			FloatOption.builder("caveFeatures.caveMouths.strength")
+				.translation(RTFTranslationKeys.GUI_SLIDER_CAVE_MOUTH_STRENGTH)
+				.range(0.0F, 2.0F)
+				.activeWhen(CAVE_MOUTHS)
+				.bind((p) -> p.caveFeatures().caveMouths.strength, (p, v) -> p.caveFeatures().caveMouths.strength = v)
+				.build()
+		)
+	);
+
+	public static final List<Page> PAGES = List.of(WORLD, SURFACE, CAVES, CAVE_FEATURES, CLIMATE, TERRAIN, RIVERS, LANDFORMS, COASTS, FILTERS, MISCELLANEOUS);
 
 	private static final Map<String, Option<?>> BY_PATH = PAGES.stream().flatMap(Page::options).collect(Collectors.toUnmodifiableMap(Option::path, Function.identity()));
 

@@ -13,6 +13,7 @@ import net.minecraft.world.level.levelgen.NoiseRouterData;
 import net.minecraft.world.level.levelgen.Noises;
 import net.minecraft.world.level.levelgen.OreVeinifier;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
+import raccoonman.reterraforged.data.preset.settings.CaveFeatureSettings;
 import raccoonman.reterraforged.data.preset.settings.CaveSettings;
 import raccoonman.reterraforged.data.preset.settings.Preset;
 import raccoonman.reterraforged.data.preset.settings.WorldSettings;
@@ -23,6 +24,14 @@ import raccoonman.reterraforged.world.worldgen.noise.module.Noise;
 public class PresetNoiseRouterData {
 	private static final float SCALER = 128.0F;
 	private static final float UNIT = 1.0F / SCALER;
+	// ground with a gradient below this counts as flat, and above that as steep
+	private static final double FLAT_GROUND = 0.25D;
+	private static final double STEEP_GROUND = 0.45D;
+	// how much the entrance noise is raised on flat ground, and lowered on steep ground, at full strength
+	private static final double FLAT_BIAS = 0.35D;
+	private static final double STEEP_BIAS = 0.12D;
+	// how far under the surface cave entrances are kept to slopes
+	private static final double MOUTH_DEPTH = 24.0D;
 	
     public static void bootstrap(Preset preset, BootstapContext<DensityFunction> ctx) {
         HolderGetter<DensityFunction> densityFunctions = ctx.lookup(Registries.DENSITY_FUNCTION);
@@ -44,7 +53,22 @@ public class PresetNoiseRouterData {
         ctx.register(NoiseRouterData.JAGGEDNESS, jaggednessPerformanceHack());
         CaveSettings caves = preset.caves();
         ctx.register(NoiseRouterData.NOODLE, noodle(-worldDepth, worldHeight, 1.0F - caves.noodleCaveProbability, densityFunctions, noiseParams));
-        ctx.register(NoiseRouterData.ENTRANCES, probabilityDensity(caves.entranceCaveProbability, NoiseRouterData.entrances(densityFunctions, noiseParams)));
+        DensityFunction entrances = probabilityDensity(caves.entranceCaveProbability, NoiseRouterData.entrances(densityFunctions, noiseParams));
+        CaveFeatureSettings.CaveMouths mouths = preset.caveFeatures().caveMouths;
+        if (mouths.enabled && mouths.strength > 0.0F) {
+        	// cave entrances kept off flat ground and gathered on slopes, cliffs and gorge walls: the steeper the ground,
+        	// the lower the entrance noise, which opens where it's below zero
+        	DensityFunction gradient = RTFDensityFunctions.cell(CellField.GRADIENT);
+        	DensityFunction flat = DensityFunctions.add(DensityFunctions.constant(FLAT_GROUND), DensityFunctions.mul(DensityFunctions.constant(-1.0D), gradient)).clamp(0.0D, FLAT_GROUND);
+        	DensityFunction steep = DensityFunctions.add(gradient, DensityFunctions.constant(-STEEP_GROUND)).clamp(0.0D, 1.0D - STEEP_GROUND);
+        	DensityFunction bias = DensityFunctions.add(DensityFunctions.mul(DensityFunctions.constant(mouths.strength * FLAT_BIAS / FLAT_GROUND), flat), DensityFunctions.mul(DensityFunctions.constant(-mouths.strength * STEEP_BIAS / (1.0D - STEEP_GROUND)), steep));
+        	// only near the surface, where caves open onto it: 1 at the surface, 0 from MOUTH_DEPTH blocks down
+        	DensityFunction surface = DensityFunctions.mul(RTFDensityFunctions.cell(CellField.HEIGHT), DensityFunctions.constant(properties.terrainScaler()));
+        	DensityFunction depth = DensityFunctions.add(DensityFunctions.yClampedGradient(-worldDepth, worldHeight, -worldDepth, worldHeight), DensityFunctions.mul(DensityFunctions.constant(-1.0D), surface));
+        	DensityFunction near = DensityFunctions.add(DensityFunctions.mul(depth, DensityFunctions.constant(1.0D / MOUTH_DEPTH)), DensityFunctions.constant(1.0D)).clamp(0.0D, 1.0D);
+        	entrances = DensityFunctions.add(entrances, DensityFunctions.mul(bias, near));
+        }
+        ctx.register(NoiseRouterData.ENTRANCES, entrances);
         ctx.register(NoiseRouterData.SPAGHETTI_2D, probabilityDensity(caves.spaghettiCaveProbability, spaghetti2D(-worldDepth, worldHeight, densityFunctions, noiseParams)));
     }
 

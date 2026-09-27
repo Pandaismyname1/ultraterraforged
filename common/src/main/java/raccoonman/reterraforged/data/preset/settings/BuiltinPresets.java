@@ -64,7 +64,8 @@ public class BuiltinPresets {
 			new StructureSettings(),
 			new MiscellaneousSettings(true, 600, true, true, true, false, true, true, true, true, true, 0.4F, 0.4F, true),
 			LandformSettings.makeDefault(),
-			CoastSettings.makeDefault()
+			CoastSettings.makeDefault(),
+			CaveFeatureSettings.makeDefault()
 		); 
 	}
 	
@@ -110,7 +111,8 @@ public class BuiltinPresets {
 			new StructureSettings(),
 			new MiscellaneousSettings(true, 600, true, true, true, false, true, true, true, true, true, 0.4F, 0.4F, false),
 			LandformSettings.makeNone(),
-			CoastSettings.makeNone()
+			CoastSettings.makeNone(),
+			CaveFeatureSettings.makeNone()
 		); 
 	}
 
@@ -156,7 +158,8 @@ public class BuiltinPresets {
 			new StructureSettings(),
 			new MiscellaneousSettings(false, 600, false, true, false, false, false, false, true, true, true, 1.0F, 0.75F, false),
 			LandformSettings.makeNone(),
-			CoastSettings.makeNone()
+			CoastSettings.makeNone(),
+			CaveFeatureSettings.makeNone()
 		); 
 	}
 	
@@ -202,7 +205,8 @@ public class BuiltinPresets {
 			new StructureSettings(),
 			new MiscellaneousSettings(true, 684, true, true, true, false, true, true, true, true, false, 0.853F, 0.855F, false),
 			LandformSettings.makeNone(),
-			CoastSettings.makeNone()
+			CoastSettings.makeNone(),
+			CaveFeatureSettings.makeNone()
 		); 
 	}
 
@@ -248,7 +252,8 @@ public class BuiltinPresets {
 			new StructureSettings(),
 			new MiscellaneousSettings(true, 600, false, true, true, false, true, true, true, true, true, 1.0F, 0.75F, false),
 			LandformSettings.makeNone(),
-			CoastSettings.makeNone()
+			CoastSettings.makeNone(),
+			CaveFeatureSettings.makeNone()
 		);
 	}
 
@@ -294,7 +299,8 @@ public class BuiltinPresets {
 			new StructureSettings(),
 			new MiscellaneousSettings(true, 721, true, true, true, false, true, true, true, true, false, 0.902F, 0.945F, false),
 			LandformSettings.makeNone(),
-			CoastSettings.makeNone()
+			CoastSettings.makeNone(),
+			CaveFeatureSettings.makeNone()
 		);
 	}
 

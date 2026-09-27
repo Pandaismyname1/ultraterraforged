@@ -3,6 +3,7 @@ package raccoonman.reterraforged.world.worldgen;
 import org.jetbrains.annotations.Nullable;
 
 import raccoonman.reterraforged.data.preset.settings.Preset;
+import raccoonman.reterraforged.world.worldgen.cave.CaveFeatures;
 import raccoonman.reterraforged.world.worldgen.heightmap.Heightmap;
 import raccoonman.reterraforged.world.worldgen.heightmap.Levels;
 import raccoonman.reterraforged.world.worldgen.heightmap.WorldLookup;
@@ -22,6 +23,7 @@ public class GeneratorContext {
     @Nullable
     public TileCache cache;
     public WorldLookup lookup;
+    public CaveFeatures caveFeatures;
     
     public GeneratorContext(Preset preset, int seed, int tileSize, int tileBorder, int batchCount, @Nullable TileCache cache) {
         this.preset = preset;
@@ -33,6 +35,7 @@ public class GeneratorContext {
         this.generator = new TileGenerator(this.localHeightmap, new WorldFilters(this, globalHeightmap), tileSize, tileBorder, batchCount);
         this.cache = cache;
         this.lookup = new WorldLookup(this);
+        this.caveFeatures = new CaveFeatures(this);
     }
 
     public static GeneratorContext makeCached(Preset preset, int seed, int tileSize, int batchCount, boolean queue) {

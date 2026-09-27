@@ -31,7 +31,7 @@ import raccoonman.reterraforged.data.preset.PresetSurfaceLayerData;
 import raccoonman.reterraforged.registries.RTFRegistries;
 
 //TODO make this actually immutable when we rework the gui
-public record Preset(WorldSettings world, SurfaceSettings surface, CaveSettings caves, ClimateSettings climate, TerrainSettings terrain, RiverSettings rivers, FilterSettings filters, StructureSettings structures, MiscellaneousSettings miscellaneous, LandformSettings landforms, CoastSettings coasts) {
+public record Preset(WorldSettings world, SurfaceSettings surface, CaveSettings caves, ClimateSettings climate, TerrainSettings terrain, RiverSettings rivers, FilterSettings filters, StructureSettings structures, MiscellaneousSettings miscellaneous, LandformSettings landforms, CoastSettings coasts, CaveFeatureSettings caveFeatures) {
 	private static final Codec<Preset> UNVERSIONED_CODEC = RecordCodecBuilder.create(instance -> instance.group(
 		WorldSettings.CODEC.fieldOf("world").forGetter(Preset::world),
 		// presets are mutable, so a missing section must get its own default instance rather than a shared one
@@ -45,7 +45,8 @@ public record Preset(WorldSettings world, SurfaceSettings surface, CaveSettings 
 		MiscellaneousSettings.CODEC.fieldOf("miscellaneous").forGetter(Preset::miscellaneous),
 		// added after the first releases; older presets get today's landforms
 		LandformSettings.CODEC.optionalFieldOf("landforms").xmap((landforms) -> landforms.orElseGet(LandformSettings::makeDefault), Optional::of).forGetter(Preset::landforms),
-		CoastSettings.CODEC.optionalFieldOf("coasts").xmap((coasts) -> coasts.orElseGet(CoastSettings::makeDefault), Optional::of).forGetter(Preset::coasts)
+		CoastSettings.CODEC.optionalFieldOf("coasts").xmap((coasts) -> coasts.orElseGet(CoastSettings::makeDefault), Optional::of).forGetter(Preset::coasts),
+		CaveFeatureSettings.CODEC.optionalFieldOf("caveFeatures").xmap((caveFeatures) -> caveFeatures.orElseGet(CaveFeatureSettings::makeDefault), Optional::of).forGetter(Preset::caveFeatures)
 	).apply(instance, Preset::new));
 
 	// what preset files and datapacks use; handles upgrading presets saved by older versions
@@ -56,7 +57,7 @@ public record Preset(WorldSettings world, SurfaceSettings surface, CaveSettings 
 	}
 	
 	public Preset copy() {
-		return new Preset(this.world.copy(), this.surface.copy(), this.caves.copy(), this.climate.copy(), this.terrain.copy(), this.rivers.copy(), this.filters.copy(), this.structures.copy(), this.miscellaneous.copy(), this.landforms.copy(), this.coasts.copy());
+		return new Preset(this.world.copy(), this.surface.copy(), this.caves.copy(), this.climate.copy(), this.terrain.copy(), this.rivers.copy(), this.filters.copy(), this.structures.copy(), this.miscellaneous.copy(), this.landforms.copy(), this.coasts.copy(), this.caveFeatures.copy());
 	}
 
 	public HolderLookup.Provider buildPatch(HolderLookup.Provider registries) {
