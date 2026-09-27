@@ -227,7 +227,7 @@ final class PerformanceModsSection {
 			// an installed stand-in shows under its own name
 			PerformanceMods.Build shown = installed ? this.status.installed() : this.status.recommended();
 			Component name = shown != null && !shown.name().equals(this.status.mod().name())
-				? Component.literal(shown.name()).append(Component.literal(" (" + this.status.mod().name() + ")").withStyle(ChatFormatting.DARK_GRAY))
+				? Component.literal(shown.name()).append(Component.literal(" (" + this.status.mod().name() + ")").withStyle(ChatFormatting.GRAY))
 				: this.getMessage();
 			graphics.drawString(font, name, this.getX() + 13, middle, available ? 0xFFFFFFFF : 0xFF909090);
 			graphics.drawString(font, this.state, this.getX() + this.width - font.width(this.state) - 2, middle, this.stateColor);
