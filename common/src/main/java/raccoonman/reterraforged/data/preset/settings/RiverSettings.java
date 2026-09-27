@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 public class RiverSettings {
-	private static final int DEFAULT_GORGE_DEPTH = 20;
+	private static final int DEFAULT_GORGE_DEPTH = 32;
 	public static final Codec<RiverSettings> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 		Codec.INT.fieldOf("seedOffset").forGetter((o) -> o.seedOffset),
 		Codec.INT.fieldOf("riverCount").forGetter((o) -> o.riverCount),
