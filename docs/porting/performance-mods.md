@@ -26,12 +26,23 @@ Two things the dev runs need that a real game doesn't:
   doesn't unpack jars in jars ("requires c2me-base, which is missing"). Fabric puts them in the `devModsFolder`
   configuration instead: `syncDevMods` copies them unremapped to `fabric/build/devmods`, and every run passes that
   folder to Fabric loader as `fabric.addMods`, which unpacks and remaps them like a mods folder.
-- **Forge's dev game** finds libraries nested in `META-INF/jarjar`, but not ones kept elsewhere, and has no MixinExtras
-  of its own: `extractNestedDevLibs` takes every nested library out of the Forge mods into `forge/build/devlibs-nested`
-  for the runtime classpath, and MixinExtras 0.5.0 (the newest any of them nests) is added once. **Radium is left out of
-  the Forge dev runs**: its config library sits in `META-INF/jars` and isn't picked up even from the classpath (it isn't
-  marked as a game library), and without it Radium's patches clash (`InjectionError: LVT in LevelChunk::setBlockState`).
-  It works in a real game, tested on the dedicated server.
+- **The Forge dev game runs with Mojang's names; released Forge mods use SRG names**, so released jars can't just go in
+  `forge/run/mods` (unlike Fabric, whose loader remaps the mods folder in dev). Everything goes through Loom, which
+  remaps dependencies, and a few things need more:
+  - Remapping a mod drops its list of nested jars (`META-INF/jarjar/metadata.json`), so their libraries don't load.
+    `extractNestedDevLibs` takes them out for the runtime classpath, marking any that aren't typed as
+    `FMLModType: GAMELIBRARY` (as a real game treats them; otherwise Radium's config library is ignored and its patches
+    clash), and adds MixinExtras once, the newest version any mod nests.
+  - **Sinytra Connector** keeps its own mod inside its jar and only loads it from there, with SRG names.
+    `prepareConnectorForDev` downloads Connector, remaps it and the mod inside from SRG to the dev names with Loom's
+    mappings and tiny-remapper, and puts the mod back. It also needs `connector.clean.path`: the unpatched game with the
+    dev names, taken from the Fabric side's Loom cache (so run a Fabric task once first).
+  - **Forgified Fabric API** comes from Sinytra's Maven (`maven.su5ed.dev`), module by module so Loom can remap each,
+    without its old separate Fabric loader, which clashes with Connector's.
+  - **C2ME** goes in `forge/run/mods` unremapped (`copyConnectorMods`): Connector only looks for Fabric mods there, and
+    remaps them itself.
+  - Connector brings its own Mixin, which ignores the `--mixin.config` arguments the dev game passes, so
+    `forge/src/main/resources/META-INF/MANIFEST.MF` names ReTerraForged's mixin configs, as the released jar's does.
 - **Sodium refuses the dev game's LWJGL** (3.3.2 against the 3.3.1 launchers ship), so the runs set
   `sodium.checks.issue2561=false`. Check whether that's still needed after a port: newer Sodium versions require
   other LWJGL versions, and the property name follows Sodium's issue number.
@@ -67,10 +78,10 @@ What the dev runs use, pinned to Modrinth version ids because Noisiumed shares i
 
 | Mod | Fabric | Forge / NeoForge 47.1 |
 |---|---|---|
-| C2ME | 0.2.0+alpha.11.18 (`fyt7FtgA`) | the Fabric build, through Connector (not in the dev runs) |
+| C2ME | 0.2.0+alpha.11.18 (`fyt7FtgA`) | the Fabric build, through Connector 1.0.0-beta.49 + Forgified Fabric API 0.92.6 |
 | C2ME OpenCL | none (from 1.21.1) | none |
 | Noisium | Noisiumed 3.0.6 (`vcRbbvYP`) | Noisiumed 3.0.6 (`LbWCNzST`) |
-| Lithium | 0.11.4 (`iEcXOkz4`) | Radium 0.12.4 (`n947JjJH`, not in the dev runs, see above); Canary 0.3.3 also works |
+| Lithium | 0.11.4 (`iEcXOkz4`) | Radium 0.12.4 (`n947JjJH`); Canary 0.3.3 also works |
 | ModernFix | 5.25.2 (`rPmgLeZC`) | 5.27.83 (`jAZ7Ge3d`) |
 | AllTheLeaks | none | 1.1.3 (`curse.maven:alltheleaks-1091339:8779054`) |
 | Sodium | 0.5.13 (`OihdIimA`) | Embeddium 0.3.31 (`UTbfe5d1`) |
@@ -111,8 +122,7 @@ them together 25–28 %, which brings ReTerraForged to vanilla's speed or better
   0.2.0+alpha.11.18): its modules load, ReTerraForged generates and locates as on Fabric. The only errors in the log are
   Forgified Fabric API's client screen mixins being skipped on a dedicated server. So `PerformanceMods` lists C2ME for
   Forge as a Connector build: it counts once Connector is installed, and its row links to Connector until then.
-  Connector isn't in the Forge dev runs: it remaps Fabric mods from intermediary names, which the dev environment's
-  named classes don't match, and it's untested there.
+  The Forge dev runs include it too (see above for what that takes).
 - **C2ME OpenCL doesn't run on 1.20.1**, tried with its 1.21.1 build (0.4.0-alpha.0.13) on Java 25: Fabric loader
   refuses it, as it needs C2ME's density function compiler (`c2me-opts-dfc`) and chunk system rewrite
   (`c2me-rewrites-chunk-system`), which 1.20.1's C2ME doesn't have. With those dependencies overridden it crashes

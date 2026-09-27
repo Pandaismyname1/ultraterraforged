@@ -45,6 +45,15 @@ allprojects {
             forRepository { maven { url = "https://cursemaven.com" } }
             filter { includeGroup "curse.maven" }
         }
+        // Sinytra Connector and Forgified Fabric API, published module by module so the dev runs can remap them
+        exclusiveContent {
+            forRepository { maven { url = "https://maven.su5ed.dev/releases" } }
+            filter {
+                includeGroup "org.sinytra"
+                includeGroup "dev.su5ed.sinytra"
+                includeGroup "dev.su5ed.sinytra.fabric-api"
+            }
+        }
     }
 
     tasks.withType(JavaCompile).configureEach {
