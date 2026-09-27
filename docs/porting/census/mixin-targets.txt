@@ -1,0 +1,190 @@
+## MixinBiomeGenerationSettings: world.level.biome.BiomeGenerationSettings.features [f]
+   1.20.1  List;
+## MixinBiomeGenerationSettings: world.level.biome.BiomeGenerationSettings.flowerFeatures [f]
+   1.20.1  function/Supplier;
+   26.1    MISSING
+## MixinChunkMap: server.level.ChunkMap.<init> [m]
+   1.20.1  (server/level/ServerLevel;world/level/storage/LevelStorageSource$LevelStorageAccess;Lcom/mojang/datafixers/DataFixer;world/level/levelgen/structure/templatesystem/StructureTemplateManager;concurrent/Executor;util/thread/BlockableEventLoop;world/level/chunk/LightChunkGetter;world/level/chunk/ChunkGenerator;server/level/progress/ChunkProgressListener;world/level/entity/ChunkStatusUpdateListener;function/Supplier;IZ)V
+   26.1    (server/level/ServerLevel;world/level/storage/LevelStorageSource$LevelStorageAccess;Lcom/mojang/datafixers/DataFixer;world/level/levelgen/structure/templatesystem/StructureTemplateManager;concurrent/Executor;util/thread/BlockableEventLoop;world/level/chunk/LightChunkGetter;world/level/chunk/ChunkGenerator;world/level/entity/ChunkStatusUpdateListener;function/Supplier;world/level/TicketStorage;IZ)V
+   26.3    (server/level/ServerLevel;world/level/storage/LevelStorageSource$LevelStorageAccess;Lcom/mojang/datafixers/DataFixer;world/level/levelgen/structure/templatesystem/StructureTemplateManager;concurrent/Executor;util/thread/BlockableEventLoop;world/level/chunk/LightChunkGetter;world/level/chunk/ChunkGenerator;world/level/entity/ChunkStatusUpdateListener;world/level/TicketStorage;IZ)V
+## MixinChunkMap: server.level.ChunkMap.randomState [f]
+   1.20.1  world/level/levelgen/RandomState;
+## MixinChunkStatus 1.21+ equiv: world.level.chunk.status.ChunkStatusTasks.generateStructureStarts [m]
+   1.20.1  CLASS GONE
+   1.21.1  (world/level/chunk/status/WorldGenContext;world/level/chunk/status/ChunkStep;util/StaticCache2D;world/level/chunk/ChunkAccess;)concurrent/CompletableFuture;
+## MixinChunkStatus 1.21+ equiv: world.level.chunk.status.ChunkStatusTasks.generateFeatures [m]
+   1.20.1  CLASS GONE
+   1.21.1  (world/level/chunk/status/WorldGenContext;world/level/chunk/status/ChunkStep;util/StaticCache2D;world/level/chunk/ChunkAccess;)concurrent/CompletableFuture;
+## MixinChunkStatus 1.21+ equiv: world.level.chunk.status.ChunkStatusTasks.generateNoise [m]
+   1.20.1  CLASS GONE
+   1.21.1  (world/level/chunk/status/WorldGenContext;world/level/chunk/status/ChunkStep;util/StaticCache2D;world/level/chunk/ChunkAccess;)concurrent/CompletableFuture;
+   26.3    MISSING
+## MixinChunkStatus 1.21+ equiv: world.level.chunk.status.ChunkStatusTasks.generateSurface [m]
+   1.20.1  CLASS GONE
+   1.21.1  (world/level/chunk/status/WorldGenContext;world/level/chunk/status/ChunkStep;util/StaticCache2D;world/level/chunk/ChunkAccess;)concurrent/CompletableFuture;
+   26.3    MISSING
+## MixinChunkStatus 1.21+ equiv: world.level.chunk.status.ChunkStatusTasks.generateTerrain [m]
+   1.20.1  CLASS GONE
+   1.21.1  MISSING
+## MixinClimateSampler: world.level.biome.Climate$Sampler.sample [m]
+   1.20.1  (III)world/level/biome/Climate$TargetPoint;
+## MixinClimateSampler: world.level.biome.Climate$Sampler.findSpawnPosition [m]
+   1.20.1  ()core/BlockPos;
+   26.3    MISSING
+## MixinSpawnFinder: world.level.biome.Climate.findSpawnPosition [m]
+   1.20.1  (List;world/level/biome/Climate$Sampler;)core/BlockPos;
+   26.3    MISSING
+## MixinContext: world.level.levelgen.SurfaceRules$Context.<init> [m]
+   1.20.1  (world/level/levelgen/SurfaceSystem;world/level/levelgen/RandomState;world/level/chunk/ChunkAccess;world/level/levelgen/NoiseChunk;function/Function;core/Registry;world/level/levelgen/WorldGenerationContext;)V
+   26.2    (world/level/levelgen/SurfaceSystem;world/level/levelgen/RandomState;world/level/chunk/ChunkAccess;world/level/levelgen/NoiseChunk;function/Function;world/level/levelgen/WorldGenerationContext;Set;)V
+   26.3    CLASS GONE
+## MixinContext: world.level.levelgen.SurfaceRules$Context.chunk [f]
+   1.20.1  world/level/chunk/ChunkAccess;
+   26.3    CLASS GONE
+## MixinCreateWorldScreen: client.gui.screens.worldselection.CreateWorldScreen.init [m]
+   1.20.1  ()V
+## MixinCreateWorldScreen: client.gui.screens.worldselection.CreateWorldScreen.onCreate [m]
+   1.20.1  ()V
+## MixinCreateWorldScreen: client.gui.screens.worldselection.CreateWorldScreen.tick [m]
+   1.20.1  ()V
+   1.21.1  MISSING
+## MixinCreateWorldScreen: client.gui.screens.worldselection.CreateWorldScreen.recreated [f]
+   1.20.1  Z
+## MixinCreateWorldScreen: client.gui.screens.worldselection.CreateWorldScreen.uiState [f]
+   1.20.1  client/gui/screens/worldselection/WorldCreationUiState;
+## MixinCreateWorldScreen: client.gui.screens.worldselection.CreateWorldScreen.tabNavigationBar [f]
+   1.20.1  client/gui/components/tabs/TabNavigationBar;
+   26.2    client/gui/components/tabs/MenuTabBar;
+## MixinCreateWorldScreen: client.gui.components.tabs.TabNavigationBar$Builder.addTabs [m]
+   1.20.1  ([client/gui/components/tabs/Tab;)client/gui/components/tabs/TabNavigationBar$Builder;
+   26.2    MISSING
+## MixinMinecraftServer: server.MinecraftServer.setInitialSpawn [m]
+   1.20.1  (server/level/ServerLevel;world/level/storage/ServerLevelData;ZZ)V
+   26.1    (server/level/ServerLevel;world/level/storage/ServerLevelData;ZZserver/level/progress/LevelLoadListener;)V
+## MixinNoiseBasedChunkGenerator: world.level.levelgen.NoiseBasedChunkGenerator.buildSurface [m]
+   1.20.1  (server/level/WorldGenRegion;world/level/StructureManager;world/level/levelgen/RandomState;world/level/chunk/ChunkAccess;)V | (world/level/chunk/ChunkAccess;world/level/levelgen/WorldGenerationContext;world/level/levelgen/RandomState;world/level/StructureManager;world/level/biome/BiomeManager;core/Registry;world/level/levelgen/blending/Blender;)V
+   26.2    (server/level/WorldGenRegion;world/level/StructureManager;world/level/levelgen/RandomState;world/level/chunk/ChunkAccess;)V | (world/level/chunk/ChunkAccess;world/level/levelgen/WorldGenerationContext;world/level/levelgen/RandomState;world/level/StructureManager;world/level/biome/BiomeManager;world/level/levelgen/blending/Blender;Set;)V
+   26.3    (world/level/chunk/ChunkAccess;world/level/levelgen/NoiseChunk;world/level/levelgen/RandomState;world/level/biome/BiomeManager;Set;world/level/levelgen/material/rule/MaterialRule;)V
+## MixinNoiseBasedChunkGenerator: world.level.levelgen.NoiseBasedChunkGenerator.fillFromNoise [m]
+   1.20.1  (concurrent/Executor;world/level/levelgen/blending/Blender;world/level/levelgen/RandomState;world/level/StructureManager;world/level/chunk/ChunkAccess;)concurrent/CompletableFuture;
+   1.21.1  (world/level/levelgen/blending/Blender;world/level/levelgen/RandomState;world/level/StructureManager;world/level/chunk/ChunkAccess;)concurrent/CompletableFuture;
+   26.3    MISSING
+## MixinNoiseBasedChunkGenerator: world.level.levelgen.NoiseBasedChunkGenerator.doFill [m]
+   1.20.1  (world/level/levelgen/blending/Blender;world/level/StructureManager;world/level/levelgen/RandomState;world/level/chunk/ChunkAccess;II)world/level/chunk/ChunkAccess;
+   26.3    (world/level/levelgen/NoiseChunk;world/level/chunk/ChunkAccess;)V
+## MixinNoiseBasedChunkGenerator: world.level.levelgen.NoiseBasedChunkGenerator.iterateNoiseColumn [m]
+   1.20.1  (world/level/LevelHeightAccessor;world/level/levelgen/RandomState;IILorg/apache/commons/lang3/mutable/MutableObject;function/Predicate;)OptionalInt;
+## MixinNoiseBasedChunkGenerator: world.level.levelgen.NoiseBasedChunkGenerator.addDebugScreenInfo [m]
+   1.20.1  (List;world/level/levelgen/RandomState;core/BlockPos;)V
+   26.3    (List;world/level/levelgen/RandomState;core/BlockPos;world/level/levelgen/densityfunction/SamplerContext;)V
+## MixinNoiseBasedChunkGenerator: world.level.levelgen.NoiseBasedChunkGenerator.settings [f]
+   1.20.1  core/Holder;
+## (INVOKE target): world.level.levelgen.NoiseSettings.height [m]
+   1.20.1  ()I
+## MixinNoiseChunk: world.level.levelgen.NoiseChunk.<init> [m]
+   1.20.1  (Iworld/level/levelgen/RandomState;IIworld/level/levelgen/NoiseSettings;world/level/levelgen/DensityFunctions$BeardifierOrMarker;world/level/levelgen/NoiseGeneratorSettings;world/level/levelgen/Aquifer$FluidPicker;world/level/levelgen/blending/Blender;)V
+   26.3    (world/level/levelgen/RandomState;world/level/levelgen/Beardifier;world/level/levelgen/NoiseGeneratorSettings;world/level/levelgen/Aquifer$FluidPicker;world/level/levelgen/blending/Blender;world/level/levelgen/densityfunction/DensityVolume;)V
+## MixinNoiseChunk: world.level.levelgen.NoiseChunk.wrapNew [m]
+   1.20.1  (world/level/levelgen/DensityFunction;)world/level/levelgen/DensityFunction;
+   26.3    MISSING
+## MixinNoiseChunk: world.level.levelgen.NoiseChunk.wrap [m]
+   1.20.1  (world/level/levelgen/DensityFunction;)world/level/levelgen/DensityFunction;
+   26.3    MISSING
+## MixinNoiseChunk: world.level.levelgen.NoiseChunk.computePreliminarySurfaceLevel [m]
+   1.20.1  (J)I
+   26.3    MISSING
+## MixinNoiseChunk: world.level.levelgen.NoiseChunk.cachedClimateSampler [m]
+   1.20.1  (world/level/levelgen/NoiseRouter;List;)world/level/biome/Climate$Sampler;
+   26.3    MISSING
+## MixinNoiseChunk: world.level.levelgen.NoiseChunk.initialDensityNoJaggedness [f]
+   1.20.1  world/level/levelgen/DensityFunction;
+   26.1    MISSING
+## MixinNoiseChunk: world.level.levelgen.NoiseChunk.firstNoiseX [f]
+   1.20.1  I
+   26.3    MISSING
+## MixinNoiseChunk: world.level.levelgen.NoiseChunk.firstNoiseZ [f]
+   1.20.1  I
+   26.3    MISSING
+## MixinNoiseChunk: world.level.levelgen.NoiseChunk.cellCountXZ [f]
+   1.20.1  I
+   26.3    MISSING
+## MixinNoiseChunk: world.level.levelgen.NoiseChunk.cellCountY [f]
+   1.20.1  I
+   26.3    MISSING
+## MixinNoiseChunk: world.level.levelgen.NoiseChunk.cellHeight [f]
+   1.20.1  I
+   26.3    MISSING
+## (INVOKE target): world.level.levelgen.RandomState.router [m]
+   1.20.1  ()world/level/levelgen/NoiseRouter;
+   26.3    MISSING
+## MixinRandomState: world.level.levelgen.RandomState.<init> [m]
+   1.20.1  (world/level/levelgen/NoiseGeneratorSettings;core/HolderGetter;J)V
+   26.3    (core/HolderGetter;JZworld/level/block/state/BlockState;Iworld/level/levelgen/NoiseRouter;)V
+## MixinRandomState: world.level.levelgen.RandomState.sampler [f]
+   1.20.1  world/level/biome/Climate$Sampler;
+   26.3    MISSING
+## MixinRandomState: world.level.levelgen.RandomState.surfaceSystem [f]
+   1.20.1  world/level/levelgen/SurfaceSystem;
+   26.3    MISSING
+## MixinRandomState: world.level.levelgen.RandomState.random [f]
+   1.20.1  world/level/levelgen/PositionalRandomFactory;
+## (INVOKE target): world.level.levelgen.NoiseRouter.mapAll [m]
+   1.20.1  (world/level/levelgen/DensityFunction$Visitor;)world/level/levelgen/NoiseRouter;
+   26.3    MISSING
+## MixinRegistryDataLoader: resources.RegistryDataLoader.loadRegistryContents [m]
+   1.20.1  (resources/RegistryOps$RegistryInfoLookup;server/packs/resources/ResourceManager;resources/ResourceKey;core/WritableRegistry;Lcom/mojang/serialization/Decoder;Map;)V
+   1.21.1  MISSING
+## MixinRegistryDataLoader: resources.RegistryDataLoader.loadElementFromResource [m]
+   1.20.1  MISSING
+   1.21.1  (core/WritableRegistry;Lcom/mojang/serialization/Decoder;resources/RegistryOps;resources/ResourceKey;server/packs/resources/Resource;core/RegistrationInfo;)V
+   26.1    MISSING
+## (INVOKE target): server.packs.resources.Resource.isBuiltin [m]
+   1.20.1  ()Z
+   1.21.1  MISSING
+## (INVOKE target): server.packs.resources.Resource.knownPackInfo [m]
+   1.20.1  MISSING
+   1.21.1  ()Optional;
+## MixinServerPacksSource: server.packs.repository.ServerPacksSource.createPackRepository [m]
+   1.20.1  (Ljava/nio/file/Path;)server/packs/repository/PackRepository; | (world/level/storage/LevelStorageSource$LevelStorageAccess;)server/packs/repository/PackRepository;
+   1.21.1  (Ljava/nio/file/Path;world/level/validation/DirectoryValidator;)server/packs/repository/PackRepository; | (world/level/storage/LevelStorageSource$LevelStorageAccess;)server/packs/repository/PackRepository;
+## MixinStructure: world.level.levelgen.structure.Structure.isValidBiome [m]
+   1.20.1  (world/level/levelgen/structure/Structure$GenerationStub;world/level/levelgen/structure/Structure$GenerationContext;)Z
+   26.3    MISSING
+## MixinSurfaceRules$BiomeConditionSource: world.level.levelgen.SurfaceRules$BiomeConditionSource.apply [m]
+   1.20.1  (Object;)Object; | (world/level/levelgen/SurfaceRules$Context;)world/level/levelgen/SurfaceRules$Condition;
+   26.3    CLASS GONE
+## MixinSurfaceRules$BiomeConditionSource: world.level.levelgen.SurfaceRules$BiomeConditionSource.biomeNameTest [f]
+   1.20.1  function/Predicate;
+   26.2    MISSING
+   26.3    CLASS GONE
+## MixinSurfaceSystem: world.level.levelgen.SurfaceSystem.<init> [m]
+   1.20.1  (world/level/levelgen/RandomState;world/level/block/state/BlockState;Iworld/level/levelgen/PositionalRandomFactory;)V
+   26.3    CLASS GONE
+## MixinSurfaceSystem: world.level.levelgen.SurfaceSystem.buildSurface [m]
+   1.20.1  (world/level/levelgen/RandomState;world/level/biome/BiomeManager;core/Registry;Zworld/level/levelgen/WorldGenerationContext;world/level/chunk/ChunkAccess;world/level/levelgen/NoiseChunk;world/level/levelgen/SurfaceRules$RuleSource;)V
+   26.2    (world/level/levelgen/RandomState;world/level/biome/BiomeManager;Zworld/level/levelgen/WorldGenerationContext;world/level/chunk/ChunkAccess;world/level/levelgen/NoiseChunk;world/level/levelgen/SurfaceRules$RuleSource;Set;)V
+   26.3    CLASS GONE
+## MixinUtil: Util.shutdownExecutors [m]
+   1.20.1  ()V
+   26.1    CLASS GONE
+## MixinUtil: Util.shutdownExecutor [m]
+   1.20.1  (concurrent/ExecutorService;)V
+   26.1    CLASS GONE
+## MixinUtil 26.x: util.Util.shutdownExecutors [m]
+   1.20.1  CLASS GONE
+   26.1    ()V
+## MixinUtil 26.x: util.Util.shutdownExecutor [m]
+   1.20.1  CLASS GONE
+   26.1    MISSING
+## ScreenInvoker: client.gui.screens.Screen.addRenderableWidget [m]
+   1.20.1  (client/gui/components/events/GuiEventListener;)client/gui/components/events/GuiEventListener;
+## terrablender.MixinParameterList: world.level.biome.Climate$ParameterList.findValuePositional [m]
+   1.20.1  MISSING
+## terrablender.MixinTargetPoint: world.level.biome.Climate$TargetPoint.<init> [m]
+   1.20.1  (JJJJJJ)V
+## fabric MixinPresetEditor: client.gui.screens.worldselection.PresetEditor.<clinit> [m]
+   1.20.1  ()V
+## forge PlainBuilder accessor: world.level.biome.BiomeGenerationSettings$PlainBuilder.features [f]
+   1.20.1  List;
+## MinecraftServer reloadResources: server.MinecraftServer.reloadResources [m]
+   1.20.1  (Collection;)concurrent/CompletableFuture;

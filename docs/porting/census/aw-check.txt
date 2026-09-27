@@ -1,0 +1,76 @@
+BREAKS@1.21.1 field  server/level/WorldGenRegion.cache                                           1.21.1=TYPE:Lnet/minecraft/util/StaticCache2D; 26.1=TYPE:Lnet/minecraft/util/StaticCache2D; 26.1.2=TYPE:Lnet/minecraft/util/StaticCache2D; 26.2=TYPE:Lnet/minecraft/util/StaticCache2D; 26.3=TYPE:Lnet/minecraft/util/StaticCache2D;
+BREAKS@1.21.1 field  server/level/WorldGenRegion.firstPos                                        1.21.1=MISSING 26.1=MISSING 26.1.2=MISSING 26.2=MISSING 26.3=MISSING
+BREAKS@1.21.1 field  server/level/WorldGenRegion.lastPos                                         1.21.1=MISSING 26.1=MISSING 26.1.2=MISSING 26.2=MISSING 26.3=MISSING
+BREAKS@26.1 field  world/level/levelgen/Beardifier.junctionIterator                            26.1=MISSING 26.1.2=MISSING 26.2=MISSING 26.3=MISSING
+BREAKS@26.1 field  world/level/levelgen/Beardifier.pieceIterator                               26.1=MISSING 26.1.2=MISSING 26.2=MISSING 26.3=MISSING
+BREAKS@26.1 field  world/level/levelgen/NoiseChunk.initialDensityNoJaggedness                  26.1=MISSING 26.1.2=MISSING 26.2=MISSING 26.3=MISSING
+BREAKS@26.1 method world/level/biome/Biome.getTemperature                                      26.1=SIG 26.1.2=SIG 26.2=SIG 26.3=SIG
+BREAKS@26.2 class  world/level/levelgen/DensityFunctions$WeirdScaledSampler                    26.2=CLASS-GONE 26.3=CLASS-GONE
+BREAKS@26.2 class  world/level/levelgen/DensityFunctions$WeirdScaledSampler$RarityValueMapper  26.2=CLASS-GONE 26.3=CLASS-GONE
+BREAKS@26.2 field  client/gui/screens/worldselection/CreateWorldScreen.tabNavigationBar        26.2=TYPE:Lnet/minecraft/client/gui/components/tabs/MenuTabBar; 26.3=TYPE:Lnet/minecraft/client/gui/components/tabs/MenuTabBar;
+BREAKS@26.2 field  world/level/levelgen/SurfaceRules$Context.biome                             26.2=TYPE:Lnet/minecraft/core/Holder; 26.3=CLASS-GONE
+BREAKS@26.2 method world/level/levelgen/SurfaceRules$Context.<init>                            26.2=SIG 26.3=CLASS-GONE
+BREAKS@26.3 class  world/level/levelgen/DensityFunctions$BeardifierMarker                      26.3=CLASS-GONE
+BREAKS@26.3 class  world/level/levelgen/OreVeinifier$VeinType                                  26.3=CLASS-GONE
+BREAKS@26.3 class  world/level/levelgen/SurfaceRules$Condition                                 26.3=CLASS-GONE
+BREAKS@26.3 class  world/level/levelgen/SurfaceRules$Context                                   26.3=CLASS-GONE
+BREAKS@26.3 class  world/level/levelgen/SurfaceRules$LazyCondition                             26.3=CLASS-GONE
+BREAKS@26.3 class  world/level/levelgen/SurfaceRules$LazyXZCondition                           26.3=CLASS-GONE
+BREAKS@26.3 class  world/level/levelgen/SurfaceRules$LazyYCondition                            26.3=CLASS-GONE
+BREAKS@26.3 class  world/level/levelgen/SurfaceRules$SurfaceRule                               26.3=CLASS-GONE
+BREAKS@26.3 field  world/level/levelgen/DensityFunctions.MAX_REASONABLE_NOISE_VALUE            26.3=CLASS-GONE
+BREAKS@26.3 field  world/level/levelgen/NoiseChunk.cellCountY                                  26.3=MISSING
+BREAKS@26.3 field  world/level/levelgen/NoiseRouterData.SLOPED_CHEESE                          26.3=MISSING
+BREAKS@26.3 field  world/level/levelgen/OreVeinifier$VeinType.maxY                             26.3=CLASS-GONE
+BREAKS@26.3 field  world/level/levelgen/OreVeinifier$VeinType.minY                             26.3=CLASS-GONE
+BREAKS@26.3 field  world/level/levelgen/SurfaceRules$Context.biomeGetter                       26.3=CLASS-GONE
+BREAKS@26.3 field  world/level/levelgen/SurfaceRules$Context.biomeGetter                       26.3=CLASS-GONE
+BREAKS@26.3 field  world/level/levelgen/SurfaceRules$Context.blockX                            26.3=CLASS-GONE
+BREAKS@26.3 field  world/level/levelgen/SurfaceRules$Context.blockY                            26.3=CLASS-GONE
+BREAKS@26.3 field  world/level/levelgen/SurfaceRules$Context.blockZ                            26.3=CLASS-GONE
+BREAKS@26.3 field  world/level/levelgen/SurfaceRules$Context.chunk                             26.3=CLASS-GONE
+BREAKS@26.3 field  world/level/levelgen/SurfaceRules$Context.context                           26.3=CLASS-GONE
+BREAKS@26.3 field  world/level/levelgen/SurfaceRules$Context.lastUpdateXZ                      26.3=CLASS-GONE
+BREAKS@26.3 field  world/level/levelgen/SurfaceRules$Context.noiseChunk                        26.3=CLASS-GONE
+BREAKS@26.3 field  world/level/levelgen/SurfaceRules$Context.pos                               26.3=CLASS-GONE
+BREAKS@26.3 field  world/level/levelgen/SurfaceRules$Context.randomState                       26.3=CLASS-GONE
+BREAKS@26.3 field  world/level/levelgen/SurfaceRules$Context.stoneDepthAbove                   26.3=CLASS-GONE
+BREAKS@26.3 field  world/level/levelgen/SurfaceRules$Context.stoneDepthBelow                   26.3=CLASS-GONE
+BREAKS@26.3 field  world/level/levelgen/SurfaceRules$Context.system                            26.3=CLASS-GONE
+BREAKS@26.3 field  world/level/levelgen/SurfaceSystem.seaLevel                                 26.3=CLASS-GONE
+BREAKS@26.3 field  world/level/levelgen/structure/placement/StructurePlacement.exclusionZone   26.3=MISSING
+BREAKS@26.3 field  world/level/levelgen/structure/placement/StructurePlacement.frequency       26.3=MISSING
+BREAKS@26.3 field  world/level/levelgen/structure/placement/StructurePlacement.frequencyReductionMethod 26.3=MISSING
+BREAKS@26.3 field  world/level/levelgen/structure/placement/StructurePlacement.locateOffset    26.3=MISSING
+BREAKS@26.3 field  world/level/levelgen/structure/placement/StructurePlacement.salt            26.3=MISSING
+BREAKS@26.3 method world/level/levelgen/NoiseChunk.wrap                                        26.3=MISSING
+BREAKS@26.3 method world/level/levelgen/NoiseRouterData.entrances                              26.3=SIG
+BREAKS@26.3 method world/level/levelgen/NoiseRouterData.getFunction                            26.3=SIG
+BREAKS@26.3 method world/level/levelgen/NoiseRouterData.noiseGradientDensity                   26.3=SIG
+BREAKS@26.3 method world/level/levelgen/NoiseRouterData.postProcess                            26.3=SIG
+BREAKS@26.3 method world/level/levelgen/NoiseRouterData.registerAndWrap                        26.3=SIG
+BREAKS@26.3 method world/level/levelgen/NoiseRouterData.underground                            26.3=SIG
+BREAKS@26.3 method world/level/levelgen/NoiseRouterData.yLimitedInterpolatable                 26.3=SIG
+BREAKS@26.3 method world/level/levelgen/SurfaceRules$Context.updateXZ                          26.3=CLASS-GONE
+BREAKS@26.3 method world/level/levelgen/structure/placement/StructurePlacement.salt            26.3=MISSING
+ok        field  client/gui/components/AbstractWidget.height                                 
+ok        field  client/gui/screens/Screen.font                                              
+ok        field  client/gui/screens/Screen.minecraft                                         
+ok        field  data/DataGenerator.vanillaPackOutput                                        
+ok        field  world/level/StructureManager.level                                          
+ok        field  world/level/levelgen/NoiseRouterData.BASE_3D_NOISE_OVERWORLD                
+ok        field  world/level/levelgen/NoiseRouterData.ENTRANCES                              
+ok        field  world/level/levelgen/NoiseRouterData.NOODLE                                 
+ok        field  world/level/levelgen/NoiseRouterData.PILLARS                                
+ok        field  world/level/levelgen/NoiseRouterData.SPAGHETTI_2D                           
+ok        field  world/level/levelgen/NoiseRouterData.SPAGHETTI_2D_THICKNESS_MODULATOR       
+ok        field  world/level/levelgen/NoiseRouterData.SPAGHETTI_ROUGHNESS_FUNCTION           
+ok        field  world/level/levelgen/NoiseRouterData.Y                                      
+ok        field  world/level/levelgen/RandomState.random                                     
+ok        method client/gui/components/AbstractSelectionList.replaceEntries                  
+ok        method client/gui/screens/Screen.rebuildWidgets                                    
+ok        method client/gui/screens/worldselection/CreateWorldScreen.getDataPackSelectionSettings 
+ok        method client/gui/screens/worldselection/CreateWorldScreen.tryApplyNewDataPacks    
+ok        method commands/synchronization/ArgumentTypeInfos.register                         
+ok        method data/DataGenerator$PackGenerator.<init>                                     
+ok        method world/level/biome/Climate$ParameterPoint.fitness                            
