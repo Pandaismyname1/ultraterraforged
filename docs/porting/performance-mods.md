@@ -1,10 +1,10 @@
 # Performance mods
 
-ReTerraForged recommends a set of performance mods, shows in the Create World screen which of them are installed, and
+UltraTerraForged recommends a set of performance mods, shows in the Create World screen which of them are installed, and
 runs them in the dev environment. Which builds exist changes with every Minecraft version and loader, so this page
-records what was found for each version, what was tested with ReTerraForged, and what to change when porting.
+records what was found for each version, what was tested with UltraTerraForged, and what to change when porting.
 
-State as of 2026-09-27 (ReTerraForged on 1.20.1, Fabric and Forge; the Forge jar also covers NeoForge 47.1).
+State as of 2026-09-27 (UltraTerraForged on 1.20.1, Fabric and Forge; the Forge jar also covers NeoForge 47.1).
 
 ## Where it lives
 
@@ -18,7 +18,7 @@ State as of 2026-09-27 (ReTerraForged on 1.20.1, Fabric and Forge; the Forge jar
 | Availability lookup | `docs/porting/tools/perfmods.py` |
 | Server tests: timing chunk generation, running console commands | `docs/porting/tools/servers/` |
 
-`-Prtf.perfMods=false` runs the dev game without them, e.g. to measure or debug ReTerraForged on its own.
+`-Prtf.perfMods=false` runs the dev game without them, e.g. to measure or debug UltraTerraForged on its own.
 
 Two things the dev runs need that a real game doesn't:
 
@@ -42,7 +42,7 @@ Two things the dev runs need that a real game doesn't:
   - **C2ME** goes in `forge/run/mods` unremapped (`copyConnectorMods`): Connector only looks for Fabric mods there, and
     remaps them itself.
   - Connector brings its own Mixin, which ignores the `--mixin.config` arguments the dev game passes, so
-    `forge/src/main/resources/META-INF/MANIFEST.MF` names ReTerraForged's mixin configs, as the released jar's does.
+    `forge/src/main/resources/META-INF/MANIFEST.MF` names UltraTerraForged's mixin configs, as the released jar's does.
 - **Sodium refuses the dev game's LWJGL** (3.3.2 against the 3.3.1 launchers ship), so the runs set
   `sodium.checks.issue2561=false`. Check whether that's still needed after a port: newer Sodium versions require
   other LWJGL versions, and the property name follows Sodium's issue number.
@@ -89,7 +89,7 @@ What the dev runs use, pinned to Modrinth version ids because Noisiumed shares i
 So five of the seven count on either loader: on Fabric everything but C2ME OpenCL and AllTheLeaks, on Forge everything
 but C2ME and C2ME OpenCL, and six once Sinytra Connector is installed, which brings C2ME.
 
-### Tested with ReTerraForged
+### Tested with UltraTerraForged
 
 Dedicated servers, fresh world with the default preset, 1024 forceloaded chunks, Ryzen 7 9800X3D, measured with
 `tools/servers/bench.sh`:
@@ -97,15 +97,15 @@ Dedicated servers, fresh world with the default preset, 1024 forceloaded chunks,
 | Setup | Seed 1111 | Seed 2222 | Seed 3333 |
 |---|---|---|---|
 | Vanilla, Fabric | 14.5 s | 14.2 s | 14.3 s |
-| ReTerraForged, Fabric | 16.8 s | 18.9 s | 18.8 s |
-| ReTerraForged, Fabric + C2ME, Noisiumed, Lithium, ModernFix | 14.2 s | 14.2 s | 11.9 s |
-| ReTerraForged, Forge | 19.0 s | | 16.4 s |
-| ReTerraForged, Forge + Noisiumed, Radium, ModernFix, AllTheLeaks | 18.8 s | | |
-| ReTerraForged, Forge + C2ME through Connector | 16.8 s | | 16.4 s |
-| ReTerraForged, Forge + all of the above | 14.2 s | | 11.9 s |
+| UltraTerraForged, Fabric | 16.8 s | 18.9 s | 18.8 s |
+| UltraTerraForged, Fabric + C2ME, Noisiumed, Lithium, ModernFix | 14.2 s | 14.2 s | 11.9 s |
+| UltraTerraForged, Forge | 19.0 s | | 16.4 s |
+| UltraTerraForged, Forge + Noisiumed, Radium, ModernFix, AllTheLeaks | 18.8 s | | |
+| UltraTerraForged, Forge + C2ME through Connector | 16.8 s | | 16.4 s |
+| UltraTerraForged, Forge + all of the above | 14.2 s | | 11.9 s |
 
 C2ME does most of the work, but only with the rest: on Forge, C2ME alone gained 0–12 %, the others alone 1 %, all of
-them together 25–28 %, which brings ReTerraForged to vanilla's speed or better on both loaders. Every setup passed the
+them together 25–28 %, which brings UltraTerraForged to vanilla's speed or better on both loaders. Every setup passed the
 `/rtf locate` smoke test with the same results.
 
 - **Forge crashed at startup with Noisiumed, ModernFix or AllTheLeaks** (a `ClassCastException` in MixinExtras'
@@ -116,10 +116,10 @@ them together 25–28 %, which brings ReTerraForged to vanilla's speed or better
   sponge-mixin 0.17.3 (`common/build.gradle`); `MixinAnnotationsTest` fails if an array comes back. **Keep this in mind
   on every port**: whenever the Fabric loader is bumped, check the pin still applies, and run a NeoForge/Forge server
   with a MixinExtras-bundling mod (ModernFix is in most packs).
-- C2ME changes how chunks are scheduled. ReTerraForged's hooks on the chunk status tasks (queueing tiles before
+- C2ME changes how chunks are scheduled. UltraTerraForged's hooks on the chunk status tasks (queueing tiles before
   generation, dropping them after features) still run under it; `/rtf locate` and generation work, no errors.
 - **C2ME on Forge through Sinytra Connector works** (Connector 1.0.0-beta.49, Forgified Fabric API 0.92.6, C2ME
-  0.2.0+alpha.11.18): its modules load, ReTerraForged generates and locates as on Fabric. The only errors in the log are
+  0.2.0+alpha.11.18): its modules load, UltraTerraForged generates and locates as on Fabric. The only errors in the log are
   Forgified Fabric API's client screen mixins being skipped on a dedicated server. So `PerformanceMods` lists C2ME for
   Forge as a Connector build: it counts once Connector is installed, and its row links to Connector until then.
   The Forge dev runs include it too (see above for what that takes).
@@ -130,7 +130,7 @@ them together 25–28 %, which brings ReTerraForged to vanilla's speed or better
 
 ## Later versions
 
-From 1.21 on ReTerraForged targets Fabric and NeoForge only. What exists (newest build per version, found
+From 1.21 on UltraTerraForged targets Fabric and NeoForge only. What exists (newest build per version, found
 2026-09-27 with `tools/perfmods.py`; a = alpha, b = beta):
 
 | Mod | 1.21.1 | 1.21.4 – 1.21.5 | 1.21.8 – 1.21.11 | 26.1 / 26.1.2 | 26.2 | 26.3 |
@@ -166,7 +166,7 @@ What that means for the port:
 3. Update `PerformanceModsTest` for the new counts, and the dev dependencies in each loader's `build.gradle`.
 4. Check each mod's mod id in its jar (`fabric.mod.json` `id`, `META-INF/neoforge.mods.toml` `modId`); forks
    sometimes keep the original's id, and Connector turns `-` in Fabric ids into `_`.
-5. Run a dedicated server of each loader with the mods and ReTerraForged (`tools/servers/bench.sh` and
+5. Run a dedicated server of each loader with the mods and UltraTerraForged (`tools/servers/bench.sh` and
    `tools/servers/smoke.sh`): a fresh world, `/rtf locate` a few landforms, forceload an area, no errors in the
-   log. C2ME and Noisium change the chunk pipeline ReTerraForged hooks into, so this is the part most likely to break.
+   log. C2ME and Noisium change the chunk pipeline UltraTerraForged hooks into, so this is the part most likely to break.
 6. Run the dev client once to see the section: the light, and a click opening a mod's page.

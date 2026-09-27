@@ -13,7 +13,7 @@ loom {
     runs {
         // new worlds in the dev game start in creative with cheats, to fly around and inspect terrain
         client {
-            property "reterraforged.dev.creative", "true"
+            property "ultraterraforged.dev.creative", "true"
         }
     }
 
@@ -21,13 +21,13 @@ loom {
         convertAccessWideners = true
         extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
 
-        mixinConfig "reterraforged-common.mixins.json"
-        mixinConfig "reterraforged-forge.mixins.json"
+        mixinConfig "ultraterraforged-common.mixins.json"
+        mixinConfig "ultraterraforged-forge.mixins.json"
 
         // ./gradlew :forge:runData regenerates the translation files into forge/src/generated; copy them into common resources.
         // The dev datagen JVM does not exit on its own once it prints "All providers took", so stop it manually.
         dataGen {
-            mod "reterraforged"
+            mod "ultraterraforged"
         }
     }
 }
@@ -268,5 +268,37 @@ sourcesJar {
 components.java {
     withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
         skip()
+    }
+}
+
+// Maven: <group>:ultraterraforged-forge:<version>, published to the repository given by -PmavenUrl (CI publishes to a folder
+// and pushes it to the "maven" branch)
+publishing {
+    publications {
+        register("maven", MavenPublication) {
+            artifactId = "${rootProject.archives_base_name}-${project.name}"
+            version = project.ext.mavenVersion
+            artifact(remapJar) {
+                builtBy remapJar
+                classifier ""
+            }
+            artifact(sourcesJar) {
+                builtBy sourcesJar
+                classifier "sources"
+            }
+        }
+    }
+    repositories {
+        if (project.hasProperty("mavenUrl")) {
+            maven {
+                url = project.mavenUrl
+                if (!project.mavenUrl.toString().startsWith("file:")) {
+                    credentials {
+                        username = project.findProperty("mavenUsername") ?: "ci"
+                        password = project.findProperty("mavenPassword") ?: "ci"
+                    }
+                }
+            }
+        }
     }
 }

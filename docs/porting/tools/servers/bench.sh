@@ -1,7 +1,7 @@
 #!/bin/bash
 # usage: bench.sh <server dir> <label> <seed> <level type> <preset json or -> <area x> <area z>
 # Run from Git Bash on Windows (process CPU time comes from PowerShell), in a server folder set up for the loader, with
-# ReTerraForged and any mods under test in mods/. JAVA picks the Java, SERVER_ARGS replaces "-jar server.jar" (Forge:
+# UltraTerraForged and any mods under test in mods/. JAVA picks the Java, SERVER_ARGS replaces "-jar server.jar" (Forge:
 # "@libraries/net/minecraftforge/forge/<version>/win_args.txt"), JAVA_EXTRA adds JVM options such as a flight recording.
 # Fresh world; records the spawn preparation time, then forceloads 32x32 chunks at the area and measures wall time and
 # process CPU time until generation goes idle. Appends a line to bench-results.txt in the server folder.
@@ -11,7 +11,7 @@ ax=$(( ax / 16 * 16 )); az=$(( az / 16 * 16 ))
 cd "$dir" || exit 1
 rm -rf world logs
 sed -i -e "s/^level-seed=.*/level-seed=$seed/" -e "s/^level-type=.*/level-type=${type//:/\\\\:}/" server.properties
-if [ "$preset" != "-" ]; then cp "$preset" config/reterraforged/server-preset.json; fi
+if [ "$preset" != "-" ]; then cp "$preset" config/ultraterraforged/server-preset.json; fi
 # the Java the server runs on; 17 for 1.20.1
 J=${JAVA:-java}
 log=$PWD/bench-$label-$seed.log

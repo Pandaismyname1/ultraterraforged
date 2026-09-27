@@ -3,7 +3,7 @@ architectury {
 }
 
 loom {
-    accessWidenerPath = file("src/main/resources/reterraforged.accesswidener")
+    accessWidenerPath = file("src/main/resources/ultraterraforged.accesswidener")
 }
 
 // Fabric's Mixin 0.17.4 turned the "at" of @Redirect, @ModifyArg, @ModifyArgs and @ModifyVariable into an array. Common

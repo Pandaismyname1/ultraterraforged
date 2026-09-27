@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "com.pandaismyname1.ultraterraforged.forge.mixin",
+  "minVersion": "0.8",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+  	"MixinTagsProvider",
+  	"MixinBiomeGenerationSettingsPlainsBuilder",
+  	"MixinMinecraftServer",
+  	"MixinServerLifecycleHooks"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

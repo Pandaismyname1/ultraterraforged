@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
-  "id": "reterraforged_clienttest",
+  "id": "ultraterraforged_clienttest",
   "version": "0",
-  "name": "ReTerraForged client test",
+  "name": "UltraTerraForged client test",
   "description": "Drives the client through world creation and takes screenshots. Only on the clientTest run's classpath.",
   "environment": "client",
   "entrypoints": {
     "client": [
-      "raccoonman.reterraforged.clienttest.ClientTest"
+      "com.pandaismyname1.ultraterraforged.clienttest.ClientTest"
     ]
   },
   "depends": {
-    "reterraforged": "*",
+    "ultraterraforged": "*",
     "fabric-lifecycle-events-v1": "*"
   }
 }

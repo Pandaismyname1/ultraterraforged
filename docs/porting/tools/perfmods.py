@@ -16,7 +16,7 @@ CURSEFORGE = ['alltheleaks']
 
 
 def get(url):
-    return json.load(urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'ReTerraForged-porting-tools'})))
+    return json.load(urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'UltraTerraForged-porting-tools'})))
 
 
 def modrinth(slug):

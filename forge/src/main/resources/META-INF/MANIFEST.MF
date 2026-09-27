@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
-MixinConfigs: reterraforged-common.mixins.json,reterraforged-forge.mixins.json
+MixinConfigs: ultraterraforged-common.mixins.json,ultraterraforged-forge.mixins.json
 

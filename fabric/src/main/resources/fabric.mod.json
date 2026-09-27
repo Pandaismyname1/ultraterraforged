@@ -1,26 +1,34 @@
 {
   "schemaVersion": 1,
-  "id": "reterraforged",
+  "id": "ultraterraforged",
   "version": "${version}",
-  "name": "ReTerraForged",
-  "description": "A continuation of TerraForged (https://github.com/TerraForged/TerraForged): realistic, configurable terrain generation.",
+  "name": "UltraTerraForged",
+  "description": "Realistic, configurable terrain: continents, mountain ranges, rivers that follow the land, coasts, caves and sea floors worth exploring. A continuation of ReTerraForged and TerraForged.",
   "authors": [
-    "dags",
-    "Won-Ton",
-    "raccoonman",
-    "Steveplays28",
-    "EdoEquin0x"
+    "pandaismyname1"
   ],
+  "contributors": [
+    "dags (TerraForged)",
+    "Won-Ton (TerraForged)",
+    "raccoonman (ReTerraForged)",
+    "Steveplays28 (ReTerraForged)",
+    "EdoEquin0x (ReTerraForged)"
+  ],
+  "contact": {
+    "homepage": "https://github.com/Pandaismyname1/ultraterraforged",
+    "sources": "https://github.com/Pandaismyname1/ultraterraforged",
+    "issues": "https://github.com/Pandaismyname1/ultraterraforged/issues"
+  },
   "license": "MIT",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "raccoonman.reterraforged.fabric.RTFFabric"
+      "com.pandaismyname1.ultraterraforged.fabric.RTFFabric"
     ]
   },
   "mixins": [
-    "reterraforged-common.mixins.json",
-    "reterraforged-fabric.mixins.json"
+    "ultraterraforged-common.mixins.json",
+    "ultraterraforged-fabric.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.15.0",

@@ -1,0 +1,110 @@
+package com.pandaismyname1.ultraterraforged.client.gui.screen;
+
+import java.nio.file.Files;
+import java.util.function.Consumer;
+
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.toasts.SystemToast.SystemToastIds;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import com.pandaismyname1.ultraterraforged.RTFCommon;
+import com.pandaismyname1.ultraterraforged.client.data.RTFTranslationKeys;
+import com.pandaismyname1.ultraterraforged.client.gui.PresetSharing;
+import com.pandaismyname1.ultraterraforged.client.gui.Toasts;
+import com.pandaismyname1.ultraterraforged.data.preset.PresetLibrary;
+import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
+
+/**
+ * Asks for a name and saves a preset to the player's preset folder, where the Terrain tab and the editor list it.
+ */
+public class SavePresetScreen extends Screen {
+	private final Screen parent;
+	private final Preset preset;
+	private final String suggestedName;
+	private final Consumer<PresetLibrary.Entry> onSaved;
+	private EditBox name;
+	private Button save;
+	private Component hint = Component.empty();
+
+	public SavePresetScreen(Screen parent, String suggestedName, Preset preset, Consumer<PresetLibrary.Entry> onSaved) {
+		super(Component.translatable(RTFTranslationKeys.GUI_SAVE_PRESET_TITLE));
+		this.parent = parent;
+		this.preset = preset;
+		// keep only the characters a preset name may have, e.g. from a translated built-in preset name
+		this.suggestedName = suggestedName.replaceAll("[^A-Za-z0-9_ -]", "").trim();
+		this.onSaved = onSaved;
+	}
+
+	@Override
+	protected void init() {
+		int center = this.width / 2;
+		int y = this.height / 2 - 30;
+		String value = this.name != null ? this.name.getValue() : this.suggestedName;
+		this.name = new EditBox(this.font, center - 100, y, 200, 20, Component.translatable(RTFTranslationKeys.GUI_SAVE_PRESET_NAME));
+		this.name.setMaxLength(64);
+		this.name.setHint(Component.translatable(RTFTranslationKeys.GUI_SAVE_PRESET_NAME).withStyle(ChatFormatting.DARK_GRAY));
+		this.name.setValue(value);
+		this.name.setResponder((text) -> this.validate());
+		this.addRenderableWidget(this.name);
+
+		this.save = this.addRenderableWidget(Button.builder(Component.translatable(RTFTranslationKeys.GUI_SAVE_PRESET_CONFIRM), (button) -> this.save())
+			.bounds(center - 100, y + 40, 98, 20).build());
+		this.addRenderableWidget(Button.builder(CommonComponents.GUI_CANCEL, (button) -> this.onClose())
+			.bounds(center + 2, y + 40, 98, 20).build());
+		this.setInitialFocus(this.name);
+		this.validate();
+	}
+
+	private void validate() {
+		String text = this.name.getValue().trim();
+		boolean valid = PresetLibrary.isValidName(text);
+		this.save.active = valid;
+		if (!valid) {
+			this.hint = text.isEmpty() ? Component.empty() : Component.translatable(RTFTranslationKeys.GUI_SAVE_PRESET_INVALID_NAME).withStyle(ChatFormatting.RED);
+		} else if (Files.exists(PresetLibrary.file(PresetSharing.presetFolder(), text))) {
+			this.hint = Component.translatable(RTFTranslationKeys.GUI_SAVE_PRESET_REPLACES).withStyle(ChatFormatting.YELLOW);
+		} else {
+			this.hint = Component.empty();
+		}
+	}
+
+	private void save() {
+		String text = this.name.getValue().trim();
+		try {
+			PresetLibrary.Entry entry = PresetLibrary.save(PresetSharing.presetFolder(), text, this.preset);
+			Toasts.notify(RTFTranslationKeys.GUI_SAVE_PRESET_SAVED, Component.literal(text), SystemToastIds.PERIODIC_NOTIFICATION);
+			this.onSaved.accept(entry);
+			this.onClose();
+		} catch (Exception e) {
+			RTFCommon.LOGGER.error("Couldn't save preset {}", text, e);
+			Toasts.notify(RTFTranslationKeys.GUI_SAVE_PRESET_FAILED, Component.literal(String.valueOf(e.getMessage())), SystemToastIds.PACK_LOAD_FAILURE);
+		}
+	}
+
+	@Override
+	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+		// enter saves
+		if ((keyCode == 257 || keyCode == 335) && this.save.active) {
+			this.save();
+			return true;
+		}
+		return super.keyPressed(keyCode, scanCode, modifiers);
+	}
+
+	@Override
+	public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+		this.renderBackground(graphics);
+		graphics.drawCenteredString(this.font, this.title, this.width / 2, this.height / 2 - 60, 0xFFFFFF);
+		graphics.drawCenteredString(this.font, this.hint, this.width / 2, this.height / 2 - 4, 0xFFFFFF);
+		super.render(graphics, mouseX, mouseY, partialTick);
+	}
+
+	@Override
+	public void onClose() {
+		this.minecraft.setScreen(this.parent);
+	}
+}

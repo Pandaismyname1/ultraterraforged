@@ -43,7 +43,7 @@ dependencies {
 
     // Performance mods, in the dev runs only: the ones PerformanceMods lists for Fabric on this version, pinned to
     // Modrinth version ids (the version numbers are shared between loaders). -Prtf.perfMods=false leaves them out, to
-    // measure or debug ReTerraForged on its own. See docs/porting/performance-mods.md.
+    // measure or debug UltraTerraForged on its own. See docs/porting/performance-mods.md.
     if (project.findProperty("rtf.perfMods") != "false") {
         devModsFolder "maven.modrinth:c2me-fabric:fyt7FtgA"     // C2ME 0.2.0+alpha.11.18: its modules are nested jars
         modLocalRuntime "maven.modrinth:noisiumed:vcRbbvYP"     // Noisiumed 3.0.6
@@ -124,18 +124,50 @@ loom {
         }
         // new worlds in the dev game start in creative with cheats, to fly around and inspect terrain
         client {
-            property "reterraforged.dev.creative", "true"
+            property "ultraterraforged.dev.creative", "true"
         }
         clientTest {
             client()
             name = "Client Test"
             source sourceSets.clienttest
             runDir = "run-clienttest"
-            property "reterraforged.clienttest.out", file("build/clienttest").absolutePath
-            // -Dreterraforged.clienttest.tour=true visits the landforms in a default world instead
-            property "reterraforged.clienttest.tour", System.getProperty("reterraforged.clienttest.tour", "false")
-            property "reterraforged.clienttest.stops", System.getProperty("reterraforged.clienttest.stops", "river,salt_flat,alluvial_fan,glacial_valley,cirque,drumlins,moraine,barrier_island,karst,sinkhole,delta,wetland,lake,peninsula,coastal_island,sand_bar,skerry,volcanic_island,river_island,submarine_canyon,seamount,guyot,blue_hole,coral_reef,ocean_trench,ocean_ridge,sand_waves")
-            property "reterraforged.dev.creative", "true"
+            property "ultraterraforged.clienttest.out", file("build/clienttest").absolutePath
+            // -Dultraterraforged.clienttest.tour=true visits the landforms in a default world instead
+            property "ultraterraforged.clienttest.tour", System.getProperty("ultraterraforged.clienttest.tour", "false")
+            property "ultraterraforged.clienttest.stops", System.getProperty("ultraterraforged.clienttest.stops", "river,salt_flat,alluvial_fan,glacial_valley,cirque,drumlins,moraine,barrier_island,karst,sinkhole,delta,wetland,lake,peninsula,coastal_island,sand_bar,skerry,volcanic_island,river_island,submarine_canyon,seamount,guyot,blue_hole,coral_reef,ocean_trench,ocean_ridge,sand_waves")
+            property "ultraterraforged.dev.creative", "true"
+        }
+    }
+}
+
+// Maven: <group>:ultraterraforged-fabric:<version>, published to the repository given by -PmavenUrl (CI publishes to a folder
+// and pushes it to the "maven" branch)
+publishing {
+    publications {
+        register("maven", MavenPublication) {
+            artifactId = "${rootProject.archives_base_name}-${project.name}"
+            version = project.ext.mavenVersion
+            artifact(remapJar) {
+                builtBy remapJar
+                classifier ""
+            }
+            artifact(sourcesJar) {
+                builtBy sourcesJar
+                classifier "sources"
+            }
+        }
+    }
+    repositories {
+        if (project.hasProperty("mavenUrl")) {
+            maven {
+                url = project.mavenUrl
+                if (!project.mavenUrl.toString().startsWith("file:")) {
+                    credentials {
+                        username = project.findProperty("mavenUsername") ?: "ci"
+                        password = project.findProperty("mavenPassword") ?: "ci"
+                    }
+                }
+            }
         }
     }
 }
