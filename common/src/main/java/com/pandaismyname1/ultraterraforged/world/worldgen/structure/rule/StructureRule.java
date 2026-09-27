@@ -6,10 +6,10 @@ import com.mojang.serialization.Codec;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.levelgen.RandomState;
-import com.pandaismyname1.ultraterraforged.registries.RTFBuiltInRegistries;
+import com.pandaismyname1.ultraterraforged.registries.UTFBuiltInRegistries;
 
 public interface StructureRule {
-    public static final Codec<StructureRule> CODEC = RTFBuiltInRegistries.STRUCTURE_RULE_TYPE.byNameCodec().dispatch(StructureRule::codec, Function.identity());
+    public static final Codec<StructureRule> CODEC = UTFBuiltInRegistries.STRUCTURE_RULE_TYPE.byNameCodec().dispatch(StructureRule::codec, Function.identity());
 
 	boolean test(RandomState randomState, BlockPos pos);
 	

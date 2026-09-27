@@ -7,6 +7,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import com.pandaismyname1.ultraterraforged.world.worldgen.surface.rule.StrataStack;
 
-public interface RTFSurfaceSystem {
+public interface UTFSurfaceSystem {
 	List<StrataStack> getOrCreateStrata(ResourceLocation name, Function<RandomSource, List<StrataStack>> factory);
 }

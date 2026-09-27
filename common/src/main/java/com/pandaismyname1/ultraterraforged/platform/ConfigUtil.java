@@ -6,14 +6,14 @@ import java.nio.file.Path;
 import java.util.stream.Stream;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
-import com.pandaismyname1.ultraterraforged.RTFCommon;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
 
 public class ConfigUtil {
-	public static final Path RTF_CONFIG_PATH = getConfigPath().resolve(RTFCommon.MOD_ID);
-	public static final Path LEGACY_CONFIG_PATH = getConfigPath().resolve(RTFCommon.LEGACY_MOD_ID);
+	public static final Path UTF_CONFIG_PATH = getConfigPath().resolve(UTFCommon.MOD_ID);
+	public static final Path LEGACY_CONFIG_PATH = getConfigPath().resolve(UTFCommon.LEGACY_MOD_ID);
 	
-	public static Path rtf(String path) {
-		return RTF_CONFIG_PATH.resolve(path);
+	public static Path utf(String path) {
+		return UTF_CONFIG_PATH.resolve(path);
 	}
 	
 	public static Path legacy(String path) {
@@ -29,15 +29,15 @@ public class ConfigUtil {
 	private static final String RETERRAFORGED_ID = "reterraforged";
 
 	static {
-		if(!Files.exists(RTF_CONFIG_PATH)) {
+		if(!Files.exists(UTF_CONFIG_PATH)) {
 			try {
 				Path previous = getConfigPath().resolve(RETERRAFORGED_ID);
 				if(Files.isDirectory(previous)) {
 					// players coming from ReTerraForged keep their saved presets, modpack setup and server preset
-					copy(previous, RTF_CONFIG_PATH);
-					RTFCommon.LOGGER.info("Copied the ReTerraForged config folder {} to {}", previous, RTF_CONFIG_PATH);
+					copy(previous, UTF_CONFIG_PATH);
+					UTFCommon.LOGGER.info("Copied the ReTerraForged config folder {} to {}", previous, UTF_CONFIG_PATH);
 				} else {
-					Files.createDirectory(RTF_CONFIG_PATH);
+					Files.createDirectory(UTF_CONFIG_PATH);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();

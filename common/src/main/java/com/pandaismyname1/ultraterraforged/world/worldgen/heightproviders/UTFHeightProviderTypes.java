@@ -7,7 +7,7 @@ import net.minecraft.world.level.levelgen.heightproviders.HeightProvider;
 import net.minecraft.world.level.levelgen.heightproviders.HeightProviderType;
 import com.pandaismyname1.ultraterraforged.platform.RegistryUtil;
 
-public class RTFHeightProviderTypes {
+public class UTFHeightProviderTypes {
 	public static final HeightProviderType<LegacyCarverHeight> LEGACY_CARVER = register("legacy_carver", LegacyCarverHeight.CODEC);
 	
 	public static void bootstrap() {

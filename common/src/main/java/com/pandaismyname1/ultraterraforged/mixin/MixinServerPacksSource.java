@@ -14,7 +14,7 @@ import com.google.common.collect.Lists;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.server.packs.repository.ServerPacksSource;
-import com.pandaismyname1.ultraterraforged.data.packs.RTFBuiltinPackSource;
+import com.pandaismyname1.ultraterraforged.data.packs.UTFBuiltinPackSource;
 import com.pandaismyname1.ultraterraforged.platform.ModLoaderUtil;
 import com.pandaismyname1.ultraterraforged.server.ServerPresets;
 
@@ -42,7 +42,7 @@ class MixinServerPacksSource {
 	)
     private static PackRepository createPackRepository(RepositorySource[] repositorySources, Path path) {
 		List<RepositorySource> sourceList = Lists.newArrayList(repositorySources);
-		sourceList.add(new RTFBuiltinPackSource());
+		sourceList.add(new UTFBuiltinPackSource());
     	return new PackRepository(sourceList.toArray(RepositorySource[]::new));
     }
 }

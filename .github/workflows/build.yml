@@ -27,11 +27,11 @@ jobs:
 
       # the performance mods are only for the dev games; leaving them out keeps CI off their Maven servers
       - name: Build Fabric
-        run: ./gradlew :fabric:build -Prtf.perfMods=false
+        run: ./gradlew :fabric:build -Putf.perfMods=false
 
       # the Forge jar also runs on NeoForge 47.1
       - name: Build Forge
-        run: ./gradlew :forge:build -Prtf.perfMods=false
+        run: ./gradlew :forge:build -Putf.perfMods=false
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
@@ -65,7 +65,7 @@ jobs:
 
       # includes the checks that the built-in presets still generate the same terrain
       - name: Test
-        run: ./gradlew :common:test -Prtf.perfMods=false
+        run: ./gradlew :common:test -Putf.perfMods=false
 
       - name: Upload Test Report
         if: failure()

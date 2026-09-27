@@ -12,7 +12,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import com.pandaismyname1.ultraterraforged.client.data.RTFTranslationKeys;
+import com.pandaismyname1.ultraterraforged.client.data.UTFTranslationKeys;
 import com.pandaismyname1.ultraterraforged.client.gui.widget.Slider;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 import com.pandaismyname1.ultraterraforged.preset.option.BoolOption;
@@ -59,11 +59,11 @@ public final class OptionWidgets {
 	}
 
 	public static Component enumName(Enum<?> value) {
-		return Component.translatable(RTFTranslationKeys.enumValue(value));
+		return Component.translatable(UTFTranslationKeys.enumValue(value));
 	}
 
 	private static Component booleanName(boolean value) {
-		return Component.translatable(value ? RTFTranslationKeys.GUI_BUTTON_TRUE : RTFTranslationKeys.GUI_BUTTON_FALSE);
+		return Component.translatable(value ? UTFTranslationKeys.GUI_BUTTON_TRUE : UTFTranslationKeys.GUI_BUTTON_FALSE);
 	}
 
 	// a bar along the left edge of options the player changed
@@ -78,7 +78,7 @@ public final class OptionWidgets {
 		for (OptionTag tag : option.tags()) {
 			text.append(CommonComponents.NEW_LINE).append(Component.translatable(tag.translationKey()).withStyle(ChatFormatting.GOLD));
 		}
-		text.append(CommonComponents.NEW_LINE).append(Component.translatable(RTFTranslationKeys.GUI_RESET_TO_DEFAULT, defaultValue).withStyle(ChatFormatting.GRAY));
+		text.append(CommonComponents.NEW_LINE).append(Component.translatable(UTFTranslationKeys.GUI_RESET_TO_DEFAULT, defaultValue).withStyle(ChatFormatting.GRAY));
 		return Tooltip.create(text);
 	}
 

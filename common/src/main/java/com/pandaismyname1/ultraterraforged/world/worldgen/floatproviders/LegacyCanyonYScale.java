@@ -27,6 +27,6 @@ public class LegacyCanyonYScale extends FloatProvider {
 
 	@Override
 	public FloatProviderType<LegacyCanyonYScale> getType() {
-		return RTFFloatProviderTypes.LEGACY_CANYON_Y_SCALE;
+		return UTFFloatProviderTypes.LEGACY_CANYON_Y_SCALE;
 	}
 }

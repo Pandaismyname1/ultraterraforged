@@ -8,7 +8,7 @@ import com.pandaismyname1.ultraterraforged.concurrent.ThreadPools;
 import com.pandaismyname1.ultraterraforged.platform.ConfigUtil;
 
 public record PerformanceConfig(int tileSize, int batchCount, int threadCount) {
-	public static final Path DEFAULT_FILE_PATH = ConfigUtil.rtf("performance_internal.conf");
+	public static final Path DEFAULT_FILE_PATH = ConfigUtil.utf("performance_internal.conf");
 	
     public static final int MAX_TILE_SIZE = 8;
     public static final int MAX_BATCH_COUNT = 20;

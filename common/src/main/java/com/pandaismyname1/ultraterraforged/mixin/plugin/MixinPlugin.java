@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
 import com.google.common.collect.ImmutableList;
 
-import com.pandaismyname1.ultraterraforged.RTFCommon;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
 import com.pandaismyname1.ultraterraforged.compat.terrablender.TBCompat;
 import com.pandaismyname1.ultraterraforged.compat.worldpreview.WPCompat;
 
@@ -62,9 +62,9 @@ public class MixinPlugin implements IMixinConfigPlugin {
 	
 	private static void log(boolean isModLoaded, String modName) {
 		if(isModLoaded) {
-			RTFCommon.LOGGER.info("Enabling {} compat", modName);
+			UTFCommon.LOGGER.info("Enabling {} compat", modName);
 		} else {
-			RTFCommon.LOGGER.info("Disabling {} compat", modName);
+			UTFCommon.LOGGER.info("Disabling {} compat", modName);
 		}
 	}
 }

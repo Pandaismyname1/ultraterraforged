@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import com.pandaismyname1.ultraterraforged.RTFCommon;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 import com.pandaismyname1.ultraterraforged.world.worldgen.biome.modifier.BiomeModifier;
 import com.pandaismyname1.ultraterraforged.world.worldgen.feature.chance.ChanceModifier;
@@ -16,7 +16,7 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noise;
 import com.pandaismyname1.ultraterraforged.world.worldgen.structure.rule.StructureRule;
 import com.pandaismyname1.ultraterraforged.world.worldgen.surface.rule.LayeredSurfaceRule;
 
-public class RTFRegistries {
+public class UTFRegistries {
 	public static final ResourceKey<Registry<Codec<? extends Noise>>> NOISE_TYPE = createKey("worldgen/noise_type");
 	public static final ResourceKey<Registry<Codec<? extends Domain>>> DOMAIN_TYPE = createKey("worldgen/domain_type");
 	public static final ResourceKey<Registry<Codec<? extends CurveFunction>>> CURVE_FUNCTION_TYPE = createKey("worldgen/curve_function_type");
@@ -33,10 +33,10 @@ public class RTFRegistries {
 	public static final ResourceKey<Registry<Preset>> PRESET = createKey("worldgen/preset");
 	
 	public static <T> ResourceKey<T> createKey(ResourceKey<? extends Registry<T>> registryKey, String valueKey) {
-		return ResourceKey.create(registryKey, RTFCommon.location(valueKey));
+		return ResourceKey.create(registryKey, UTFCommon.location(valueKey));
 	}
 
 	private static <T> ResourceKey<Registry<T>> createKey(String key) {
-		return ResourceKey.createRegistryKey(RTFCommon.location(key));
+		return ResourceKey.createRegistryKey(UTFCommon.location(key));
 	}
 }

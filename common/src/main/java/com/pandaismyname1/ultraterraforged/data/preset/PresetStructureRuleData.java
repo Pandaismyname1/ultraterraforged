@@ -3,9 +3,9 @@ package com.pandaismyname1.ultraterraforged.data.preset;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.StructureTags;
-import com.pandaismyname1.ultraterraforged.RTFCommon;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
-import com.pandaismyname1.ultraterraforged.registries.RTFRegistries;
+import com.pandaismyname1.ultraterraforged.registries.UTFRegistries;
 import com.pandaismyname1.ultraterraforged.world.worldgen.structure.rule.StructureRule;
 import com.pandaismyname1.ultraterraforged.world.worldgen.structure.rule.StructureRules;
 import com.pandaismyname1.ultraterraforged.world.worldgen.terrain.TerrainType;
@@ -18,6 +18,6 @@ public class PresetStructureRuleData {
 	}
 	
 	private static ResourceKey<StructureRule> createKey(String name) {
-        return ResourceKey.create(RTFRegistries.STRUCTURE_RULE, RTFCommon.location(name));
+        return ResourceKey.create(UTFRegistries.STRUCTURE_RULE, UTFCommon.location(name));
 	}
 }

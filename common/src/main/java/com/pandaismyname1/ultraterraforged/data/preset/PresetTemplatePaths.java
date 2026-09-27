@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.minecraft.resources.ResourceLocation;
-import com.pandaismyname1.ultraterraforged.RTFCommon;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
 
 public class PresetTemplatePaths {
 	public static final List<ResourceLocation> OAK_SMALL = tree("oak/small", "oak_bush_1", "oak_bush_2", "oak_small_1", "oak_small_2", "oak_small_3", "oak_small_4");
@@ -45,7 +45,7 @@ public class PresetTemplatePaths {
 	
 	private static List<ResourceLocation> path(String root, String variant, String... paths) {
 		return Arrays.stream(paths).map((path) -> {
-			return RTFCommon.location("structures/" + root + "/" + variant + "/" + path + ".nbt");
+			return UTFCommon.location("structures/" + root + "/" + variant + "/" + path + ".nbt");
 		}).toList();
 	}
 

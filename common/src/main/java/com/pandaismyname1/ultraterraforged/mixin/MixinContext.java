@@ -20,10 +20,10 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.levelgen.SurfaceRules.Context;
-import com.pandaismyname1.ultraterraforged.world.worldgen.surface.RTFSurfaceContext;
+import com.pandaismyname1.ultraterraforged.world.worldgen.surface.UTFSurfaceContext;
 import com.pandaismyname1.ultraterraforged.world.worldgen.surface.SurfaceRegion;
 
-@Implements(@Interface(iface = RTFSurfaceContext.class, prefix = "ultraterraforged$RTFSurfaceContext$"))
+@Implements(@Interface(iface = UTFSurfaceContext.class, prefix = "ultraterraforged$UTFSurfaceContext$"))
 @Mixin(Context.class)
 abstract class MixinContext {
 	@Shadow
@@ -56,7 +56,7 @@ abstract class MixinContext {
 		}
 	}
 
-	public Set<ResourceKey<Biome>> ultraterraforged$RTFSurfaceContext$getSurroundingBiomes() {
+	public Set<ResourceKey<Biome>> ultraterraforged$UTFSurfaceContext$getSurroundingBiomes() {
 		return this.surroundingBiomes;
 	}
 }

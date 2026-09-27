@@ -33,8 +33,8 @@ class MixinSpawnFinder {
 //		require = 1
 //	)
 //	private static int modifyX(List<ParameterPoint> points, Climate.Sampler sampler, int x, int z) {
-//		if((Object) sampler instanceof RTFClimateSampler rtfClimateSampler) {
-//			BlockPos center = rtfClimateSampler.getSpawnSearchCenter();
+//		if((Object) sampler instanceof UTFClimateSampler utfClimateSampler) {
+//			BlockPos center = utfClimateSampler.getSpawnSearchCenter();
 //			return center != null ? center.getX() : 0;
 //		} else {
 //			return 0;
@@ -51,8 +51,8 @@ class MixinSpawnFinder {
 //		require = 1
 //	)
 //	private static int modifyZ(List<ParameterPoint> points, Climate.Sampler sampler, int x, int z) {
-//		if((Object) sampler instanceof RTFClimateSampler rtfClimateSampler) {
-//			BlockPos center = rtfClimateSampler.getSpawnSearchCenter();
+//		if((Object) sampler instanceof UTFClimateSampler utfClimateSampler) {
+//			BlockPos center = utfClimateSampler.getSpawnSearchCenter();
 //			return center != null ? center.getZ() : 0;
 //		} else {
 //			return 0;

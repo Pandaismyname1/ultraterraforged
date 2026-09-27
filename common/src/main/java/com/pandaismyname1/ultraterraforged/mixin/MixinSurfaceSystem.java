@@ -20,16 +20,16 @@ import net.minecraft.world.level.levelgen.PositionalRandomFactory;
 import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.SurfaceSystem;
-import com.pandaismyname1.ultraterraforged.RTFCommon;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
 import com.pandaismyname1.ultraterraforged.compat.terrablender.TBCompat;
-import com.pandaismyname1.ultraterraforged.world.worldgen.surface.RTFSurfaceSystem;
+import com.pandaismyname1.ultraterraforged.world.worldgen.surface.UTFSurfaceSystem;
 import com.pandaismyname1.ultraterraforged.world.worldgen.surface.rule.StrataStack;
 import terrablender.worldgen.surface.NamespacedSurfaceRuleSource;
 
 @Mixin(SurfaceSystem.class)
-@Implements(@Interface(iface = RTFSurfaceSystem.class, prefix = RTFCommon.MOD_ID + "$RTFSurfaceSystem$"))
+@Implements(@Interface(iface = UTFSurfaceSystem.class, prefix = UTFCommon.MOD_ID + "$UTFSurfaceSystem$"))
 class MixinSurfaceSystem {
-	private static final ResourceLocation STRATA_RANDOM = RTFCommon.location("strata");
+	private static final ResourceLocation STRATA_RANDOM = UTFCommon.location("strata");
 	private RandomSource strataRandom;
 	private Map<ResourceLocation, List<StrataStack>> strata;
 	
@@ -58,7 +58,7 @@ class MixinSurfaceSystem {
 		return source;
 	}
 
-	public List<StrataStack> ultraterraforged$RTFSurfaceSystem$getOrCreateStrata(ResourceLocation cacheId, Function<RandomSource, List<StrataStack>> factory) {
+	public List<StrataStack> ultraterraforged$UTFSurfaceSystem$getOrCreateStrata(ResourceLocation cacheId, Function<RandomSource, List<StrataStack>> factory) {
 		return this.strata.computeIfAbsent(cacheId, (k) -> {
 			return factory.apply(this.strataRandom.fork());
 		});

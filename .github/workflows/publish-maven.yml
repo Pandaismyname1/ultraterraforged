@@ -33,7 +33,7 @@ jobs:
       - name: Publish to local maven folder
         env:
           RELEASE: true
-        run: ./gradlew :fabric:publish :forge:publish -Prtf.perfMods=false -PmavenUrl=file://$PWD/build/maven
+        run: ./gradlew :fabric:publish :forge:publish -Putf.perfMods=false -PmavenUrl=file://$PWD/build/maven
 
       - name: Collect maven output
         run: |

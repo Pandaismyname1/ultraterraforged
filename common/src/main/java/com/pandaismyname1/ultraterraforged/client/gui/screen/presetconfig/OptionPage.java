@@ -25,8 +25,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
-import com.pandaismyname1.ultraterraforged.RTFCommon;
-import com.pandaismyname1.ultraterraforged.client.data.RTFTranslationKeys;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
+import com.pandaismyname1.ultraterraforged.client.data.UTFTranslationKeys;
 import com.pandaismyname1.ultraterraforged.client.gui.PresetSharing;
 import com.pandaismyname1.ultraterraforged.client.gui.screen.SavePresetScreen;
 import com.pandaismyname1.ultraterraforged.client.gui.screen.page.LinkedPageScreen;
@@ -97,8 +97,8 @@ public class OptionPage implements LinkedPageScreen.Page {
 		int rightX = screen.width - MARGIN - rightWidth;
 
 		int searchWidth = Math.min(396, leftWidth - 20);
-		EditBox search = new EditBox(screen.font, MARGIN + (leftWidth - searchWidth) / 2 + 2, TOP, searchWidth, ROW, Component.translatable(RTFTranslationKeys.GUI_EDITOR_SEARCH));
-		search.setHint(Component.translatable(RTFTranslationKeys.GUI_EDITOR_SEARCH).withStyle(ChatFormatting.DARK_GRAY));
+		EditBox search = new EditBox(screen.font, MARGIN + (leftWidth - searchWidth) / 2 + 2, TOP, searchWidth, ROW, Component.translatable(UTFTranslationKeys.GUI_EDITOR_SEARCH));
+		search.setHint(Component.translatable(UTFTranslationKeys.GUI_EDITOR_SEARCH).withStyle(ChatFormatting.DARK_GRAY));
 		search.setValue(this.query);
 		search.setResponder((text) -> {
 			if (!text.equals(this.query)) {
@@ -117,31 +117,31 @@ public class OptionPage implements LinkedPageScreen.Page {
 		this.add(CycleButton.<Integer>builder((i) -> Component.translatable(this.session.pages.get(i).titleKey()))
 			.withValues(indices)
 			.withInitialValue(this.index)
-			.create(rightX, y, rightWidth, ROW, Component.translatable(RTFTranslationKeys.GUI_EDITOR_PAGE), (button, page) -> screen.setPage(new OptionPage(this.session, page))));
+			.create(rightX, y, rightWidth, ROW, Component.translatable(UTFTranslationKeys.GUI_EDITOR_PAGE), (button, page) -> screen.setPage(new OptionPage(this.session, page))));
 		y += ROW + GAP;
 
 		int half = (rightWidth - GAP) / 2;
-		this.add(Button.builder(Component.translatable(RTFTranslationKeys.GUI_EDITOR_RESET_PAGE), (button) -> this.resetShown())
+		this.add(Button.builder(Component.translatable(UTFTranslationKeys.GUI_EDITOR_RESET_PAGE), (button) -> this.resetShown())
 			.bounds(rightX, y, half, ROW)
-			.tooltip(Tooltip.create(Component.translatable(RTFTranslationKeys.GUI_EDITOR_RESET_PAGE_TOOLTIP)))
+			.tooltip(Tooltip.create(Component.translatable(UTFTranslationKeys.GUI_EDITOR_RESET_PAGE_TOOLTIP)))
 			.build());
 		this.add(CycleButton.<RenderMode>builder(OptionWidgets::enumName)
 			.withValues(RenderMode.values())
 			.withInitialValue(this.session.preview.mode())
 			.displayOnlyValue()
-			.create(rightX + half + GAP, y, rightWidth - half - GAP, ROW, Component.translatable(RTFTranslationKeys.GUI_TERRAIN_TAB_VIEW), (button, mode) -> this.session.preview.setMode(mode)));
+			.create(rightX + half + GAP, y, rightWidth - half - GAP, ROW, Component.translatable(UTFTranslationKeys.GUI_TERRAIN_TAB_VIEW), (button, mode) -> this.session.preview.setMode(mode)));
 		y += ROW + GAP;
 
-		this.add(Button.builder(Component.translatable(RTFTranslationKeys.GUI_SAVE_PRESET), (button) -> {
+		this.add(Button.builder(Component.translatable(UTFTranslationKeys.GUI_SAVE_PRESET), (button) -> {
 			screen.minecraft.setScreen(new SavePresetScreen(screen, this.session.entry.getName().getString(), this.preset().copy(), (saved) -> {}));
-		}).bounds(rightX, y, half, ROW).tooltip(Tooltip.create(Component.translatable(RTFTranslationKeys.GUI_SAVE_PRESET_TOOLTIP))).build());
-		this.add(Button.builder(Component.translatable(RTFTranslationKeys.GUI_SHARE_COPY), (button) -> PresetSharing.copy(this.preset()))
+		}).bounds(rightX, y, half, ROW).tooltip(Tooltip.create(Component.translatable(UTFTranslationKeys.GUI_SAVE_PRESET_TOOLTIP))).build());
+		this.add(Button.builder(Component.translatable(UTFTranslationKeys.GUI_SHARE_COPY), (button) -> PresetSharing.copy(this.preset()))
 			.bounds(rightX + half + GAP, y, rightWidth - half - GAP, ROW)
-			.tooltip(Tooltip.create(Component.translatable(RTFTranslationKeys.GUI_SHARE_COPY_TOOLTIP)))
+			.tooltip(Tooltip.create(Component.translatable(UTFTranslationKeys.GUI_SHARE_COPY_TOOLTIP)))
 			.build());
 		y += ROW + GAP;
 
-		AbstractWidget seed = PresetWidgets.createRandomButton(RTFTranslationKeys.GUI_BUTTON_SEED, (int) screen.seed(), (value) -> screen.setSeed(value));
+		AbstractWidget seed = PresetWidgets.createRandomButton(UTFTranslationKeys.GUI_BUTTON_SEED, (int) screen.seed(), (value) -> screen.setSeed(value));
 		seed.setX(rightX);
 		seed.setY(y);
 		seed.setWidth(rightWidth);
@@ -183,7 +183,7 @@ public class OptionPage implements LinkedPageScreen.Page {
 				}
 			}
 			if (rows.isEmpty()) {
-				rows.add(PresetWidgets.createLabel(Component.translatable(RTFTranslationKeys.GUI_EDITOR_NO_RESULTS).withStyle(ChatFormatting.GRAY)));
+				rows.add(PresetWidgets.createLabel(Component.translatable(UTFTranslationKeys.GUI_EDITOR_NO_RESULTS).withStyle(ChatFormatting.GRAY)));
 			}
 		}
 		this.options.replaceEntries(rows.stream().map(WidgetList.Entry::new).toList());
@@ -257,7 +257,7 @@ public class OptionPage implements LinkedPageScreen.Page {
 		try {
 			this.session.entry.save();
 		} catch (IOException e) {
-			RTFCommon.LOGGER.error("Couldn't save preset {}", this.session.entry.getName().getString(), e);
+			UTFCommon.LOGGER.error("Couldn't save preset {}", this.session.entry.getName().getString(), e);
 		}
 	}
 
@@ -266,7 +266,7 @@ public class OptionPage implements LinkedPageScreen.Page {
 		try {
 			this.session.screen.applyPreset(this.session.entry);
 		} catch (IOException e) {
-			RTFCommon.LOGGER.error("Couldn't apply preset {}", this.session.entry.getName().getString(), e);
+			UTFCommon.LOGGER.error("Couldn't apply preset {}", this.session.entry.getName().getString(), e);
 		}
 	}
 }

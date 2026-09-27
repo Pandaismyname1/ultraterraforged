@@ -4,11 +4,11 @@ import java.util.function.Function;
 
 import com.mojang.serialization.Codec;
 
-import com.pandaismyname1.ultraterraforged.registries.RTFBuiltInRegistries;
+import com.pandaismyname1.ultraterraforged.registries.UTFBuiltInRegistries;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noise;
 
 public interface Domain {
-    public static final Codec<Domain> CODEC = RTFBuiltInRegistries.DOMAIN_TYPE.byNameCodec().dispatch(Domain::codec, Function.identity());
+    public static final Codec<Domain> CODEC = UTFBuiltInRegistries.DOMAIN_TYPE.byNameCodec().dispatch(Domain::codec, Function.identity());
 	
     float getOffsetX(float x, float z, int seed);
     

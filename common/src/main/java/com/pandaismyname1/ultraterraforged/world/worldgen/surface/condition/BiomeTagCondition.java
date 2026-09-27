@@ -11,7 +11,7 @@ import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.SurfaceRules.Context;
-import com.pandaismyname1.ultraterraforged.world.worldgen.RTFRandomState;
+import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
 
 record BiomeTagCondition(TagKey<Biome> tag) implements SurfaceRules.ConditionSource {
 	public static final Codec<BiomeTagCondition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -21,8 +21,8 @@ record BiomeTagCondition(TagKey<Biome> tag) implements SurfaceRules.ConditionSou
 	@SuppressWarnings("unchecked")
 	@Override
 	public SurfaceRules.Condition apply(Context ctx) {
-		if((Object) ctx.randomState instanceof RTFRandomState rtfRandomState) {
-			RegistryLookup<Biome> registry = rtfRandomState.registryAccess().lookupOrThrow(Registries.BIOME);
+		if((Object) ctx.randomState instanceof UTFRandomState utfRandomState) {
+			RegistryLookup<Biome> registry = utfRandomState.registryAccess().lookupOrThrow(Registries.BIOME);
 			return SurfaceRules.isBiome(registry.getOrThrow(this.tag)
 				.stream()
 				.map((holder) -> holder.unwrapKey().orElseThrow())

@@ -15,10 +15,10 @@ import com.google.gson.JsonParser;
 import com.mojang.serialization.JsonOps;
 
 import net.minecraft.data.registries.VanillaRegistries;
-import com.pandaismyname1.ultraterraforged.RTFCommon;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
 import com.pandaismyname1.ultraterraforged.data.PresetPacks;
 import com.pandaismyname1.ultraterraforged.data.preset.PresetLibrary;
-import com.pandaismyname1.ultraterraforged.data.preset.RTFWorldPresets;
+import com.pandaismyname1.ultraterraforged.data.preset.UTFWorldPresets;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 import com.pandaismyname1.ultraterraforged.platform.ConfigUtil;
 
@@ -43,10 +43,10 @@ public final class ServerPresets {
 			return;
 		}
 		try {
-			Preset preset = loadOrCreatePreset(ConfigUtil.rtf(PRESET_FILE), PresetLibrary::defaultPreset);
+			Preset preset = loadOrCreatePreset(ConfigUtil.utf(PRESET_FILE), PresetLibrary::defaultPreset);
 			// the server hasn't loaded its registries yet, so generate against vanilla's built-in worldgen
 			PresetPacks.export(preset, VanillaRegistries.createLookup(), datapackDir.resolve(PresetPacks.WORLD_PACK_NAME));
-			RTFCommon.LOGGER.info("Creating a UltraTerraForged world with the preset from {}", ConfigUtil.rtf(PRESET_FILE));
+			UTFCommon.LOGGER.info("Creating a UltraTerraForged world with the preset from {}", ConfigUtil.utf(PRESET_FILE));
 		} catch (IOException | RuntimeException e) {
 			// failing here would silently produce vanilla terrain, so stop instead
 			throw new IllegalStateException("Couldn't set up the UltraTerraForged preset for the new world", e);
@@ -61,11 +61,11 @@ public final class ServerPresets {
 		try (Reader reader = Files.newBufferedReader(serverProperties)) {
 			properties.load(reader);
 		} catch (IOException e) {
-			RTFCommon.LOGGER.warn("Couldn't read {}", serverProperties, e);
+			UTFCommon.LOGGER.warn("Couldn't read {}", serverProperties, e);
 			return false;
 		}
 		String levelType = properties.getProperty("level-type", "").trim().toLowerCase(Locale.ROOT);
-		return levelType.equals(RTFWorldPresets.ULTRATERRAFORGED.location().toString());
+		return levelType.equals(UTFWorldPresets.ULTRATERRAFORGED.location().toString());
 	}
 
 	static Preset loadOrCreatePreset(Path file, Supplier<PresetLibrary.Entry> defaultPreset) throws IOException {
@@ -74,10 +74,10 @@ public final class ServerPresets {
 			Preset preset = defaults.create();
 			Files.createDirectories(file.getParent());
 			try (Writer writer = Files.newBufferedWriter(file)) {
-				JsonElement json = Preset.CODEC.encodeStart(JsonOps.INSTANCE, preset).getOrThrow(false, RTFCommon.LOGGER::error);
+				JsonElement json = Preset.CODEC.encodeStart(JsonOps.INSTANCE, preset).getOrThrow(false, UTFCommon.LOGGER::error);
 				new GsonBuilder().setPrettyPrinting().create().toJson(json, writer);
 			}
-			RTFCommon.LOGGER.info("Wrote the {} preset to {}; edit it to change the terrain of new worlds", defaults.id(), file);
+			UTFCommon.LOGGER.info("Wrote the {} preset to {}; edit it to change the terrain of new worlds", defaults.id(), file);
 			return preset;
 		}
 		try (Reader reader = Files.newBufferedReader(file)) {

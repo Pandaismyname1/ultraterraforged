@@ -16,7 +16,7 @@
 * Oceans: continental shelves, submarine canyons, trenches, seamounts and guyots, mid-ocean ridges with hydrothermal vents, blue holes, coral reefs, sand waves, whale falls, and sand, gravel and clay sea floors.
 * Caves shaped by the land, biomes untouched: underground rivers, springs, karst caves, lava tubes, sea caves and arches, layered caves, giant caverns, rock shelters, glacier caves; cave mouths in slopes.
 * A snow line that depends on which way slopes face; rock layers from vanilla and modded stone.
-* `/rtf locate <terrain>` finds landforms and puts you on their surface.
+* `/utf locate <terrain>` finds landforms and puts you on their surface.
 
 ### Performance
 * The Terrain tab recommends performance mods and shows which are installed: C2ME (also on Forge through Sinytra Connector), Noisium(ed), Lithium (Radium or Canary on Forge), ModernFix, AllTheLeaks, Sodium (Embeddium on Forge). With them, new land generates as fast as vanilla or faster.
@@ -25,4 +25,4 @@
 ### Fixes
 * Forge no longer crashes at startup next to mods bundling MixinExtras up to 0.5.0 (ModernFix, Noisium, AllTheLeaks and many others).
 * Fixed an ArrayIndexOutOfBoundsException generating chunks, from terrain tiles reused after being closed.
-* Fixed rivers generated before the terrain (no rivers at all), missing cave and structure settings, presets losing their scales, `/rtf locate` sending players to random places, bare rock over the sea floor, and a crash placing some trees.
+* Fixed from ReTerraForged: rivers generated before the terrain (no rivers at all), missing cave and structure settings, presets losing their scales, `/rtf locate` (now `/utf locate`) sending players to random places, bare rock over the sea floor, and a crash placing some trees.

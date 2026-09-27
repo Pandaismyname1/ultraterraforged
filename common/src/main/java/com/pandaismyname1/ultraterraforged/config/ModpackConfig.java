@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import com.pandaismyname1.ultraterraforged.RTFCommon;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
 import com.pandaismyname1.ultraterraforged.platform.ConfigUtil;
 
 /**
@@ -34,11 +34,11 @@ public record ModpackConfig(@Nullable String defaultPreset, boolean showBuiltinP
 	private static final String DEFAULT_WORLD_TYPE = "useAsDefaultWorldType";
 
 	public static ModpackConfig load() {
-		return load(ConfigUtil.rtf(FILE));
+		return load(ConfigUtil.utf(FILE));
 	}
 
 	public static Path presetFolder() {
-		return ConfigUtil.rtf(PRESET_FOLDER);
+		return ConfigUtil.utf(PRESET_FOLDER);
 	}
 
 	public static ModpackConfig load(Path file) {
@@ -53,7 +53,7 @@ public record ModpackConfig(@Nullable String defaultPreset, boolean showBuiltinP
 				json.has(DEFAULT_WORLD_TYPE) ? json.get(DEFAULT_WORLD_TYPE).getAsBoolean() : null
 			);
 		} catch (IOException | RuntimeException e) {
-			RTFCommon.LOGGER.error("Couldn't read {}, ignoring the modpack defaults", file, e);
+			UTFCommon.LOGGER.error("Couldn't read {}, ignoring the modpack defaults", file, e);
 			return NONE;
 		}
 	}

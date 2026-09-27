@@ -28,12 +28,12 @@ class MixinParameterList<T> {
     public void initializeForTerraBlender(RegistryAccess registryAccess, RegionType regionType, long seed, CallbackInfo callback) {
     	this.maxIndex = Regions.getCount(regionType) - 1;
 //
-//    	registryAccess.lookup(RTFRegistries.PRESET).flatMap((registry) -> {
+//    	registryAccess.lookup(UTFRegistries.PRESET).flatMap((registry) -> {
 //    		return registry.get(Preset.KEY);
 //    	}).ifPresent((holder) -> {
 //    		Preset preset = holder.value();
 //        	TBCompat.setSurfaceRules(preset, (defaultRules) -> {
-//        		return RTFSurfaceRuleData.overworld(preset, registryAccess.lookupOrThrow(Registries.DENSITY_FUNCTION), registryAccess.lookupOrThrow(RTFRegistries.NOISE), defaultRules);
+//        		return UTFSurfaceRuleData.overworld(preset, registryAccess.lookupOrThrow(Registries.DENSITY_FUNCTION), registryAccess.lookupOrThrow(UTFRegistries.NOISE), defaultRules);
 //            });
 //    	});
     }

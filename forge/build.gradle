@@ -68,9 +68,9 @@ dependencies {
     shadowBundle(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
 
     // Performance mods, in the dev runs only: the ones PerformanceMods lists for Forge on this version, pinned to
-    // Modrinth version ids and a CurseForge file. -Prtf.perfMods=false leaves them out. See
+    // Modrinth version ids and a CurseForge file. -Putf.perfMods=false leaves them out. See
     // docs/porting/performance-mods.md.
-    if (project.findProperty("rtf.perfMods") != "false") {
+    if (project.findProperty("utf.perfMods") != "false") {
         [
             "maven.modrinth:noisiumed:LbWCNzST",        // Noisiumed 3.0.6
             "maven.modrinth:radium:n947JjJH",           // Radium 0.12.4, standing in for Lithium

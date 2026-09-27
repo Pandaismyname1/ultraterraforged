@@ -14,7 +14,7 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.terrain.TerrainType;
 import com.pandaismyname1.ultraterraforged.world.worldgen.tile.Tile;
 
 /**
- * /rtf locate should lead to the terrain asked for, as the world generates it.
+ * /utf locate should lead to the terrain asked for, as the world generates it.
  */
 public class LocateTest {
 

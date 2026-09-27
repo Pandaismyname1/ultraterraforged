@@ -12,7 +12,7 @@ import java.util.Map;
 import org.apache.commons.io.file.PathUtils;
 
 import net.minecraft.core.HolderLookup;
-import com.pandaismyname1.ultraterraforged.RTFCommon;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 
 // Turns a preset into the datapack a world is created with
@@ -35,7 +35,7 @@ public final class PresetPacks {
 		Path workDir = Files.createTempDirectory("ultraterraforged-preset-");
 		try {
 			Path generated = workDir.resolve("pack");
-			RTFDataGen.makePreset(preset, registries, workDir.resolve("cache"), generated).run();
+			UTFDataGen.makePreset(preset, registries, workDir.resolve("cache"), generated).run();
 
 			// build next to the target and swap it in, so a half-written or stale pack is never picked up
 			Path parent = zip.toAbsolutePath().getParent();
@@ -47,7 +47,7 @@ public final class PresetPacks {
 		} finally {
 			PathUtils.deleteDirectory(workDir);
 		}
-		RTFCommon.LOGGER.info("Wrote preset datapack to {}", zip);
+		UTFCommon.LOGGER.info("Wrote preset datapack to {}", zip);
 	}
 
 	private static void zip(Path directory, Path zip) throws IOException {

@@ -32,7 +32,7 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.terrain.TerrainType;
 /**
  * Benchmarks of the terrain pipeline as world generation runs it: whole tiles, with the erosion and smoothing filters,
  * in clusters like the land around a player exploring. Time is the CPU time of the whole process, so other programs
- * running at the same time barely skew it. Only runs when asked: -Drtf.bench=true
+ * running at the same time barely skew it. Only runs when asked: -Dutf.bench=true
  */
 public class PerformanceBenchmarkTest {
 	private static final int SEED = PresetRenderer.SEED;
@@ -45,7 +45,7 @@ public class PerformanceBenchmarkTest {
 
 	@BeforeAll
 	static void bootstrap() {
-		assumeTrue(Boolean.getBoolean("rtf.bench"));
+		assumeTrue(Boolean.getBoolean("utf.bench"));
 		TestBootstrap.init();
 	}
 
@@ -161,10 +161,10 @@ public class PerformanceBenchmarkTest {
 		}
 	}
 
-	// the default preset only, over and over, to profile with -Drtf.jfr=<file>
+	// the default preset only, over and over, to profile with -Dutf.jfr=<file>
 	@Test
 	void profileDefault() {
-		assumeTrue(System.getProperty("rtf.profile") != null);
+		assumeTrue(System.getProperty("utf.profile") != null);
 		Preset preset = builtin("default");
 		for (int i = 0; i < 8; i++) {
 			generate(preset, CLUSTERS.length);
@@ -196,7 +196,7 @@ public class PerformanceBenchmarkTest {
 			"mesa", "canyon", "volcano", "badlands"
 		};
 		Preset preset = builtin("default");
-		System.out.printf("%n/rtf locate on the default preset, from 0 0, each on a fresh world%n");
+		System.out.printf("%n/utf locate on the default preset, from 0 0, each on a fresh world%n");
 		System.out.printf("%-20s %9s %9s%n", "terrain", "ms", "distance");
 		for (String name : targets) {
 			Terrain terrain = TerrainType.get(name);

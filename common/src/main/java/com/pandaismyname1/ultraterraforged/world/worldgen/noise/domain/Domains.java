@@ -3,7 +3,7 @@ package com.pandaismyname1.ultraterraforged.world.worldgen.noise.domain;
 import com.mojang.serialization.Codec;
 
 import com.pandaismyname1.ultraterraforged.platform.RegistryUtil;
-import com.pandaismyname1.ultraterraforged.registries.RTFBuiltInRegistries;
+import com.pandaismyname1.ultraterraforged.registries.UTFBuiltInRegistries;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noise;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noises;
 
@@ -54,6 +54,6 @@ public class Domains {
 	}
 	
 	private static void register(String name, Codec<? extends Domain> value) {
-		RegistryUtil.register(RTFBuiltInRegistries.DOMAIN_TYPE, name, value);
+		RegistryUtil.register(UTFBuiltInRegistries.DOMAIN_TYPE, name, value);
 	}
 }

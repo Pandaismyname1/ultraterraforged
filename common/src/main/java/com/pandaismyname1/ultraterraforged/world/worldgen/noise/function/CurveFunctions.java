@@ -3,7 +3,7 @@ package com.pandaismyname1.ultraterraforged.world.worldgen.noise.function;
 import com.mojang.serialization.Codec;
 
 import com.pandaismyname1.ultraterraforged.platform.RegistryUtil;
-import com.pandaismyname1.ultraterraforged.registries.RTFBuiltInRegistries;
+import com.pandaismyname1.ultraterraforged.registries.UTFBuiltInRegistries;
 
 public class CurveFunctions {
 
@@ -22,6 +22,6 @@ public class CurveFunctions {
 	}
 	
 	private static void register(String name, Codec<? extends CurveFunction> value) {
-		RegistryUtil.register(RTFBuiltInRegistries.CURVE_FUNCTION_TYPE, name, value);
+		RegistryUtil.register(UTFBuiltInRegistries.CURVE_FUNCTION_TYPE, name, value);
 	}
 }

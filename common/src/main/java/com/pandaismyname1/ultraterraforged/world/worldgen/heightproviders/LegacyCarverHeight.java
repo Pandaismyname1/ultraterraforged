@@ -33,7 +33,7 @@ public class LegacyCarverHeight extends HeightProvider {
 
 	@Override
 	public HeightProviderType<LegacyCarverHeight> getType() {
-		return RTFHeightProviderTypes.LEGACY_CARVER;
+		return UTFHeightProviderTypes.LEGACY_CARVER;
 	}
 	
 	public static LegacyCarverHeight of(int min, int variationMin, int variationRange) {

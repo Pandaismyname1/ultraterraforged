@@ -32,7 +32,7 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.rivermap.RaisedWater;
 import net.minecraft.world.level.levelgen.blending.Blender;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.WorldSettings;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
-import com.pandaismyname1.ultraterraforged.world.worldgen.RTFRandomState;
+import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
 import com.pandaismyname1.ultraterraforged.world.worldgen.WorldGenFlags;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.Cell;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.NoiseUtil;
@@ -49,7 +49,7 @@ class MixinNoiseBasedChunkGenerator {
     public void buildSurface$HEAD(WorldGenRegion worldGenRegion, StructureManager structureManager, RandomState randomState, ChunkAccess chunkAccess, CallbackInfo callback) {
 		SurfaceRegion.set(worldGenRegion);
 		GeneratorContext generatorContext;
-		if((Object) randomState instanceof RTFRandomState rtfRandomState && (generatorContext = rtfRandomState.generatorContext()) != null) {
+		if((Object) randomState instanceof UTFRandomState utfRandomState && (generatorContext = utfRandomState.generatorContext()) != null) {
 			// the water of rivers and lakes above the sea, so the surface is built under it
 			RaisedWater.fill(chunkAccess, generatorContext);
 		}
@@ -59,7 +59,7 @@ class MixinNoiseBasedChunkGenerator {
     public void buildSurface$TAIL(WorldGenRegion worldGenRegion, StructureManager structureManager, RandomState randomState, ChunkAccess chunkAccess, CallbackInfo callback) {
 		SurfaceRegion.set(null);
 		GeneratorContext generatorContext;
-		if((Object) randomState instanceof RTFRandomState rtfRandomState && (generatorContext = rtfRandomState.generatorContext()) != null) {
+		if((Object) randomState instanceof UTFRandomState utfRandomState && (generatorContext = utfRandomState.generatorContext()) != null) {
 			// caves shaped by the land, carved into the finished surface
 			generatorContext.caveFeatures.carve(chunkAccess);
 		}
@@ -75,7 +75,7 @@ class MixinNoiseBasedChunkGenerator {
     public int fillFromNoise(NoiseSettings settings, Executor executor, Blender blender, RandomState randomState, StructureManager structureManager, ChunkAccess chunkAccess2) {
 		GeneratorContext generatorContext;
 		ChunkPos chunkPos = chunkAccess2.getPos();
-		if((Object) randomState instanceof RTFRandomState rtfRandomState && (generatorContext = rtfRandomState.generatorContext()) != null) {
+		if((Object) randomState instanceof UTFRandomState utfRandomState && (generatorContext = utfRandomState.generatorContext()) != null) {
 			return generatorContext.lookup.getGenerationHeight(chunkPos.x, chunkPos.z, this.settings.value(), true);
 		} else {
     		return settings.height();
@@ -92,7 +92,7 @@ class MixinNoiseBasedChunkGenerator {
 	)
     private int iterateNoiseColumn(NoiseSettings settings, LevelHeightAccessor levelHeightAccessor, RandomState randomState, int blockX, int blockZ, @Nullable MutableObject<NoiseColumn> mutableObject, @Nullable Predicate<BlockState> predicate) {
 		GeneratorContext generatorContext;
-		if((Object) randomState instanceof RTFRandomState rtfRandomState && (generatorContext = rtfRandomState.generatorContext()) != null) {
+		if((Object) randomState instanceof UTFRandomState utfRandomState && (generatorContext = utfRandomState.generatorContext()) != null) {
 			return generatorContext.lookup.getGenerationHeight(SectionPos.blockToSectionCoord(blockX), SectionPos.blockToSectionCoord(blockZ), this.settings.value(), !WorldGenFlags.fastLookups());
     	} else {
     		return settings.height();
@@ -106,7 +106,7 @@ class MixinNoiseBasedChunkGenerator {
     private void addDebugScreenInfo(List<String> list, RandomState randomState, BlockPos blockPos, CallbackInfo callback) {
 		@Nullable
 		GeneratorContext generatorContext;
-		if((Object) randomState instanceof RTFRandomState rtfRandomState && (generatorContext = rtfRandomState.generatorContext()) != null) {
+		if((Object) randomState instanceof UTFRandomState utfRandomState && (generatorContext = utfRandomState.generatorContext()) != null) {
 			Cell cell = new Cell();
 			generatorContext.lookup.apply(cell, blockPos.getX(), blockPos.getZ());
 

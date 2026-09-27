@@ -1,8 +1,8 @@
 package com.pandaismyname1.ultraterraforged.client.data;
 
-import com.pandaismyname1.ultraterraforged.RTFCommon;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
 
-public class RTFTranslationKeys {
+public class UTFTranslationKeys {
 	public static final String METADATA_DESCRIPTION = resolve("metadata.description");
 	public static final String PRESET_METADATA_DESCRIPTION = resolve("preset.metadata.description");
 	public static final String MUD_SWAMPS_METADATA_DESCRIPTION = resolve("mudSwamps.metadata.description");
@@ -442,6 +442,6 @@ public class RTFTranslationKeys {
 	}
 
 	private static String resolve(String key) {
-		return RTFCommon.MOD_ID + "." + key;
+		return UTFCommon.MOD_ID + "." + key;
 	}
 }

@@ -23,7 +23,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "com.pandaismyname1.ultraterraforged.fabric.RTFFabric"
+      "com.pandaismyname1.ultraterraforged.fabric.UTFFabric"
     ]
   },
   "mixins": [

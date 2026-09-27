@@ -9,7 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
-import com.pandaismyname1.ultraterraforged.world.worldgen.RTFRandomState;
+import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
 import com.pandaismyname1.ultraterraforged.world.worldgen.tile.Tile;
 
 class ElevationChanceModifier extends RangeChanceModifier {
@@ -33,13 +33,13 @@ class ElevationChanceModifier extends RangeChanceModifier {
 		BlockPos pos = placeCtx.origin();
 		@Nullable
 		GeneratorContext generatorContext;
-		if((Object) placeCtx.level().getLevel().getChunkSource().randomState() instanceof RTFRandomState rtfRandomState && (generatorContext = rtfRandomState.generatorContext()) != null) {
+		if((Object) placeCtx.level().getLevel().getChunkSource().randomState() instanceof UTFRandomState utfRandomState && (generatorContext = utfRandomState.generatorContext()) != null) {
 			int x = pos.getX();
 			int z = pos.getZ();
 			int chunkX = SectionPos.blockToSectionCoord(x);
 			int chunkZ = SectionPos.blockToSectionCoord(z);
 			Tile.Chunk chunk = generatorContext.cache.provideAtChunk(chunkX, chunkZ).getChunkReader(chunkX, chunkZ);
-			return rtfRandomState.generatorContext().localHeightmap.get().levels().elevation(chunk.getCell(x, z).height);
+			return utfRandomState.generatorContext().localHeightmap.get().levels().elevation(chunk.getCell(x, z).height);
 		} else {
 			throw new UnsupportedOperationException();
 		}

@@ -28,7 +28,7 @@ import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
-import com.pandaismyname1.ultraterraforged.world.worldgen.RTFRandomState;
+import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.Cell;
 import com.pandaismyname1.ultraterraforged.world.worldgen.feature.ErodeSnowFeature.Config;
 import com.pandaismyname1.ultraterraforged.world.worldgen.heightmap.Levels;
@@ -58,7 +58,7 @@ public class ErodeSnowFeature extends Feature<Config> {
 		
 		@Nullable
 		GeneratorContext generatorContext;
-		if((Object) randomState instanceof RTFRandomState rtfRandomState && (generatorContext = rtfRandomState.generatorContext()) != null) {
+		if((Object) randomState instanceof UTFRandomState utfRandomState && (generatorContext = utfRandomState.generatorContext()) != null) {
 			ChunkGenerator generator = placeContext.chunkGenerator();
 			ChunkPos chunkPos = new ChunkPos(placeContext.origin());
 			int chunkX = chunkPos.x;

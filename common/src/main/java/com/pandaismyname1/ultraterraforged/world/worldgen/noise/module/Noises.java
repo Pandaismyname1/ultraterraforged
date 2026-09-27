@@ -7,7 +7,7 @@ import com.mojang.serialization.Codec;
 
 import net.minecraft.core.Holder;
 import com.pandaismyname1.ultraterraforged.platform.RegistryUtil;
-import com.pandaismyname1.ultraterraforged.registries.RTFBuiltInRegistries;
+import com.pandaismyname1.ultraterraforged.registries.UTFBuiltInRegistries;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.CellField;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.noise.CellSampler;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.domain.Domain;
@@ -19,7 +19,7 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.noise.function.EdgeFun
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.function.Interpolation;
 
 public class Noises {
-    private static final Codec<Noise> CODEC = RTFBuiltInRegistries.NOISE_TYPE.byNameCodec().dispatch(Noise::codec, Function.identity());
+    private static final Codec<Noise> CODEC = UTFBuiltInRegistries.NOISE_TYPE.byNameCodec().dispatch(Noise::codec, Function.identity());
     public static final float MAX_REASONABLE_NOISE_VALUE = 1000000.0F;
     public static final Codec<Float> NOISE_VALUE_CODEC = Codec.floatRange(-MAX_REASONABLE_NOISE_VALUE, MAX_REASONABLE_NOISE_VALUE);
     public static final Codec<Noise> DIRECT_CODEC = Codec.either(NOISE_VALUE_CODEC, CODEC).xmap(either -> either.map(Noises::constant, Function.identity()), noise -> {
@@ -425,7 +425,7 @@ public class Noises {
 	}
  
 	private static void register(String name, Codec<? extends Noise> value) {
-		RegistryUtil.register(RTFBuiltInRegistries.NOISE_TYPE, name, value);
+		RegistryUtil.register(UTFBuiltInRegistries.NOISE_TYPE, name, value);
 	}
 	
 	public record HolderHolder(Holder<Noise> holder) implements Noise {

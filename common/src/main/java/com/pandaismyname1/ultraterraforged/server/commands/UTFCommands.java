@@ -1,16 +1,21 @@
-package com.pandaismyname1.ultraterraforged.server.commands.fabric;
+package com.pandaismyname1.ultraterraforged.server.commands;
 
 import java.util.function.BiConsumer;
 
 import com.mojang.brigadier.CommandDispatcher;
 
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 
-public class RTFCommandsImpl {
+public class UTFCommands {
 
+	public static void bootstrap() {
+		register(LocateTerrainCommand::register);
+	}
+	
+	@ExpectPlatform
 	public static void register(BiConsumer<CommandDispatcher<CommandSourceStack>, CommandBuildContext> register) {
-	    CommandRegistrationCallback.EVENT.register((dispatcher, buildContext, environment) -> register.accept(dispatcher, buildContext));
+		throw new UnsupportedOperationException();
 	}
 }

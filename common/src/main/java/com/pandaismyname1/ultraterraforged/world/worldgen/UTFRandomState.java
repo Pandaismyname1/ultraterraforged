@@ -7,7 +7,7 @@ import net.minecraft.world.level.levelgen.DensityFunction;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noise;
 
-public interface RTFRandomState {
+public interface UTFRandomState {
 	void initialize(RegistryAccess registryAccess);
 	
 	@Nullable

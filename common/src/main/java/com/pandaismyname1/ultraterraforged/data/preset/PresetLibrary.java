@@ -25,8 +25,8 @@ import com.mojang.serialization.JsonOps;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.GsonHelper;
-import com.pandaismyname1.ultraterraforged.RTFCommon;
-import com.pandaismyname1.ultraterraforged.client.data.RTFTranslationKeys;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
+import com.pandaismyname1.ultraterraforged.client.data.UTFTranslationKeys;
 import com.pandaismyname1.ultraterraforged.config.ModpackConfig;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.BuiltinPresets;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
@@ -127,7 +127,7 @@ public final class PresetLibrary {
 			if (chosen.isPresent()) {
 				return chosen.get();
 			}
-			RTFCommon.LOGGER.warn("The default preset \"{}\" in {} isn't one of the available presets {}", reference, ModpackConfig.FILE, entries.stream().map(Entry::id).toList());
+			UTFCommon.LOGGER.warn("The default preset \"{}\" in {} isn't one of the available presets {}", reference, ModpackConfig.FILE, entries.stream().map(Entry::id).toList());
 		}
 		for (Entry entry : entries) {
 			if (entry.id().equals(DEFAULT_ID)) {
@@ -241,7 +241,7 @@ public final class PresetLibrary {
 		try (Stream<Path> stream = Files.list(folder)) {
 			return stream.filter((file) -> Files.isRegularFile(file) && file.getFileName().toString().endsWith(".json")).sorted(Comparator.comparing(Path::getFileName)).toList();
 		} catch (IOException e) {
-			RTFCommon.LOGGER.error("Couldn't list presets in {}", folder, e);
+			UTFCommon.LOGGER.error("Couldn't list presets in {}", folder, e);
 			return List.of();
 		}
 	}
@@ -255,14 +255,14 @@ public final class PresetLibrary {
 		try (Reader reader = Files.newBufferedReader(file)) {
 			return Optional.of(JsonParser.parseReader(reader));
 		} catch (IOException | RuntimeException e) {
-			RTFCommon.LOGGER.error("Couldn't read preset {}", file, e);
+			UTFCommon.LOGGER.error("Couldn't read preset {}", file, e);
 			return Optional.empty();
 		}
 	}
 
 	private static Optional<Preset> parse(Path file, JsonElement json) {
 		return Preset.CODEC.parse(JsonOps.INSTANCE, json).resultOrPartial((error) -> {
-			RTFCommon.LOGGER.error("Couldn't read preset {}: {}", file, error);
+			UTFCommon.LOGGER.error("Couldn't read preset {}: {}", file, error);
 		});
 	}
 
@@ -278,8 +278,8 @@ public final class PresetLibrary {
 	}
 
 	private static Entry builtin(String id, String translationId, Supplier<Preset> factory) {
-		Component name = Component.translatable(RTFTranslationKeys.presetName(translationId)).withStyle(ChatFormatting.GRAY);
-		return new Entry("builtin/" + id, name, Component.translatable(RTFTranslationKeys.presetDescription(translationId)), factory, null, Source.BUILTIN);
+		Component name = Component.translatable(UTFTranslationKeys.presetName(translationId)).withStyle(ChatFormatting.GRAY);
+		return new Entry("builtin/" + id, name, Component.translatable(UTFTranslationKeys.presetDescription(translationId)), factory, null, Source.BUILTIN);
 	}
 
 	private PresetLibrary() {

@@ -17,14 +17,14 @@ import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
-import com.pandaismyname1.ultraterraforged.client.data.RTFTranslationKeys;
+import com.pandaismyname1.ultraterraforged.client.data.UTFTranslationKeys;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
-import com.pandaismyname1.ultraterraforged.world.worldgen.RTFRandomState;
+import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
 import com.pandaismyname1.ultraterraforged.world.worldgen.heightmap.TerrainLocator;
 import com.pandaismyname1.ultraterraforged.world.worldgen.terrain.Terrain;
 
 public class LocateTerrainCommand {
-    private static final DynamicCommandExceptionType ERROR_TERRAIN_NOT_FOUND = new DynamicCommandExceptionType(terrain -> Component.translatable(RTFTranslationKeys.TERRAIN_NOT_FOUND, terrain));
+    private static final DynamicCommandExceptionType ERROR_TERRAIN_NOT_FOUND = new DynamicCommandExceptionType(terrain -> Component.translatable(UTFTranslationKeys.TERRAIN_NOT_FOUND, terrain));
 
     // how far to search, in blocks
     private static final int MAX_DISTANCE = 24000;
@@ -32,7 +32,7 @@ public class LocateTerrainCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> commandDispatcher, CommandBuildContext commandBuildContext) {
     	commandDispatcher.register(
-    		Commands.literal("rtf").requires((stack) -> stack.hasPermission(2)).then(
+    		Commands.literal("utf").requires((stack) -> stack.hasPermission(2)).then(
     			Commands.literal("locate").then(
     				TerrainArgument.terrain("terrain").executes((ctx) -> {
 	    				CommandSourceStack stack = ctx.getSource();
@@ -43,7 +43,7 @@ public class LocateTerrainCommand {
 	    				BlockPos result = locate(stack, terrain, origin);
 	    				if(result != null) {
 	    			        int distance = Mth.floor(dist(origin.getX(), origin.getZ(), result.getX(), result.getZ()));
-		    			    stack.sendSuccess(() -> Component.translatable(RTFTranslationKeys.TERRAIN_FOUND, terrainName, createTeleportMessage(result), distance), false);
+		    			    stack.sendSuccess(() -> Component.translatable(UTFTranslationKeys.TERRAIN_FOUND, terrainName, createTeleportMessage(result), distance), false);
 		    			    return Command.SINGLE_SUCCESS;
 	    				}
 	    	            throw ERROR_TERRAIN_NOT_FOUND.create(terrainName);
@@ -67,7 +67,7 @@ public class LocateTerrainCommand {
 
     	@Nullable
     	GeneratorContext generatorContext;
-    	if((Object) level.getChunkSource().randomState() instanceof RTFRandomState rtfRandomState && (generatorContext = rtfRandomState.generatorContext()) != null) {
+    	if((Object) level.getChunkSource().randomState() instanceof UTFRandomState utfRandomState && (generatorContext = utfRandomState.generatorContext()) != null) {
     		@Nullable
     		TerrainLocator.Found found = TerrainLocator.locate(generatorContext.lookup, target, origin.getX(), origin.getZ(), MAX_DISTANCE, TIMEOUT_MILLIS);
     		if (found != null) {

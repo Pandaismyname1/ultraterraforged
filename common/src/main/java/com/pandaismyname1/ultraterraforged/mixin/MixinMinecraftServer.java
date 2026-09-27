@@ -12,9 +12,9 @@ import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.storage.ServerLevelData;
 import com.pandaismyname1.ultraterraforged.data.preset.PresetData;
-import com.pandaismyname1.ultraterraforged.registries.RTFRegistries;
-import com.pandaismyname1.ultraterraforged.world.worldgen.RTFRandomState;
-import com.pandaismyname1.ultraterraforged.world.worldgen.biome.RTFClimateSampler;
+import com.pandaismyname1.ultraterraforged.registries.UTFRegistries;
+import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
+import com.pandaismyname1.ultraterraforged.world.worldgen.biome.UTFClimateSampler;
 
 @Mixin(MinecraftServer.class)
 class MixinMinecraftServer {
@@ -29,12 +29,12 @@ class MixinMinecraftServer {
     private static void findSpawnPosition(ServerLevel serverLevel, ServerLevelData serverLevelData, boolean bl, boolean bl2, CallbackInfo callback) {
 		RandomState randomState = serverLevel.getChunkSource().randomState();
 		Climate.Sampler sampler = randomState.sampler();
-		serverLevel.registryAccess().lookup(RTFRegistries.PRESET).flatMap((registry) -> {
+		serverLevel.registryAccess().lookup(UTFRegistries.PRESET).flatMap((registry) -> {
 			return registry.get(PresetData.PRESET);
 		}).ifPresent((preset) -> {
-			if((Object) randomState instanceof RTFRandomState rtfRandomState && (Object) sampler instanceof RTFClimateSampler rtfClimateSampler) {
-				BlockPos searchCenter = preset.value().world().properties.spawnType.getSearchCenter(rtfRandomState.generatorContext());
-				rtfClimateSampler.setSpawnSearchCenter(searchCenter);
+			if((Object) randomState instanceof UTFRandomState utfRandomState && (Object) sampler instanceof UTFClimateSampler utfClimateSampler) {
+				BlockPos searchCenter = preset.value().world().properties.spawnType.getSearchCenter(utfRandomState.generatorContext());
+				utfClimateSampler.setSpawnSearchCenter(searchCenter);
 			} else {
 				throw new IllegalStateException();
 			}

@@ -22,13 +22,13 @@ import net.minecraft.server.packs.repository.BuiltInPackSource;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.Pack.ResourcesSupplier;
 import net.minecraft.server.packs.repository.PackSource;
-import com.pandaismyname1.ultraterraforged.RTFCommon;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
 
-public class RTFBuiltinPackSource extends BuiltInPackSource {
-	private static final ResourceLocation PACKS_DIR = RTFCommon.location("datapacks");
+public class UTFBuiltinPackSource extends BuiltInPackSource {
+	private static final ResourceLocation PACKS_DIR = UTFCommon.location("datapacks");
 	
-	public RTFBuiltinPackSource() {
-		super(PackType.SERVER_DATA, createRTFPackSource(), PACKS_DIR);
+	public UTFBuiltinPackSource() {
+		super(PackType.SERVER_DATA, createUTFPackSource(), PACKS_DIR);
 	}
 
 	@Nullable
@@ -47,24 +47,24 @@ public class RTFBuiltinPackSource extends BuiltInPackSource {
         return Pack.readMetaAndCreate(title, description, false, resourceSupplier, PackType.SERVER_DATA, Pack.Position.TOP, PackSource.FEATURE);
 	}
 
-	private static VanillaPackResources createRTFPackSource() {
-		VanillaPackResourcesBuilder builder = new VanillaPackResourcesBuilder().exposeNamespace(RTFCommon.MOD_ID);
+	private static VanillaPackResources createUTFPackSource() {
+		VanillaPackResourcesBuilder builder = new VanillaPackResourcesBuilder().exposeNamespace(UTFCommon.MOD_ID);
 		PackType packType = PackType.SERVER_DATA;
 		String root = "/" + packType.getDirectory() + "/";
-		URL uRL = RTFCommon.class.getResource(root);
+		URL uRL = UTFCommon.class.getResource(root);
 		if (uRL == null) {
-			RTFCommon.LOGGER.error("File {} does not exist in classpath", root);
+			UTFCommon.LOGGER.error("File {} does not exist in classpath", root);
 		} else {
 			try {
 				URI uRI = uRL.toURI();
 				String uriSchema = uRI.getScheme();
 				if (!"jar".equals(uriSchema) && !"file".equals(uriSchema)) {
-					RTFCommon.LOGGER.warn("Assets URL '{}' uses unexpected schema", uRI);
+					UTFCommon.LOGGER.warn("Assets URL '{}' uses unexpected schema", uRI);
 				}
 				Path path = safeGetPath(uRI);
 				builder.pushAssetPath(packType, path);
 			} catch (Exception exception) {
-				RTFCommon.LOGGER.error("Couldn't resolve path to assets", exception);
+				UTFCommon.LOGGER.error("Couldn't resolve path to assets", exception);
 			}	
 		}
         return builder.applyDevelopmentConfig().build();
@@ -75,7 +75,7 @@ public class RTFBuiltinPackSource extends BuiltInPackSource {
             return Paths.get(uRI);
         } catch (FileSystemNotFoundException fileSystemNotFoundException) {
         } catch (Throwable throwable) {
-        	RTFCommon.LOGGER.warn("Unable to get path for: {}", uRI, throwable);
+        	UTFCommon.LOGGER.warn("Unable to get path for: {}", uRI, throwable);
         }
         try {
             FileSystems.newFileSystem(uRI, Collections.emptyMap());

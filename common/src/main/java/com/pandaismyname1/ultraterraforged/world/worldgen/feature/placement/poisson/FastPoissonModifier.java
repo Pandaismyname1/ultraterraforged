@@ -15,8 +15,8 @@ import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.placement.PlacementContext;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
-import com.pandaismyname1.ultraterraforged.world.worldgen.RTFRandomState;
-import com.pandaismyname1.ultraterraforged.world.worldgen.feature.placement.RTFPlacementModifiers;
+import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
+import com.pandaismyname1.ultraterraforged.world.worldgen.feature.placement.UTFPlacementModifiers;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noise;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noises;
 import com.pandaismyname1.ultraterraforged.world.worldgen.tile.Tile;
@@ -75,15 +75,15 @@ public class FastPoissonModifier extends PlacementModifier {
 
 	@Override
 	public PlacementModifierType<FastPoissonModifier> type() {
-		return RTFPlacementModifiers.FAST_POISSON;
+		return UTFPlacementModifiers.FAST_POISSON;
 	}
 
 	private DensityNoise getDensityNoise(int seed, ChunkPos chunkPos, RandomState randomState) {
 		BiomeVariance biomeVariance = BiomeVariance.NONE;
 		
 		if (this.biomeFade > BiomeVariance.MIN_FADE) {
-			if((Object) randomState instanceof RTFRandomState rtfRandomState) {
-				Tile.Chunk reader = rtfRandomState.generatorContext().cache.provideAtChunk(chunkPos.x, chunkPos.z).getChunkReader(chunkPos.x, chunkPos.z);
+			if((Object) randomState instanceof UTFRandomState utfRandomState) {
+				Tile.Chunk reader = utfRandomState.generatorContext().cache.provideAtChunk(chunkPos.x, chunkPos.z).getChunkReader(chunkPos.x, chunkPos.z);
 				if (reader != null) {
 					biomeVariance = new BiomeVariance(reader, this.biomeFade);
 				}

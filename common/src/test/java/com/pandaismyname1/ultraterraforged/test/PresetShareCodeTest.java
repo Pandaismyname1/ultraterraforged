@@ -67,7 +67,7 @@ public class PresetShareCodeTest {
 	@Test
 	void invalidCodesAreRejected() {
 		String code = PresetShareCode.encode(BuiltinPresets.makeDefault());
-		for (String invalid : List.of("", "hello", "RTF1:", "RTF1:!!!!", "RTF2:" + code.substring(5), code.substring(0, code.length() / 2), "RTF1:" + Base64.getUrlEncoder().encodeToString("not deflated".getBytes(StandardCharsets.UTF_8)))) {
+		for (String invalid : List.of("", "hello", "UTF1:", "UTF1:!!!!", "UTF2:" + code.substring(5), code.substring(0, code.length() / 2), "UTF1:" + Base64.getUrlEncoder().encodeToString("not deflated".getBytes(StandardCharsets.UTF_8)))) {
 			assertTrue(PresetShareCode.decode(invalid).result().isEmpty(), "accepted " + invalid);
 		}
 	}

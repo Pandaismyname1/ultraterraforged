@@ -21,8 +21,8 @@ import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import com.pandaismyname1.ultraterraforged.RTFCommon;
-import com.pandaismyname1.ultraterraforged.client.data.RTFTranslationKeys;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
+import com.pandaismyname1.ultraterraforged.client.data.UTFTranslationKeys;
 import com.pandaismyname1.ultraterraforged.client.gui.screen.presetconfig.RenderMode;
 import com.pandaismyname1.ultraterraforged.concurrent.ThreadPools;
 import com.pandaismyname1.ultraterraforged.config.PerformanceConfig;
@@ -47,7 +47,7 @@ public class TerrainPreview extends AbstractWidget {
 	private static final float MIN_ZOOM = 1.0F;
 	private static final float MAX_ZOOM = 400.0F;
 
-	private static final ScheduledExecutorService EXECUTOR = Executors.newSingleThreadScheduledExecutor(ThreadPools.daemonFactory("RTF-Preview"));
+	private static final ScheduledExecutorService EXECUTOR = Executors.newSingleThreadScheduledExecutor(ThreadPools.daemonFactory("UTF-Preview"));
 	private static final AtomicInteger GENERATION = new AtomicInteger();
 	@Nullable
 	private static DynamicTexture texture;
@@ -73,7 +73,7 @@ public class TerrainPreview extends AbstractWidget {
 	}
 
 	public TerrainPreview(PreviewSource state) {
-		super(0, 0, 0, 0, Component.translatable(RTFTranslationKeys.GUI_TERRAIN_TAB_PREVIEW));
+		super(0, 0, 0, 0, Component.translatable(UTFTranslationKeys.GUI_TERRAIN_TAB_PREVIEW));
 		this.state = state;
 	}
 
@@ -116,7 +116,7 @@ public class TerrainPreview extends AbstractWidget {
 			return;
 		}
 		try {
-			int batchCount = PerformanceConfig.read(PerformanceConfig.DEFAULT_FILE_PATH).resultOrPartial(RTFCommon.LOGGER::error).orElseGet(PerformanceConfig::makeDefault).batchCount();
+			int batchCount = PerformanceConfig.read(PerformanceConfig.DEFAULT_FILE_PATH).resultOrPartial(UTFCommon.LOGGER::error).orElseGet(PerformanceConfig::makeDefault).batchCount();
 			GeneratorContext context = GeneratorContext.makeUncached(preset, (int) seed, TILE_SIZE, 0, batchCount);
 
 			// center on the continent the player will spawn on, like the world does
@@ -146,7 +146,7 @@ public class TerrainPreview extends AbstractWidget {
 				}
 			});
 		} catch (Throwable t) {
-			RTFCommon.LOGGER.error("Couldn't render the terrain preview", t);
+			UTFCommon.LOGGER.error("Couldn't render the terrain preview", t);
 			Minecraft.getInstance().execute(() -> this.loading = false);
 		}
 	}
@@ -154,7 +154,7 @@ public class TerrainPreview extends AbstractWidget {
 	private static void upload(int[] pixels) {
 		if (texture == null) {
 			texture = new DynamicTexture(new NativeImage(RESOLUTION, RESOLUTION, false));
-			textureId = Minecraft.getInstance().getTextureManager().register(RTFCommon.MOD_ID + "-terrain-preview", texture);
+			textureId = Minecraft.getInstance().getTextureManager().register(UTFCommon.MOD_ID + "-terrain-preview", texture);
 		}
 		NativeImage image = texture.getPixels();
 		for (int z = 0; z < RESOLUTION; z++) {
@@ -181,13 +181,13 @@ public class TerrainPreview extends AbstractWidget {
 
 		Font font = Minecraft.getInstance().font;
 		if (this.loading) {
-			graphics.drawString(font, Component.translatable(RTFTranslationKeys.GUI_TERRAIN_TAB_PREVIEW_LOADING), x + 4, y + 4, 0xFFFFFF);
+			graphics.drawString(font, Component.translatable(UTFTranslationKeys.GUI_TERRAIN_TAB_PREVIEW_LOADING), x + 4, y + 4, 0xFFFFFF);
 		}
 		if (this.rendered != null && this.isMouseOver(mouseX, mouseY)) {
 			this.renderReadout(graphics, font, mouseX, mouseY);
 		} else {
 			// only where it fits, the editor's preview can be small
-			Component hint = Component.translatable(RTFTranslationKeys.GUI_TERRAIN_TAB_PREVIEW_HINT).withStyle(ChatFormatting.GRAY);
+			Component hint = Component.translatable(UTFTranslationKeys.GUI_TERRAIN_TAB_PREVIEW_HINT).withStyle(ChatFormatting.GRAY);
 			if (font.width(hint) <= this.width - 8) {
 				graphics.drawString(font, hint, x + 4, y + this.height - 12, 0xFFFFFF);
 			}

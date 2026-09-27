@@ -14,7 +14,7 @@ import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.SurfaceRules.Context;
 import net.minecraft.world.level.levelgen.SurfaceRules.SurfaceRule;
-import com.pandaismyname1.ultraterraforged.world.worldgen.surface.rule.RTFSurfaceRules;
+import com.pandaismyname1.ultraterraforged.world.worldgen.surface.rule.UTFSurfaceRules;
 import terrablender.api.SurfaceRuleManager;
 import terrablender.api.SurfaceRuleManager.RuleCategory;
 import terrablender.worldgen.surface.NamespacedSurfaceRuleSource;
@@ -22,7 +22,7 @@ import terrablender.worldgen.surface.NamespacedSurfaceRuleSource;
 public class TBSurfaceRules {
 
 	public static void bootstrap() {
-		RTFSurfaceRules.register("terrablender", TBRule.CODEC);
+		UTFSurfaceRules.register("terrablender", TBRule.CODEC);
 	}
 	
 	public static TBRule rule(String category, String modId) {

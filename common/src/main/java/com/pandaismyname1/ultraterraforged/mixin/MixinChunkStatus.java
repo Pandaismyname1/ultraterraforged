@@ -24,7 +24,7 @@ import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
-import com.pandaismyname1.ultraterraforged.world.worldgen.RTFRandomState;
+import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
 import com.pandaismyname1.ultraterraforged.world.worldgen.WorldGenFlags;
 import com.pandaismyname1.ultraterraforged.world.worldgen.rivermap.FrozenFalls;
 
@@ -40,10 +40,10 @@ public class MixinChunkStatus {
 	)
 	private static void method_39464$HEAD(ChunkStatus status, Executor executor, ServerLevel level, ChunkGenerator generator, StructureTemplateManager templateManager, ThreadedLevelLightEngine lightEngine, Function<ChunkAccess, CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>>> chunkLookup, List<ChunkAccess> regionChunks, ChunkAccess centerChunk, CallbackInfoReturnable<CompletableFuture<ChunkAccess>> callback) {
 		RandomState randomState = level.getChunkSource().randomState();
-		if((Object) randomState instanceof RTFRandomState rtfRandomState) {
+		if((Object) randomState instanceof UTFRandomState utfRandomState) {
 			ChunkPos chunkPos = centerChunk.getPos();
 			@Nullable
-			GeneratorContext context = rtfRandomState.generatorContext();
+			GeneratorContext context = utfRandomState.generatorContext();
 			
 			if(context != null) {
 				context.cache.queueAtChunk(chunkPos.x, chunkPos.z);
@@ -60,9 +60,9 @@ public class MixinChunkStatus {
 	)
 	private static void method_39464$TAIL(ChunkStatus status, Executor executor, ServerLevel level, ChunkGenerator generator, StructureTemplateManager templateManager, ThreadedLevelLightEngine lightEngine, Function<ChunkAccess, CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>>> chunkLookup, List<ChunkAccess> regionChunks, ChunkAccess centerChunk, CallbackInfoReturnable<CompletableFuture<ChunkAccess>> callback) {
 		RandomState randomState = level.getChunkSource().randomState();
-		if((Object) randomState instanceof RTFRandomState rtfRandomState) {
+		if((Object) randomState instanceof UTFRandomState utfRandomState) {
 			@Nullable
-			GeneratorContext context = rtfRandomState.generatorContext();
+			GeneratorContext context = utfRandomState.generatorContext();
 			if(context != null) {
 				WorldGenFlags.setFastCellLookups(true);
 			}
@@ -77,10 +77,10 @@ public class MixinChunkStatus {
 	)
 	private static void method_51375(ChunkStatus status, ServerLevel level, ChunkGenerator generator, List<ChunkAccess> chunks, ChunkAccess centerChunk, CallbackInfo callback) {
 		RandomState randomState = level.getChunkSource().randomState();
-		if((Object) randomState instanceof RTFRandomState rtfRandomState) {
+		if((Object) randomState instanceof UTFRandomState utfRandomState) {
 			ChunkPos chunkPos = centerChunk.getPos();
 			@Nullable
-			GeneratorContext context = rtfRandomState.generatorContext();
+			GeneratorContext context = utfRandomState.generatorContext();
 			
 			if(context != null) {
 				// after freezing, so falls on frozen rivers freeze too

@@ -11,7 +11,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.Structure.GenerationContext;
 import net.minecraft.world.level.levelgen.structure.Structure.GenerationStub;
-import com.pandaismyname1.ultraterraforged.registries.RTFRegistries;
+import com.pandaismyname1.ultraterraforged.registries.UTFRegistries;
 import com.pandaismyname1.ultraterraforged.world.worldgen.structure.rule.StructureRule;
 
 @Mixin(Structure.class)
@@ -24,7 +24,7 @@ public class MixinStructure {
 	)
     private static void isValidBiome(GenerationStub generationStub, GenerationContext generationContext, CallbackInfoReturnable<Boolean> callback) {
 		RegistryAccess registry = generationContext.registryAccess();
-		RegistryLookup<StructureRule> structureRules = registry.lookupOrThrow(RTFRegistries.STRUCTURE_RULE);
+		RegistryLookup<StructureRule> structureRules = registry.lookupOrThrow(UTFRegistries.STRUCTURE_RULE);
 		
 		for(StructureRule structureRule : structureRules.listElements().map(Holder::value).toList()) {
 			if(!structureRule.test(generationContext.randomState(), generationStub.position())) {

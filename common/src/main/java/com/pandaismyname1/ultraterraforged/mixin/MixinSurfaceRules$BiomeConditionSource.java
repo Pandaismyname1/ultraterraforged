@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.SurfaceRules;
-import com.pandaismyname1.ultraterraforged.world.worldgen.surface.RTFSurfaceContext;
+import com.pandaismyname1.ultraterraforged.world.worldgen.surface.UTFSurfaceContext;
 
 @Mixin(targets = "net.minecraft.world.level.levelgen.SurfaceRules$BiomeConditionSource")
 public class MixinSurfaceRules$BiomeConditionSource {
@@ -24,7 +24,7 @@ public class MixinSurfaceRules$BiomeConditionSource {
     @Inject(at = @At("HEAD"), method = "apply", cancellable = true)
     public void apply(SurfaceRules.Context ctx, CallbackInfoReturnable<SurfaceRules.Condition> callback) {
     	Set<ResourceKey<Biome>> surroundingBiomes;
-    	if((Object) ctx instanceof RTFSurfaceContext rtfSurfaceContext && (surroundingBiomes = rtfSurfaceContext.getSurroundingBiomes()) != null) {
+    	if((Object) ctx instanceof UTFSurfaceContext utfSurfaceContext && (surroundingBiomes = utfSurfaceContext.getSurroundingBiomes()) != null) {
     		boolean result = surroundingBiomes.stream().filter(this.biomeNameTest).findAny().isPresent();
     		if(!result || surroundingBiomes.size() == 1) {
     			callback.setReturnValue(() -> result);

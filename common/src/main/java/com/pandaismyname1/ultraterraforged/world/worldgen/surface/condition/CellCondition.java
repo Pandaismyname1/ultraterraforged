@@ -6,7 +6,7 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.SurfaceRules.LazyXZCondition;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
-import com.pandaismyname1.ultraterraforged.world.worldgen.RTFRandomState;
+import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.Cell;
 import com.pandaismyname1.ultraterraforged.world.worldgen.tile.Tile;
 import com.pandaismyname1.ultraterraforged.world.worldgen.util.PosUtil;
@@ -23,7 +23,7 @@ abstract class CellCondition extends LazyXZCondition {
 	public CellCondition(SurfaceRules.Context context) {
 		super(context);
 		//TODO store this in SurfaceRules$Context instead so we can cache the chunk lookup
-		if((Object) context.randomState instanceof RTFRandomState randomState && (this.generatorContext = randomState.generatorContext()) != null) {
+		if((Object) context.randomState instanceof UTFRandomState randomState && (this.generatorContext = randomState.generatorContext()) != null) {
 			ChunkPos chunkPos = context.chunk.getPos();
 			this.chunk = this.generatorContext.cache.provideChunk(chunkPos.x, chunkPos.z);
 		}

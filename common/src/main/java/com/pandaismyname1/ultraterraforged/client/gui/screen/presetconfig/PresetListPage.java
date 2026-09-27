@@ -30,8 +30,8 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.toasts.SystemToast.SystemToastIds;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.GsonHelper;
-import com.pandaismyname1.ultraterraforged.RTFCommon;
-import com.pandaismyname1.ultraterraforged.client.data.RTFTranslationKeys;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
+import com.pandaismyname1.ultraterraforged.client.data.UTFTranslationKeys;
 import com.pandaismyname1.ultraterraforged.client.gui.Toasts;
 import com.pandaismyname1.ultraterraforged.client.gui.screen.page.BisectedPage;
 import com.pandaismyname1.ultraterraforged.client.gui.screen.page.LinkedPageScreen.Page;
@@ -45,8 +45,8 @@ import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 import com.pandaismyname1.ultraterraforged.platform.ConfigUtil;
 
 class PresetListPage extends BisectedPage<PresetConfigScreen, PresetEntry, AbstractWidget> {
-	private static final Path PRESET_PATH = ConfigUtil.rtf("presets");
-	private static final Path EXPORT_PATH = ConfigUtil.rtf("exports");
+	private static final Path PRESET_PATH = ConfigUtil.utf("presets");
+	private static final Path EXPORT_PATH = ConfigUtil.utf("exports");
 	private static final Path LEGACY_PRESET_PATH = ConfigUtil.legacy("presets");
 	
 	private static final Predicate<String> IS_VALID = Pattern.compile("^[A-Za-z0-9\\-_ ]+$").asPredicate();
@@ -72,7 +72,7 @@ class PresetListPage extends BisectedPage<PresetConfigScreen, PresetEntry, Abstr
 
 	@Override
 	public Component title() {
-		return Component.translatable(RTFTranslationKeys.GUI_SELECT_PRESET_TITLE);
+		return Component.translatable(UTFTranslationKeys.GUI_SELECT_PRESET_TITLE);
 	}
 
 	@Override
@@ -85,14 +85,14 @@ class PresetListPage extends BisectedPage<PresetConfigScreen, PresetEntry, Abstr
 			final int red = 0xFFFF3F30;
 			this.createPreset.active = isValid;
 			this.input.setTextColor(isValid ? white : red);
-		}, Component.translatable(RTFTranslationKeys.GUI_INPUT_PROMPT).withStyle(ChatFormatting.DARK_GRAY));
-		this.createPreset = PresetWidgets.createThrowingButton(RTFTranslationKeys.GUI_BUTTON_CREATE, () -> {
+		}, Component.translatable(UTFTranslationKeys.GUI_INPUT_PROMPT).withStyle(ChatFormatting.DARK_GRAY));
+		this.createPreset = PresetWidgets.createThrowingButton(UTFTranslationKeys.GUI_BUTTON_CREATE, () -> {
 			new PresetEntry(Component.literal(this.input.getValue()), BuiltinPresets.makeDefault(), false, this).save();
 			this.rebuildPresets();
 			this.input.setValue(StringUtil.EMPTY_STRING);
 		});
 		this.createPreset.active = this.isValidPresetName(this.input.getValue());
-		this.copyPreset = PresetWidgets.createThrowingButton(RTFTranslationKeys.GUI_BUTTON_COPY, () -> {
+		this.copyPreset = PresetWidgets.createThrowingButton(UTFTranslationKeys.GUI_BUTTON_COPY, () -> {
 			PresetEntry preset = this.left.getSelected().getWidget();
 			String name = preset.getName().getString();
 			int counter = 1;
@@ -103,26 +103,26 @@ class PresetListPage extends BisectedPage<PresetConfigScreen, PresetEntry, Abstr
 			new PresetEntry(Component.literal(uniqueName), preset.getPreset().copy(), false, this).save();
 			this.rebuildPresets();
 		});
-		this.deletePreset = PresetWidgets.createThrowingButton(RTFTranslationKeys.GUI_BUTTON_DELETE, () -> {
+		this.deletePreset = PresetWidgets.createThrowingButton(UTFTranslationKeys.GUI_BUTTON_DELETE, () -> {
 			PresetEntry preset = this.left.getSelected().getWidget();
 			Files.delete(preset.getPath());
 			this.rebuildPresets();
 		});
-		this.openPresetFolder = PresetWidgets.createThrowingButton(RTFTranslationKeys.GUI_BUTTON_OPEN_PRESET_FOLDER, () -> {
+		this.openPresetFolder = PresetWidgets.createThrowingButton(UTFTranslationKeys.GUI_BUTTON_OPEN_PRESET_FOLDER, () -> {
 			Util.getPlatform().openUri(PRESET_PATH.toUri());
 			this.rebuildPresets();
 		});
-		this.openExportFolder = PresetWidgets.createThrowingButton(RTFTranslationKeys.GUI_BUTTON_OPEN_EXPORT_FOLDER, () -> {
+		this.openExportFolder = PresetWidgets.createThrowingButton(UTFTranslationKeys.GUI_BUTTON_OPEN_EXPORT_FOLDER, () -> {
 			Util.getPlatform().openUri(EXPORT_PATH.toUri());
 			this.rebuildPresets();
 		});
-		this.exportAsDatapack = PresetWidgets.createThrowingButton(RTFTranslationKeys.GUI_BUTTON_EXPORT_AS_DATAPACK, () -> {
+		this.exportAsDatapack = PresetWidgets.createThrowingButton(UTFTranslationKeys.GUI_BUTTON_EXPORT_AS_DATAPACK, () -> {
 			PresetEntry preset = this.left.getSelected().getWidget();
 			Path path = EXPORT_PATH.resolve(preset.getName().getString() + ".zip");
 			this.screen.exportAsDatapack(path, preset);
 			this.rebuildPresets();
 			
-			Toasts.notify(RTFTranslationKeys.GUI_BUTTON_EXPORT_SUCCESS, Component.literal(path.toString()), SystemToastIds.WORLD_BACKUP);
+			Toasts.notify(UTFTranslationKeys.GUI_BUTTON_EXPORT_SUCCESS, Component.literal(path.toString()), SystemToastIds.WORLD_BACKUP);
 		});
 
 		this.right.addWidget(this.input);

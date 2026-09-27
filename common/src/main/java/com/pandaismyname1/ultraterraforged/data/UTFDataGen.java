@@ -12,22 +12,22 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.metadata.PackMetadataGenerator;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import com.pandaismyname1.ultraterraforged.client.data.RTFLanguageProvider;
-import com.pandaismyname1.ultraterraforged.client.data.RTFTranslationKeys;
+import com.pandaismyname1.ultraterraforged.client.data.UTFLanguageProvider;
+import com.pandaismyname1.ultraterraforged.client.data.UTFTranslationKeys;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 import com.pandaismyname1.ultraterraforged.data.preset.tags.PresetBiomeTagsProvider;
 import com.pandaismyname1.ultraterraforged.data.preset.tags.PresetBlockTagsProvider;
 import com.pandaismyname1.ultraterraforged.data.preset.tags.PresetSurfaceLayerProvider;
 import com.pandaismyname1.ultraterraforged.platform.DataGenUtil;
 
-public class RTFDataGen {
+public class UTFDataGen {
 	public static final String DATAPACK_PATH = "data/ultraterraforged/datapacks";
 	
 	public static void generateResourcePacks(ResourcePackFactory resourcePackFactory) {
 		DataGenerator.PackGenerator pack = resourcePackFactory.createPack();
 
-		pack.addProvider(RTFLanguageProvider.EnglishUS::new);
-		pack.addProvider((PackOutput output) -> PackMetadataGenerator.forFeaturePack(output, Component.translatable(RTFTranslationKeys.METADATA_DESCRIPTION)));
+		pack.addProvider(UTFLanguageProvider.EnglishUS::new);
+		pack.addProvider((PackOutput output) -> PackMetadataGenerator.forFeaturePack(output, Component.translatable(UTFTranslationKeys.METADATA_DESCRIPTION)));
 	}
 	
 	@Deprecated
@@ -50,7 +50,7 @@ public class RTFDataGen {
 			return new PresetBiomeTagsProvider(preset, output, CompletableFuture.completedFuture(registryAccess));
 		});
 		packGenerator.addProvider((output) -> {
-			return PackMetadataGenerator.forFeaturePack(output, Component.translatable(RTFTranslationKeys.PRESET_METADATA_DESCRIPTION));
+			return PackMetadataGenerator.forFeaturePack(output, Component.translatable(UTFTranslationKeys.PRESET_METADATA_DESCRIPTION));
 		});
 		return dataGenerator;
 	}

@@ -6,7 +6,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ThreadPools {
-	public static final ExecutorService WORLD_GEN = Executors.newFixedThreadPool(availableProcessors(), daemonFactory("RTF-WorldGen"));
+	public static final ExecutorService WORLD_GEN = Executors.newFixedThreadPool(availableProcessors(), daemonFactory("UTF-WorldGen"));
 	
 	public static int availableProcessors() {
 		return Math.max(2, Runtime.getRuntime().availableProcessors());

@@ -11,13 +11,13 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.util.PosUtil;
 
 /**
  * Renders relief maps of typical places into common/build/terrain-views, to look at terrain changes. Only runs when
- * asked: ./gradlew :common:test --tests '*TerrainViewTest*' -Drtf.render=true
+ * asked: ./gradlew :common:test --tests '*TerrainViewTest*' -Dutf.render=true
  */
 public class TerrainViewTest {
 
 	@BeforeAll
 	static void onlyWhenAsked() {
-		assumeTrue(Boolean.getBoolean("rtf.render"), "set -Drtf.render=true to render terrain views");
+		assumeTrue(Boolean.getBoolean("utf.render"), "set -Dutf.render=true to render terrain views");
 		TestBootstrap.init();
 	}
 

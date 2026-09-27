@@ -4,7 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.components.toasts.SystemToast.SystemToastIds;
 import net.minecraft.network.chat.Component;
-import com.pandaismyname1.ultraterraforged.client.data.RTFTranslationKeys;
+import com.pandaismyname1.ultraterraforged.client.data.UTFTranslationKeys;
 
 public final class Toasts {
 
@@ -23,7 +23,7 @@ public final class Toasts {
 			if(message != null) {
 				messageComponent = Component.literal(message);
 			} else {
-				messageComponent = Component.translatable(RTFTranslationKeys.NO_ERROR_MESSAGE);
+				messageComponent = Component.translatable(UTFTranslationKeys.NO_ERROR_MESSAGE);
 			}
 			
 			notify(errorMessage, messageComponent, SystemToastIds.PACK_LOAD_FAILURE);

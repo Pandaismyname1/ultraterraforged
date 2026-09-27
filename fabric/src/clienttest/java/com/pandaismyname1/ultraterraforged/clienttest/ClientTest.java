@@ -40,7 +40,7 @@ import com.pandaismyname1.ultraterraforged.preset.option.PresetOptions;
  */
 public class ClientTest implements ClientModInitializer {
 	private static final int TIMEOUT_TICKS = 20 * 60 * 5;
-	// with -Dultraterraforged.clienttest.tour=true: a default world, visiting each of these, as /rtf locate finds them
+	// with -Dultraterraforged.clienttest.tour=true: a default world, visiting each of these, as /utf locate finds them
 	private static final boolean TOUR = Boolean.getBoolean("ultraterraforged.clienttest.tour");
 	private static final String[] TOUR_STOPS = System.getProperty("ultraterraforged.clienttest.stops", "river,salt_flat,alluvial_fan,glacial_valley,cirque,drumlins,moraine,barrier_island,karst,sinkhole,delta,wetland,lake,peninsula,coastal_island,sand_bar,skerry,volcanic_island,river_island,submarine_canyon,seamount,guyot,blue_hole,coral_reef,ocean_trench,ocean_ridge,sand_waves").split(",");
 	private static final String SAVED_PRESET = "ClientTest Preset";
@@ -53,7 +53,7 @@ public class ClientTest implements ClientModInitializer {
 	private String worldFolder;
 	@org.jetbrains.annotations.Nullable
 	volatile BlockPos volcano;
-	// where the last /rtf locate led
+	// where the last /utf locate led
 	@org.jetbrains.annotations.Nullable
 	volatile BlockPos located;
 	volatile boolean locateDone;
@@ -158,9 +158,9 @@ public class ClientTest implements ClientModInitializer {
 			this.log("world datapacks: " + this.list(server.getWorldPath(LevelResource.DATAPACK_DIR)));
 			this.log("enabled packs: " + server.getPackRepository().getSelectedIds());
 			server.execute(() -> {
-				server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSource(new LoggingSource(this)), "rtf locate plains");
-				server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSource(new LoggingSource(this)), "rtf locate mountain_chain");
-				server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSource(new LoggingSource(this)), "rtf locate volcano_pipe");
+				server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSource(new LoggingSource(this)), "utf locate plains");
+				server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSource(new LoggingSource(this)), "utf locate mountain_chain");
+				server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSource(new LoggingSource(this)), "utf locate volcano_pipe");
 			});
 		});
 		this.step("rock layers", () -> true, 100, () -> {
@@ -237,7 +237,7 @@ public class ClientTest implements ClientModInitializer {
 				this.locateDone = false;
 				IntegratedServer server = mc.getSingleplayerServer();
 				server.execute(() -> {
-					this.command(server, "rtf locate " + stop);
+					this.command(server, "utf locate " + stop);
 					this.locateDone = true;
 				});
 			});
@@ -307,7 +307,7 @@ public class ClientTest implements ClientModInitializer {
 		this.log("surface at " + name + " " + center + ": " + top);
 		this.log("under water at " + name + ": " + floor);
 		// the ground as generated against the ground the heightmap was made with, for a few columns
-		if ((Object) level.getChunkSource().randomState() instanceof com.pandaismyname1.ultraterraforged.world.worldgen.RTFRandomState state && state.generatorContext() != null) {
+		if ((Object) level.getChunkSource().randomState() instanceof com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState state && state.generatorContext() != null) {
 			StringBuilder line = new StringBuilder("floor against heightmap at " + name + ":");
 			for (int i = 0; i < 8; i++) {
 				int x = center.getX() + i * 7 - 24;

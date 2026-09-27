@@ -94,8 +94,8 @@ rather than in flat fields.
 
 ### Finding things
 
-`/rtf locate <terrain>` finds the nearest landform, coast or sea-floor feature and puts you on its surface, e.g.
-`/rtf locate cirque`, `/rtf locate blue_hole`.
+`/utf locate <terrain>` finds the nearest landform, coast or sea-floor feature and puts you on its surface, e.g.
+`/utf locate cirque`, `/utf locate blue_hole`.
 
 ### Performance
 
@@ -107,7 +107,7 @@ rather than in flat fields.
 ### Fixes over ReTerraForged
 
 Rivers generated before the terrain (no rivers at all), cave and structure settings missing, terrain presets losing
-their scales, `/rtf locate` sending players to random places, bare rock over every sea floor, crashes when generating
+their scales, `/rtf locate` (now `/utf locate`) sending players to random places, bare rock over every sea floor, crashes when generating
 chunks and when placing some trees, and a startup crash on Forge next to mods that bundle MixinExtras (ModernFix,
 Noisium, AllTheLeaks and many more).
 
@@ -180,7 +180,7 @@ dependencies {
 ## Building
 
 Gradle runs on Java 21 (the mod targets Java 17): `./gradlew build`. The Fabric and Forge dev games include the
-recommended performance mods; `-Prtf.perfMods=false` leaves them out. `./gradlew :common:test` runs the tests, which
+recommended performance mods; `-Putf.perfMods=false` leaves them out. `./gradlew :common:test` runs the tests, which
 include checks that the built-in presets still generate the same terrain. Notes for porting to newer Minecraft
 versions are in [docs/porting](docs/porting).
 

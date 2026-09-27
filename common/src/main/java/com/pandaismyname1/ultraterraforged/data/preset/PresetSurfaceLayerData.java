@@ -12,19 +12,19 @@ import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.SurfaceRules;
-import com.pandaismyname1.ultraterraforged.RTFCommon;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
 import com.pandaismyname1.ultraterraforged.compat.terrablender.TBCompat;
 import com.pandaismyname1.ultraterraforged.compat.terrablender.TBSurfaceRules;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.SurfaceSettings;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.WorldSettings;
-import com.pandaismyname1.ultraterraforged.registries.RTFRegistries;
-import com.pandaismyname1.ultraterraforged.tags.RTFBiomeTags;
-import com.pandaismyname1.ultraterraforged.tags.RTFSurfaceLayerTags;
+import com.pandaismyname1.ultraterraforged.registries.UTFRegistries;
+import com.pandaismyname1.ultraterraforged.tags.UTFBiomeTags;
+import com.pandaismyname1.ultraterraforged.tags.UTFSurfaceLayerTags;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noise;
-import com.pandaismyname1.ultraterraforged.world.worldgen.surface.condition.RTFSurfaceConditions;
+import com.pandaismyname1.ultraterraforged.world.worldgen.surface.condition.UTFSurfaceConditions;
 import com.pandaismyname1.ultraterraforged.world.worldgen.surface.rule.LayeredSurfaceRule;
-import com.pandaismyname1.ultraterraforged.world.worldgen.surface.rule.RTFSurfaceRules;
+import com.pandaismyname1.ultraterraforged.world.worldgen.surface.rule.UTFSurfaceRules;
 import com.pandaismyname1.ultraterraforged.world.worldgen.util.Scaling;
 import terrablender.core.TerraBlender;
 
@@ -62,9 +62,9 @@ public class PresetSurfaceLayerData {
 	    	SurfaceRules.ifTrue(
 	    		erosionBiomeCheck(),
 	    		SurfaceRules.ifTrue(
-		    		RTFSurfaceConditions.steepness(settings.dirtSteepness, noise.getOrThrow(PresetSurfaceNoise.STEEPNESS_VARIANCE)),
+		    		UTFSurfaceConditions.steepness(settings.dirtSteepness, noise.getOrThrow(PresetSurfaceNoise.STEEPNESS_VARIANCE)),
 		    		SurfaceRules.ifTrue(
-		    			RTFSurfaceConditions.height(noise.getOrThrow(PresetSurfaceNoise.ERODED_DIRT), noise.getOrThrow(PresetSurfaceNoise.HEIGHT_VARIANCE)),
+		    			UTFSurfaceConditions.height(noise.getOrThrow(PresetSurfaceNoise.ERODED_DIRT), noise.getOrThrow(PresetSurfaceNoise.HEIGHT_VARIANCE)),
 		    			COARSE_DIRT
 		    		)
 		    	)
@@ -82,9 +82,9 @@ public class PresetSurfaceLayerData {
 	}
 	
 //	private static LayeredSurfaceRule.Layer makeErosion(SurfaceSettings.Erosion erosion, HolderGetter<Noise> noise) {
-//		SurfaceRules.ConditionSource erodedRock = RTFSurfaceConditions.steepness(erosion.rockSteepness, noise.getOrThrow(PresetSurfaceNoise.STEEPNESS_VARIANCE));
-//		SurfaceRules.ConditionSource erodedRockVariance = RTFSurfaceConditions.height(noise.getOrThrow(PresetSurfaceNoise.ERODED_ROCK), noise.getOrThrow(PresetSurfaceNoise.HEIGHT_VARIANCE));
-//		SurfaceRules.RuleSource erodedMaterial = RTFSurfaceRules.layered(RTFSurfaceLayerTags.EROSION_MATERIAL);
+//		SurfaceRules.ConditionSource erodedRock = UTFSurfaceConditions.steepness(erosion.rockSteepness, noise.getOrThrow(PresetSurfaceNoise.STEEPNESS_VARIANCE));
+//		SurfaceRules.ConditionSource erodedRockVariance = UTFSurfaceConditions.height(noise.getOrThrow(PresetSurfaceNoise.ERODED_ROCK), noise.getOrThrow(PresetSurfaceNoise.HEIGHT_VARIANCE));
+//		SurfaceRules.RuleSource erodedMaterial = UTFSurfaceRules.layered(UTFSurfaceLayerTags.EROSION_MATERIAL);
 //		SurfaceRules.RuleSource erode = SurfaceRules.sequence(
 //			SurfaceRules.ifTrue(
 //				erodedRock, 
@@ -118,28 +118,28 @@ public class PresetSurfaceLayerData {
     	float min = scaling.ground(10);
     	float level = scaling.ground(40);
     	
-    	SurfaceRules.ConditionSource aboveLevel = RTFSurfaceConditions.height(level, variance);
+    	SurfaceRules.ConditionSource aboveLevel = UTFSurfaceConditions.height(level, variance);
 		return LayeredSurfaceRule.layer(
 	    	SurfaceRules.ifTrue(
 	    		SurfaceRules.isBiome(Biomes.DESERT),
 	    		SurfaceRules.ifTrue(
-		    		RTFSurfaceConditions.height(min), 
+		    		UTFSurfaceConditions.height(min), 
 		    		SurfaceRules.sequence(
 		    			SurfaceRules.ifTrue(
-		    				RTFSurfaceConditions.steepness(0.15F), 
+		    				UTFSurfaceConditions.steepness(0.15F), 
 		    				SurfaceRules.ifTrue(
 		    					aboveLevel, 
 		    					SurfaceRules.sequence(
-		    						SurfaceRules.ifTrue(RTFSurfaceConditions.steepness(0.975F), TERRACOTTA),
-		    						SurfaceRules.ifTrue(RTFSurfaceConditions.steepness(0.85F), BROWN_TERRACOTTA),
-		    						SurfaceRules.ifTrue(RTFSurfaceConditions.steepness(0.75F), ORANGE_TERRACOTTA),
-		    						SurfaceRules.ifTrue(RTFSurfaceConditions.steepness(0.65F), TERRACOTTA), 
+		    						SurfaceRules.ifTrue(UTFSurfaceConditions.steepness(0.975F), TERRACOTTA),
+		    						SurfaceRules.ifTrue(UTFSurfaceConditions.steepness(0.85F), BROWN_TERRACOTTA),
+		    						SurfaceRules.ifTrue(UTFSurfaceConditions.steepness(0.75F), ORANGE_TERRACOTTA),
+		    						SurfaceRules.ifTrue(UTFSurfaceConditions.steepness(0.65F), TERRACOTTA), 
 		    						SMOOTH_SANDSTONE
 		    					)
 		    				)
 		    			),
 		        		SurfaceRules.ifTrue(
-		        			RTFSurfaceConditions.steepness(0.3F), 
+		        			UTFSurfaceConditions.steepness(0.3F), 
 		        			SMOOTH_SANDSTONE
 		            	)
 		    		)
@@ -152,7 +152,7 @@ public class PresetSurfaceLayerData {
 		return LayeredSurfaceRule.layer(
 			SurfaceRules.ifTrue(
 				SurfaceRules.isBiome(Biomes.FOREST, Biomes.DARK_FOREST),
-				RTFSurfaceRules.noise(
+				UTFSurfaceRules.noise(
 					noise.getOrThrow(PresetSurfaceNoise.FOREST), 
 					List.of(
 						Pair.of(0.65F, PODZOL),
@@ -167,8 +167,8 @@ public class PresetSurfaceLayerData {
     private static LayeredSurfaceRule.Layer makeRiverBank(HolderGetter<Noise> noise) {
 		return LayeredSurfaceRule.layer(
 			SurfaceRules.ifTrue(
-				RTFSurfaceConditions.riverBank(0.002F),
-				RTFSurfaceRules.noise(
+				UTFSurfaceConditions.riverBank(0.002F),
+				UTFSurfaceRules.noise(
 					noise.getOrThrow(PresetSurfaceNoise.RIVER_BANK), 
 					List.of(
 						Pair.of(0.35F, GRAVEL),
@@ -180,7 +180,7 @@ public class PresetSurfaceLayerData {
     }
 	
     private static SurfaceRules.ConditionSource erosionBiomeCheck() {
-    	return SurfaceRules.not(RTFSurfaceConditions.biomeTag(RTFBiomeTags.EROSION_BLACKLIST));
+    	return SurfaceRules.not(UTFSurfaceConditions.biomeTag(UTFBiomeTags.EROSION_BLACKLIST));
     }
     
     private static SurfaceRules.RuleSource makeStateRule(Block block) {
@@ -188,6 +188,6 @@ public class PresetSurfaceLayerData {
     }
 
     public static ResourceKey<LayeredSurfaceRule.Layer> createKey(String name) {
-        return ResourceKey.create(RTFRegistries.SURFACE_LAYERS, RTFCommon.location(name));
+        return ResourceKey.create(UTFRegistries.SURFACE_LAYERS, UTFCommon.location(name));
 	}
 }

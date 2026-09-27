@@ -9,14 +9,14 @@ import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 
 /**
  * How much the landforms slow down terrain generation, over areas at full resolution like world generation uses.
- * Only runs when asked: -Drtf.render=true
+ * Only runs when asked: -Dutf.render=true
  */
 public class LandformPerformanceTest {
 	private static final int AREAS = 24;
 
 	@Test
 	void landformCost() {
-		assumeTrue(Boolean.getBoolean("rtf.render"));
+		assumeTrue(Boolean.getBoolean("utf.render"));
 		TestBootstrap.init();
 		for (String name : new String[] { "default", "badlands", "frozen_north", "tropics" }) {
 			Preset with = BuiltinPresetRenderTest.presets().get(name).get();

@@ -16,8 +16,8 @@ import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
-import com.pandaismyname1.ultraterraforged.RTFCommon;
-import com.pandaismyname1.ultraterraforged.server.RTFMinecraftServer;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
+import com.pandaismyname1.ultraterraforged.server.UTFMinecraftServer;
 import com.pandaismyname1.ultraterraforged.world.worldgen.feature.template.TemplateFeature.Config;
 import com.pandaismyname1.ultraterraforged.world.worldgen.feature.template.decorator.DecoratorConfig;
 import com.pandaismyname1.ultraterraforged.world.worldgen.feature.template.decorator.TemplateDecorator;
@@ -51,15 +51,15 @@ public class TemplateFeature extends Feature<Config<?>> {
 
     public static <T extends TemplateContext> boolean paste(WorldGenLevel world, RandomSource rand, BlockPos pos, Mirror mirror, Rotation rotation, Config<T> config, PasteType pasteType, boolean modified) {
         if (config.templates().isEmpty()) {
-            RTFCommon.LOGGER.warn("Empty template list for config");
+            UTFCommon.LOGGER.warn("Empty template list for config");
             return false;
         }
         
-        if(world.getServer() instanceof RTFMinecraftServer rtfMinecraftServer) {
+        if(world.getServer() instanceof UTFMinecraftServer utfMinecraftServer) {
 	        DecoratorConfig<T> decoratorConfig = config.decorator();
 	        
 	        ResourceLocation templateName = nextTemplate(config.templates, rand);
-	        FeatureTemplate template = rtfMinecraftServer.getFeatureTemplateManager().load(templateName);
+	        FeatureTemplate template = utfMinecraftServer.getFeatureTemplateManager().load(templateName);
 	        
 	        Dimensions dimensions = template.getDimensions(mirror, rotation);
 	        TemplatePlacement<T> placement = config.placement();

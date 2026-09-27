@@ -18,7 +18,7 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.terrain.TerrainType;
 
 /**
  * Peninsulas, headlands and bays, coastal islands and sandbars, skerries, volcanic island arcs and lake and river
- * islands: each is found as /rtf locate would find it and measured, with it on and off. With -Drtf.render=true the
+ * islands: each is found as /utf locate would find it and measured, with it on and off. With -Dutf.render=true the
  * places are also drawn to build/terrain-views.
  */
 public class CoastsTest {
@@ -43,7 +43,7 @@ public class CoastsTest {
 	}
 
 	private static void render(TerrainViews.View view, String name) throws IOException {
-		if (Boolean.getBoolean("rtf.render")) {
+		if (Boolean.getBoolean("utf.render")) {
 			TerrainViews.write(view, name);
 			TerrainViews.writePerspective(view, name + "_3d");
 		}

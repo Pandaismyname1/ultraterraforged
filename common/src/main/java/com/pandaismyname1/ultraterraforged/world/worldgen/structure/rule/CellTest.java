@@ -12,7 +12,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.levelgen.RandomState;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
-import com.pandaismyname1.ultraterraforged.world.worldgen.RTFRandomState;
+import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.Cell;
 import com.pandaismyname1.ultraterraforged.world.worldgen.heightmap.WorldLookup;
 import com.pandaismyname1.ultraterraforged.world.worldgen.terrain.Terrain;
@@ -30,9 +30,9 @@ record CellTest(float cutoff, Set<Terrain> terrainTypeBlacklist) implements Stru
 	
 	@Override
 	public boolean test(RandomState randomState, BlockPos pos) {
-		if((Object) randomState instanceof RTFRandomState rtfRandomState) {
+		if((Object) randomState instanceof UTFRandomState utfRandomState) {
 			@Nullable
-			GeneratorContext generatorContext = rtfRandomState.generatorContext();
+			GeneratorContext generatorContext = utfRandomState.generatorContext();
 			if(generatorContext != null) {
 				WorldLookup worldLookup = generatorContext.lookup;
 				Cell cell = new Cell();

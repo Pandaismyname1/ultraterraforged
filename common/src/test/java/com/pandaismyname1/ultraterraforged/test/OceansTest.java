@@ -16,7 +16,7 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.terrain.Terrain;
 import com.pandaismyname1.ultraterraforged.world.worldgen.terrain.TerrainType;
 
 /**
- * The sea floor's features: each is found as /rtf locate would find it and measured. With -Drtf.render=true the places
+ * The sea floor's features: each is found as /utf locate would find it and measured. With -Dutf.render=true the places
  * are also drawn to build/terrain-views.
  */
 public class OceansTest {
@@ -41,7 +41,7 @@ public class OceansTest {
 	}
 
 	private static void render(TerrainViews.View view, String name) throws IOException {
-		if (Boolean.getBoolean("rtf.render")) {
+		if (Boolean.getBoolean("utf.render")) {
 			TerrainViews.write(view, name);
 			TerrainViews.writeProfile(view, name + "_profile");
 		}

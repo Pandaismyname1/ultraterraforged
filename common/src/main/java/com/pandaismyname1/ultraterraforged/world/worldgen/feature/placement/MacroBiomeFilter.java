@@ -27,6 +27,6 @@ class MacroBiomeFilter extends CellFilter {
 	
 	@Override
 	public PlacementModifierType<MacroBiomeFilter> type() {
-		return RTFPlacementModifiers.MACRO_BIOME_FILTER;
+		return UTFPlacementModifiers.MACRO_BIOME_FILTER;
 	}
 }

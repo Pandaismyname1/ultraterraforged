@@ -10,7 +10,7 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.terrain.Terrain;
 import com.pandaismyname1.ultraterraforged.world.worldgen.terrain.TerrainType;
 
 /**
- * Where the newer landforms turn up in the built-in presets: run by hand, with -Drtf.survey=true.
+ * Where the newer landforms turn up in the built-in presets: run by hand, with -Dutf.survey=true.
  */
 public class LandformSurveyTest {
 
@@ -21,7 +21,7 @@ public class LandformSurveyTest {
 
 	@Test
 	void seaFloor() {
-		if (!Boolean.getBoolean("rtf.survey.sea")) {
+		if (!Boolean.getBoolean("utf.survey.sea")) {
 			return;
 		}
 		Preset preset = BuiltinPresetRenderTest.presets().get("default").get();
@@ -44,7 +44,7 @@ public class LandformSurveyTest {
 
 	@Test
 	void shorelineEdge() {
-		if (!Boolean.getBoolean("rtf.survey.shore")) {
+		if (!Boolean.getBoolean("utf.survey.shore")) {
 			return;
 		}
 		Preset preset = BuiltinPresetRenderTest.presets().get("default").get();
@@ -72,7 +72,7 @@ public class LandformSurveyTest {
 
 	@Test
 	void gravelBeachCoasts() {
-		if (!Boolean.getBoolean("rtf.survey.gravel")) {
+		if (!Boolean.getBoolean("utf.survey.gravel")) {
 			return;
 		}
 		String[] off = { "none", "headlands", "peninsulas", "coastalIslands", "spits", "all" };
@@ -116,13 +116,13 @@ public class LandformSurveyTest {
 
 	@Test
 	void windingRivers() throws java.io.IOException {
-		if (!Boolean.getBoolean("rtf.survey.rivers")) {
+		if (!Boolean.getBoolean("utf.survey.rivers")) {
 			return;
 		}
 		Preset on = BuiltinPresetRenderTest.presets().get("default").get();
 		Preset off = on.copy();
 		off.rivers().winding = false;
-		float zoom = Float.parseFloat(System.getProperty("rtf.survey.zoom", "8"));
+		float zoom = Float.parseFloat(System.getProperty("utf.survey.zoom", "8"));
 		TerrainViews.View wide = TerrainViews.view(on, 0.0F, 0.0F, 16.0F);
 		int found = 0;
 		for (int x = 8; x < wide.size() - 8 && found < 4; x += 17) {
@@ -141,7 +141,7 @@ public class LandformSurveyTest {
 
 	@Test
 	void saltCracks() {
-		if (!Boolean.getBoolean("rtf.survey.salt")) {
+		if (!Boolean.getBoolean("utf.survey.salt")) {
 			return;
 		}
 		com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noise noise = com.pandaismyname1.ultraterraforged.data.preset.PresetSurfaceNoise.makeSaltFlat();
@@ -159,7 +159,7 @@ public class LandformSurveyTest {
 
 	@Test
 	void desertRelief() {
-		if (!Boolean.getBoolean("rtf.survey.desert")) {
+		if (!Boolean.getBoolean("utf.survey.desert")) {
 			return;
 		}
 		Preset preset = BuiltinPresetRenderTest.presets().get("default").get();
@@ -201,12 +201,12 @@ public class LandformSurveyTest {
 
 	@Test
 	void survey() {
-		if (!Boolean.getBoolean("rtf.survey")) {
+		if (!Boolean.getBoolean("utf.survey")) {
 			return;
 		}
-		String names = System.getProperty("rtf.survey.terrains", "salt_flat,alluvial_fan,glacial_valley,cirque,drumlins,moraine,barrier_island,karst,sinkhole,delta");
+		String names = System.getProperty("utf.survey.terrains", "salt_flat,alluvial_fan,glacial_valley,cirque,drumlins,moraine,barrier_island,karst,sinkhole,delta");
 		Terrain[] terrains = java.util.Arrays.stream(names.split(",")).map(TerrainType::get).toArray(Terrain[]::new);
-		for (String name : System.getProperty("rtf.survey.presets", "default").split(",")) {
+		for (String name : System.getProperty("utf.survey.presets", "default").split(",")) {
 			Preset preset = BuiltinPresetRenderTest.presets().get(name).get();
 			GeneratorContext context = GeneratorContext.makeCached(preset, PresetRenderer.SEED, 3, 6, false);
 			for (Terrain terrain : terrains) {

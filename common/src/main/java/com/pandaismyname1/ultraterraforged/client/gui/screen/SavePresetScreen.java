@@ -11,8 +11,8 @@ import net.minecraft.client.gui.components.toasts.SystemToast.SystemToastIds;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import com.pandaismyname1.ultraterraforged.RTFCommon;
-import com.pandaismyname1.ultraterraforged.client.data.RTFTranslationKeys;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
+import com.pandaismyname1.ultraterraforged.client.data.UTFTranslationKeys;
 import com.pandaismyname1.ultraterraforged.client.gui.PresetSharing;
 import com.pandaismyname1.ultraterraforged.client.gui.Toasts;
 import com.pandaismyname1.ultraterraforged.data.preset.PresetLibrary;
@@ -31,7 +31,7 @@ public class SavePresetScreen extends Screen {
 	private Component hint = Component.empty();
 
 	public SavePresetScreen(Screen parent, String suggestedName, Preset preset, Consumer<PresetLibrary.Entry> onSaved) {
-		super(Component.translatable(RTFTranslationKeys.GUI_SAVE_PRESET_TITLE));
+		super(Component.translatable(UTFTranslationKeys.GUI_SAVE_PRESET_TITLE));
 		this.parent = parent;
 		this.preset = preset;
 		// keep only the characters a preset name may have, e.g. from a translated built-in preset name
@@ -44,14 +44,14 @@ public class SavePresetScreen extends Screen {
 		int center = this.width / 2;
 		int y = this.height / 2 - 30;
 		String value = this.name != null ? this.name.getValue() : this.suggestedName;
-		this.name = new EditBox(this.font, center - 100, y, 200, 20, Component.translatable(RTFTranslationKeys.GUI_SAVE_PRESET_NAME));
+		this.name = new EditBox(this.font, center - 100, y, 200, 20, Component.translatable(UTFTranslationKeys.GUI_SAVE_PRESET_NAME));
 		this.name.setMaxLength(64);
-		this.name.setHint(Component.translatable(RTFTranslationKeys.GUI_SAVE_PRESET_NAME).withStyle(ChatFormatting.DARK_GRAY));
+		this.name.setHint(Component.translatable(UTFTranslationKeys.GUI_SAVE_PRESET_NAME).withStyle(ChatFormatting.DARK_GRAY));
 		this.name.setValue(value);
 		this.name.setResponder((text) -> this.validate());
 		this.addRenderableWidget(this.name);
 
-		this.save = this.addRenderableWidget(Button.builder(Component.translatable(RTFTranslationKeys.GUI_SAVE_PRESET_CONFIRM), (button) -> this.save())
+		this.save = this.addRenderableWidget(Button.builder(Component.translatable(UTFTranslationKeys.GUI_SAVE_PRESET_CONFIRM), (button) -> this.save())
 			.bounds(center - 100, y + 40, 98, 20).build());
 		this.addRenderableWidget(Button.builder(CommonComponents.GUI_CANCEL, (button) -> this.onClose())
 			.bounds(center + 2, y + 40, 98, 20).build());
@@ -64,9 +64,9 @@ public class SavePresetScreen extends Screen {
 		boolean valid = PresetLibrary.isValidName(text);
 		this.save.active = valid;
 		if (!valid) {
-			this.hint = text.isEmpty() ? Component.empty() : Component.translatable(RTFTranslationKeys.GUI_SAVE_PRESET_INVALID_NAME).withStyle(ChatFormatting.RED);
+			this.hint = text.isEmpty() ? Component.empty() : Component.translatable(UTFTranslationKeys.GUI_SAVE_PRESET_INVALID_NAME).withStyle(ChatFormatting.RED);
 		} else if (Files.exists(PresetLibrary.file(PresetSharing.presetFolder(), text))) {
-			this.hint = Component.translatable(RTFTranslationKeys.GUI_SAVE_PRESET_REPLACES).withStyle(ChatFormatting.YELLOW);
+			this.hint = Component.translatable(UTFTranslationKeys.GUI_SAVE_PRESET_REPLACES).withStyle(ChatFormatting.YELLOW);
 		} else {
 			this.hint = Component.empty();
 		}
@@ -76,12 +76,12 @@ public class SavePresetScreen extends Screen {
 		String text = this.name.getValue().trim();
 		try {
 			PresetLibrary.Entry entry = PresetLibrary.save(PresetSharing.presetFolder(), text, this.preset);
-			Toasts.notify(RTFTranslationKeys.GUI_SAVE_PRESET_SAVED, Component.literal(text), SystemToastIds.PERIODIC_NOTIFICATION);
+			Toasts.notify(UTFTranslationKeys.GUI_SAVE_PRESET_SAVED, Component.literal(text), SystemToastIds.PERIODIC_NOTIFICATION);
 			this.onSaved.accept(entry);
 			this.onClose();
 		} catch (Exception e) {
-			RTFCommon.LOGGER.error("Couldn't save preset {}", text, e);
-			Toasts.notify(RTFTranslationKeys.GUI_SAVE_PRESET_FAILED, Component.literal(String.valueOf(e.getMessage())), SystemToastIds.PACK_LOAD_FAILURE);
+			UTFCommon.LOGGER.error("Couldn't save preset {}", text, e);
+			Toasts.notify(UTFTranslationKeys.GUI_SAVE_PRESET_FAILED, Component.literal(String.valueOf(e.getMessage())), SystemToastIds.PACK_LOAD_FAILURE);
 		}
 	}
 

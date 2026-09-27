@@ -9,18 +9,18 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.SurfaceRules.Context;
-import com.pandaismyname1.ultraterraforged.registries.RTFRegistries;
-import com.pandaismyname1.ultraterraforged.world.worldgen.RTFRandomState;
+import com.pandaismyname1.ultraterraforged.registries.UTFRegistries;
+import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
 
 public record LayeredSurfaceRule(TagKey<Layer> layers) implements SurfaceRules.RuleSource {
 	public static final Codec<LayeredSurfaceRule> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-		TagKey.hashedCodec(RTFRegistries.SURFACE_LAYERS).fieldOf("layers").forGetter(LayeredSurfaceRule::layers)
+		TagKey.hashedCodec(UTFRegistries.SURFACE_LAYERS).fieldOf("layers").forGetter(LayeredSurfaceRule::layers)
 	).apply(instance, LayeredSurfaceRule::new));
 		
 	@Override
 	public SurfaceRules.SurfaceRule apply(Context ctx) {
-		if((Object) ctx.randomState instanceof RTFRandomState rtfRandomState) {
-			RegistryLookup<Layer> layerLookup = rtfRandomState.registryAccess().lookupOrThrow(RTFRegistries.SURFACE_LAYERS);
+		if((Object) ctx.randomState instanceof UTFRandomState utfRandomState) {
+			RegistryLookup<Layer> layerLookup = utfRandomState.registryAccess().lookupOrThrow(UTFRegistries.SURFACE_LAYERS);
 			return SurfaceRules.sequence(layerLookup.getOrThrow(this.layers).stream().map(Layer::unwrapRule).toArray(SurfaceRules.RuleSource[]::new)).apply(ctx);
 		} else {
 			throw new IllegalStateException();
@@ -33,7 +33,7 @@ public record LayeredSurfaceRule(TagKey<Layer> layers) implements SurfaceRules.R
 	}
 
 	public static Layer layer(TagKey<Layer> layers) {
-		return new Layer(RTFSurfaceRules.layered(layers));
+		return new Layer(UTFSurfaceRules.layered(layers));
 	}
 	
 	public static Layer layer(SurfaceRules.RuleSource rule) {

@@ -11,7 +11,7 @@ import net.minecraft.world.level.levelgen.synth.NormalNoise;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.CaveSettings;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.WorldSettings;
-import com.pandaismyname1.ultraterraforged.registries.RTFRegistries;
+import com.pandaismyname1.ultraterraforged.registries.UTFRegistries;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noise;
 
 public class PresetNoiseGeneratorSettings {
@@ -19,7 +19,7 @@ public class PresetNoiseGeneratorSettings {
 	public static void bootstrap(Preset preset, BootstapContext<NoiseGeneratorSettings> ctx) {
 		HolderGetter<DensityFunction> densityFunctions = ctx.lookup(Registries.DENSITY_FUNCTION);
 		HolderGetter<NormalNoise.NoiseParameters> noiseParams = ctx.lookup(Registries.NOISE);
-		HolderGetter<Noise> noises = ctx.lookup(RTFRegistries.NOISE);
+		HolderGetter<Noise> noises = ctx.lookup(UTFRegistries.NOISE);
 		
 		WorldSettings worldSettings = preset.world();
 		WorldSettings.Properties properties = worldSettings.properties;

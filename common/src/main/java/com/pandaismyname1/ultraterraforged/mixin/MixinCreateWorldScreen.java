@@ -18,9 +18,9 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
 import net.minecraft.network.chat.Component;
-import com.pandaismyname1.ultraterraforged.RTFCommon;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
 import com.pandaismyname1.ultraterraforged.client.ClientConfig;
-import com.pandaismyname1.ultraterraforged.client.data.RTFTranslationKeys;
+import com.pandaismyname1.ultraterraforged.client.data.UTFTranslationKeys;
 import com.pandaismyname1.ultraterraforged.client.gui.createworld.PresetApplier;
 import com.pandaismyname1.ultraterraforged.client.gui.createworld.TerrainState;
 import com.pandaismyname1.ultraterraforged.client.gui.createworld.TerrainTab;
@@ -90,9 +90,9 @@ abstract class MixinCreateWorldScreen extends Screen implements TerrainState.Hol
 				callback.cancel();
 			}
 		} catch (IOException | RuntimeException e) {
-			RTFCommon.LOGGER.error("Couldn't prepare the UltraTerraForged preset", e);
+			UTFCommon.LOGGER.error("Couldn't prepare the UltraTerraForged preset", e);
 			state.setPendingSelection(null);
-			SystemToast.addOrUpdate(this.minecraft.getToasts(), SystemToast.SystemToastIds.PACK_LOAD_FAILURE, Component.translatable(RTFTranslationKeys.GUI_TERRAIN_TAB_APPLY_FAILED), Component.literal(String.valueOf(e.getMessage())));
+			SystemToast.addOrUpdate(this.minecraft.getToasts(), SystemToast.SystemToastIds.PACK_LOAD_FAILURE, Component.translatable(UTFTranslationKeys.GUI_TERRAIN_TAB_APPLY_FAILED), Component.literal(String.valueOf(e.getMessage())));
 			callback.cancel();
 		}
 	}

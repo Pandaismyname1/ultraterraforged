@@ -45,6 +45,6 @@ class DimensionFilter extends PlacementFilter {
 
 	@Override
 	public PlacementModifierType<DimensionFilter> type() {
-		return RTFPlacementModifiers.DIMENSION_FILTER;
+		return UTFPlacementModifiers.DIMENSION_FILTER;
 	}
 }

@@ -14,7 +14,7 @@ import com.pandaismyname1.ultraterraforged.compat.terrablender.TBSurfaceRules;
 import com.pandaismyname1.ultraterraforged.platform.RegistryUtil;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noise;
 
-public class RTFSurfaceRules {
+public class UTFSurfaceRules {
 
 	public static void bootstrap() {
 		register("layered", LayeredSurfaceRule.CODEC);

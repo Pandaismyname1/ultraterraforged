@@ -16,16 +16,16 @@ import net.minecraft.world.level.levelgen.Noises;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.placement.CaveSurface;
-import com.pandaismyname1.ultraterraforged.RTFCommon;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.MiscellaneousSettings;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.SurfaceSettings;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.WorldSettings;
-import com.pandaismyname1.ultraterraforged.tags.RTFBlockTags;
+import com.pandaismyname1.ultraterraforged.tags.UTFBlockTags;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noise;
-import com.pandaismyname1.ultraterraforged.world.worldgen.surface.condition.RTFSurfaceConditions;
+import com.pandaismyname1.ultraterraforged.world.worldgen.surface.condition.UTFSurfaceConditions;
 import com.pandaismyname1.ultraterraforged.world.worldgen.terrain.TerrainType;
-import com.pandaismyname1.ultraterraforged.world.worldgen.surface.rule.RTFSurfaceRules;
+import com.pandaismyname1.ultraterraforged.world.worldgen.surface.rule.UTFSurfaceRules;
 import com.pandaismyname1.ultraterraforged.world.worldgen.surface.rule.StrataRule;
 import com.pandaismyname1.ultraterraforged.world.worldgen.util.Scaling;
 
@@ -78,8 +78,8 @@ public class PresetSurfaceRuleData {
     // where the salt crust noise is above this, it's a crack between the crust's polygons
     private static final float SALT_CRACK = 0.983F;
 
-    private static final ResourceLocation STRATA_CACHE_ID = RTFCommon.location("default");
-    private static final ResourceLocation DEEP_STRATA_CACHE_ID = RTFCommon.location("deep");
+    private static final ResourceLocation STRATA_CACHE_ID = UTFCommon.location("default");
+    private static final ResourceLocation DEEP_STRATA_CACHE_ID = UTFCommon.location("deep");
     private static final int STRATA_VARIANTS = 100;
     // thin beds, so a cliff shows many alternating layers
     private static final int STRATA_MIN_THICKNESS = 1;
@@ -126,10 +126,10 @@ public class PresetSurfaceRuleData {
         // (and everything above the rock line, which the default presets set above the build limit)
         // (sand dunes are steep but loose, so they stay sand)
         SurfaceRules.ConditionSource erodedRock = miscellaneousSettings.erosionDecorator ? and(
-        	SurfaceRules.not(RTFSurfaceConditions.terrain(TerrainType.DUNES)),
-        	RTFSurfaceConditions.any(
-        		RTFSurfaceConditions.steepness(erosion.rockSteepness, noise.getOrThrow(PresetSurfaceNoise.STEEPNESS_VARIANCE)),
-        		RTFSurfaceConditions.height(noise.getOrThrow(PresetSurfaceNoise.ERODED_ROCK), noise.getOrThrow(PresetSurfaceNoise.HEIGHT_VARIANCE))
+        	SurfaceRules.not(UTFSurfaceConditions.terrain(TerrainType.DUNES)),
+        	UTFSurfaceConditions.any(
+        		UTFSurfaceConditions.steepness(erosion.rockSteepness, noise.getOrThrow(PresetSurfaceNoise.STEEPNESS_VARIANCE)),
+        		UTFSurfaceConditions.height(noise.getOrThrow(PresetSurfaceNoise.ERODED_ROCK), noise.getOrThrow(PresetSurfaceNoise.HEIGHT_VARIANCE))
         	)
         ) : NEVER;
         SurfaceRules.RuleSource erodedDirt = miscellaneousSettings.erosionDecorator ? makeErodedDirtRule(noise, erosion) : SurfaceRules.ifTrue(NEVER, COARSE_DIRT);
@@ -145,19 +145,19 @@ public class PresetSurfaceRuleData {
         SurfaceRules.RuleSource gravel = SurfaceRules.sequence(SurfaceRules.ifTrue(SurfaceRules.ON_CEILING, STONE), GRAVEL);
         SurfaceRules.RuleSource windswept = SurfaceRules.sequence(
         	SurfaceRules.ifTrue(
-        		RTFSurfaceConditions.sediment(5.3F), 
+        		UTFSurfaceConditions.sediment(5.3F), 
         		STONE
             ),
         	SurfaceRules.ifTrue(
-        		RTFSurfaceConditions.sediment(2.4F), 
+        		UTFSurfaceConditions.sediment(2.4F), 
         		gravel
             ),
         	SurfaceRules.ifTrue(
-        		RTFSurfaceConditions.erosion(8.25F),
+        		UTFSurfaceConditions.erosion(8.25F),
         		STONE
         	),
         	SurfaceRules.ifTrue(
-	        	RTFSurfaceConditions.erosion(5.5F),
+	        	UTFSurfaceConditions.erosion(5.5F),
 	        	gravel
 	        )
         );
@@ -188,7 +188,7 @@ public class PresetSurfaceRuleData {
         		SurfaceRules.isBiome(Biomes.WINDSWEPT_HILLS), 
         		SurfaceRules.ifTrue(
 //        			PresetSurfaceRuleData.surfaceNoiseAbove(1.0), 
-        			RTFSurfaceConditions.sediment(5.0F),
+        			UTFSurfaceConditions.sediment(5.0F),
         			STONE
         		)
         	), 
@@ -436,7 +436,7 @@ public class PresetSurfaceRuleData {
         	preset.landforms().volcanicSurface ? makeVolcanoRule(noise) : SurfaceRules.ifTrue(NEVER, STONE),
         	// the gravel beaches at the foot of sea cliffs
         	SurfaceRules.ifTrue(
-        		RTFSurfaceConditions.terrain(TerrainType.SHINGLE_BEACH),
+        		UTFSurfaceConditions.terrain(TerrainType.SHINGLE_BEACH),
         		SurfaceRules.ifTrue(SurfaceRules.UNDER_FLOOR, gravel)
         	),
         	makeLandformSurfaceRule(noise, yOnSurface, sand, gravel),
@@ -445,7 +445,7 @@ public class PresetSurfaceRuleData {
         	SurfaceRules.ifTrue(
         		y4BelowSurface, 
         		SurfaceRules.ifTrue(
-        			SurfaceRules.not(RTFSurfaceConditions.terrain(TerrainType.DUNES)),
+        			SurfaceRules.not(UTFSurfaceConditions.terrain(TerrainType.DUNES)),
         			makeDesertRule(scaling, noise)
         		)
         	),
@@ -662,11 +662,11 @@ public class PresetSurfaceRuleData {
         	),
         	// sediment on the sea floor: before the preliminary surface check, which doesn't hold on the deep sea floor
         	// (but not where the surface has floors of its own: reefs, deltas, lagoons, and river and lake beds)
-        	preset.oceans().sediment ? SurfaceRules.ifTrue(RTFSurfaceConditions.nearGround(3), SurfaceRules.ifTrue(SurfaceRules.not(RTFSurfaceConditions.any(RTFSurfaceConditions.terrain(TerrainType.CORAL_REEF, TerrainType.DELTA, TerrainType.WETLAND, TerrainType.LAGOON, TerrainType.BARRIER_ISLAND, TerrainType.SAND_BAR, TerrainType.LAKE, TerrainType.RIVER), RTFSurfaceConditions.riverSide(1.0F))), makeSeaFloorRule(properties.seaLevel, noise, yOnSurface, sand, gravel))) : SurfaceRules.ifTrue(NEVER, STONE),
+        	preset.oceans().sediment ? SurfaceRules.ifTrue(UTFSurfaceConditions.nearGround(3), SurfaceRules.ifTrue(SurfaceRules.not(UTFSurfaceConditions.any(UTFSurfaceConditions.terrain(TerrainType.CORAL_REEF, TerrainType.DELTA, TerrainType.WETLAND, TerrainType.LAGOON, TerrainType.BARRIER_ISLAND, TerrainType.SAND_BAR, TerrainType.LAKE, TerrainType.RIVER), UTFSurfaceConditions.riverSide(1.0F))), makeSeaFloorRule(properties.seaLevel, noise, yOnSurface, sand, gravel))) : SurfaceRules.ifTrue(NEVER, STONE),
         	SurfaceRules.ifTrue(
         		SurfaceRules.abovePreliminarySurface(),
         		// tors and skerries are bare rock: the rock layers, or plain stone without them
-        		SurfaceRules.ifTrue(SurfaceRules.not(RTFSurfaceConditions.terrain(TerrainType.TOR, TerrainType.SKERRY)), surface)
+        		SurfaceRules.ifTrue(SurfaceRules.not(UTFSurfaceConditions.terrain(TerrainType.TOR, TerrainType.SKERRY)), surface)
         	)
         );
         // vanilla's gradual change from stone to deepslate; with rock layers the deepslate is layered too
@@ -694,29 +694,29 @@ public class PresetSurfaceRuleData {
     	float min = scaling.ground(10);
     	float level = scaling.ground(40);
     	
-    	SurfaceRules.ConditionSource aboveLevel = RTFSurfaceConditions.height(level, variance);
+    	SurfaceRules.ConditionSource aboveLevel = UTFSurfaceConditions.height(level, variance);
         SurfaceRules.ConditionSource desert = SurfaceRules.isBiome(Biomes.DESERT);
     	return SurfaceRules.ifTrue(
-    		RTFSurfaceConditions.height(min),
+    		UTFSurfaceConditions.height(min),
     		SurfaceRules.sequence(
     			SurfaceRules.ifTrue(
-    				RTFSurfaceConditions.steepness(0.15F), 
+    				UTFSurfaceConditions.steepness(0.15F), 
 			        SurfaceRules.ifTrue(
 			        	desert, 
 			        	SurfaceRules.ifTrue(
 			        		aboveLevel, 
 			        		SurfaceRules.sequence(
-								SurfaceRules.ifTrue(RTFSurfaceConditions.steepness(0.975F), TERRACOTTA),
-								SurfaceRules.ifTrue(RTFSurfaceConditions.steepness(0.85F), BROWN_TERRACOTTA),
-								SurfaceRules.ifTrue(RTFSurfaceConditions.steepness(0.75F), ORANGE_TERRACOTTA),
-								SurfaceRules.ifTrue(RTFSurfaceConditions.steepness(0.65F), TERRACOTTA), 
+								SurfaceRules.ifTrue(UTFSurfaceConditions.steepness(0.975F), TERRACOTTA),
+								SurfaceRules.ifTrue(UTFSurfaceConditions.steepness(0.85F), BROWN_TERRACOTTA),
+								SurfaceRules.ifTrue(UTFSurfaceConditions.steepness(0.75F), ORANGE_TERRACOTTA),
+								SurfaceRules.ifTrue(UTFSurfaceConditions.steepness(0.65F), TERRACOTTA), 
 								SMOOTH_SANDSTONE
 							)
 						)
     	            )
     			),
         		SurfaceRules.ifTrue(
-        			RTFSurfaceConditions.steepness(0.3F), 
+        			UTFSurfaceConditions.steepness(0.3F), 
         			SurfaceRules.ifTrue(
         				desert, 
         				SMOOTH_SANDSTONE
@@ -733,55 +733,55 @@ public class PresetSurfaceRuleData {
     	SurfaceRules.ConditionSource topLayers = SurfaceRules.stoneDepthCheck(2, false, CaveSurface.FLOOR);
     	return SurfaceRules.sequence(
     		SurfaceRules.ifTrue(
-    			RTFSurfaceConditions.terrain(TerrainType.SALT_FLAT),
+    			UTFSurfaceConditions.terrain(TerrainType.SALT_FLAT),
     			SurfaceRules.sequence(
     				SurfaceRules.ifTrue(
     					SurfaceRules.ON_FLOOR,
-    					RTFSurfaceRules.noise(noise.getOrThrow(PresetSurfaceNoise.SALT_FLAT), List.of(Pair.of(SALT_CRACK, WHITE_TERRACOTTA), Pair.of(-1.0F, CALCITE)))
+    					UTFSurfaceRules.noise(noise.getOrThrow(PresetSurfaceNoise.SALT_FLAT), List.of(Pair.of(SALT_CRACK, WHITE_TERRACOTTA), Pair.of(-1.0F, CALCITE)))
     				),
     				SurfaceRules.ifTrue(SurfaceRules.UNDER_FLOOR, sand)
     			)
     		),
     		SurfaceRules.ifTrue(
-    			RTFSurfaceConditions.terrain(TerrainType.BARRIER_ISLAND, TerrainType.LAGOON, TerrainType.SAND_BAR, TerrainType.SAND_WAVES),
+    			UTFSurfaceConditions.terrain(TerrainType.BARRIER_ISLAND, TerrainType.LAGOON, TerrainType.SAND_BAR, TerrainType.SAND_WAVES),
     			SurfaceRules.ifTrue(SurfaceRules.UNDER_FLOOR, sand)
     		),
     		SurfaceRules.ifTrue(
-    			RTFSurfaceConditions.terrain(TerrainType.CORAL_REEF),
+    			UTFSurfaceConditions.terrain(TerrainType.CORAL_REEF),
     			SurfaceRules.sequence(
-    				SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, RTFSurfaceRules.noise(noise.getOrThrow(PresetSurfaceNoise.CORAL), List.of(Pair.of(0.82F, FIRE_CORAL), Pair.of(0.66F, BRAIN_CORAL), Pair.of(0.5F, TUBE_CORAL), Pair.of(0.34F, HORN_CORAL), Pair.of(0.2F, BUBBLE_CORAL), Pair.of(-1.0F, sand)))),
+    				SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, UTFSurfaceRules.noise(noise.getOrThrow(PresetSurfaceNoise.CORAL), List.of(Pair.of(0.82F, FIRE_CORAL), Pair.of(0.66F, BRAIN_CORAL), Pair.of(0.5F, TUBE_CORAL), Pair.of(0.34F, HORN_CORAL), Pair.of(0.2F, BUBBLE_CORAL), Pair.of(-1.0F, sand)))),
     				SurfaceRules.ifTrue(SurfaceRules.UNDER_FLOOR, sand)
     			)
     		),
     		SurfaceRules.ifTrue(
-    			RTFSurfaceConditions.terrain(TerrainType.DELTA),
+    			UTFSurfaceConditions.terrain(TerrainType.DELTA),
     			SurfaceRules.ifTrue(
     				topLayers,
     				SurfaceRules.sequence(
-    					SurfaceRules.ifTrue(SurfaceRules.not(dry), RTFSurfaceRules.noise(debris, List.of(Pair.of(0.65F, CLAY), Pair.of(0.4F, MUD), Pair.of(-1.0F, sand)))),
-    					RTFSurfaceRules.noise(debris, List.of(Pair.of(0.62F, MUD), Pair.of(0.54F, sand)))
+    					SurfaceRules.ifTrue(SurfaceRules.not(dry), UTFSurfaceRules.noise(debris, List.of(Pair.of(0.65F, CLAY), Pair.of(0.4F, MUD), Pair.of(-1.0F, sand)))),
+    					UTFSurfaceRules.noise(debris, List.of(Pair.of(0.62F, MUD), Pair.of(0.54F, sand)))
     				)
     			)
     		),
     		SurfaceRules.ifTrue(
-    			RTFSurfaceConditions.terrain(TerrainType.ALLUVIAL_FAN),
+    			UTFSurfaceConditions.terrain(TerrainType.ALLUVIAL_FAN),
     			SurfaceRules.ifTrue(
     				topLayers,
-    				RTFSurfaceRules.noise(debris, List.of(Pair.of(0.56F, gravel), Pair.of(0.44F, COARSE_DIRT)))
+    				UTFSurfaceRules.noise(debris, List.of(Pair.of(0.56F, gravel), Pair.of(0.44F, COARSE_DIRT)))
     			)
     		),
     		SurfaceRules.ifTrue(
-    			RTFSurfaceConditions.terrain(TerrainType.MORAINE),
+    			UTFSurfaceConditions.terrain(TerrainType.MORAINE),
     			SurfaceRules.ifTrue(
     				SurfaceRules.ON_FLOOR,
-    				RTFSurfaceRules.noise(debris, List.of(Pair.of(0.74F, MOSSY_COBBLESTONE), Pair.of(0.64F, COBBLESTONE), Pair.of(0.48F, gravel), Pair.of(0.36F, COARSE_DIRT)))
+    				UTFSurfaceRules.noise(debris, List.of(Pair.of(0.74F, MOSSY_COBBLESTONE), Pair.of(0.64F, COBBLESTONE), Pair.of(0.48F, gravel), Pair.of(0.36F, COARSE_DIRT)))
     			)
     		),
     		SurfaceRules.ifTrue(
-    			RTFSurfaceConditions.terrain(TerrainType.CIRQUE),
+    			UTFSurfaceConditions.terrain(TerrainType.CIRQUE),
     			SurfaceRules.ifTrue(
     				SurfaceRules.ON_FLOOR,
-    				RTFSurfaceRules.noise(debris, List.of(Pair.of(0.5F, gravel), Pair.of(0.32F, STONE)))
+    				UTFSurfaceRules.noise(debris, List.of(Pair.of(0.5F, gravel), Pair.of(0.32F, STONE)))
     			)
     		)
     	);
@@ -799,13 +799,13 @@ public class PresetSurfaceRuleData {
     		SurfaceRules.ifTrue(
     			underSea,
     			SurfaceRules.ifTrue(
-    				SurfaceRules.not(RTFSurfaceConditions.steepness(0.85F)),
+    				SurfaceRules.not(UTFSurfaceConditions.steepness(0.85F)),
     				SurfaceRules.ifTrue(
     					SurfaceRules.stoneDepthCheck(1, false, CaveSurface.FLOOR),
     					SurfaceRules.sequence(
-    						SurfaceRules.ifTrue(shallow, RTFSurfaceRules.noise(patches, List.of(Pair.of(0.74F, gravel), Pair.of(-1.0F, sand)))),
-    						SurfaceRules.ifTrue(middle, RTFSurfaceRules.noise(patches, List.of(Pair.of(0.7F, CLAY), Pair.of(0.46F, gravel), Pair.of(-1.0F, sand)))),
-    						RTFSurfaceRules.noise(patches, List.of(Pair.of(0.58F, CLAY), Pair.of(0.32F, gravel), Pair.of(-1.0F, sand)))
+    						SurfaceRules.ifTrue(shallow, UTFSurfaceRules.noise(patches, List.of(Pair.of(0.74F, gravel), Pair.of(-1.0F, sand)))),
+    						SurfaceRules.ifTrue(middle, UTFSurfaceRules.noise(patches, List.of(Pair.of(0.7F, CLAY), Pair.of(0.46F, gravel), Pair.of(-1.0F, sand)))),
+    						UTFSurfaceRules.noise(patches, List.of(Pair.of(0.58F, CLAY), Pair.of(0.32F, gravel), Pair.of(-1.0F, sand)))
     					)
     				)
     			)
@@ -818,29 +818,29 @@ public class PresetSurfaceRuleData {
     private static SurfaceRules.RuleSource makeRiverBankRule(Scaling scaling, HolderGetter<Noise> noise, SurfaceRules.ConditionSource dry, SurfaceRules.RuleSource sand, SurfaceRules.RuleSource gravel) {
     	Holder<Noise> bed = noise.getOrThrow(PresetSurfaceNoise.RIVER_BED);
     	SurfaceRules.ConditionSource underwater = SurfaceRules.not(dry);
-    	SurfaceRules.ConditionSource wet = RTFSurfaceConditions.any(RTFSurfaceConditions.terrain(TerrainType.WETLAND, TerrainType.DELTA), SurfaceRules.isBiome(Biomes.SWAMP, Biomes.MANGROVE_SWAMP));
-    	SurfaceRules.ConditionSource high = RTFSurfaceConditions.height(scaling.ground(MOUNTAIN_RIVER_HEIGHT));
+    	SurfaceRules.ConditionSource wet = UTFSurfaceConditions.any(UTFSurfaceConditions.terrain(TerrainType.WETLAND, TerrainType.DELTA), SurfaceRules.isBiome(Biomes.SWAMP, Biomes.MANGROVE_SWAMP));
+    	SurfaceRules.ConditionSource high = UTFSurfaceConditions.height(scaling.ground(MOUNTAIN_RIVER_HEIGHT));
     	SurfaceRules.RuleSource wetBanks = SurfaceRules.sequence(
-    		SurfaceRules.ifTrue(underwater, RTFSurfaceRules.noise(bed, List.of(Pair.of(0.62F, CLAY), Pair.of(-1.0F, MUD)))),
-    		RTFSurfaceRules.noise(bed, List.of(Pair.of(0.55F, MUD)))
+    		SurfaceRules.ifTrue(underwater, UTFSurfaceRules.noise(bed, List.of(Pair.of(0.62F, CLAY), Pair.of(-1.0F, MUD)))),
+    		UTFSurfaceRules.noise(bed, List.of(Pair.of(0.55F, MUD)))
     	);
     	SurfaceRules.RuleSource mountainBanks = SurfaceRules.sequence(
-    		SurfaceRules.ifTrue(underwater, RTFSurfaceRules.noise(bed, List.of(Pair.of(0.7F, MOSSY_COBBLESTONE), Pair.of(0.6F, COBBLESTONE), Pair.of(-1.0F, gravel)))),
-    		SurfaceRules.ifTrue(RTFSurfaceConditions.riverSide(0.9F), RTFSurfaceRules.noise(bed, List.of(Pair.of(0.5F, gravel), Pair.of(0.4F, COARSE_DIRT))))
+    		SurfaceRules.ifTrue(underwater, UTFSurfaceRules.noise(bed, List.of(Pair.of(0.7F, MOSSY_COBBLESTONE), Pair.of(0.6F, COBBLESTONE), Pair.of(-1.0F, gravel)))),
+    		SurfaceRules.ifTrue(UTFSurfaceConditions.riverSide(0.9F), UTFSurfaceRules.noise(bed, List.of(Pair.of(0.5F, gravel), Pair.of(0.4F, COARSE_DIRT))))
     	);
     	SurfaceRules.RuleSource lowlandBanks = SurfaceRules.sequence(
-    		SurfaceRules.ifTrue(underwater, RTFSurfaceRules.noise(bed, List.of(Pair.of(0.7F, CLAY), Pair.of(0.58F, gravel), Pair.of(-1.0F, sand)))),
-    		SurfaceRules.ifTrue(RTFSurfaceConditions.riverSide(0.85F), RTFSurfaceRules.noise(bed, List.of(Pair.of(0.45F, sand))))
+    		SurfaceRules.ifTrue(underwater, UTFSurfaceRules.noise(bed, List.of(Pair.of(0.7F, CLAY), Pair.of(0.58F, gravel), Pair.of(-1.0F, sand)))),
+    		SurfaceRules.ifTrue(UTFSurfaceConditions.riverSide(0.85F), UTFSurfaceRules.noise(bed, List.of(Pair.of(0.45F, sand))))
     	);
     	return SurfaceRules.ifTrue(
-    		SurfaceRules.not(RTFSurfaceConditions.steepness(0.45F)),
+    		SurfaceRules.not(UTFSurfaceConditions.steepness(0.45F)),
     		SurfaceRules.ifTrue(
     			SurfaceRules.stoneDepthCheck(2, false, CaveSurface.FLOOR),
     			SurfaceRules.sequence(
     				// the whole of a wetland, not just along its river
-    				SurfaceRules.ifTrue(wet, SurfaceRules.ifTrue(RTFSurfaceConditions.any(RTFSurfaceConditions.terrain(TerrainType.WETLAND, TerrainType.DELTA), RTFSurfaceConditions.riverSide(1.0F)), wetBanks)),
+    				SurfaceRules.ifTrue(wet, SurfaceRules.ifTrue(UTFSurfaceConditions.any(UTFSurfaceConditions.terrain(TerrainType.WETLAND, TerrainType.DELTA), UTFSurfaceConditions.riverSide(1.0F)), wetBanks)),
     				SurfaceRules.ifTrue(
-    					RTFSurfaceConditions.riverSide(1.0F),
+    					UTFSurfaceConditions.riverSide(1.0F),
     					SurfaceRules.ifTrue(
     						SurfaceRules.not(wet),
     						SurfaceRules.sequence(
@@ -857,7 +857,7 @@ public class PresetSurfaceRuleData {
     // lava over magma in the crater; basalt, blackstone and tuff all over the cone; patches of old lava flows on the
     // land around it, with the usual surface in between
     private static SurfaceRules.RuleSource makeVolcanoRule(HolderGetter<Noise> noise) {
-    	SurfaceRules.RuleSource volcanicRock = RTFSurfaceRules.noise(
+    	SurfaceRules.RuleSource volcanicRock = UTFSurfaceRules.noise(
     		noise.getOrThrow(PresetSurfaceNoise.VOLCANIC_ROCK),
     		List.of(
     			Pair.of(0.0F, BASALT),
@@ -868,23 +868,23 @@ public class PresetSurfaceRuleData {
     	);
     	return SurfaceRules.sequence(
     		SurfaceRules.ifTrue(
-    			RTFSurfaceConditions.terrain(TerrainType.VOLCANO_PIPE),
+    			UTFSurfaceConditions.terrain(TerrainType.VOLCANO_PIPE),
     			SurfaceRules.sequence(
     				SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, LAVA),
     				MAGMA_BLOCK
     			)
     		),
     		SurfaceRules.ifTrue(
-    			RTFSurfaceConditions.terrain(TerrainType.VOLCANO, TerrainType.VOLCANIC_ISLAND),
+    			UTFSurfaceConditions.terrain(TerrainType.VOLCANO, TerrainType.VOLCANIC_ISLAND),
     			volcanicRock
     		),
     		SurfaceRules.ifTrue(
-    			RTFSurfaceConditions.terrain(TerrainType.VOLCANIC_LOWLANDS),
+    			UTFSurfaceConditions.terrain(TerrainType.VOLCANIC_LOWLANDS),
     			SurfaceRules.sequence(
-    				SurfaceRules.ifTrue(RTFSurfaceConditions.steepness(0.15F), volcanicRock),
+    				SurfaceRules.ifTrue(UTFSurfaceConditions.steepness(0.15F), volcanicRock),
     				SurfaceRules.ifTrue(
     					SurfaceRules.ON_FLOOR,
-    					RTFSurfaceRules.noise(
+    					UTFSurfaceRules.noise(
     						noise.getOrThrow(PresetSurfaceNoise.LAVA_FIELDS),
     						List.of(
     							Pair.of(0.6F, SMOOTH_BASALT),
@@ -900,7 +900,7 @@ public class PresetSurfaceRuleData {
     private static SurfaceRules.RuleSource makeForestRule(HolderGetter<Noise> noise) {
     	return SurfaceRules.ifTrue(
     		SurfaceRules.ON_FLOOR, 
-    		RTFSurfaceRules.noise(
+    		UTFSurfaceRules.noise(
     			noise.getOrThrow(PresetSurfaceNoise.FOREST), 
     			List.of(
     				Pair.of(0.65F, PODZOL),
@@ -919,7 +919,7 @@ public class PresetSurfaceRuleData {
 			Blocks.STONE,
 			STRATA_STONE_SHARE,
 			miscellaneousSettings.rockTag(),
-			RTFBlockTags.STRATA_EXCLUDED,
+			UTFBlockTags.STRATA_EXCLUDED,
 			STRATA_VARIANTS,
 			STRATA_MIN_THICKNESS,
 			STRATA_MAX_THICKNESS
@@ -935,8 +935,8 @@ public class PresetSurfaceRuleData {
 			noise.getOrThrow(PresetStrataNoise.STRATA_THICKNESS),
 			Blocks.DEEPSLATE,
 			STRATA_DEEPSLATE_SHARE,
-			RTFBlockTags.DEEP_ROCK,
-			RTFBlockTags.STRATA_EXCLUDED,
+			UTFBlockTags.DEEP_ROCK,
+			UTFBlockTags.STRATA_EXCLUDED,
 			STRATA_VARIANTS,
 			STRATA_MIN_THICKNESS,
 			STRATA_MAX_THICKNESS
@@ -945,16 +945,16 @@ public class PresetSurfaceRuleData {
 
     // high, steep ground loses its soil: coarse dirt on the steeper slopes, loose gravel (scree) on the gentler ones
     private static SurfaceRules.RuleSource makeErodedDirtRule(HolderGetter<Noise> noise, SurfaceSettings.Erosion settings) {
-    	SurfaceRules.ConditionSource high = RTFSurfaceConditions.height(noise.getOrThrow(PresetSurfaceNoise.ERODED_DIRT), noise.getOrThrow(PresetSurfaceNoise.HEIGHT_VARIANCE));
+    	SurfaceRules.ConditionSource high = UTFSurfaceConditions.height(noise.getOrThrow(PresetSurfaceNoise.ERODED_DIRT), noise.getOrThrow(PresetSurfaceNoise.HEIGHT_VARIANCE));
     	return SurfaceRules.ifTrue(
     		high,
     		SurfaceRules.sequence(
     			SurfaceRules.ifTrue(
-    				RTFSurfaceConditions.steepness(settings.dirtSteepness, noise.getOrThrow(PresetSurfaceNoise.STEEPNESS_VARIANCE)),
+    				UTFSurfaceConditions.steepness(settings.dirtSteepness, noise.getOrThrow(PresetSurfaceNoise.STEEPNESS_VARIANCE)),
     				COARSE_DIRT
     			),
     			SurfaceRules.ifTrue(
-    				RTFSurfaceConditions.steepness(settings.screeSteepness, noise.getOrThrow(PresetSurfaceNoise.STEEPNESS_VARIANCE)),
+    				UTFSurfaceConditions.steepness(settings.screeSteepness, noise.getOrThrow(PresetSurfaceNoise.STEEPNESS_VARIANCE)),
     				SurfaceRules.sequence(SurfaceRules.ifTrue(SurfaceRules.ON_CEILING, STONE), GRAVEL)
     			)
     		)
@@ -963,7 +963,7 @@ public class PresetSurfaceRuleData {
 	
     // both conditions hold: neither fails
     private static SurfaceRules.ConditionSource and(SurfaceRules.ConditionSource a, SurfaceRules.ConditionSource b) {
-    	return SurfaceRules.not(RTFSurfaceConditions.any(SurfaceRules.not(a), SurfaceRules.not(b)));
+    	return SurfaceRules.not(UTFSurfaceConditions.any(SurfaceRules.not(a), SurfaceRules.not(b)));
     }
 
     private static SurfaceRules.ConditionSource surfaceNoiseAbove(double target) {

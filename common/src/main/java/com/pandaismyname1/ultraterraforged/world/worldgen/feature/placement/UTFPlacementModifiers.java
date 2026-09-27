@@ -15,7 +15,7 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.feature.placement.pois
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noise;
 import com.pandaismyname1.ultraterraforged.world.worldgen.terrain.Terrain;
 
-public class RTFPlacementModifiers {
+public class UTFPlacementModifiers {
 	public static final PlacementModifierType<DimensionFilter> DIMENSION_FILTER = register("dimension_filter", DimensionFilter.CODEC);
 	public static final PlacementModifierType<TerrainFilter> TERRAIN_FILTER = register("terrain_filter", TerrainFilter.CODEC);
 	public static final PlacementModifierType<MacroBiomeFilter> MACRO_BIOME_FILTER = register("macro_biome_filter", MacroBiomeFilter.CODEC);

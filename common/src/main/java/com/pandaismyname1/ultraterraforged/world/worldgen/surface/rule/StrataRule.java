@@ -26,10 +26,10 @@ import net.minecraft.world.level.block.FallingBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.SurfaceRules.Context;
-import com.pandaismyname1.ultraterraforged.RTFCommon;
-import com.pandaismyname1.ultraterraforged.world.worldgen.RTFRandomState;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
+import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noise;
-import com.pandaismyname1.ultraterraforged.world.worldgen.surface.RTFSurfaceSystem;
+import com.pandaismyname1.ultraterraforged.world.worldgen.surface.UTFSurfaceSystem;
 
 /**
  * Replaces stone with layers of different rock, like the bands in a canyon wall. The layers run roughly level but
@@ -65,7 +65,7 @@ public record StrataRule(ResourceLocation cacheId, Holder<Noise> selector, Holde
 
 	@Override
 	public SurfaceRules.SurfaceRule apply(Context ctx) {
-		if (!((Object) ctx.system instanceof RTFSurfaceSystem surfaceSystem) || !((Object) ctx.randomState instanceof RTFRandomState randomState)) {
+		if (!((Object) ctx.system instanceof UTFSurfaceSystem surfaceSystem) || !((Object) ctx.randomState instanceof UTFRandomState randomState)) {
 			throw new IllegalStateException("Strata need UltraTerraForged's surface system");
 		}
 		int bottom = ctx.chunk.getMinBuildHeight();
@@ -82,7 +82,7 @@ public record StrataRule(ResourceLocation cacheId, Holder<Noise> selector, Holde
 
 	private List<StrataStack> generate(RandomSource random, int height) {
 		List<BlockState> materials = this.findMaterials();
-		RTFCommon.LOGGER.info("Rock layers ({}, on {}) use {}", this.cacheId, BuiltInRegistries.BLOCK.getKey(this.base), materials.stream().map((state) -> BuiltInRegistries.BLOCK.getKey(state.getBlock()).toString()).toList());
+		UTFCommon.LOGGER.info("Rock layers ({}, on {}) use {}", this.cacheId, BuiltInRegistries.BLOCK.getKey(this.base), materials.stream().map((state) -> BuiltInRegistries.BLOCK.getKey(state.getBlock()).toString()).toList());
 		List<StrataStack> stacks = new ArrayList<>(this.variants);
 		for (int i = 0; i < this.variants; i++) {
 			// layers can be stretched to half their thickness at the least, see PresetStrataNoise

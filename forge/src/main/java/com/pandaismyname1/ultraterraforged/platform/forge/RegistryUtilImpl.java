@@ -17,9 +17,9 @@ import net.minecraftforge.registries.DataPackRegistryEvent;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.GameData;
 import net.minecraftforge.registries.RegistryBuilder;
-import com.pandaismyname1.ultraterraforged.RTFCommon;
-import com.pandaismyname1.ultraterraforged.registries.RTFBuiltInRegistries;
-import com.pandaismyname1.ultraterraforged.registries.RTFRegistries;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
+import com.pandaismyname1.ultraterraforged.registries.UTFBuiltInRegistries;
+import com.pandaismyname1.ultraterraforged.registries.UTFRegistries;
 
 //this is only public so the initializer class can call register
 //TODO make this non public
@@ -43,13 +43,13 @@ public final class RegistryUtilImpl {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static <T> WritableRegistry<T> getWritable(Registry<T> registry) {
 		return (WritableRegistry<T>) REGISTERS.computeIfAbsent(registry.key(), (k) -> {
-			return new DeferredRegistry.Writable<>(DeferredRegister.create((ResourceKey) k, RTFCommon.MOD_ID));
+			return new DeferredRegistry.Writable<>(DeferredRegister.create((ResourceKey) k, UTFCommon.MOD_ID));
 		});
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static <T> Registry<T> createRegistry(ResourceKey<? extends Registry<T>> key) {
-		DeferredRegister<T> register = DeferredRegister.create((ResourceKey) key, RTFCommon.MOD_ID);
+		DeferredRegister<T> register = DeferredRegister.create((ResourceKey) key, UTFCommon.MOD_ID);
 		register.makeRegistry(() -> {
 			return new RegistryBuilder().hasTags();
 		});

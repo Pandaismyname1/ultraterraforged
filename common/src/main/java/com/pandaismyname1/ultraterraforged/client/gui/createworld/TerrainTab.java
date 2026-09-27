@@ -20,7 +20,7 @@ import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import com.pandaismyname1.ultraterraforged.client.data.RTFTranslationKeys;
+import com.pandaismyname1.ultraterraforged.client.data.UTFTranslationKeys;
 import com.pandaismyname1.ultraterraforged.client.gui.PresetSharing;
 import com.pandaismyname1.ultraterraforged.client.gui.screen.SavePresetScreen;
 import com.pandaismyname1.ultraterraforged.client.gui.screen.presetconfig.OptionWidgets;
@@ -64,41 +64,41 @@ public class TerrainTab implements Tab {
 		Minecraft minecraft = Minecraft.getInstance();
 		this.status = new StringWidget(Component.empty(), minecraft.font).alignLeft();
 		this.presetButton = Button.builder(Component.empty(), (button) -> this.cyclePreset(Screen.hasShiftDown() ? -1 : 1)).build();
-		this.advancedButton = Button.builder(Component.translatable(RTFTranslationKeys.GUI_TERRAIN_TAB_ADVANCED), (button) -> {
+		this.advancedButton = Button.builder(Component.translatable(UTFTranslationKeys.GUI_TERRAIN_TAB_ADVANCED), (button) -> {
 			minecraft.setScreen(PresetConfigScreen.editing(this.screen, this.state.name(), this.state.preset(), this.state.baseline()));
 		}).build();
-		this.advancedButton.setTooltip(Tooltip.create(Component.translatable(RTFTranslationKeys.GUI_TERRAIN_TAB_ADVANCED_TOOLTIP)));
-		this.saveButton = Button.builder(Component.translatable(RTFTranslationKeys.GUI_SAVE_PRESET), (button) -> {
+		this.advancedButton.setTooltip(Tooltip.create(Component.translatable(UTFTranslationKeys.GUI_TERRAIN_TAB_ADVANCED_TOOLTIP)));
+		this.saveButton = Button.builder(Component.translatable(UTFTranslationKeys.GUI_SAVE_PRESET), (button) -> {
 			minecraft.setScreen(new SavePresetScreen(this.screen, this.state.name().getString(), this.state.preset().copy(), (saved) -> {
 				this.reloadPresets();
 				this.state.select(saved);
 				this.state.selectUltraTerraForged();
 			}));
-		}).tooltip(Tooltip.create(Component.translatable(RTFTranslationKeys.GUI_SAVE_PRESET_TOOLTIP))).build();
-		this.copyButton = Button.builder(Component.translatable(RTFTranslationKeys.GUI_SHARE_COPY), (button) -> PresetSharing.copy(this.state.preset()))
-			.tooltip(Tooltip.create(Component.translatable(RTFTranslationKeys.GUI_SHARE_COPY_TOOLTIP))).build();
-		this.pasteButton = Button.builder(Component.translatable(RTFTranslationKeys.GUI_SHARE_PASTE), (button) -> {
+		}).tooltip(Tooltip.create(Component.translatable(UTFTranslationKeys.GUI_SAVE_PRESET_TOOLTIP))).build();
+		this.copyButton = Button.builder(Component.translatable(UTFTranslationKeys.GUI_SHARE_COPY), (button) -> PresetSharing.copy(this.state.preset()))
+			.tooltip(Tooltip.create(Component.translatable(UTFTranslationKeys.GUI_SHARE_COPY_TOOLTIP))).build();
+		this.pasteButton = Button.builder(Component.translatable(UTFTranslationKeys.GUI_SHARE_PASTE), (button) -> {
 			PresetSharing.paste().ifPresent((preset) -> {
-				this.state.select(new PresetLibrary.Entry("shared", Component.translatable(RTFTranslationKeys.GUI_SHARE_PASTED_NAME), null, preset::copy, null, PresetLibrary.Source.OTHER));
+				this.state.select(new PresetLibrary.Entry("shared", Component.translatable(UTFTranslationKeys.GUI_SHARE_PASTED_NAME), null, preset::copy, null, PresetLibrary.Source.OTHER));
 				this.state.selectUltraTerraForged();
 				this.rebuildSliders();
 				this.updateLabels();
 			});
-		}).tooltip(Tooltip.create(Component.translatable(RTFTranslationKeys.GUI_SHARE_PASTE_TOOLTIP))).build();
+		}).tooltip(Tooltip.create(Component.translatable(UTFTranslationKeys.GUI_SHARE_PASTE_TOOLTIP))).build();
 		this.sliders = new ScrollingPanel();
 		this.performanceLight = PerformanceModsSection.light(this.sliders::scrollToBottom);
 		this.preview = new TerrainPreview(this.state);
 		this.viewButton = CycleButton.<RenderMode>builder(OptionWidgets::enumName)
 			.withValues(RenderMode.values())
 			.withInitialValue(this.preview.mode())
-			.create(0, 0, 0, 0, Component.translatable(RTFTranslationKeys.GUI_TERRAIN_TAB_VIEW), (button, mode) -> this.preview.setMode(mode));
+			.create(0, 0, 0, 0, Component.translatable(UTFTranslationKeys.GUI_TERRAIN_TAB_VIEW), (button, mode) -> this.preview.setMode(mode));
 		this.rebuildSliders();
 		this.updateLabels();
 	}
 
 	@Override
 	public Component getTabTitle() {
-		return Component.translatable(RTFTranslationKeys.GUI_TERRAIN_TAB_TITLE);
+		return Component.translatable(UTFTranslationKeys.GUI_TERRAIN_TAB_TITLE);
 	}
 
 	@Override
@@ -214,23 +214,23 @@ public class TerrainTab implements Tab {
 	private void updateLabels() {
 		MutableComponent name = this.state.name().copy();
 		if (this.state.isEdited()) {
-			name.append(Component.translatable(RTFTranslationKeys.GUI_TERRAIN_TAB_MODIFIED).withStyle(ChatFormatting.YELLOW));
+			name.append(Component.translatable(UTFTranslationKeys.GUI_TERRAIN_TAB_MODIFIED).withStyle(ChatFormatting.YELLOW));
 		}
-		this.presetButton.setMessage(CommonComponents.optionNameValue(Component.translatable(RTFTranslationKeys.GUI_TERRAIN_TAB_PRESET), name));
+		this.presetButton.setMessage(CommonComponents.optionNameValue(Component.translatable(UTFTranslationKeys.GUI_TERRAIN_TAB_PRESET), name));
 		if (this.tooltipSource != this.state.source()) {
 			this.tooltipSource = this.state.source();
 			MutableComponent tooltip = Component.empty();
 			if (this.tooltipSource.description() != null) {
 				tooltip.append(this.tooltipSource.description()).append(CommonComponents.NEW_LINE).append(CommonComponents.NEW_LINE);
 			}
-			tooltip.append(Component.translatable(RTFTranslationKeys.GUI_TERRAIN_TAB_PRESET_TOOLTIP).withStyle(ChatFormatting.GRAY));
+			tooltip.append(Component.translatable(UTFTranslationKeys.GUI_TERRAIN_TAB_PRESET_TOOLTIP).withStyle(ChatFormatting.GRAY));
 			this.presetButton.setTooltip(Tooltip.create(tooltip));
 		}
 
 		if (this.state.isUltraTerraForgedSelected()) {
-			this.status.setMessage(Component.translatable(RTFTranslationKeys.GUI_TERRAIN_TAB_ACTIVE).withStyle(ChatFormatting.GREEN));
+			this.status.setMessage(Component.translatable(UTFTranslationKeys.GUI_TERRAIN_TAB_ACTIVE).withStyle(ChatFormatting.GREEN));
 		} else {
-			this.status.setMessage(Component.translatable(RTFTranslationKeys.GUI_TERRAIN_TAB_INACTIVE).withStyle(ChatFormatting.GRAY));
+			this.status.setMessage(Component.translatable(UTFTranslationKeys.GUI_TERRAIN_TAB_INACTIVE).withStyle(ChatFormatting.GRAY));
 		}
 	}
 }

@@ -3,7 +3,7 @@ package com.pandaismyname1.ultraterraforged.world.worldgen.feature.template.plac
 import com.mojang.serialization.Codec;
 
 import com.pandaismyname1.ultraterraforged.platform.RegistryUtil;
-import com.pandaismyname1.ultraterraforged.registries.RTFBuiltInRegistries;
+import com.pandaismyname1.ultraterraforged.registries.UTFBuiltInRegistries;
 
 public class TemplatePlacements {
 
@@ -21,6 +21,6 @@ public class TemplatePlacements {
 	}
 	
 	private static void register(String name, Codec<? extends TemplatePlacement<?>> placement) {
-		RegistryUtil.register(RTFBuiltInRegistries.TEMPLATE_PLACEMENT_TYPE, name, placement);
+		RegistryUtil.register(UTFBuiltInRegistries.TEMPLATE_PLACEMENT_TYPE, name, placement);
 	}
 }

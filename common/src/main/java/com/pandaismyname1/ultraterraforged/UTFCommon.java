@@ -8,67 +8,67 @@ import com.pandaismyname1.ultraterraforged.compat.terrablender.TBCompat;
 import com.pandaismyname1.ultraterraforged.compat.terrablender.TBSurfaceRules;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 import com.pandaismyname1.ultraterraforged.platform.RegistryUtil;
-import com.pandaismyname1.ultraterraforged.registries.RTFBuiltInRegistries;
-import com.pandaismyname1.ultraterraforged.registries.RTFRegistries;
-import com.pandaismyname1.ultraterraforged.server.commands.RTFCommands;
+import com.pandaismyname1.ultraterraforged.registries.UTFBuiltInRegistries;
+import com.pandaismyname1.ultraterraforged.registries.UTFRegistries;
+import com.pandaismyname1.ultraterraforged.server.commands.UTFCommands;
 import com.pandaismyname1.ultraterraforged.world.worldgen.biome.modifier.BiomeModifier;
 import com.pandaismyname1.ultraterraforged.world.worldgen.biome.modifier.BiomeModifiers;
-import com.pandaismyname1.ultraterraforged.world.worldgen.densityfunction.RTFDensityFunctions;
-import com.pandaismyname1.ultraterraforged.world.worldgen.feature.RTFFeatures;
-import com.pandaismyname1.ultraterraforged.world.worldgen.feature.chance.RTFChanceModifiers;
-import com.pandaismyname1.ultraterraforged.world.worldgen.feature.placement.RTFPlacementModifiers;
+import com.pandaismyname1.ultraterraforged.world.worldgen.densityfunction.UTFDensityFunctions;
+import com.pandaismyname1.ultraterraforged.world.worldgen.feature.UTFFeatures;
+import com.pandaismyname1.ultraterraforged.world.worldgen.feature.chance.UTFChanceModifiers;
+import com.pandaismyname1.ultraterraforged.world.worldgen.feature.placement.UTFPlacementModifiers;
 import com.pandaismyname1.ultraterraforged.world.worldgen.feature.template.decorator.TemplateDecorators;
 import com.pandaismyname1.ultraterraforged.world.worldgen.feature.template.placement.TemplatePlacements;
-import com.pandaismyname1.ultraterraforged.world.worldgen.floatproviders.RTFFloatProviderTypes;
-import com.pandaismyname1.ultraterraforged.world.worldgen.heightproviders.RTFHeightProviderTypes;
+import com.pandaismyname1.ultraterraforged.world.worldgen.floatproviders.UTFFloatProviderTypes;
+import com.pandaismyname1.ultraterraforged.world.worldgen.heightproviders.UTFHeightProviderTypes;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.domain.Domains;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.function.CurveFunctions;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noise;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noises;
 import com.pandaismyname1.ultraterraforged.world.worldgen.structure.rule.StructureRule;
 import com.pandaismyname1.ultraterraforged.world.worldgen.structure.rule.StructureRules;
-import com.pandaismyname1.ultraterraforged.world.worldgen.surface.condition.RTFSurfaceConditions;
+import com.pandaismyname1.ultraterraforged.world.worldgen.surface.condition.UTFSurfaceConditions;
 import com.pandaismyname1.ultraterraforged.world.worldgen.surface.rule.LayeredSurfaceRule;
-import com.pandaismyname1.ultraterraforged.world.worldgen.surface.rule.RTFSurfaceRules;
+import com.pandaismyname1.ultraterraforged.world.worldgen.surface.rule.UTFSurfaceRules;
 
-public class RTFCommon {
+public class UTFCommon {
 	public static final String MOD_ID = "ultraterraforged";
 	public static final String LEGACY_MOD_ID = "terraforged";
 	public static final Logger LOGGER = LogManager.getLogger("UltraTerraForged");
 
 	public static void bootstrap() {
-		RTFBuiltInRegistries.bootstrap();
+		UTFBuiltInRegistries.bootstrap();
 		TemplatePlacements.bootstrap();
 		TemplateDecorators.bootstrap();
-		RTFChanceModifiers.bootstrap();
-		RTFPlacementModifiers.bootstrap();
-		RTFDensityFunctions.bootstrap();
+		UTFChanceModifiers.bootstrap();
+		UTFPlacementModifiers.bootstrap();
+		UTFDensityFunctions.bootstrap();
 		Noises.bootstrap();
 		Domains.bootstrap();
 		CurveFunctions.bootstrap();
-		RTFFeatures.bootstrap();
-		RTFHeightProviderTypes.bootstrap();
-		RTFFloatProviderTypes.bootstrap();
-		RTFSurfaceRules.bootstrap();
-		RTFSurfaceConditions.bootstrap();
+		UTFFeatures.bootstrap();
+		UTFHeightProviderTypes.bootstrap();
+		UTFFloatProviderTypes.bootstrap();
+		UTFSurfaceRules.bootstrap();
+		UTFSurfaceConditions.bootstrap();
 		BiomeModifiers.bootstrap();
 		StructureRules.bootstrap();
 
-		RTFCommands.bootstrap();
+		UTFCommands.bootstrap();
 		
 		if(TBCompat.isEnabled()) {
 			TBCompat.bootstrap();
 		}
 		
-		RegistryUtil.createDataRegistry(RTFRegistries.NOISE, Noise.DIRECT_CODEC);
-		RegistryUtil.createDataRegistry(RTFRegistries.BIOME_MODIFIER, BiomeModifier.CODEC);
-		RegistryUtil.createDataRegistry(RTFRegistries.STRUCTURE_RULE, StructureRule.CODEC);
-		RegistryUtil.createDataRegistry(RTFRegistries.SURFACE_LAYERS, LayeredSurfaceRule.Layer.CODEC);
-		RegistryUtil.createDataRegistry(RTFRegistries.PRESET, Preset.CODEC);
+		RegistryUtil.createDataRegistry(UTFRegistries.NOISE, Noise.DIRECT_CODEC);
+		RegistryUtil.createDataRegistry(UTFRegistries.BIOME_MODIFIER, BiomeModifier.CODEC);
+		RegistryUtil.createDataRegistry(UTFRegistries.STRUCTURE_RULE, StructureRule.CODEC);
+		RegistryUtil.createDataRegistry(UTFRegistries.SURFACE_LAYERS, LayeredSurfaceRule.Layer.CODEC);
+		RegistryUtil.createDataRegistry(UTFRegistries.PRESET, Preset.CODEC);
 	}
 	
 	public static ResourceLocation location(String name) {
 		if (name.contains(":")) return new ResourceLocation(name);
-		return new ResourceLocation(RTFCommon.MOD_ID, name);
+		return new ResourceLocation(UTFCommon.MOD_ID, name);
 	}
 }

@@ -7,14 +7,14 @@ import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.core.Registry;
 import net.minecraft.core.WritableRegistry;
 import net.minecraft.resources.ResourceKey;
-import com.pandaismyname1.ultraterraforged.registries.RTFRegistries;
+import com.pandaismyname1.ultraterraforged.registries.UTFRegistries;
 import com.pandaismyname1.ultraterraforged.world.worldgen.biome.modifier.BiomeModifier;
 
 @Deprecated
 public final class RegistryUtil {
 	
 	public static <T> void register(Registry<T> registry, String name, T value) {
-		getWritable(registry).register(RTFRegistries.createKey(registry.key(), name), value, Lifecycle.stable());
+		getWritable(registry).register(UTFRegistries.createKey(registry.key(), name), value, Lifecycle.stable());
 	}
 	
 	@ExpectPlatform

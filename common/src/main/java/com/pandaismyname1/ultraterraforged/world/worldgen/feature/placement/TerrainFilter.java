@@ -35,6 +35,6 @@ class TerrainFilter extends CellFilter {
 	
 	@Override
 	public PlacementModifierType<TerrainFilter> type() {
-		return RTFPlacementModifiers.TERRAIN_FILTER;
+		return UTFPlacementModifiers.TERRAIN_FILTER;
 	}
 }

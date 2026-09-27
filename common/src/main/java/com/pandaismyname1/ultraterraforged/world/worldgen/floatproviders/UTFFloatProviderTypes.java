@@ -7,7 +7,7 @@ import net.minecraft.util.valueproviders.FloatProvider;
 import net.minecraft.util.valueproviders.FloatProviderType;
 import com.pandaismyname1.ultraterraforged.platform.RegistryUtil;
 
-public class RTFFloatProviderTypes {
+public class UTFFloatProviderTypes {
 	public static final FloatProviderType<LegacyCanyonYScale> LEGACY_CANYON_Y_SCALE = register("legacy_canyon_y_scale", LegacyCanyonYScale.CODEC);
 	
 	public static void bootstrap() {

@@ -3,9 +3,9 @@ package com.pandaismyname1.ultraterraforged.tags;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
-import com.pandaismyname1.ultraterraforged.RTFCommon;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
 
-public class RTFBiomeTags {
+public class UTFBiomeTags {
 	public static final TagKey<Biome> HAS_SWAMP_SURFACE = resolve("features/has_swamp_surface");
 	public static final TagKey<Biome> HAS_SWAMP_TREES = resolve("features/has_swamp_trees");
 	public static final TagKey<Biome> HAS_PLAINS_TREES = resolve("features/has_plains_trees");
@@ -42,6 +42,6 @@ public class RTFBiomeTags {
 	public static final TagKey<Biome> EROSION_BLACKLIST = resolve("surface/erosion_blacklist");
 	
     private static TagKey<Biome> resolve(String path) {
-    	return TagKey.create(Registries.BIOME, RTFCommon.location(path));
+    	return TagKey.create(Registries.BIOME, UTFCommon.location(path));
     }
 }

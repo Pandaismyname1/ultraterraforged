@@ -9,7 +9,7 @@ import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
-import com.pandaismyname1.ultraterraforged.world.worldgen.RTFRandomState;
+import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
 import com.pandaismyname1.ultraterraforged.world.worldgen.tile.Tile;
 
 /**
@@ -29,7 +29,7 @@ class NearGroundCondition extends SurfaceRules.LazyYCondition {
 		this.depth = depth;
 		GeneratorContext generatorContext = null;
 		Tile.Chunk chunk = null;
-		if ((Object) context.randomState instanceof RTFRandomState randomState && (generatorContext = randomState.generatorContext()) != null) {
+		if ((Object) context.randomState instanceof UTFRandomState randomState && (generatorContext = randomState.generatorContext()) != null) {
 			ChunkPos chunkPos = context.chunk.getPos();
 			chunk = generatorContext.cache.provideChunk(chunkPos.x, chunkPos.z);
 		}

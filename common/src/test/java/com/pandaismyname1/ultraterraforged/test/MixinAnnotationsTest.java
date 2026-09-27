@@ -18,7 +18,7 @@ import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
-import com.pandaismyname1.ultraterraforged.RTFCommon;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
 
 /**
  * The common mixins must keep a single @At in the injectors where older Mixin expects one. Compiled against Fabric's
@@ -36,7 +36,7 @@ public class MixinAnnotationsTest {
 	@Test
 	@SuppressWarnings("unchecked")
 	void injectorsHaveASingleAt() throws IOException, URISyntaxException {
-		Path root = Path.of(RTFCommon.class.getProtectionDomain().getCodeSource().getLocation().toURI()).resolve("com/pandaismyname1/ultraterraforged/mixin");
+		Path root = Path.of(UTFCommon.class.getProtectionDomain().getCodeSource().getLocation().toURI()).resolve("com/pandaismyname1/ultraterraforged/mixin");
 		List<String> wrong = new ArrayList<>();
 		int checked = 0;
 		try (Stream<Path> files = Files.walk(root)) {

@@ -42,9 +42,9 @@ dependencies {
     shadowBundle(project(path: ":common", configuration: "transformProductionFabric")) { transitive = false }
 
     // Performance mods, in the dev runs only: the ones PerformanceMods lists for Fabric on this version, pinned to
-    // Modrinth version ids (the version numbers are shared between loaders). -Prtf.perfMods=false leaves them out, to
+    // Modrinth version ids (the version numbers are shared between loaders). -Putf.perfMods=false leaves them out, to
     // measure or debug UltraTerraForged on its own. See docs/porting/performance-mods.md.
-    if (project.findProperty("rtf.perfMods") != "false") {
+    if (project.findProperty("utf.perfMods") != "false") {
         devModsFolder "maven.modrinth:c2me-fabric:fyt7FtgA"     // C2ME 0.2.0+alpha.11.18: its modules are nested jars
         modLocalRuntime "maven.modrinth:noisiumed:vcRbbvYP"     // Noisiumed 3.0.6
         modLocalRuntime "maven.modrinth:lithium:iEcXOkz4"       // Lithium 0.11.4

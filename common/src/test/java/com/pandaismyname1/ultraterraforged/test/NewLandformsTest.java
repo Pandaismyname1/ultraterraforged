@@ -19,8 +19,8 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.terrain.TerrainType;
 
 /**
  * Salt flats, alluvial fans, glacial valleys and cirques, moraines and drumlins, barrier islands, karst and deltas:
- * each is found as /rtf locate would find it, then the place is generated with it on and off and measured.
- * With -Drtf.render=true the places are also drawn to build/terrain-views.
+ * each is found as /utf locate would find it, then the place is generated with it on and off and measured.
+ * With -Dutf.render=true the places are also drawn to build/terrain-views.
  */
 public class NewLandformsTest {
 
@@ -44,7 +44,7 @@ public class NewLandformsTest {
 	}
 
 	private static void render(TerrainViews.View view, String name) throws IOException {
-		if (Boolean.getBoolean("rtf.render")) {
+		if (Boolean.getBoolean("utf.render")) {
 			TerrainViews.write(view, name);
 			TerrainViews.writeProfile(view, name + "_profile");
 			TerrainViews.writePerspective(view, name + "_3d");

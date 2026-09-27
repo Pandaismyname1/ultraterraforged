@@ -9,7 +9,7 @@ import com.pandaismyname1.ultraterraforged.platform.RegistryUtil;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.CellField;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noise;	
 
-public class RTFDensityFunctions {
+public class UTFDensityFunctions {
 
 	public static void bootstrap() {
 		register("noise_sampler", NoiseSampler.Marker.CODEC);

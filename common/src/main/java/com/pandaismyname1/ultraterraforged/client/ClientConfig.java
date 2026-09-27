@@ -10,7 +10,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import com.pandaismyname1.ultraterraforged.RTFCommon;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
 import com.pandaismyname1.ultraterraforged.config.ModpackConfig;
 import com.pandaismyname1.ultraterraforged.platform.ConfigUtil;
 
@@ -19,7 +19,7 @@ public record ClientConfig(boolean defaultWorldType) {
 	private static final String DEFAULT_WORLD_TYPE = "useAsDefaultWorldType";
 
 	public static ClientConfig load() {
-		Path file = ConfigUtil.rtf("client.json");
+		Path file = ConfigUtil.utf("client.json");
 		Boolean modpackWorldType = ModpackConfig.load().defaultWorldType();
 		ClientConfig defaults = new ClientConfig(modpackWorldType == null || modpackWorldType);
 		if (!Files.exists(file)) {
@@ -30,7 +30,7 @@ public record ClientConfig(boolean defaultWorldType) {
 			JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
 			return new ClientConfig(json.has(DEFAULT_WORLD_TYPE) ? json.get(DEFAULT_WORLD_TYPE).getAsBoolean() : defaults.defaultWorldType);
 		} catch (IOException | RuntimeException e) {
-			RTFCommon.LOGGER.error("Couldn't read {}, using defaults", file, e);
+			UTFCommon.LOGGER.error("Couldn't read {}, using defaults", file, e);
 			return defaults;
 		}
 	}
@@ -44,7 +44,7 @@ public record ClientConfig(boolean defaultWorldType) {
 				new GsonBuilder().setPrettyPrinting().create().toJson(json, writer);
 			}
 		} catch (IOException e) {
-			RTFCommon.LOGGER.error("Couldn't write {}", file, e);
+			UTFCommon.LOGGER.error("Couldn't write {}", file, e);
 		}
 	}
 }

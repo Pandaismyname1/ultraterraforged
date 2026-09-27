@@ -18,7 +18,7 @@ State as of 2026-09-27 (UltraTerraForged on 1.20.1, Fabric and Forge; the Forge 
 | Availability lookup | `docs/porting/tools/perfmods.py` |
 | Server tests: timing chunk generation, running console commands | `docs/porting/tools/servers/` |
 
-`-Prtf.perfMods=false` runs the dev game without them, e.g. to measure or debug UltraTerraForged on its own.
+`-Putf.perfMods=false` runs the dev game without them, e.g. to measure or debug UltraTerraForged on its own.
 
 Two things the dev runs need that a real game doesn't:
 
@@ -106,7 +106,7 @@ Dedicated servers, fresh world with the default preset, 1024 forceloaded chunks,
 
 C2ME does most of the work, but only with the rest: on Forge, C2ME alone gained 0–12 %, the others alone 1 %, all of
 them together 25–28 %, which brings UltraTerraForged to vanilla's speed or better on both loaders. Every setup passed the
-`/rtf locate` smoke test with the same results.
+`/utf locate` smoke test with the same results.
 
 - **Forge crashed at startup with Noisiumed, ModernFix or AllTheLeaks** (a `ClassCastException` in MixinExtras'
   `FactoryRedirectWrapperMixinTransformer`, loading `NoiseBasedChunkGenerator`). Not the mods' fault: Fabric's Mixin
@@ -117,7 +117,7 @@ them together 25–28 %, which brings UltraTerraForged to vanilla's speed or bet
   on every port**: whenever the Fabric loader is bumped, check the pin still applies, and run a NeoForge/Forge server
   with a MixinExtras-bundling mod (ModernFix is in most packs).
 - C2ME changes how chunks are scheduled. UltraTerraForged's hooks on the chunk status tasks (queueing tiles before
-  generation, dropping them after features) still run under it; `/rtf locate` and generation work, no errors.
+  generation, dropping them after features) still run under it; `/utf locate` and generation work, no errors.
 - **C2ME on Forge through Sinytra Connector works** (Connector 1.0.0-beta.49, Forgified Fabric API 0.92.6, C2ME
   0.2.0+alpha.11.18): its modules load, UltraTerraForged generates and locates as on Fabric. The only errors in the log are
   Forgified Fabric API's client screen mixins being skipped on a dedicated server. So `PerformanceMods` lists C2ME for
@@ -167,6 +167,6 @@ What that means for the port:
 4. Check each mod's mod id in its jar (`fabric.mod.json` `id`, `META-INF/neoforge.mods.toml` `modId`); forks
    sometimes keep the original's id, and Connector turns `-` in Fabric ids into `_`.
 5. Run a dedicated server of each loader with the mods and UltraTerraForged (`tools/servers/bench.sh` and
-   `tools/servers/smoke.sh`): a fresh world, `/rtf locate` a few landforms, forceload an area, no errors in the
+   `tools/servers/smoke.sh`): a fresh world, `/utf locate` a few landforms, forceload an area, no errors in the
    log. C2ME and Noisium change the chunk pipeline UltraTerraForged hooks into, so this is the part most likely to break.
 6. Run the dev client once to see the section: the light, and a click opening a mod's page.

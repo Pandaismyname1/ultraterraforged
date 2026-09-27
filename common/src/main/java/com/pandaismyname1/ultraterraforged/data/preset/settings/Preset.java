@@ -28,7 +28,7 @@ import com.pandaismyname1.ultraterraforged.data.preset.PresetPlacedFeatures;
 import com.pandaismyname1.ultraterraforged.data.preset.PresetStructureRuleData;
 import com.pandaismyname1.ultraterraforged.data.preset.PresetStructureSets;
 import com.pandaismyname1.ultraterraforged.data.preset.PresetSurfaceLayerData;
-import com.pandaismyname1.ultraterraforged.registries.RTFRegistries;
+import com.pandaismyname1.ultraterraforged.registries.UTFRegistries;
 
 //TODO make this actually immutable when we rework the gui
 public record Preset(WorldSettings world, SurfaceSettings surface, CaveSettings caves, ClimateSettings climate, TerrainSettings terrain, RiverSettings rivers, FilterSettings filters, StructureSettings structures, MiscellaneousSettings miscellaneous, LandformSettings landforms, CoastSettings coasts, CaveFeatureSettings caveFeatures, OceanSettings oceans) {
@@ -63,11 +63,11 @@ public record Preset(WorldSettings world, SurfaceSettings surface, CaveSettings 
 
 	public HolderLookup.Provider buildPatch(HolderLookup.Provider registries) {
 		RegistrySetBuilder builder = new RegistrySetBuilder();
-		this.addPatch(builder, RTFRegistries.PRESET, PresetData::bootstrap);
-		this.addPatch(builder, RTFRegistries.NOISE, PresetNoiseData::bootstrap);
-		this.addPatch(builder, RTFRegistries.BIOME_MODIFIER, PresetBiomeModifierData::bootstrap);
-		this.addPatch(builder, RTFRegistries.STRUCTURE_RULE, PresetStructureRuleData::bootstrap);
-		this.addPatch(builder, RTFRegistries.SURFACE_LAYERS, PresetSurfaceLayerData::bootstrap);
+		this.addPatch(builder, UTFRegistries.PRESET, PresetData::bootstrap);
+		this.addPatch(builder, UTFRegistries.NOISE, PresetNoiseData::bootstrap);
+		this.addPatch(builder, UTFRegistries.BIOME_MODIFIER, PresetBiomeModifierData::bootstrap);
+		this.addPatch(builder, UTFRegistries.STRUCTURE_RULE, PresetStructureRuleData::bootstrap);
+		this.addPatch(builder, UTFRegistries.SURFACE_LAYERS, PresetSurfaceLayerData::bootstrap);
 		this.addPatch(builder, Registries.CONFIGURED_FEATURE, (preset, ctx) -> {
 			PresetConfiguredFeatures.bootstrap(preset, ctx);
 		});

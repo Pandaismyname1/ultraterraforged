@@ -54,12 +54,12 @@ jobs:
       - name: Build Fabric
         env:
           RELEASE: true
-        run: ./gradlew :fabric:build -Prtf.perfMods=false
+        run: ./gradlew :fabric:build -Putf.perfMods=false
 
       - name: Build Forge
         env:
           RELEASE: true
-        run: ./gradlew :forge:build -Prtf.perfMods=false
+        run: ./gradlew :forge:build -Putf.perfMods=false
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2

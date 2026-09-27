@@ -32,6 +32,6 @@ class NoiseFilter extends PlacementFilter {
 	
 	@Override
 	public PlacementModifierType<NoiseFilter> type() {
-		return RTFPlacementModifiers.NOISE_FILTER;
+		return UTFPlacementModifiers.NOISE_FILTER;
 	}
 }

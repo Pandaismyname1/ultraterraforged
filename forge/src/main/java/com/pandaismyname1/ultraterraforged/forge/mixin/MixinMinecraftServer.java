@@ -19,10 +19,10 @@ import net.minecraft.server.level.progress.ChunkProgressListenerFactory;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.level.storage.LevelStorageSource;
-import com.pandaismyname1.ultraterraforged.server.RTFMinecraftServer;
+import com.pandaismyname1.ultraterraforged.server.UTFMinecraftServer;
 import com.pandaismyname1.ultraterraforged.world.worldgen.feature.template.template.FeatureTemplateManager;
 
-@Implements(@Interface(iface = RTFMinecraftServer.class, prefix = "ultraterraforged$RTFMinecraftServer$"))
+@Implements(@Interface(iface = UTFMinecraftServer.class, prefix = "ultraterraforged$UTFMinecraftServer$"))
 @Mixin(MinecraftServer.class)
 public class MixinMinecraftServer {
 	private FeatureTemplateManager templateManager;
@@ -35,7 +35,7 @@ public class MixinMinecraftServer {
 		this.templateManager = new FeatureTemplateManager((MinecraftServer) (Object) this, this.getResourceManager());
 	}
 	
-	public FeatureTemplateManager ultraterraforged$RTFMinecraftServer$getFeatureTemplateManager() {
+	public FeatureTemplateManager ultraterraforged$UTFMinecraftServer$getFeatureTemplateManager() {
 		return this.templateManager;
 	}
 

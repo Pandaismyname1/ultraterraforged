@@ -14,14 +14,14 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
-import com.pandaismyname1.ultraterraforged.client.data.RTFTranslationKeys;
+import com.pandaismyname1.ultraterraforged.client.data.UTFTranslationKeys;
 import com.pandaismyname1.ultraterraforged.world.worldgen.terrain.Terrain;
 import com.pandaismyname1.ultraterraforged.world.worldgen.terrain.TerrainType;
 
 // A plain word argument with server-side suggestions rather than a custom ArgumentType,
 // so the command tree stays vanilla-compatible and clients don't need the mod installed
 public class TerrainArgument {
-    public static final DynamicCommandExceptionType ERROR_INVALID_VALUE = new DynamicCommandExceptionType(input -> Component.translatable(RTFTranslationKeys.TERRAIN_ARGUMENT_INVALID, input));
+    public static final DynamicCommandExceptionType ERROR_INVALID_VALUE = new DynamicCommandExceptionType(input -> Component.translatable(UTFTranslationKeys.TERRAIN_ARGUMENT_INVALID, input));
     // volcano_pipe, the lava lake in a crater, can be located too
     private static final List<Terrain> BLACKLIST = ImmutableList.of(TerrainType.NONE);
 

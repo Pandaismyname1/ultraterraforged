@@ -25,7 +25,7 @@ now() { date +%s%3N; }
     grep -qE 'Done \(|Exception in server tick loop|Crash report saved|Failed to start the minecraft server' logs/latest.log 2>/dev/null && break
     sleep 2
   done
-  pid=$(powershell.exe -NoProfile -Command "(Get-CimInstance Win32_Process | Where-Object { \$_.CommandLine -like '*rtfbench*' -and \$_.Name -like 'java*' }).ProcessId" | tr -d '\r' | head -1)
+  pid=$(powershell.exe -NoProfile -Command "(Get-CimInstance Win32_Process | Where-Object { \$_.CommandLine -like '*utfbench*' -and \$_.Name -like 'java*' }).ProcessId" | tr -d '\r' | head -1)
   sleep 5
   startCpu=$(cpu $pid); start=$(now)
   echo "pid $pid cpu at done $startCpu" >> "$log"
@@ -49,7 +49,7 @@ now() { date +%s%3N; }
   echo "forceload done wall $((busyT - start)) cpu $(awk -v a=$busyCpu -v b=$startCpu 'BEGIN { printf "%.0f", a - b }')" >> "$log"
   echo stop
   sleep 5
-) | "$J" -Xmx4G -Drtfbench=1 $JAVA_EXTRA ${SERVER_ARGS:--jar server.jar} nogui > console.log 2>&1
+) | "$J" -Xmx4G -Dutfbench=1 $JAVA_EXTRA ${SERVER_ARGS:--jar server.jar} nogui > console.log 2>&1
 
 spawn=$(grep -o 'Time elapsed: [0-9]* ms' logs/latest.log | grep -o '[0-9]*' | head -1)
 done_s=$(grep -o 'Done ([0-9.]*s)' logs/latest.log | grep -o '[0-9.]*' | head -1)

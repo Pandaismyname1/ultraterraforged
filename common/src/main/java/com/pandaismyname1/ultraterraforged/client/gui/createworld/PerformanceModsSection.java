@@ -17,7 +17,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import com.pandaismyname1.ultraterraforged.client.data.RTFTranslationKeys;
+import com.pandaismyname1.ultraterraforged.client.data.UTFTranslationKeys;
 import com.pandaismyname1.ultraterraforged.compat.performance.PerformanceMods;
 import com.pandaismyname1.ultraterraforged.platform.ModLoaderUtil;
 
@@ -69,15 +69,15 @@ final class PerformanceModsSection {
 
 	private static Tooltip tooltip(PerformanceMods.Report report) {
 		String light = switch (report.light()) {
-			case RED -> RTFTranslationKeys.GUI_PERFORMANCE_MODS_LIGHT_RED;
-			case ORANGE -> RTFTranslationKeys.GUI_PERFORMANCE_MODS_LIGHT_ORANGE;
-			case YELLOW -> RTFTranslationKeys.GUI_PERFORMANCE_MODS_LIGHT_YELLOW;
-			case GREEN -> RTFTranslationKeys.GUI_PERFORMANCE_MODS_LIGHT_GREEN;
+			case RED -> UTFTranslationKeys.GUI_PERFORMANCE_MODS_LIGHT_RED;
+			case ORANGE -> UTFTranslationKeys.GUI_PERFORMANCE_MODS_LIGHT_ORANGE;
+			case YELLOW -> UTFTranslationKeys.GUI_PERFORMANCE_MODS_LIGHT_YELLOW;
+			case GREEN -> UTFTranslationKeys.GUI_PERFORMANCE_MODS_LIGHT_GREEN;
 		};
-		return Tooltip.create(Component.translatable(RTFTranslationKeys.GUI_PERFORMANCE_MODS_TITLE).withStyle(ChatFormatting.BOLD)
+		return Tooltip.create(Component.translatable(UTFTranslationKeys.GUI_PERFORMANCE_MODS_TITLE).withStyle(ChatFormatting.BOLD)
 			.append(CommonComponents.NEW_LINE).append(Component.translatable(light).withStyle(ChatFormatting.RESET))
 			.append(CommonComponents.NEW_LINE).append(CommonComponents.NEW_LINE)
-			.append(Component.translatable(RTFTranslationKeys.GUI_PERFORMANCE_MODS_HELP).withStyle(ChatFormatting.GRAY)));
+			.append(Component.translatable(UTFTranslationKeys.GUI_PERFORMANCE_MODS_HELP).withStyle(ChatFormatting.GRAY)));
 	}
 
 	// a small round lamp with a darker rim, 8 pixels across, centred on the given height
@@ -95,7 +95,7 @@ final class PerformanceModsSection {
 		private final Runnable show;
 
 		Light(PerformanceMods.Report report, Runnable show) {
-			super(0, 0, 0, 0, Component.translatable(RTFTranslationKeys.GUI_PERFORMANCE_MODS_TITLE));
+			super(0, 0, 0, 0, Component.translatable(UTFTranslationKeys.GUI_PERFORMANCE_MODS_TITLE));
 			this.report = report;
 			this.show = show;
 			this.setTooltip(tooltip(report));
@@ -129,14 +129,14 @@ final class PerformanceModsSection {
 	}
 
 	private static Component count(PerformanceMods.Report report) {
-		return Component.translatable(RTFTranslationKeys.GUI_PERFORMANCE_MODS_COUNT, report.installed(), report.available());
+		return Component.translatable(UTFTranslationKeys.GUI_PERFORMANCE_MODS_COUNT, report.installed(), report.available());
 	}
 
 	private static class Header extends AbstractWidget {
 		private final PerformanceMods.Report report;
 
 		Header(PerformanceMods.Report report) {
-			super(0, 0, 0, 0, Component.translatable(RTFTranslationKeys.GUI_PERFORMANCE_MODS_TITLE));
+			super(0, 0, 0, 0, Component.translatable(UTFTranslationKeys.GUI_PERFORMANCE_MODS_TITLE));
 			this.report = report;
 			this.active = false;
 			this.setTooltip(tooltip(report));
@@ -175,42 +175,42 @@ final class PerformanceModsSection {
 			PerformanceMods.Build shown = status.installed() != null ? status.installed() : status.recommended();
 
 			if (status.installed() != null) {
-				this.state = Component.translatable(RTFTranslationKeys.GUI_PERFORMANCE_MODS_INSTALLED);
+				this.state = Component.translatable(UTFTranslationKeys.GUI_PERFORMANCE_MODS_INSTALLED);
 				this.stateColor = 0xFF55FF55;
 			} else if (status.recommended() != null) {
-				this.state = Component.translatable(RTFTranslationKeys.GUI_PERFORMANCE_MODS_MISSING);
+				this.state = Component.translatable(UTFTranslationKeys.GUI_PERFORMANCE_MODS_MISSING);
 				this.stateColor = 0xFFFFD040;
 			} else if (mod.availableFrom() != null) {
-				this.state = Component.translatable(RTFTranslationKeys.GUI_PERFORMANCE_MODS_NEEDS_VERSION, mod.availableFrom());
+				this.state = Component.translatable(UTFTranslationKeys.GUI_PERFORMANCE_MODS_NEEDS_VERSION, mod.availableFrom());
 				this.stateColor = 0xFF808080;
 			} else if (mod.builds(loader).stream().anyMatch(PerformanceMods.Build::viaConnector)) {
-				this.state = Component.translatable(RTFTranslationKeys.GUI_PERFORMANCE_MODS_NEEDS_CONNECTOR);
+				this.state = Component.translatable(UTFTranslationKeys.GUI_PERFORMANCE_MODS_NEEDS_CONNECTOR);
 				this.stateColor = 0xFFB0B0B0;
 			} else {
-				this.state = Component.translatable(RTFTranslationKeys.GUI_PERFORMANCE_MODS_NOT_ON_LOADER, loaderName(loader));
+				this.state = Component.translatable(UTFTranslationKeys.GUI_PERFORMANCE_MODS_NOT_ON_LOADER, loaderName(loader));
 				this.stateColor = 0xFF808080;
 			}
 			boolean connector = mod.builds(loader).stream().anyMatch(PerformanceMods.Build::viaConnector);
 			// with nothing to get until Connector is there, the link goes to Connector
 			this.url = shown != null ? shown.url() : connector ? PerformanceMods.CONNECTOR_URL : mod.url();
 
-			MutableComponent tooltip = Component.translatable(RTFTranslationKeys.performanceModCategory(mod.category().name().toLowerCase(Locale.ROOT))).withStyle(ChatFormatting.AQUA)
+			MutableComponent tooltip = Component.translatable(UTFTranslationKeys.performanceModCategory(mod.category().name().toLowerCase(Locale.ROOT))).withStyle(ChatFormatting.AQUA)
 				.append(CommonComponents.NEW_LINE)
-				.append(Component.translatable(RTFTranslationKeys.performanceModDescription(mod.key())).withStyle(ChatFormatting.WHITE));
+				.append(Component.translatable(UTFTranslationKeys.performanceModDescription(mod.key())).withStyle(ChatFormatting.WHITE));
 			if (shown != null && shown.alternative() && !shown.name().equals(mod.name()) && !mod.builds(loader).stream().anyMatch((build) -> !build.alternative())) {
 				tooltip.append(CommonComponents.NEW_LINE).append(CommonComponents.NEW_LINE)
-					.append(Component.translatable(RTFTranslationKeys.GUI_PERFORMANCE_MODS_STANDS_IN, mod.name(), loaderName(loader), shown.name()).withStyle(ChatFormatting.GRAY));
+					.append(Component.translatable(UTFTranslationKeys.GUI_PERFORMANCE_MODS_STANDS_IN, mod.name(), loaderName(loader), shown.name()).withStyle(ChatFormatting.GRAY));
 			}
 			if (connector) {
 				tooltip.append(CommonComponents.NEW_LINE).append(CommonComponents.NEW_LINE)
-					.append(Component.translatable(RTFTranslationKeys.GUI_PERFORMANCE_MODS_VIA_CONNECTOR, mod.name(), loaderName(loader)).withStyle(ChatFormatting.GRAY));
+					.append(Component.translatable(UTFTranslationKeys.GUI_PERFORMANCE_MODS_VIA_CONNECTOR, mod.name(), loaderName(loader)).withStyle(ChatFormatting.GRAY));
 			}
 			if (status.installed() != null) {
-				tooltip.append(CommonComponents.NEW_LINE).append(Component.translatable(RTFTranslationKeys.GUI_PERFORMANCE_MODS_RUNNING, status.installed().name()).withStyle(ChatFormatting.GREEN));
+				tooltip.append(CommonComponents.NEW_LINE).append(Component.translatable(UTFTranslationKeys.GUI_PERFORMANCE_MODS_RUNNING, status.installed().name()).withStyle(ChatFormatting.GREEN));
 			} else if (status.recommended() != null) {
-				tooltip.append(CommonComponents.NEW_LINE).append(Component.translatable(RTFTranslationKeys.GUI_PERFORMANCE_MODS_GET, status.recommended().name()).withStyle(ChatFormatting.YELLOW));
+				tooltip.append(CommonComponents.NEW_LINE).append(Component.translatable(UTFTranslationKeys.GUI_PERFORMANCE_MODS_GET, status.recommended().name()).withStyle(ChatFormatting.YELLOW));
 			}
-			tooltip.append(CommonComponents.NEW_LINE).append(Component.translatable(RTFTranslationKeys.GUI_PERFORMANCE_MODS_OPEN).withStyle(ChatFormatting.DARK_GRAY));
+			tooltip.append(CommonComponents.NEW_LINE).append(Component.translatable(UTFTranslationKeys.GUI_PERFORMANCE_MODS_OPEN).withStyle(ChatFormatting.DARK_GRAY));
 			this.setTooltip(Tooltip.create(tooltip));
 		}
 

@@ -22,7 +22,7 @@ import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 import net.minecraft.world.level.storage.DimensionDataStorage;
 import net.minecraft.world.level.storage.LevelStorageSource;
-import com.pandaismyname1.ultraterraforged.world.worldgen.RTFRandomState;
+import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
 import com.pandaismyname1.ultraterraforged.world.worldgen.WorldGenFlags;
 
 @Mixin(ChunkMap.class)
@@ -35,10 +35,10 @@ public class MixinChunkMap {
 		method = "<init>"
 	)
 	public void ChunkMap(ServerLevel serverLevel, LevelStorageSource.LevelStorageAccess storageAccess, DataFixer dataFixer, StructureTemplateManager templateLoader, Executor executor, BlockableEventLoop<Runnable> eventLoop, LightChunkGetter lightChunkGetter, ChunkGenerator chunkGenerator, ChunkProgressListener chunkProgressListener, ChunkStatusUpdateListener chunkStatusListener, Supplier<DimensionDataStorage> dimensionStorage, int viewDistance, boolean syncChunkWrites, CallbackInfo callback) {
-		if((Object) this.randomState instanceof RTFRandomState rtfRandomState) {
+		if((Object) this.randomState instanceof UTFRandomState utfRandomState) {
 			WorldGenFlags.setCullNoiseSections(true);
 
-			rtfRandomState.initialize(serverLevel.registryAccess());
+			utfRandomState.initialize(serverLevel.registryAccess());
 		}
 	}
 }

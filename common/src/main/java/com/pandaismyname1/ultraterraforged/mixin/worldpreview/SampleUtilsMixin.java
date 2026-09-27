@@ -22,8 +22,8 @@ import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.WorldOptions;
-import com.pandaismyname1.ultraterraforged.RTFCommon;
-import com.pandaismyname1.ultraterraforged.world.worldgen.RTFRandomState;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
+import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
 import com.pandaismyname1.ultraterraforged.world.worldgen.WorldGenFlags;
 
 @Pseudo
@@ -47,7 +47,7 @@ public class SampleUtilsMixin {
 		)
 	)
 	private void SampleUtils$1(CallbackInfo callback) {
-		this.initRTF();
+		this.initUTF();
 	}
 
 	@Inject(
@@ -61,16 +61,16 @@ public class SampleUtilsMixin {
 		)
 	) 
 	private void SampleUtils$2(CallbackInfo callback) {
-		this.initRTF();
+		this.initUTF();
 	}
 	
-	private void initRTF() {
-		if((Object) this.randomState instanceof RTFRandomState rtfRandomState) {
+	private void initUTF() {
+		if((Object) this.randomState instanceof UTFRandomState utfRandomState) {
 			WorldGenFlags.setCullNoiseSections(false);
 			
-			rtfRandomState.initialize(this.registryAccess);
+			utfRandomState.initialize(this.registryAccess);
 			
-			RTFCommon.LOGGER.info("initialized rtf data");
+			UTFCommon.LOGGER.info("initialized utf data");
 		} else {
 			throw new IllegalStateException();
 		}

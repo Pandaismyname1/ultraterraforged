@@ -10,7 +10,7 @@ import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 
-public class RTFBiomes {
+public class UTFBiomes {
     @Nullable
     private static final Music NORMAL_MUSIC = null;
 

@@ -23,7 +23,7 @@ import net.minecraft.world.level.levelgen.NoiseRouter;
 import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.SurfaceSystem;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
-import com.pandaismyname1.ultraterraforged.RTFCommon;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
 import com.pandaismyname1.ultraterraforged.compat.terrablender.TBClimateSampler;
 import com.pandaismyname1.ultraterraforged.compat.terrablender.TBCompat;
 import com.pandaismyname1.ultraterraforged.compat.terrablender.TBNoiseRouterData;
@@ -32,16 +32,16 @@ import com.pandaismyname1.ultraterraforged.concurrent.cache.CacheManager;
 import com.pandaismyname1.ultraterraforged.config.PerformanceConfig;
 import com.pandaismyname1.ultraterraforged.data.preset.PresetData;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
-import com.pandaismyname1.ultraterraforged.registries.RTFRegistries;
+import com.pandaismyname1.ultraterraforged.registries.UTFRegistries;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
-import com.pandaismyname1.ultraterraforged.world.worldgen.RTFRandomState;
+import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
 import com.pandaismyname1.ultraterraforged.world.worldgen.densityfunction.CellSampler;
 import com.pandaismyname1.ultraterraforged.world.worldgen.densityfunction.NoiseSampler;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noise;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noises;
 
 @Mixin(RandomState.class)
-@Implements(@Interface(iface = RTFRandomState.class, prefix = "ultraterraforged$RTFRandomState$"))
+@Implements(@Interface(iface = UTFRandomState.class, prefix = "ultraterraforged$UTFRandomState$"))
 class MixinRandomState {
 	@Shadow
 	@Final
@@ -98,10 +98,10 @@ class MixinRandomState {
 		return router.mapAll(this.densityFunctionWrapper);
 	}
 
-	public void ultraterraforged$RTFRandomState$initialize(RegistryAccess registryAccess) {
+	public void ultraterraforged$UTFRandomState$initialize(RegistryAccess registryAccess) {
 		this.registryAccess = registryAccess;
 		
-		RegistryLookup<Preset> presets = registryAccess.lookupOrThrow(RTFRegistries.PRESET);
+		RegistryLookup<Preset> presets = registryAccess.lookupOrThrow(UTFRegistries.PRESET);
 		RegistryLookup<DensityFunction> functions = registryAccess.lookupOrThrow(Registries.DENSITY_FUNCTION);
 		
 		if((Object) this.sampler instanceof TBClimateSampler tbClimateSampler && TBCompat.isEnabled()) {
@@ -118,7 +118,7 @@ class MixinRandomState {
 				CacheManager.clear();
 				
 				PerformanceConfig config = PerformanceConfig.read(PerformanceConfig.DEFAULT_FILE_PATH)
-					.resultOrPartial(RTFCommon.LOGGER::error)
+					.resultOrPartial(UTFCommon.LOGGER::error)
 					.orElseGet(PerformanceConfig::makeDefault);
 				this.generatorContext = GeneratorContext.makeCached(this.preset, (int) this.seed, config.tileSize(), config.batchCount(), ThreadPools.availableProcessors() > 4);
 			}
@@ -126,26 +126,26 @@ class MixinRandomState {
 	}
 	
 	@Nullable
-	public RegistryAccess ultraterraforged$RTFRandomState$registryAccess() {
+	public RegistryAccess ultraterraforged$UTFRandomState$registryAccess() {
 		return this.registryAccess;
 	}
 	
 	@Nullable
-	public Preset ultraterraforged$RTFRandomState$preset() {
+	public Preset ultraterraforged$UTFRandomState$preset() {
 		return this.preset;
 	}
 	
 	@Nullable
-	public GeneratorContext ultraterraforged$RTFRandomState$generatorContext() {
+	public GeneratorContext ultraterraforged$UTFRandomState$generatorContext() {
 		return this.generatorContext;
 	}
 
 	@Nullable
-	public DensityFunction ultraterraforged$RTFRandomState$wrap(DensityFunction function) {
+	public DensityFunction ultraterraforged$UTFRandomState$wrap(DensityFunction function) {
 		return function.mapAll(this.densityFunctionWrapper);
 	}
 
-	public Noise ultraterraforged$RTFRandomState$wrap(Noise noise) {
+	public Noise ultraterraforged$UTFRandomState$wrap(Noise noise) {
 		return Noises.shiftSeed(noise, (int) this.seed);
 	}
 }

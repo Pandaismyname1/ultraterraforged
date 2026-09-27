@@ -5,7 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
-import com.pandaismyname1.ultraterraforged.tags.RTFBlockTags;
+import com.pandaismyname1.ultraterraforged.tags.UTFBlockTags;
 
 public class MiscellaneousSettings {
 	public static final Codec<MiscellaneousSettings> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -78,6 +78,6 @@ public class MiscellaneousSettings {
 	}
 	
 	public TagKey<Block> rockTag() {
-		return this.oreCompatibleStoneOnly ? RTFBlockTags.ORE_COMPATIBLE_ROCK : RTFBlockTags.ROCK;
+		return this.oreCompatibleStoneOnly ? UTFBlockTags.ORE_COMPATIBLE_ROCK : UTFBlockTags.ROCK;
 	}
 }

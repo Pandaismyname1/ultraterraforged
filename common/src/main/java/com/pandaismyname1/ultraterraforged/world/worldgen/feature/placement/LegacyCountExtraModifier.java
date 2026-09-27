@@ -40,6 +40,6 @@ class LegacyCountExtraModifier extends PlacementModifier {
 
 	@Override
 	public PlacementModifierType<LegacyCountExtraModifier> type() {
-		return RTFPlacementModifiers.LEGACY_COUNT_EXTRA;
+		return UTFPlacementModifiers.LEGACY_COUNT_EXTRA;
 	}
 }

@@ -14,7 +14,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import com.pandaismyname1.ultraterraforged.platform.RegistryUtil;
-import com.pandaismyname1.ultraterraforged.registries.RTFBuiltInRegistries;
+import com.pandaismyname1.ultraterraforged.registries.UTFBuiltInRegistries;
 
 public class BiomeModifiers {
 
@@ -60,6 +60,6 @@ public class BiomeModifiers {
 	}
 	
 	public static void register(String name, Codec<? extends BiomeModifier> value) {
-		RegistryUtil.register(RTFBuiltInRegistries.BIOME_MODIFIER_TYPE, name, value);
+		RegistryUtil.register(UTFBuiltInRegistries.BIOME_MODIFIER_TYPE, name, value);
 	}
 }

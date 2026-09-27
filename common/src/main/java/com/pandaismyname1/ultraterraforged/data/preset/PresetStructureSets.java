@@ -17,7 +17,7 @@ import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.levelgen.structure.placement.ConcentricRingsStructurePlacement;
 import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement;
 import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement;
-import com.pandaismyname1.ultraterraforged.RTFCommon;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.StructureSettings.StructureSetEntry;
 
@@ -38,7 +38,7 @@ public class PresetStructureSets {
 			Optional<StructureSet> original = registered.get(key).map(Holder::value);
 			if (original.isEmpty()) {
 				// e.g. the preset was made with a mod that isn't installed now
-				RTFCommon.LOGGER.warn("Preset changes structure set {}, which doesn't exist; ignoring it", id);
+				UTFCommon.LOGGER.warn("Preset changes structure set {}, which doesn't exist; ignoring it", id);
 				return;
 			}
 			ctx.register(key, apply(original.get(), entry, structures, structureSets, biomes));

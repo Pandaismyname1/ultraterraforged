@@ -21,7 +21,7 @@ import net.fabricmc.fabric.impl.biome.modification.BiomeModificationImpl;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
-import com.pandaismyname1.ultraterraforged.registries.RTFRegistries;
+import com.pandaismyname1.ultraterraforged.registries.UTFRegistries;
 import com.pandaismyname1.ultraterraforged.world.worldgen.biome.modifier.BiomeModifier;
 import com.pandaismyname1.ultraterraforged.world.worldgen.biome.modifier.fabric.FabricBiomeModifier;
 
@@ -43,7 +43,7 @@ public class MixinBiomeModificationImpl {
 	)
 	public List<Object> getSortedModifiers(BiomeModificationImpl self, RegistryAccess registries) {
 		List<Object> modifiers = new ArrayList<>(this.getSortedModifiers());
-		for(Holder.Reference<BiomeModifier> holder : registries.lookupOrThrow(RTFRegistries.BIOME_MODIFIER).listElements().toList()) {
+		for(Holder.Reference<BiomeModifier> holder : registries.lookupOrThrow(UTFRegistries.BIOME_MODIFIER).listElements().toList()) {
 			if(holder.value() instanceof FabricBiomeModifier modifier) {
 				modifiers.add(this.makeModifierRecord(holder.key().location(), ModificationPhase.POST_PROCESSING, (ctx) -> {
 					return true;

@@ -6,7 +6,7 @@ import com.mojang.serialization.Codec;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import com.pandaismyname1.ultraterraforged.platform.RegistryUtil;
-import com.pandaismyname1.ultraterraforged.registries.RTFBuiltInRegistries;
+import com.pandaismyname1.ultraterraforged.registries.UTFBuiltInRegistries;
 import com.pandaismyname1.ultraterraforged.world.worldgen.terrain.Terrain;
 
 public class StructureRules {
@@ -20,6 +20,6 @@ public class StructureRules {
 	}
 
 	private static void register(String name, Codec<? extends StructureRule> value) {
-		RegistryUtil.register(RTFBuiltInRegistries.STRUCTURE_RULE_TYPE, name, value);
+		RegistryUtil.register(UTFBuiltInRegistries.STRUCTURE_RULE_TYPE, name, value);
 	}
 }

@@ -16,12 +16,12 @@ import com.mojang.serialization.JsonOps;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 
 /**
- * A preset as one line of text that can be pasted into chat or a forum post: {@code RTF1:} followed by the
+ * A preset as one line of text that can be pasted into chat or a forum post: {@code UTF1:} followed by the
  * compressed preset file in URL-safe base64. The preset file carries its own format version, so codes made by
  * older versions of the mod keep working.
  */
 public final class PresetShareCode {
-	public static final String PREFIX = "RTF1:";
+	public static final String PREFIX = "UTF1:";
 	// a preset is a few kilobytes; anything much larger is not a preset code
 	private static final int MAX_SIZE = 1 << 20;
 

@@ -16,7 +16,7 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noise;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noises;
 import com.pandaismyname1.ultraterraforged.world.worldgen.terrain.Terrain;
 
-public class RTFSurfaceConditions {
+public class UTFSurfaceConditions {
 
 	public static void bootstrap() {
 		register("mod", ModCondition.CODEC);

@@ -25,7 +25,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.JsonOps;
 
-import com.pandaismyname1.ultraterraforged.client.data.RTFTranslationKeys;
+import com.pandaismyname1.ultraterraforged.client.data.UTFTranslationKeys;
 import com.pandaismyname1.ultraterraforged.client.gui.screen.presetconfig.RenderMode;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.PresetFormat;
@@ -166,7 +166,7 @@ public class PresetOptionsTest {
 						// the values of cycle buttons are shown by name
 						if (option instanceof EnumOption<?> enumOption) {
 							for (Enum<?> value : enumOption.values()) {
-								requireKey(lang, RTFTranslationKeys.enumValue(value), missing);
+								requireKey(lang, UTFTranslationKeys.enumValue(value), missing);
 							}
 						}
 					}
@@ -180,9 +180,9 @@ public class PresetOptionsTest {
 			requireKey(lang, setting.labelKey(), missing);
 		}
 		for (RenderMode mode : RenderMode.values()) {
-			requireKey(lang, RTFTranslationKeys.enumValue(mode), missing);
+			requireKey(lang, UTFTranslationKeys.enumValue(mode), missing);
 		}
-		for (Field field : RTFTranslationKeys.class.getFields()) {
+		for (Field field : UTFTranslationKeys.class.getFields()) {
 			if (Modifier.isStatic(field.getModifiers()) && field.getType() == String.class) {
 				requireKey(lang, (String) field.get(null), missing);
 			}

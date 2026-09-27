@@ -24,7 +24,7 @@ import net.minecraft.world.level.levelgen.NoiseSettings;
 import net.minecraft.world.level.levelgen.RandomState;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
-import com.pandaismyname1.ultraterraforged.world.worldgen.RTFRandomState;
+import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
 import com.pandaismyname1.ultraterraforged.world.worldgen.WorldGenFlags;
 import com.pandaismyname1.ultraterraforged.world.worldgen.densityfunction.CellSampler;
 import com.pandaismyname1.ultraterraforged.world.worldgen.densityfunction.CellSampler.Cache2d;
@@ -75,7 +75,7 @@ class MixinNoiseChunk {
 		this.chunkZ = SectionPos.blockToSectionCoord(minBlockZ);
 		this.generatorSettings = noiseGeneratorSettings;
 		GeneratorContext generatorContext;
-		if((Object) this.randomState instanceof RTFRandomState rtfRandomState && (generatorContext = rtfRandomState.generatorContext()) != null) {
+		if((Object) this.randomState instanceof UTFRandomState utfRandomState && (generatorContext = utfRandomState.generatorContext()) != null) {
 			boolean cache = !WorldGenFlags.fastLookups() || CellSampler.isCachedNoiseChunk(cellCountXZ);
 
 //			if(beardifierOrMarker instanceof Beardifier beardifier && (beardifier.pieceIterator.hasNext() || beardifier.junctionIterator.hasNext())) {
@@ -107,12 +107,12 @@ class MixinNoiseChunk {
 	)
 	//TODO clean this up
 	private static Aquifer.FluidPicker modifyFluidPicker(Aquifer.FluidPicker fluidPicker, int cellCountXZ, RandomState randomState, int minBlockX, int minBlockZ, NoiseSettings noiseSettings, DensityFunctions.BeardifierOrMarker beardifierOrMarker, NoiseGeneratorSettings noiseGeneratorSettings) {
-		if((Object) randomState instanceof RTFRandomState rtfRandomState) {
+		if((Object) randomState instanceof UTFRandomState utfRandomState) {
 			@Nullable
-			Preset preset = rtfRandomState.preset();
+			Preset preset = utfRandomState.preset();
 			@Nullable
 			GeneratorContext generatorContext;
-			if(preset != null && (generatorContext = rtfRandomState.generatorContext()) != null) {
+			if(preset != null && (generatorContext = utfRandomState.generatorContext()) != null) {
 				int lavaLevel = preset.world().properties.lavaLevel;
 		        Aquifer.FluidStatus lava = new Aquifer.FluidStatus(lavaLevel, Blocks.LAVA.defaultBlockState());
 		        int seaLevel = noiseGeneratorSettings.seaLevel();
@@ -134,7 +134,7 @@ class MixinNoiseChunk {
 		cancellable = true
 	)
 	private void wrapNew(DensityFunction function, CallbackInfoReturnable<DensityFunction> callback) {
-		if((Object) this.randomState instanceof RTFRandomState randomState && function instanceof CellSampler mapped) {
+		if((Object) this.randomState instanceof UTFRandomState randomState && function instanceof CellSampler mapped) {
 			callback.setReturnValue(mapped.new CacheChunk(this.chunk, this.cache2d, this.chunkX, this.chunkZ));
 		}
 	}
@@ -151,7 +151,7 @@ class MixinNoiseChunk {
         int blockZ = ColumnPos.getZ(packedPos);
         int generationHeight;
 		GeneratorContext generatorContext;
-        if((Object) this.randomState instanceof RTFRandomState rtfRandomState && (generatorContext = rtfRandomState.generatorContext()) != null) {
+        if((Object) this.randomState instanceof UTFRandomState utfRandomState && (generatorContext = utfRandomState.generatorContext()) != null) {
         	generationHeight = generatorContext.lookup.getGenerationHeight(SectionPos.blockToSectionCoord(blockX), SectionPos.blockToSectionCoord(blockZ), this.generatorSettings, false);
         } else {
         	generationHeight = this.generatorSettings.noiseSettings().height();

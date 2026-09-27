@@ -10,23 +10,23 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
-import com.pandaismyname1.ultraterraforged.RTFCommon;
-import com.pandaismyname1.ultraterraforged.client.data.RTFLanguageProvider;
-import com.pandaismyname1.ultraterraforged.client.data.RTFTranslationKeys;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
+import com.pandaismyname1.ultraterraforged.client.data.UTFLanguageProvider;
+import com.pandaismyname1.ultraterraforged.client.data.UTFTranslationKeys;
 import com.pandaismyname1.ultraterraforged.platform.forge.RegistryUtilImpl;
 
-@Mod(RTFCommon.MOD_ID)
-public class RTFForge {
+@Mod(UTFCommon.MOD_ID)
+public class UTFForge {
 
-    public RTFForge() {
-    	RTFCommon.bootstrap();
+    public UTFForge() {
+    	UTFCommon.bootstrap();
 
     	IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
 
     	if (FMLEnvironment.dist == Dist.CLIENT) {
-    		modBus.addListener(RTFForgeClient::registerPresetEditors);
+    		modBus.addListener(UTFForgeClient::registerPresetEditors);
     	}
-    	modBus.addListener(RTFForge::gatherData);
+    	modBus.addListener(UTFForge::gatherData);
 
     	RegistryUtilImpl.register(modBus);
     }
@@ -36,7 +36,7 @@ public class RTFForge {
     	DataGenerator generator = event.getGenerator();
     	PackOutput output = generator.getPackOutput();
 
-    	generator.addProvider(includeClient, new RTFLanguageProvider.EnglishUS(output));
-    	generator.addProvider(includeClient, PackMetadataGenerator.forFeaturePack(output, Component.translatable(RTFTranslationKeys.METADATA_DESCRIPTION)));
+    	generator.addProvider(includeClient, new UTFLanguageProvider.EnglishUS(output));
+    	generator.addProvider(includeClient, PackMetadataGenerator.forFeaturePack(output, Component.translatable(UTFTranslationKeys.METADATA_DESCRIPTION)));
     }
 }

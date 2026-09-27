@@ -11,7 +11,7 @@ import com.pandaismyname1.ultraterraforged.concurrent.ThreadPools;
 import com.pandaismyname1.ultraterraforged.concurrent.cache.map.LongMap;
 
 public class Cache<V extends ExpiringEntry> implements AutoCloseable {
-	public static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor(ThreadPools.daemonFactory("RTF-CacheScheduler"));
+	public static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor(ThreadPools.daemonFactory("UTF-CacheScheduler"));
 	
     private LongMap<V> map;
     private long lifetimeMS;

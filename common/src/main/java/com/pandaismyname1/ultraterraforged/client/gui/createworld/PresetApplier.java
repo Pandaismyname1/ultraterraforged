@@ -16,7 +16,7 @@ import com.mojang.serialization.JsonOps;
 
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.server.packs.repository.PackRepository;
-import com.pandaismyname1.ultraterraforged.RTFCommon;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
 import com.pandaismyname1.ultraterraforged.data.PresetPacks;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 
@@ -77,7 +77,7 @@ public final class PresetApplier {
 	}
 
 	static String packName(Preset preset) {
-		String json = Preset.CODEC.encodeStart(JsonOps.INSTANCE, preset).getOrThrow(false, RTFCommon.LOGGER::error).toString();
+		String json = Preset.CODEC.encodeStart(JsonOps.INSTANCE, preset).getOrThrow(false, UTFCommon.LOGGER::error).toString();
 		try {
 			byte[] hash = MessageDigest.getInstance("SHA-1").digest(json.getBytes(StandardCharsets.UTF_8));
 			return PACK_PREFIX + "-" + HexFormat.of().formatHex(hash).substring(0, 12) + ".zip";

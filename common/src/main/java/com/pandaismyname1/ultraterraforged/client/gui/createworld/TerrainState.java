@@ -11,7 +11,7 @@ import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.levelgen.WorldOptions;
 import com.pandaismyname1.ultraterraforged.data.preset.PresetLibrary;
-import com.pandaismyname1.ultraterraforged.data.preset.RTFWorldPresets;
+import com.pandaismyname1.ultraterraforged.data.preset.UTFWorldPresets;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 
 /**
@@ -108,7 +108,7 @@ public class TerrainState implements PreviewSource {
 
 	public boolean isUltraTerraForgedSelected() {
 		WorldCreationUiState.WorldTypeEntry type = this.uiState().getWorldType();
-		return type != null && type.preset() != null && type.preset().is(RTFWorldPresets.ULTRATERRAFORGED);
+		return type != null && type.preset() != null && type.preset().is(UTFWorldPresets.ULTRATERRAFORGED);
 	}
 
 	/**
@@ -119,7 +119,7 @@ public class TerrainState implements PreviewSource {
 			return true;
 		}
 		for (WorldCreationUiState.WorldTypeEntry entry : this.uiState().getNormalPresetList()) {
-			if (entry.preset() != null && entry.preset().is(RTFWorldPresets.ULTRATERRAFORGED)) {
+			if (entry.preset() != null && entry.preset().is(UTFWorldPresets.ULTRATERRAFORGED)) {
 				this.uiState().setWorldType(entry);
 				return true;
 			}

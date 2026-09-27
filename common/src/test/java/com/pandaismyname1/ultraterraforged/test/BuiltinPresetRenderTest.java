@@ -30,13 +30,13 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.tile.Tile;
  * golden values, so refactors of the preset model can't silently change worldgen.
  *
  * Images are written to common/build/preset-renders for eyeballing. After an intentional
- * terrain change, regenerate the golden file with: ./gradlew :common:test -Drtf.updateGolden=true
+ * terrain change, regenerate the golden file with: ./gradlew :common:test -Dutf.updateGolden=true
  */
 public class BuiltinPresetRenderTest {
 	private static final String GOLDEN_RESOURCE = "/golden/preset-fingerprints.properties";
 	private static final Path GOLDEN_SOURCE = Path.of("src/test/resources/golden/preset-fingerprints.properties");
 	private static final Path RENDER_DIR = Path.of("build/preset-renders");
-	private static final boolean UPDATE = Boolean.getBoolean("rtf.updateGolden");
+	private static final boolean UPDATE = Boolean.getBoolean("utf.updateGolden");
 
 	private static final Map<String, String> ACTUAL = new TreeMap<>();
 
@@ -66,7 +66,7 @@ public class BuiltinPresetRenderTest {
 
 			if (!UPDATE) {
 				String expected = golden.getProperty(entry.getKey());
-				assertNotNull(expected, "no golden fingerprint for " + entry.getKey() + "; run with -Drtf.updateGolden=true");
+				assertNotNull(expected, "no golden fingerprint for " + entry.getKey() + "; run with -Dutf.updateGolden=true");
 				assertEquals(expected, fingerprint, "terrain for preset '" + entry.getKey() + "' changed (see " + RENDER_DIR + ")");
 			}
 		}));

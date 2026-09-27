@@ -3,9 +3,9 @@ package com.pandaismyname1.ultraterraforged.world.worldgen.feature.chance;
 import com.mojang.serialization.Codec;
 
 import com.pandaismyname1.ultraterraforged.platform.RegistryUtil;
-import com.pandaismyname1.ultraterraforged.registries.RTFBuiltInRegistries;
+import com.pandaismyname1.ultraterraforged.registries.UTFBuiltInRegistries;
 
-public class RTFChanceModifiers {
+public class UTFChanceModifiers {
 
 	public static void bootstrap() {
 		register("elevation", ElevationChanceModifier.CODEC);
@@ -29,6 +29,6 @@ public class RTFChanceModifiers {
 	}
 	
 	private static void register(String name, Codec<? extends ChanceModifier> placement) {
-		RegistryUtil.register(RTFBuiltInRegistries.CHANCE_MODIFIER_TYPE, name, placement);
+		RegistryUtil.register(UTFBuiltInRegistries.CHANCE_MODIFIER_TYPE, name, placement);
 	}
 }

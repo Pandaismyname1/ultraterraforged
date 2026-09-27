@@ -3,7 +3,7 @@ package com.pandaismyname1.ultraterraforged.world.worldgen.feature.template.deco
 import com.mojang.serialization.Codec;
 
 import com.pandaismyname1.ultraterraforged.platform.RegistryUtil;
-import com.pandaismyname1.ultraterraforged.registries.RTFBuiltInRegistries;
+import com.pandaismyname1.ultraterraforged.registries.UTFBuiltInRegistries;
 
 public class TemplateDecorators {
 
@@ -20,6 +20,6 @@ public class TemplateDecorators {
 	}
 
 	private static void register(String name, Codec<? extends TemplateDecorator<?>> placement) {
-		RegistryUtil.register(RTFBuiltInRegistries.TEMPLATE_DECORATOR_TYPE, name, placement);
+		RegistryUtil.register(UTFBuiltInRegistries.TEMPLATE_DECORATOR_TYPE, name, placement);
 	}
 }

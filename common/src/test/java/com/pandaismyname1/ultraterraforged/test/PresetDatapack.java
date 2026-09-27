@@ -22,7 +22,7 @@ import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
-import com.pandaismyname1.ultraterraforged.registries.RTFRegistries;
+import com.pandaismyname1.ultraterraforged.registries.UTFRegistries;
 import com.pandaismyname1.ultraterraforged.world.worldgen.biome.modifier.BiomeModifier;
 import com.pandaismyname1.ultraterraforged.world.worldgen.biome.modifier.BiomeModifiers;
 
@@ -53,7 +53,7 @@ public final class PresetDatapack {
 			dump(patch, ops, data.key(), data.elementCodec(), files, errors);
 		}
 		TestBootstrap.DATA_REGISTRIES.forEach((key, codec) -> {
-			if (!key.equals(RTFRegistries.BIOME_MODIFIER)) {
+			if (!key.equals(UTFRegistries.BIOME_MODIFIER)) {
 				dump(patch, ops, key, codec, files, errors);
 			}
 		});

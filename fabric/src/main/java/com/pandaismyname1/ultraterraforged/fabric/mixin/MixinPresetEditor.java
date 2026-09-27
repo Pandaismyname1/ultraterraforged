@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import net.minecraft.client.gui.screens.worldselection.PresetEditor;
-import com.pandaismyname1.ultraterraforged.data.preset.RTFWorldPresets;
+import com.pandaismyname1.ultraterraforged.data.preset.UTFWorldPresets;
 import com.pandaismyname1.ultraterraforged.client.gui.screen.presetconfig.PresetConfigScreen;
 
 @Deprecated 
@@ -29,7 +29,7 @@ interface MixinPresetEditor {
 		Map<Object, Object> map = new HashMap<>();
 		map.put(k1, v1);
 		map.put(k2, v2);
-		map.put(Optional.of(RTFWorldPresets.ULTRATERRAFORGED), (PresetEditor) (screen, ctx) -> new PresetConfigScreen(screen));
+		map.put(Optional.of(UTFWorldPresets.ULTRATERRAFORGED), (PresetEditor) (screen, ctx) -> new PresetConfigScreen(screen));
 		return map;
     }
 }

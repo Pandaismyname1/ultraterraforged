@@ -19,7 +19,7 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.noise.NoiseUtil;
 
 /**
  * The caves shaped by the land, carved into a stand-in world chunk by chunk as the game would: each is found near the
- * middle of the world and measured. With -Drtf.render=true slices through them are drawn to build/terrain-views.
+ * middle of the world and measured. With -Dutf.render=true slices through them are drawn to build/terrain-views.
  */
 public class CavesTest {
 	private static final int SEED = 4321;
@@ -35,7 +35,7 @@ public class CavesTest {
 	}
 
 	private static boolean render() {
-		return Boolean.getBoolean("rtf.render");
+		return Boolean.getBoolean("utf.render");
 	}
 
 	@Test

@@ -18,7 +18,7 @@ import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.levelgen.structure.placement.ConcentricRingsStructurePlacement;
 import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement;
 import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement;
-import com.pandaismyname1.ultraterraforged.client.data.RTFTranslationKeys;
+import com.pandaismyname1.ultraterraforged.client.data.UTFTranslationKeys;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.StructureSettings;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.StructureSettings.StructureSetEntry;
@@ -38,7 +38,7 @@ public final class StructureOptions {
 			.filter(filter)
 			.sorted(Comparator.comparing((Holder.Reference<StructureSet> holder) -> holder.key().location()))
 			.forEach((holder) -> categories.add(category(holder.key().location(), holder.value())));
-		return new Page("structures", RTFTranslationKeys.GUI_STRUCTURE_SETTINGS_TITLE, categories);
+		return new Page("structures", UTFTranslationKeys.GUI_STRUCTURE_SETTINGS_TITLE, categories);
 	}
 
 	public static Category category(ResourceLocation id, StructureSet set) {
@@ -47,7 +47,7 @@ public final class StructureOptions {
 		List<Option<?>> options = new ArrayList<>();
 
 		BoolOption enabled = BoolOption.builder(path + "enabled")
-			.translation(RTFTranslationKeys.GUI_BUTTON_STRUCTURE_ENABLED)
+			.translation(UTFTranslationKeys.GUI_BUTTON_STRUCTURE_ENABLED)
 			.bind((p) -> entry(p, id, (e) -> e.enabled, true), (p, v) -> override(p, id, (e, value) -> e.enabled = value, v, true))
 			.build();
 		options.add(enabled);
@@ -57,23 +57,23 @@ public final class StructureOptions {
 			int spacing = randomSpread.spacing();
 			int separation = randomSpread.separation();
 			options.add(IntOption.builder(path + "spacing")
-				.translation(RTFTranslationKeys.GUI_SLIDER_SPACING)
+				.translation(UTFTranslationKeys.GUI_SLIDER_SPACING)
 				.range(1, Math.max(512, spacing))
 				.atLeast((p) -> entry(p, id, (e) -> e.separation, separation) + 1)
 				.activeWhen(isEnabled)
 				.bind((p) -> entry(p, id, (e) -> e.spacing, spacing), (p, v) -> override(p, id, (e, value) -> e.spacing = value, v, spacing))
 				.build());
 			options.add(IntOption.builder(path + "separation")
-				.translation(RTFTranslationKeys.GUI_SLIDER_SEPARATION)
+				.translation(UTFTranslationKeys.GUI_SLIDER_SEPARATION)
 				.range(0, Math.max(511, separation))
 				.atMost((p) -> entry(p, id, (e) -> e.spacing, spacing) - 1)
 				.activeWhen(isEnabled)
 				.bind((p) -> entry(p, id, (e) -> e.separation, separation), (p, v) -> override(p, id, (e, value) -> e.separation = value, v, separation))
 				.build());
 		} else if (placement instanceof ConcentricRingsStructurePlacement rings) {
-			options.add(ringOption(id, path + "distance", RTFTranslationKeys.GUI_SLIDER_STRUCTURE_DISTANCE, 0, 1023, rings.distance(), isEnabled, (e) -> e.distance, (e, v) -> e.distance = v));
-			options.add(ringOption(id, path + "spread", RTFTranslationKeys.GUI_SLIDER_STRUCTURE_SPREAD, 0, 1023, rings.spread(), isEnabled, (e) -> e.spread, (e, v) -> e.spread = v));
-			options.add(ringOption(id, path + "count", RTFTranslationKeys.GUI_SLIDER_STRUCTURE_COUNT, 1, Math.max(512, rings.count()), rings.count(), isEnabled, (e) -> e.count, (e, v) -> e.count = v));
+			options.add(ringOption(id, path + "distance", UTFTranslationKeys.GUI_SLIDER_STRUCTURE_DISTANCE, 0, 1023, rings.distance(), isEnabled, (e) -> e.distance, (e, v) -> e.distance = v));
+			options.add(ringOption(id, path + "spread", UTFTranslationKeys.GUI_SLIDER_STRUCTURE_SPREAD, 0, 1023, rings.spread(), isEnabled, (e) -> e.spread, (e, v) -> e.spread = v));
+			options.add(ringOption(id, path + "count", UTFTranslationKeys.GUI_SLIDER_STRUCTURE_COUNT, 1, Math.max(512, rings.count()), rings.count(), isEnabled, (e) -> e.count, (e, v) -> e.count = v));
 		}
 
 		// other placement types from mods can only be switched on and off
@@ -81,13 +81,13 @@ public final class StructureOptions {
 			float frequency = placement.frequency;
 			int salt = placement.salt;
 			options.add(FloatOption.builder(path + "frequency")
-				.translation(RTFTranslationKeys.GUI_SLIDER_STRUCTURE_FREQUENCY)
+				.translation(UTFTranslationKeys.GUI_SLIDER_STRUCTURE_FREQUENCY)
 				.range(0.0F, 1.0F)
 				.activeWhen(isEnabled)
 				.bind((p) -> entry(p, id, (e) -> e.frequency, frequency), (p, v) -> override(p, id, (e, value) -> e.frequency = value, v, frequency))
 				.build());
 			options.add(IntOption.builder(path + "salt")
-				.translation(RTFTranslationKeys.GUI_BUTTON_SALT)
+				.translation(UTFTranslationKeys.GUI_BUTTON_SALT)
 				.seed()
 				.activeWhen(isEnabled)
 				.bind((p) -> entry(p, id, (e) -> e.salt, salt), (p, v) -> override(p, id, (e, value) -> e.salt = value, v, salt))

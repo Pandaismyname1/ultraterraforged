@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.world.BiomeModifier;
 import net.minecraftforge.server.ServerLifecycleHooks;
-import com.pandaismyname1.ultraterraforged.registries.RTFRegistries;
+import com.pandaismyname1.ultraterraforged.registries.UTFRegistries;
 
 @Mixin(ServerLifecycleHooks.class)
 public class MixinServerLifecycleHooks {
@@ -31,7 +31,7 @@ public class MixinServerLifecycleHooks {
 	)
     private static List<BiomeModifier> runModifiers(List<BiomeModifier> forgeBiomeModifiers, MinecraftServer server) {
     	List<BiomeModifier> biomeModifiers = new ArrayList<>(forgeBiomeModifiers);
-    	server.registryAccess().lookup(RTFRegistries.BIOME_MODIFIER).ifPresent((biomeModifierRegistry) -> {
+    	server.registryAccess().lookup(UTFRegistries.BIOME_MODIFIER).ifPresent((biomeModifierRegistry) -> {
     		biomeModifiers.addAll(biomeModifierRegistry.listElements().map((holder) -> {
     			return (BiomeModifier) holder.value();
     		}).toList());
