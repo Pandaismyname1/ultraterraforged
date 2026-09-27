@@ -276,6 +276,8 @@
   "reterraforged.gui.slider.globalHorizontalScale.tooltip": "Globally controls the horizontal scaling of terrain",
   "reterraforged.gui.slider.globalVerticalScale": "Global Vertical Scale",
   "reterraforged.gui.slider.globalVerticalScale.tooltip": "Globally controls the vertical scaling of terrain",
+  "reterraforged.gui.slider.gravelBeaches": "Gravel Beaches",
+  "reterraforged.gui.slider.gravelBeaches.tooltip": "How much of the cliff coast has a narrow gravel beach at the foot of the cliffs, rather than dropping straight into the sea",
   "reterraforged.gui.slider.heightModifier": "Height Modifier",
   "reterraforged.gui.slider.heightModifier.tooltip": "Controls the height modifier",
   "reterraforged.gui.slider.islandCoast": "Island Coast",

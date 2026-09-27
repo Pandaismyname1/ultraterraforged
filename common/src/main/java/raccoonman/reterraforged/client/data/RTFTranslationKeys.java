@@ -43,6 +43,7 @@ public class RTFTranslationKeys {
 	public static final String GUI_SLIDER_SEA_CLIFF_FREQUENCY = resolve("gui.slider.seaCliffFrequency");
 	public static final String GUI_SLIDER_SEA_CLIFF_HEIGHT = resolve("gui.slider.seaCliffHeight");
 	public static final String GUI_BUTTON_SEA_STACKS = resolve("gui.button.seaStacks");
+	public static final String GUI_SLIDER_GRAVEL_BEACHES = resolve("gui.slider.gravelBeaches");
 	public static final String GUI_LABEL_VOLCANOES = resolve("gui.label.volcanoes");
 	public static final String GUI_LABEL_FJORDS = resolve("gui.label.fjords");
 	public static final String GUI_LABEL_ATOLLS = resolve("gui.label.atolls");

@@ -90,6 +90,8 @@ public class RTFLanguageProvider {
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_SEA_CLIFF_HEIGHT), "How many blocks the tallest cliffs rise above the sea");
 			this.add(RTFTranslationKeys.GUI_BUTTON_SEA_STACKS, "Sea Stacks");
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_SEA_STACKS), "Pillars of rock standing in the sea off the cliffs");
+			this.add(RTFTranslationKeys.GUI_SLIDER_GRAVEL_BEACHES, "Gravel Beaches");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_GRAVEL_BEACHES), "How much of the cliff coast has a narrow gravel beach at the foot of the cliffs, rather than dropping straight into the sea");
 			this.add(RTFTranslationKeys.GUI_LABEL_VOLCANOES, "Volcanoes");
 			this.add(RTFTranslationKeys.GUI_LABEL_FJORDS, "Fjords");
 			this.add(RTFTranslationKeys.GUI_LABEL_ATOLLS, "Atolls");
