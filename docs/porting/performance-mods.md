@@ -26,6 +26,12 @@ Two things the dev runs need that a real game doesn't:
   doesn't unpack jars in jars ("requires c2me-base, which is missing"). Fabric puts them in the `devModsFolder`
   configuration instead: `syncDevMods` copies them unremapped to `fabric/build/devmods`, and every run passes that
   folder to Fabric loader as `fabric.addMods`, which unpacks and remaps them like a mods folder.
+- **Forge's dev game** finds libraries nested in `META-INF/jarjar`, but not ones kept elsewhere, and has no MixinExtras
+  of its own: `extractNestedDevLibs` takes every nested library out of the Forge mods into `forge/build/devlibs-nested`
+  for the runtime classpath, and MixinExtras 0.5.0 (the newest any of them nests) is added once. **Radium is left out of
+  the Forge dev runs**: its config library sits in `META-INF/jars` and isn't picked up even from the classpath (it isn't
+  marked as a game library), and without it Radium's patches clash (`InjectionError: LVT in LevelChunk::setBlockState`).
+  It works in a real game, tested on the dedicated server.
 - **Sodium refuses the dev game's LWJGL** (3.3.2 against the 3.3.1 launchers ship), so the runs set
   `sodium.checks.issue2561=false`. Check whether that's still needed after a port: newer Sodium versions require
   other LWJGL versions, and the property name follows Sodium's issue number.
@@ -64,7 +70,7 @@ What the dev runs use, pinned to Modrinth version ids because Noisiumed shares i
 | C2ME | 0.2.0+alpha.11.18 (`fyt7FtgA`) | the Fabric build, through Connector (not in the dev runs) |
 | C2ME OpenCL | none (from 1.21.1) | none |
 | Noisium | Noisiumed 3.0.6 (`vcRbbvYP`) | Noisiumed 3.0.6 (`LbWCNzST`) |
-| Lithium | 0.11.4 (`iEcXOkz4`) | Radium 0.12.4 (`n947JjJH`); Canary 0.3.3 also works |
+| Lithium | 0.11.4 (`iEcXOkz4`) | Radium 0.12.4 (`n947JjJH`, not in the dev runs, see above); Canary 0.3.3 also works |
 | ModernFix | 5.25.2 (`rPmgLeZC`) | 5.27.83 (`jAZ7Ge3d`) |
 | AllTheLeaks | none | 1.1.3 (`curse.maven:alltheleaks-1091339:8779054`) |
 | Sodium | 0.5.13 (`OihdIimA`) | Embeddium 0.3.31 (`UTbfe5d1`) |

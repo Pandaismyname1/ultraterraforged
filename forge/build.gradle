@@ -45,6 +45,13 @@ configurations {
         canBeResolved = true
         canBeConsumed = false
     }
+
+    // the dev runs' mods as released, to take out the libraries they nest (see extractNestedDevLibs)
+    devModJars {
+        canBeResolved = true
+        canBeConsumed = false
+        transitive = false
+    }
 }
 
 dependencies {
@@ -57,12 +64,39 @@ dependencies {
     // Modrinth version ids and a CurseForge file. -Prtf.perfMods=false leaves them out. See
     // docs/porting/performance-mods.md.
     if (project.findProperty("rtf.perfMods") != "false") {
-        modLocalRuntime "maven.modrinth:noisiumed:LbWCNzST"     // Noisiumed 3.0.6
-        modLocalRuntime "maven.modrinth:radium:n947JjJH"        // Radium 0.12.4, standing in for Lithium
-        modLocalRuntime "maven.modrinth:modernfix:jAZ7Ge3d"     // ModernFix 5.27.83
-        modLocalRuntime "maven.modrinth:embeddium:UTbfe5d1"     // Embeddium 0.3.31, standing in for Sodium
-        modLocalRuntime "curse.maven:alltheleaks-1091339:8779054" // AllTheLeaks 1.1.3
+        [
+            "maven.modrinth:noisiumed:LbWCNzST",        // Noisiumed 3.0.6
+            // Radium (Lithium's stand-in) is left out: it keeps its config library outside META-INF/jarjar, which the
+            // dev game doesn't load, and without it Radium's patches clash. It works in a real game.
+            "maven.modrinth:modernfix:jAZ7Ge3d",        // ModernFix 5.27.83
+            "maven.modrinth:embeddium:UTbfe5d1",        // Embeddium 0.3.31, standing in for Sodium
+            "curse.maven:alltheleaks-1091339:8779054"   // AllTheLeaks 1.1.3
+        ].each {
+            modLocalRuntime it
+            devModJars it
+        }
+        // The libraries these nest load in a real game; the dev game finds those in META-INF/jarjar, but not every mod
+        // keeps them there, so they're all taken out and added here. MixinExtras, which several nest in different
+        // versions, comes once, the newest of them.
+        localRuntime fileTree(layout.buildDirectory.dir("devlibs-nested")) {
+            include "*.jar"
+            builtBy "extractNestedDevLibs"
+        }
+        localRuntime "io.github.llamalad7:mixinextras-forge:0.5.0"
     }
+}
+
+tasks.register("extractNestedDevLibs", Sync) {
+    from(configurations.devModJars.elements.map { jars -> jars.collect { zipTree(it.asFile) } }) {
+        include "META-INF/jarjar/*.jar", "META-INF/jars/*.jar"
+        exclude "**/mixinextras-*"
+        eachFile { path = name }
+    }
+    includeEmptyDirs = false
+    into layout.buildDirectory.dir("devlibs-nested")
+}
+tasks.matching { it.name.startsWith("run") || it.name in ["configureLaunch", "configureClientLaunch", "generateDLIConfig"] }.configureEach {
+    dependsOn "extractNestedDevLibs"
 }
 
 processResources {
