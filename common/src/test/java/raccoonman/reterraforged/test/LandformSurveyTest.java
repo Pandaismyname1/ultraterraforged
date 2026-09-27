@@ -20,6 +20,78 @@ public class LandformSurveyTest {
 	}
 
 	@Test
+	void shorelineEdge() {
+		if (!Boolean.getBoolean("rtf.survey.shore")) {
+			return;
+		}
+		Preset preset = BuiltinPresetRenderTest.presets().get("default").get();
+		TerrainViews.View view = TerrainViews.view(preset, 0.0F, 0.0F, 4.0F);
+		int water = view.levels().waterLevel;
+		java.util.List<Float> edges = new java.util.ArrayList<>();
+		java.util.List<Float> above = new java.util.ArrayList<>();
+		for (int x = 0; x < view.size(); x++) {
+			for (int z = 0; z < view.size(); z++) {
+				int y = view.blockY(x, z);
+				if (y == water - 1 || y == water) {
+					edges.add(view.cell(x, z).continentEdge);
+				}
+				if (y >= water + 5 && y <= water + 6) {
+					above.add(view.cell(x, z).continentEdge);
+				}
+			}
+		}
+		java.util.Collections.sort(edges);
+		java.util.Collections.sort(above);
+		for (float q : new float[] { 0.1F, 0.25F, 0.5F, 0.75F, 0.9F }) {
+			System.out.println("SURVEY shore q" + q + " edge at the water " + edges.get((int) (q * edges.size())) + ", 5 blocks up " + above.get((int) (q * above.size())));
+		}
+	}
+
+	@Test
+	void gravelBeachCoasts() {
+		if (!Boolean.getBoolean("rtf.survey.gravel")) {
+			return;
+		}
+		String[] off = { "none", "headlands", "peninsulas", "coastalIslands", "spits", "all" };
+		for (String feature : off) {
+			Preset preset = BuiltinPresetRenderTest.presets().get("default").get();
+			preset.landforms().canyons.enabled = false;
+			preset.landforms().buttes.enabled = false;
+			preset.landforms().seaCliffs.gravelBeaches = 1.0F;
+			switch (feature) {
+				case "headlands" -> preset.coasts().headlands.enabled = false;
+				case "peninsulas" -> preset.coasts().peninsulas.enabled = false;
+				case "coastalIslands" -> preset.coasts().coastalIslands.enabled = false;
+				case "spits" -> preset.coasts().spits.enabled = false;
+				case "all" -> { preset.coasts().headlands.enabled = false; preset.coasts().peninsulas.enabled = false; preset.coasts().coastalIslands.enabled = false; preset.coasts().spits.enabled = false; }
+				default -> {}
+			}
+			TerrainViews.View view = TerrainViews.view(preset, 0.0F, 0.0F, 4.0F);
+			int water = view.levels().waterLevel;
+			int beaches = 0;
+			int under = 0;
+			for (int x = 4; x < view.size() - 4; x++) {
+				for (int z = 4; z < view.size() - 4; z++) {
+					if (view.cell(x, z).terrain != TerrainType.SHINGLE_BEACH) {
+						continue;
+					}
+					beaches++;
+					int highest = 0;
+					for (int dx = -4; dx <= 4; dx++) {
+						for (int dz = -4; dz <= 4; dz++) {
+							highest = Math.max(highest, view.blockY(x + dx, z + dz));
+						}
+					}
+					if (highest >= water + 6) {
+						under++;
+					}
+				}
+			}
+			System.out.println("SURVEY " + feature + " off: " + beaches + " beaches, " + under + " under cliffs");
+		}
+	}
+
+	@Test
 	void windingRivers() throws java.io.IOException {
 		if (!Boolean.getBoolean("rtf.survey.rivers")) {
 			return;
@@ -109,7 +181,8 @@ public class LandformSurveyTest {
 		if (!Boolean.getBoolean("rtf.survey")) {
 			return;
 		}
-		Terrain[] terrains = { TerrainType.SALT_FLAT, TerrainType.ALLUVIAL_FAN, TerrainType.GLACIAL_VALLEY, TerrainType.CIRQUE, TerrainType.DRUMLINS, TerrainType.MORAINE, TerrainType.BARRIER_ISLAND, TerrainType.KARST, TerrainType.SINKHOLE, TerrainType.DELTA };
+		String names = System.getProperty("rtf.survey.terrains", "salt_flat,alluvial_fan,glacial_valley,cirque,drumlins,moraine,barrier_island,karst,sinkhole,delta");
+		Terrain[] terrains = java.util.Arrays.stream(names.split(",")).map(TerrainType::get).toArray(Terrain[]::new);
 		for (String name : System.getProperty("rtf.survey.presets", "default").split(",")) {
 			Preset preset = BuiltinPresetRenderTest.presets().get(name).get();
 			GeneratorContext context = GeneratorContext.makeCached(preset, PresetRenderer.SEED, 3, 6, false);

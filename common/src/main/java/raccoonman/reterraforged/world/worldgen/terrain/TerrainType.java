@@ -66,6 +66,16 @@ public class TerrainType {
     public static final Terrain SINKHOLE = registerLandform("sinkhole", TerrainCategory.LOWLAND);
     // the marshy islands and channels where a river fans out into the sea
     public static final Terrain DELTA = registerLandform("delta", TerrainCategory.WETLAND);
+    // the reshaped coast: arms of land, islands off the coast, and bars of sand
+    public static final Terrain PENINSULA = registerLandform("peninsula", TerrainCategory.LOWLAND);
+    public static final Terrain COASTAL_ISLAND = registerLandform("coastal_island", TerrainCategory.LOWLAND);
+    public static final Terrain SAND_BAR = registerLandform("sand_bar", TerrainCategory.BEACH);
+    // small bare rocky islets
+    public static final Terrain SKERRY = registerLandform("skerry", TerrainCategory.COAST);
+    // islands in lakes and wide rivers
+    public static final Terrain RIVER_ISLAND = registerLandform("river_island", TerrainCategory.FLATLAND);
+    // the cones of volcanic island arcs
+    public static final Terrain VOLCANIC_ISLAND = registerVolcano("volcanic_island", TerrainCategory.HIGHLAND);
     
     public static void forEach(Consumer<Terrain> action) {
         TerrainType.REGISTRY.forEach(action);

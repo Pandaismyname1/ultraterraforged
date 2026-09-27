@@ -129,7 +129,11 @@ public class RiverPopulator implements Comparable<RiverPopulator> {
 
         float banks = d2 * mouthModifier;
         float banksSize = this.getScaledSize(t, this.banksWidth);
-        cell.riverBank = Math.min(cell.riverBank, (float) Math.sqrt(banks / banksSize));
+        float bank = (float) Math.sqrt(banks / banksSize);
+        if (bank < cell.riverBank) {
+        	cell.riverBank = bank;
+        	cell.riverWidth = (float) Math.sqrt(banksSize);
+        }
         if (this.waterLevels != null) {
         	this.carveRaised(cell, banks, banksSize, bedHeight, level);
         	return;

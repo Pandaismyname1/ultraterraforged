@@ -654,8 +654,8 @@ public class PresetSurfaceRuleData {
         	),
         	SurfaceRules.ifTrue(
         		SurfaceRules.abovePreliminarySurface(),
-        		// tors are bare rock: the rock layers, or plain stone without them
-        		SurfaceRules.ifTrue(SurfaceRules.not(RTFSurfaceConditions.terrain(TerrainType.TOR)), surface)
+        		// tors and skerries are bare rock: the rock layers, or plain stone without them
+        		SurfaceRules.ifTrue(SurfaceRules.not(RTFSurfaceConditions.terrain(TerrainType.TOR, TerrainType.SKERRY)), surface)
         	)
         );
         // vanilla's gradual change from stone to deepslate; with rock layers the deepslate is layered too
@@ -732,7 +732,7 @@ public class PresetSurfaceRuleData {
     			)
     		),
     		SurfaceRules.ifTrue(
-    			RTFSurfaceConditions.terrain(TerrainType.BARRIER_ISLAND, TerrainType.LAGOON),
+    			RTFSurfaceConditions.terrain(TerrainType.BARRIER_ISLAND, TerrainType.LAGOON, TerrainType.SAND_BAR),
     			SurfaceRules.ifTrue(SurfaceRules.UNDER_FLOOR, sand)
     		),
     		SurfaceRules.ifTrue(
@@ -831,7 +831,7 @@ public class PresetSurfaceRuleData {
     			)
     		),
     		SurfaceRules.ifTrue(
-    			RTFSurfaceConditions.terrain(TerrainType.VOLCANO),
+    			RTFSurfaceConditions.terrain(TerrainType.VOLCANO, TerrainType.VOLCANIC_ISLAND),
     			volcanicRock
     		),
     		SurfaceRules.ifTrue(

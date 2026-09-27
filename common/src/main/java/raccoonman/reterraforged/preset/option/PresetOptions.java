@@ -933,7 +933,122 @@ public final class PresetOptions {
 		)
 	);
 
-	public static final List<Page> PAGES = List.of(WORLD, SURFACE, CAVES, CLIMATE, TERRAIN, RIVERS, LANDFORMS, FILTERS, MISCELLANEOUS);
+	// Coasts
+
+	private static final Predicate<Preset> HEADLANDS = (preset) -> preset.coasts().headlands.enabled;
+	private static final Predicate<Preset> PENINSULAS = (preset) -> preset.coasts().peninsulas.enabled;
+	private static final Predicate<Preset> COASTAL_ISLANDS = (preset) -> preset.coasts().coastalIslands.enabled;
+	private static final Predicate<Preset> SPITS = (preset) -> preset.coasts().spits.enabled;
+	private static final Predicate<Preset> SKERRIES = (preset) -> preset.coasts().skerries.enabled;
+	private static final Predicate<Preset> ISLAND_ARCS = (preset) -> preset.coasts().islandArcs.enabled;
+	private static final Predicate<Preset> RIVER_ISLANDS = (preset) -> preset.coasts().riverIslands.enabled;
+
+	public static final Page COASTS = Page.of("coasts", RTFTranslationKeys.GUI_COASTS_SETTINGS_TITLE,
+		Category.of("headlands", RTFTranslationKeys.GUI_LABEL_HEADLANDS,
+			BoolOption.builder("coasts.headlands.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_HEADLANDS)
+				.bind((p) -> p.coasts().headlands.enabled, (p, v) -> p.coasts().headlands.enabled = v)
+				.build(),
+			FloatOption.builder("coasts.headlands.strength")
+				.translation(RTFTranslationKeys.GUI_SLIDER_HEADLAND_STRENGTH)
+				.range(0.0F, 2.0F)
+				.activeWhen(HEADLANDS)
+				.bind((p) -> p.coasts().headlands.strength, (p, v) -> p.coasts().headlands.strength = v)
+				.build()
+		),
+		Category.of("peninsulas", RTFTranslationKeys.GUI_LABEL_PENINSULAS,
+			BoolOption.builder("coasts.peninsulas.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_PENINSULAS)
+				.bind((p) -> p.coasts().peninsulas.enabled, (p, v) -> p.coasts().peninsulas.enabled = v)
+				.build(),
+			FloatOption.builder("coasts.peninsulas.frequency")
+				.translation(RTFTranslationKeys.GUI_SLIDER_PENINSULA_FREQUENCY)
+				.range(0.0F, 1.0F)
+				.activeWhen(PENINSULAS)
+				.bind((p) -> p.coasts().peninsulas.frequency, (p, v) -> p.coasts().peninsulas.frequency = v)
+				.build(),
+			FloatOption.builder("coasts.peninsulas.size")
+				.translation(RTFTranslationKeys.GUI_SLIDER_PENINSULA_SIZE)
+				.range(0.4F, 2.0F)
+				.activeWhen(PENINSULAS)
+				.bind((p) -> p.coasts().peninsulas.size, (p, v) -> p.coasts().peninsulas.size = v)
+				.build()
+		),
+		Category.of("coastalIslands", RTFTranslationKeys.GUI_LABEL_COASTAL_ISLANDS,
+			BoolOption.builder("coasts.coastalIslands.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_COASTAL_ISLANDS)
+				.bind((p) -> p.coasts().coastalIslands.enabled, (p, v) -> p.coasts().coastalIslands.enabled = v)
+				.build(),
+			FloatOption.builder("coasts.coastalIslands.frequency")
+				.translation(RTFTranslationKeys.GUI_SLIDER_COASTAL_ISLAND_FREQUENCY)
+				.range(0.0F, 1.0F)
+				.activeWhen(COASTAL_ISLANDS)
+				.bind((p) -> p.coasts().coastalIslands.frequency, (p, v) -> p.coasts().coastalIslands.frequency = v)
+				.build(),
+			FloatOption.builder("coasts.coastalIslands.size")
+				.translation(RTFTranslationKeys.GUI_SLIDER_COASTAL_ISLAND_SIZE)
+				.range(0.4F, 2.0F)
+				.activeWhen(COASTAL_ISLANDS)
+				.bind((p) -> p.coasts().coastalIslands.size, (p, v) -> p.coasts().coastalIslands.size = v)
+				.build(),
+			FloatOption.builder("coasts.coastalIslands.tombolos")
+				.translation(RTFTranslationKeys.GUI_SLIDER_TOMBOLO_SHARE)
+				.range(0.0F, 1.0F)
+				.activeWhen(COASTAL_ISLANDS)
+				.bind((p) -> p.coasts().coastalIslands.tombolos, (p, v) -> p.coasts().coastalIslands.tombolos = v)
+				.build()
+		),
+		Category.of("spits", RTFTranslationKeys.GUI_LABEL_SPITS,
+			BoolOption.builder("coasts.spits.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_SPITS)
+				.bind((p) -> p.coasts().spits.enabled, (p, v) -> p.coasts().spits.enabled = v)
+				.build(),
+			FloatOption.builder("coasts.spits.frequency")
+				.translation(RTFTranslationKeys.GUI_SLIDER_SPIT_FREQUENCY)
+				.range(0.0F, 1.0F)
+				.activeWhen(SPITS)
+				.bind((p) -> p.coasts().spits.frequency, (p, v) -> p.coasts().spits.frequency = v)
+				.build()
+		),
+		Category.of("skerries", RTFTranslationKeys.GUI_LABEL_SKERRIES,
+			BoolOption.builder("coasts.skerries.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_SKERRIES)
+				.bind((p) -> p.coasts().skerries.enabled, (p, v) -> p.coasts().skerries.enabled = v)
+				.build(),
+			FloatOption.builder("coasts.skerries.density")
+				.translation(RTFTranslationKeys.GUI_SLIDER_SKERRY_DENSITY)
+				.range(0.0F, 1.0F)
+				.activeWhen(SKERRIES)
+				.bind((p) -> p.coasts().skerries.density, (p, v) -> p.coasts().skerries.density = v)
+				.build()
+		),
+		Category.of("islandArcs", RTFTranslationKeys.GUI_LABEL_ISLAND_ARCS,
+			BoolOption.builder("coasts.islandArcs.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_ISLAND_ARCS)
+				.bind((p) -> p.coasts().islandArcs.enabled, (p, v) -> p.coasts().islandArcs.enabled = v)
+				.build(),
+			FloatOption.builder("coasts.islandArcs.frequency")
+				.translation(RTFTranslationKeys.GUI_SLIDER_ISLAND_ARC_FREQUENCY)
+				.range(0.0F, 1.0F)
+				.activeWhen(ISLAND_ARCS)
+				.bind((p) -> p.coasts().islandArcs.frequency, (p, v) -> p.coasts().islandArcs.frequency = v)
+				.build()
+		),
+		Category.of("riverIslands", RTFTranslationKeys.GUI_LABEL_RIVER_ISLANDS,
+			BoolOption.builder("coasts.riverIslands.enabled")
+				.translation(RTFTranslationKeys.GUI_BUTTON_RIVER_ISLANDS)
+				.bind((p) -> p.coasts().riverIslands.enabled, (p, v) -> p.coasts().riverIslands.enabled = v)
+				.build(),
+			FloatOption.builder("coasts.riverIslands.frequency")
+				.translation(RTFTranslationKeys.GUI_SLIDER_RIVER_ISLAND_FREQUENCY)
+				.range(0.0F, 1.0F)
+				.activeWhen(RIVER_ISLANDS)
+				.bind((p) -> p.coasts().riverIslands.frequency, (p, v) -> p.coasts().riverIslands.frequency = v)
+				.build()
+		)
+	);
+
+	public static final List<Page> PAGES = List.of(WORLD, SURFACE, CAVES, CLIMATE, TERRAIN, RIVERS, LANDFORMS, COASTS, FILTERS, MISCELLANEOUS);
 
 	private static final Map<String, Option<?>> BY_PATH = PAGES.stream().flatMap(Page::options).collect(Collectors.toUnmodifiableMap(Option::path, Function.identity()));
 

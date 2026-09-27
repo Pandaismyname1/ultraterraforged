@@ -54,18 +54,18 @@ public final class TerrainLocator {
 	}
 
 	private static boolean isSmall(Terrain terrain) {
-		return terrain == TerrainType.TOR || terrain == TerrainType.SHINGLE_BEACH || terrain == TerrainType.VOLCANO_PIPE || terrain == TerrainType.SINKHOLE;
+		return terrain == TerrainType.TOR || terrain == TerrainType.SHINGLE_BEACH || terrain == TerrainType.VOLCANO_PIPE || terrain == TerrainType.SINKHOLE || terrain == TerrainType.SKERRY;
 	}
 
 	// strips along rivers and shores
 	private static boolean isNarrow(Terrain terrain) {
-		return terrain.isRiver() || terrain == TerrainType.RIVER_BANKS || terrain == TerrainType.BEACH || terrain == TerrainType.COAST || terrain == TerrainType.BARRIER_ISLAND || terrain == TerrainType.MORAINE;
+		return terrain.isRiver() || terrain == TerrainType.RIVER_BANKS || terrain == TerrainType.BEACH || terrain == TerrainType.COAST || terrain == TerrainType.BARRIER_ISLAND || terrain == TerrainType.MORAINE || terrain == TerrainType.SAND_BAR || terrain == TerrainType.RIVER_ISLAND;
 	}
 
 	// landforms and features a few hundred blocks across
 	private static boolean isLandform(Terrain terrain) {
 		return terrain.isLake() || terrain.isWetland() || terrain == TerrainType.DUNES || terrain == TerrainType.VOLCANO || terrain == TerrainType.LAGOON || terrain == TerrainType.DEEP_LAGOON
-			|| terrain == TerrainType.SALT_FLAT || terrain == TerrainType.ALLUVIAL_FAN || terrain == TerrainType.GLACIAL_VALLEY || terrain == TerrainType.CIRQUE || terrain == TerrainType.DRUMLINS || terrain == TerrainType.KARST || terrain == TerrainType.DELTA;
+			|| terrain == TerrainType.SALT_FLAT || terrain == TerrainType.ALLUVIAL_FAN || terrain == TerrainType.GLACIAL_VALLEY || terrain == TerrainType.CIRQUE || terrain == TerrainType.DRUMLINS || terrain == TerrainType.KARST || terrain == TerrainType.DELTA || terrain == TerrainType.PENINSULA || terrain == TerrainType.COASTAL_ISLAND || terrain == TerrainType.VOLCANIC_ISLAND;
 	}
 
 	/**

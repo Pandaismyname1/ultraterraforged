@@ -46,6 +46,10 @@ public class Cell {
     // how far from the middle of the nearest river or lake, as a share of the width of its water and banks: below 1 on
     // the bed and banks, 1 at their outer edge, and FAR away from any
     public float riverBank;
+    // which reshaping of the coast made this place: see CoastShaper
+    public int coastFeature;
+    // the width of the water and banks of the river nearest the middle of, either side of its middle, in blocks
+    public float riverWidth;
     public static final float FAR = 100.0F;
     public int continentX;
     public int continentZ;
@@ -96,6 +100,8 @@ public class Cell {
         this.riverDistance = other.riverDistance;
         this.waterLevel = other.waterLevel;
         this.riverBank = other.riverBank;
+        this.coastFeature = other.coastFeature;
+        this.riverWidth = other.riverWidth;
         this.continentX = other.continentX;
         this.continentZ = other.continentZ;
         this.erosionMask = other.erosionMask;

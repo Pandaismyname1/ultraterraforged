@@ -15,6 +15,7 @@ import raccoonman.reterraforged.world.worldgen.cell.CellField;
 import raccoonman.reterraforged.world.worldgen.cell.CellPopulator;
 import raccoonman.reterraforged.world.worldgen.cell.noise.CellSampler;
 import raccoonman.reterraforged.world.worldgen.climate.Climate;
+import raccoonman.reterraforged.world.worldgen.continent.CoastShaper;
 import raccoonman.reterraforged.world.worldgen.continent.Continent;
 import raccoonman.reterraforged.world.worldgen.continent.ContinentLerper2;
 import raccoonman.reterraforged.world.worldgen.continent.ContinentLerper3;
@@ -68,6 +69,8 @@ public record Heightmap(CellSampler.Provider cellProvider, CellPopulator terrain
         this.landforms.apply(cell, x, z, this);
 
         VolcanoPopulator.modifyVolcanoType(cell, this.levels);
+
+        CoastShaper.label(cell, this.levels);
 	}
 
 	private void applyTerrainTypes(Cell cell, float x, float z) {
@@ -225,7 +228,8 @@ public record Heightmap(CellSampler.Provider cellProvider, CellPopulator terrain
         
         CellPopulator terrainBlend = new RegionLerper(terrainRegionBorders, terrainRegions);
         CellPopulator mountains = Populators.makeMountainChain(mountainSeed, ground, terrainSettings.mountains, globalVerticalScale, general.fancyMountains);
-        Continent continent = worldSettings.continent.continentType.create(ctx.seed, ctx);
+        // with its coastline reshaped: the natural shoreline lies just past the beach control point
+        Continent continent = CoastShaper.wrap(worldSettings.continent.continentType.create(ctx.seed, ctx), ctx.seed.root() + 71237, controlPoints.beach + 0.011F, preset.coasts());
         Climate climate = Climate.make(continent, ctx);
         CellPopulator land = new MountainChainPopulator(terrainBlend, mountains, 0.3F, 0.8F);
         
@@ -240,7 +244,7 @@ public record Heightmap(CellSampler.Provider cellProvider, CellPopulator terrain
         beachNoise = Noises.mul(beachNoise, ctx.levels.scale(5));
         
         // the natural shoreline lies just past the beach control point
-        Landform landforms = Landforms.make(ctx.seed.offset(55123), preset.landforms(), levels, controlPoints.beach + 0.011F);
+        Landform landforms = Landforms.make(ctx.seed.offset(55123), preset.landforms(), preset.coasts(), levels, controlPoints.beach + 0.011F);
 
         CellSampler.Provider cellProvider = new CellSampler.Provider();
         return new Heightmap(cellProvider, terrain.mapNoise(cellProvider), region, continent, climate, levels, controlPoints, terrainFrequency, mountainChainAlpha, beachNoise, landforms.mapNoise(cellProvider));

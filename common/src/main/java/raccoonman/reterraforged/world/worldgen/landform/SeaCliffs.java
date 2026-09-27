@@ -3,6 +3,7 @@ package raccoonman.reterraforged.world.worldgen.landform;
 import it.unimi.dsi.fastutil.longs.Long2FloatOpenHashMap;
 import raccoonman.reterraforged.data.preset.settings.LandformSettings;
 import raccoonman.reterraforged.world.worldgen.cell.Cell;
+import raccoonman.reterraforged.world.worldgen.continent.CoastShaper;
 import raccoonman.reterraforged.world.worldgen.heightmap.Heightmap;
 import raccoonman.reterraforged.world.worldgen.heightmap.Levels;
 import raccoonman.reterraforged.world.worldgen.noise.NoiseUtil;
@@ -58,7 +59,8 @@ public record SeaCliffs(int seed, float shoreline, float threshold, float height
 			return;
 		}
 		float mask = this.cliffMask(x, z) * Landform.smoothstep(cell.riverDistance, 0.2F, 0.5F);
-		if (cell.terrain.isRiver() || cell.terrain.isLake() || cell.terrain.isWetland()) {
+		// nor on bars of sand, too low and narrow to hold a cliff
+		if (cell.terrain.isRiver() || cell.terrain.isLake() || cell.terrain.isWetland() || cell.coastFeature == CoastShaper.BAR) {
 			mask = 0.0F;
 		}
 		if (mask > 0.0F) {
@@ -78,7 +80,9 @@ public record SeaCliffs(int seed, float shoreline, float threshold, float height
 			// land: raised most at the shore, sloping back down to the natural land inland
 			float shape = Landform.smoothstep(proximity, 0.15F, 0.85F);
 			// but the lowest strip of shore stays low where there is a beach, with the cliff rising behind it
+			// (only right by the sea: low land further back still gets the cliff, rising behind the beach)
 			float strip = beach * (1.0F - Landform.smoothstep((cell.height - this.levels.water) * this.levels.worldHeight, BEACH_HEIGHT, BEACH_HEIGHT + 1.5F));
+			strip *= Landform.smoothstep(proximity, 0.55F, 0.72F);
 			float cliff = this.height * this.heightVariation.compute(x, z, 0) * shape * mask;
 			cell.height += cliff * (1.0F - strip) * this.levels.unit;
 			if (shape > 0.6F) {

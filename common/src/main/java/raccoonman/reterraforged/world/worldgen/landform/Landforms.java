@@ -3,6 +3,7 @@ package raccoonman.reterraforged.world.worldgen.landform;
 import java.util.ArrayList;
 import java.util.List;
 
+import raccoonman.reterraforged.data.preset.settings.CoastSettings;
 import raccoonman.reterraforged.data.preset.settings.LandformSettings;
 import raccoonman.reterraforged.world.worldgen.cell.Cell;
 import raccoonman.reterraforged.world.worldgen.heightmap.Heightmap;
@@ -16,7 +17,7 @@ public record Landforms(List<Landform> landforms) implements Landform {
 	/**
 	 * @param shoreline the continent edge value at which the land meets the sea
 	 */
-	public static Landforms make(Seed seed, LandformSettings settings, Levels levels, float shoreline) {
+	public static Landforms make(Seed seed, LandformSettings settings, CoastSettings coasts, Levels levels, float shoreline) {
 		List<Landform> landforms = new ArrayList<>();
 		// each landform gets its own seed, whether or not the others are on
 		int buttesSeed = seed.next();
@@ -33,6 +34,9 @@ public record Landforms(List<Landform> landforms) implements Landform {
 		int barrierIslandsSeed = seed.next();
 		int karstSeed = seed.next();
 		int deltasSeed = seed.next();
+		int skerriesSeed = seed.next();
+		int islandArcsSeed = seed.next();
+		int riverIslandsSeed = seed.next();
 		// canyons cut first, so buttes can stand in them
 		if (settings.canyons.enabled) {
 			landforms.add(Canyons.make(canyonsSeed, settings.canyons, levels));
@@ -79,9 +83,18 @@ public record Landforms(List<Landform> landforms) implements Landform {
 		if (settings.barrierIslands.enabled) {
 			landforms.add(BarrierIslands.make(barrierIslandsSeed, settings.barrierIslands, shoreline, levels, seaCliffs));
 		}
+		if (coasts.skerries.enabled) {
+			landforms.add(Skerries.make(skerriesSeed, coasts.skerries, shoreline, levels));
+		}
+		if (coasts.islandArcs.enabled) {
+			landforms.add(IslandArcs.make(islandArcsSeed, coasts.islandArcs, shoreline, levels));
+		}
 		// last, over the coast the others shaped
 		if (settings.deltas.enabled) {
 			landforms.add(Deltas.make(deltasSeed, settings.deltas, shoreline, levels));
+		}
+		if (coasts.riverIslands.enabled) {
+			landforms.add(RiverIslands.make(riverIslandsSeed, coasts.riverIslands, levels));
 		}
 		return new Landforms(List.copyOf(landforms));
 	}

@@ -68,7 +68,7 @@ public class PresetFormatTest {
 
 	private static Preset presetWithCaves(CaveSettings caves) {
 		Preset preset = BuiltinPresetRenderTest.presets().get("default").get();
-		return new Preset(preset.world(), preset.surface(), caves, preset.climate(), preset.terrain(), preset.rivers(), preset.filters(), preset.structures(), preset.miscellaneous(), preset.landforms());
+		return new Preset(preset.world(), preset.surface(), caves, preset.climate(), preset.terrain(), preset.rivers(), preset.filters(), preset.structures(), preset.miscellaneous(), preset.landforms(), preset.coasts());
 	}
 
 	@Test

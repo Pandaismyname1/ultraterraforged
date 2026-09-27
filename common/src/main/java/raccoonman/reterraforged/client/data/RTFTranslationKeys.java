@@ -88,6 +88,32 @@ public class RTFTranslationKeys {
 	public static final String GUI_BUTTON_DELTAS = resolve("gui.button.deltas");
 	public static final String GUI_SLIDER_DELTA_SIZE = resolve("gui.slider.deltaSize");
 
+	public static final String GUI_COASTS_SETTINGS_TITLE = resolve("gui.coasts.title");
+	public static final String GUI_LABEL_HEADLANDS = resolve("gui.label.headlands");
+	public static final String GUI_BUTTON_HEADLANDS = resolve("gui.button.headlands");
+	public static final String GUI_SLIDER_HEADLAND_STRENGTH = resolve("gui.slider.headlandStrength");
+	public static final String GUI_LABEL_PENINSULAS = resolve("gui.label.peninsulas");
+	public static final String GUI_BUTTON_PENINSULAS = resolve("gui.button.peninsulas");
+	public static final String GUI_SLIDER_PENINSULA_FREQUENCY = resolve("gui.slider.peninsulaFrequency");
+	public static final String GUI_SLIDER_PENINSULA_SIZE = resolve("gui.slider.peninsulaSize");
+	public static final String GUI_LABEL_COASTAL_ISLANDS = resolve("gui.label.coastalIslands");
+	public static final String GUI_BUTTON_COASTAL_ISLANDS = resolve("gui.button.coastalIslands");
+	public static final String GUI_SLIDER_COASTAL_ISLAND_FREQUENCY = resolve("gui.slider.coastalIslandFrequency");
+	public static final String GUI_SLIDER_COASTAL_ISLAND_SIZE = resolve("gui.slider.coastalIslandSize");
+	public static final String GUI_SLIDER_TOMBOLO_SHARE = resolve("gui.slider.tomboloShare");
+	public static final String GUI_LABEL_SPITS = resolve("gui.label.spits");
+	public static final String GUI_BUTTON_SPITS = resolve("gui.button.spits");
+	public static final String GUI_SLIDER_SPIT_FREQUENCY = resolve("gui.slider.spitFrequency");
+	public static final String GUI_LABEL_SKERRIES = resolve("gui.label.skerries");
+	public static final String GUI_BUTTON_SKERRIES = resolve("gui.button.skerries");
+	public static final String GUI_SLIDER_SKERRY_DENSITY = resolve("gui.slider.skerryDensity");
+	public static final String GUI_LABEL_ISLAND_ARCS = resolve("gui.label.islandArcs");
+	public static final String GUI_BUTTON_ISLAND_ARCS = resolve("gui.button.islandArcs");
+	public static final String GUI_SLIDER_ISLAND_ARC_FREQUENCY = resolve("gui.slider.islandArcFrequency");
+	public static final String GUI_LABEL_RIVER_ISLANDS = resolve("gui.label.riverIslands");
+	public static final String GUI_BUTTON_RIVER_ISLANDS = resolve("gui.button.riverIslands");
+	public static final String GUI_SLIDER_RIVER_ISLAND_FREQUENCY = resolve("gui.slider.riverIslandFrequency");
+
 	public static final String GUI_BUTTON_TRUE = resolve("gui.button.true");
 	public static final String GUI_BUTTON_FALSE = resolve("gui.button.false");
 	public static final String GUI_BUTTON_CREATE = resolve("gui.button.create");
