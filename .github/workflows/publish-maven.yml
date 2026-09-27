@@ -1,8 +1,11 @@
 name: Publish Maven
 
+# release.yml calls this directly: a release it creates with GITHUB_TOKEN doesn't trigger the release event.
+# The release event still covers releases published by hand.
 on:
   release:
     types: [published]
+  workflow_call:
   workflow_dispatch:
 
 permissions:

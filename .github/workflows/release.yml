@@ -8,10 +8,10 @@ on:
         default: alpha
         options: [release, beta, alpha]
 
-# Project ids on each platform. Fill these in once the UltraTerraForged project pages exist.
+# Project ids on each platform: modrinth.com/mod/ultraterraforged and curseforge.com/minecraft/mc-mods/ultraterraforged
 env:
-  MODRINTH_ID: ""
-  CURSEFORGE_ID: ""
+  MODRINTH_ID: "LpyUCfpY"
+  CURSEFORGE_ID: "1715379"
 
 permissions:
   contents: write
@@ -112,3 +112,7 @@ jobs:
           game-versions: ${{ steps.minecraft_version.outputs.minecraft_version }}
           java: 17
           files: forge/build/libs/ultraterraforged-${{ steps.composite_version.outputs.composite_version }}-forge.jar
+
+  maven:
+    needs: build
+    uses: ./.github/workflows/publish-maven.yml
