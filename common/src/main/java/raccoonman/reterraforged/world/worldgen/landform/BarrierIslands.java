@@ -1,5 +1,7 @@
 package raccoonman.reterraforged.world.worldgen.landform;
 
+import org.jetbrains.annotations.Nullable;
+
 import raccoonman.reterraforged.data.preset.settings.LandformSettings;
 import raccoonman.reterraforged.world.worldgen.cell.Cell;
 import raccoonman.reterraforged.world.worldgen.heightmap.Heightmap;
@@ -17,7 +19,7 @@ import raccoonman.reterraforged.world.worldgen.terrain.TerrainType;
  * @param coastline where along the coast islands form, above threshold
  * @param inlets where the islands are broken, above inletThreshold
  */
-public record BarrierIslands(float shoreline, Noise coastline, float threshold, Noise inlets, float inletThreshold, Noise dunes, Levels levels, SampleGrid distance, SampleGrid landHeight) implements Landform {
+public record BarrierIslands(float shoreline, Noise coastline, float threshold, Noise inlets, float inletThreshold, Noise dunes, Levels levels, SampleGrid distance, SampleGrid landHeight, @Nullable SeaCliffs cliffs) implements Landform {
 	private static final float GRID = 24.0F;
 	// the distances out from a grid corner that land is looked for at
 	private static final float[] RINGS = { 0.0F, 8.0F, 16.0F, 24.0F, 32.0F, 40.0F, 48.0F, 56.0F, 64.0F, 72.0F, 80.0F, 88.0F, 96.0F };
@@ -34,12 +36,15 @@ public record BarrierIslands(float shoreline, Noise coastline, float threshold, 
 	// continent edge values past this are far from the open sea
 	private static final float INLAND = 0.25F;
 
-	public static BarrierIslands make(int seed, LandformSettings.BarrierIslands settings, float shoreline, Levels levels) {
+	/**
+	 * @param cliffs the sea cliffs, whose stretches of coast get no islands; null if there are none
+	 */
+	public static BarrierIslands make(int seed, LandformSettings.BarrierIslands settings, float shoreline, Levels levels, @Nullable SeaCliffs cliffs) {
 		Noise coastline = Noises.perlin(seed, 1100, 2);
 		float frequency = NoiseUtil.clamp(settings.frequency, 0.0F, 1.0F);
 		float threshold = frequency <= 0.0F ? Float.POSITIVE_INFINITY : Landform.quantile(coastline, 1.0F - frequency);
 		Noise inlets = Noises.perlin(seed + 1, 140, 1);
-		return new BarrierIslands(shoreline, coastline, threshold, inlets, Landform.quantile(inlets, 0.85F), Noises.perlin(seed + 2, 20, 2), levels, SampleGrid.of(GRID), SampleGrid.of(GRID));
+		return new BarrierIslands(shoreline, coastline, threshold, inlets, Landform.quantile(inlets, 0.85F), Noises.perlin(seed + 2, 20, 2), levels, SampleGrid.of(GRID), SampleGrid.of(GRID), cliffs);
 	}
 
 	@Override
@@ -49,6 +54,9 @@ public record BarrierIslands(float shoreline, Noise coastline, float threshold, 
 			return;
 		}
 		float mask = Landform.smoothstep(this.coastline.compute(x, z, 0), this.threshold, this.threshold + 0.03F);
+		if (this.cliffs != null) {
+			mask *= 1.0F - this.cliffs.cliffMask(x, z);
+		}
 		if (mask <= 0.0F) {
 			return;
 		}
@@ -80,8 +88,13 @@ public record BarrierIslands(float shoreline, Noise coastline, float threshold, 
 		} else if (distance < OFFSHORE) {
 			// the lagoon: its floor built up to a shallow, even depth
 			float lagoon = this.levels.water(-(int) LAGOON_DEPTH);
+			float fill = mask * Landform.smoothstep(OFFSHORE - distance, 0.0F, 12.0F);
 			if (cell.height < lagoon) {
-				cell.height = NoiseUtil.lerp(cell.height, lagoon, mask * Landform.smoothstep(OFFSHORE - distance, 0.0F, 12.0F));
+				cell.height = NoiseUtil.lerp(cell.height, lagoon, fill);
+			}
+			// with a floor of sand
+			if (fill > 0.5F) {
+				cell.terrain = TerrainType.LAGOON;
 			}
 		}
 	}
@@ -121,6 +134,6 @@ public record BarrierIslands(float shoreline, Noise coastline, float threshold, 
 
 	@Override
 	public Landform mapNoise(Noise.Visitor visitor) {
-		return new BarrierIslands(this.shoreline, this.coastline.mapAll(visitor), this.threshold, this.inlets.mapAll(visitor), this.inletThreshold, this.dunes.mapAll(visitor), this.levels, this.distance, this.landHeight);
+		return new BarrierIslands(this.shoreline, this.coastline.mapAll(visitor), this.threshold, this.inlets.mapAll(visitor), this.inletThreshold, this.dunes.mapAll(visitor), this.levels, this.distance, this.landHeight, this.cliffs);
 	}
 }

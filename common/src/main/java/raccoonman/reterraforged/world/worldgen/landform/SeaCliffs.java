@@ -139,7 +139,8 @@ public record SeaCliffs(int seed, float shoreline, float threshold, float height
 		return proximity;
 	}
 
-	private float cliffMask(float x, float z) {
+	// 1 along the stretches of coast with cliffs, 0 elsewhere
+	float cliffMask(float x, float z) {
 		float value = this.coastline.compute(x, z, 0);
 		return Landform.smoothstep(value, this.threshold - 0.02F, this.threshold + 0.02F);
 	}

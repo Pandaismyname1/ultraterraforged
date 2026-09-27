@@ -732,7 +732,7 @@ public class PresetSurfaceRuleData {
     			)
     		),
     		SurfaceRules.ifTrue(
-    			RTFSurfaceConditions.terrain(TerrainType.BARRIER_ISLAND),
+    			RTFSurfaceConditions.terrain(TerrainType.BARRIER_ISLAND, TerrainType.LAGOON),
     			SurfaceRules.ifTrue(SurfaceRules.UNDER_FLOOR, sand)
     		),
     		SurfaceRules.ifTrue(

@@ -64,8 +64,10 @@ public record Landforms(List<Landform> landforms) implements Landform {
 		if (settings.drumlins.enabled) {
 			landforms.add(Drumlins.make(drumlinsSeed, settings.drumlins, levels));
 		}
+		SeaCliffs seaCliffs = null;
 		if (settings.seaCliffs.enabled) {
-			landforms.add(SeaCliffs.make(seaCliffsSeed, settings.seaCliffs, shoreline, levels));
+			seaCliffs = SeaCliffs.make(seaCliffsSeed, settings.seaCliffs, shoreline, levels);
+			landforms.add(seaCliffs);
 		}
 		// after the cliffs, so fjords cut through them
 		if (settings.fjords.enabled) {
@@ -75,7 +77,7 @@ public record Landforms(List<Landform> landforms) implements Landform {
 			landforms.add(Atolls.make(atollsSeed, settings.atolls, shoreline, levels));
 		}
 		if (settings.barrierIslands.enabled) {
-			landforms.add(BarrierIslands.make(barrierIslandsSeed, settings.barrierIslands, shoreline, levels));
+			landforms.add(BarrierIslands.make(barrierIslandsSeed, settings.barrierIslands, shoreline, levels, seaCliffs));
 		}
 		// last, over the coast the others shaped
 		if (settings.deltas.enabled) {
