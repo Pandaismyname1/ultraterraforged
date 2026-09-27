@@ -24,7 +24,7 @@ public enum RenderMode {
                 case BEACH:
                     return rgba(0.2F, 0.4F, 0.75F);
                 default:
-                    if (cell.height < levels.water) {
+                    if (cell.height < levels.water || cell.height < cell.waterLevel) {
                         return RenderMode.getWaterColor();
                     } else {
                         Color color = cell.biomeType.getColor();
@@ -181,7 +181,7 @@ public enum RenderMode {
     };
 
     public int getColor(Cell cell, Levels levels) {
-        if (!this.handlesWater() && cell.height < levels.water) {
+        if (!this.handlesWater() && (cell.height < levels.water || cell.height < cell.waterLevel)) {
             return getWaterColor();
         }
         float bands = 10.0F;

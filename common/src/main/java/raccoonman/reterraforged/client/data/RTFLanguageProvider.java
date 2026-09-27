@@ -223,6 +223,8 @@ public class RTFLanguageProvider {
 			this.add(RTFTranslationKeys.GUI_SLIDER_TERRAIN_VERTICAL_SCALE, "Vertical Scale");
 			this.add(RTFTranslationKeys.GUI_SLIDER_TERRAIN_HORIZONTAL_SCALE, "Horizontal Scale");
 			this.add(RTFTranslationKeys.GUI_SLIDER_RIVER_COUNT, "River Count");
+			this.add(RTFTranslationKeys.GUI_BUTTON_RAISED_WATER, "Rivers Follow the Land");
+			this.add(RTFTranslationKeys.GUI_SLIDER_GORGE_DEPTH, "Max Gorge Depth");
 			this.add(RTFTranslationKeys.GUI_SLIDER_RIVER_BED_DEPTH, "Bed Depth");
 			this.add(RTFTranslationKeys.GUI_SLIDER_RIVER_MIN_BANK_HEIGHT, "Min Bank Height");
 			this.add(RTFTranslationKeys.GUI_SLIDER_RIVER_MAX_BANK_HEIGHT, "Max Bank Height");
@@ -477,6 +479,8 @@ public class RTFLanguageProvider {
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_TERRAIN_VERTICAL_SCALE), "Stretches or compresses the terrain vertically");
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_TERRAIN_HORIZONTAL_SCALE), "Stretches or compresses the terrain horizontally");
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_RIVER_COUNT), "Controls the number of main rivers per continent.");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_GORGE_DEPTH), "How many blocks a river may cut below the land beside it; where the land rises higher, the river climbs with it in rapids");
+			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_BUTTON_RAISED_WATER), "Rivers, lakes and wetlands keep their water a few blocks below their banks, high in the hills as well as by the sea, instead of all cutting down to sea level");
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_RIVER_BED_DEPTH), "Controls the depth of the river");
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_RIVER_MIN_BANK_HEIGHT), "Controls the height of river banks");
 			this.add(Tooltips.translationKey(RTFTranslationKeys.GUI_SLIDER_RIVER_MAX_BANK_HEIGHT), "Controls the height of river banks");

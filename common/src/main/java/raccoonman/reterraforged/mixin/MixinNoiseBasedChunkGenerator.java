@@ -28,6 +28,7 @@ import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.NoiseSettings;
 import net.minecraft.world.level.levelgen.RandomState;
+import raccoonman.reterraforged.world.worldgen.rivermap.RaisedWater;
 import net.minecraft.world.level.levelgen.blending.Blender;
 import raccoonman.reterraforged.data.preset.settings.WorldSettings;
 import raccoonman.reterraforged.world.worldgen.GeneratorContext;
@@ -47,6 +48,11 @@ class MixinNoiseBasedChunkGenerator {
 	@Inject(at = @At("HEAD"), method = "buildSurface", require = 1)
     public void buildSurface$HEAD(WorldGenRegion worldGenRegion, StructureManager structureManager, RandomState randomState, ChunkAccess chunkAccess, CallbackInfo callback) {
 		SurfaceRegion.set(worldGenRegion);
+		GeneratorContext generatorContext;
+		if((Object) randomState instanceof RTFRandomState rtfRandomState && (generatorContext = rtfRandomState.generatorContext()) != null) {
+			// the water of rivers and lakes above the sea, so the surface is built under it
+			RaisedWater.fill(chunkAccess, generatorContext);
+		}
     }
 	
 	@Inject(at = @At("TAIL"), method = "buildSurface", require = 1)

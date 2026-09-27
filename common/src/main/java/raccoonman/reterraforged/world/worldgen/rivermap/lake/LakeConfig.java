@@ -11,6 +11,9 @@ public class LakeConfig {
     public float sizeRange;
     public float bankMin;
     public float bankMax;
+    // the sea level these heights are measured from
+    public float water;
+    public float unit;
     
     private LakeConfig(Builder builder) {
         this.depth = builder.depth;
@@ -20,6 +23,8 @@ public class LakeConfig {
         this.sizeRange = this.sizeMax - this.sizeMin;
         this.bankMin = builder.bankMin;
         this.bankMax = builder.bankMax;
+        this.water = builder.water;
+        this.unit = builder.unit;
     }
     
     public static LakeConfig of(RiverSettings.Lake settings, Levels levels) {
@@ -30,6 +35,8 @@ public class LakeConfig {
         builder.depth = levels.water(-settings.depth);
         builder.bankMin = levels.water(settings.minBankHeight);
         builder.bankMax = levels.water(settings.maxBankHeight);
+        builder.water = levels.water;
+        builder.unit = levels.unit;
         return new LakeConfig(builder);
     }
     
@@ -40,6 +47,8 @@ public class LakeConfig {
         public float sizeMax;
         public float bankMin;
         public float bankMax;
+        public float water;
+        public float unit;
         
         public Builder() {
             this.depth = 10.0F;

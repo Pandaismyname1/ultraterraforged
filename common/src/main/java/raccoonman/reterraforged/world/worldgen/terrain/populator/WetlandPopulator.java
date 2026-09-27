@@ -24,6 +24,14 @@ public class WetlandPopulator {
     private Noise moundShape;
     private Noise moundHeight;
     private Noise terrainEdge;
+    // where along its river the wetland starts and ends, from 0 at the source to 1 at the mouth
+    public float startT;
+    public float endT;
+    private float water;
+    // how far the wetland's water stands above the sea
+    private float shift;
+    // off where the river drops too steeply for a marsh
+    private boolean enabled = true;
     
     public WetlandPopulator(int seed, Vec2f a, Vec2f b, float radius, Levels levels) {
         this.a = a;
@@ -35,6 +43,7 @@ public class WetlandPopulator {
         this.moundMin = levels.water(1);
         this.moundMax = levels.water(2);
         this.moundVariance = this.moundMax - this.moundMin;
+        this.water = levels.water;
         
         Noise moundShape = Noises.perlin(++seed, 10, 1);
         moundShape = Noises.clamp(moundShape, 0.3F, 0.6F);
@@ -52,8 +61,24 @@ public class WetlandPopulator {
         this.terrainEdge = terrainEdge;
     }
     
+    // the wetland's water surface, when wetlands lie above the sea
+    public void setWaterLevel(float level) {
+    	this.shift = level - this.water;
+    }
+    
+    public void disable() {
+    	this.enabled = false;
+    }
+    
     public void apply(Cell cell, float rx, float rz, float x, float z) {
-        if (cell.height < this.bed) {
+        if (!this.enabled) {
+        	return;
+        }
+        float bed = this.bed + this.shift;
+        float banks = this.banks + this.shift;
+        float moundMin = this.moundMin + this.shift;
+        float moundMax = this.moundMax + this.shift;
+        if (cell.height < bed) {
             return;
         }
         float t = Line.distanceOnLine(rx, rz, this.a.x(), this.a.y(), this.b.x(), this.b.y());
@@ -66,13 +91,13 @@ public class WetlandPopulator {
             return;
         }
         float valleyAlpha = NoiseUtil.map(dist, 0.0F, 0.65F, 0.65F);
-        if (cell.height > this.banks) {
-            cell.height = NoiseUtil.lerp(cell.height, this.banks, valleyAlpha);
+        if (cell.height > banks) {
+            cell.height = NoiseUtil.lerp(cell.height, banks, valleyAlpha);
         }
 
         float poolsAlpha = NoiseUtil.map(dist, 0.65F, 0.7F, 0.050000012F);
-        if (cell.height > this.bed && cell.height <= this.banks) {
-            cell.height = NoiseUtil.lerp(cell.height, this.bed, poolsAlpha);
+        if (cell.height > bed && cell.height <= banks) {
+            cell.height = NoiseUtil.lerp(cell.height, bed, poolsAlpha);
         }
         if (poolsAlpha >= 1.0F) {
             cell.erosionMask = true;
@@ -80,10 +105,14 @@ public class WetlandPopulator {
         if (dist > 0.65F && poolsAlpha > this.terrainEdge.compute(x, z, 0)) {
             cell.terrain = TerrainType.WETLAND;
         }
-        if (cell.height >= this.bed && cell.height < this.moundMax) {
+        if (cell.height >= bed && cell.height < moundMax) {
             float shapeAlpha = this.moundShape.compute(x, z, 0) * poolsAlpha;
-            float mounds = this.moundMin + this.moundHeight.compute(x, z, 0) * this.moundVariance;
+            float mounds = moundMin + this.moundHeight.compute(x, z, 0) * this.moundVariance;
             cell.height = NoiseUtil.lerp(cell.height, mounds, shapeAlpha);
+        }
+        if (this.shift > 0.0F && cell.height < this.water + this.shift && poolsAlpha > 0.0F) {
+        	float level = this.water + this.shift;
+        	cell.waterLevel = cell.waterLevel > 0.0F ? Math.min(cell.waterLevel, level) : level;
         }
         cell.riverDistance = Math.min(cell.riverDistance, 1.0F - valleyAlpha);
     }

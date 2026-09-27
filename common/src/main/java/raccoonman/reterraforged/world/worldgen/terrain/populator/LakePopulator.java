@@ -19,6 +19,10 @@ public class LakePopulator {
     private float bankMin;
     private float bankMax;
     protected Vec2f center;
+    private float water;
+    private float unit;
+    // how far the lake's water stands above the sea
+    private float shift;
     
     private LakePopulator2 populator2;
     
@@ -38,6 +42,21 @@ public class LakePopulator {
         this.bankAlphaRange = this.bankAlphaMax - this.bankAlphaMin;
         this.lakeDistance2 = lake * lake;
         this.valleyDistance2 = this.valley2 - this.lakeDistance2;
+        this.water = config.water;
+        this.unit = config.unit;
+    }
+    
+    public Vec2f center() {
+    	return this.center;
+    }
+    
+    public float radius() {
+    	return (float) Math.sqrt(this.lakeDistance2);
+    }
+    
+    // the lake's water surface, when lakes lie above the sea
+    public void setWaterLevel(float level) {
+    	this.shift = level - this.water;
     }
     
     public void apply(Cell cell, float x, float z) {
@@ -45,6 +64,8 @@ public class LakePopulator {
         if (distance2 > this.valley2) {
             return;
         }
+        float level = this.water + this.shift;
+        boolean raised = this.shift > this.unit;
         float bankHeight = this.getBankHeight(cell);
         if (distance2 <= this.lakeDistance2) {
             cell.height = Math.min(bankHeight, cell.height);
@@ -55,14 +76,14 @@ public class LakePopulator {
                 } else if (depthAlpha > 1.0F) {
                     depthAlpha = 1.0F;
                 }
-                float lakeDepth = Math.min(cell.height, this.depth);
+                float lakeDepth = Math.min(cell.height, this.depth + this.shift);
                 cell.height = NoiseUtil.lerp(cell.height, lakeDepth, depthAlpha);
                 cell.terrain = TerrainType.LAKE;
                 cell.riverDistance = Math.min(cell.riverDistance, 1.0F - depthAlpha);
+                if (raised && cell.height < level) {
+                	cell.waterLevel = cell.waterLevel > 0.0F ? Math.min(cell.waterLevel, level) : level;
+                }
             }
-            return;
-        }
-        if (cell.height < bankHeight) {
             return;
         }
         float valleyAlpha = 1.0F - (distance2 - this.lakeDistance2) / this.valleyDistance2;
@@ -70,6 +91,14 @@ public class LakePopulator {
             valleyAlpha = 0.0F;
         } else if (valleyAlpha > 1.0F) {
             valleyAlpha = 1.0F;
+        }
+        if (raised && cell.height < level + this.unit && valleyAlpha > 0.7F && cell.waterLevel == 0.0F && !cell.terrain.isRiver()) {
+        	// the shore is lower than the lake's water: an embankment keeps it in
+        	cell.height = level + this.unit;
+        	cell.erosionMask = true;
+        }
+        if (cell.height < bankHeight) {
+            return;
         }
         cell.height = NoiseUtil.lerp(cell.height, bankHeight, valleyAlpha);
         cell.riverDistance *= 1.0F - valleyAlpha;
@@ -93,7 +122,7 @@ public class LakePopulator {
     }
     
     protected float getBankHeight(Cell cell) {
-        float bankHeightAlpha = NoiseUtil.map(cell.height, this.bankAlphaMin, this.bankAlphaMax, this.bankAlphaRange);
-        return NoiseUtil.lerp(this.bankMin, this.bankMax, bankHeightAlpha);
+        float bankHeightAlpha = NoiseUtil.map(cell.height - this.shift, this.bankAlphaMin, this.bankAlphaMax, this.bankAlphaRange);
+        return NoiseUtil.lerp(this.bankMin, this.bankMax, bankHeightAlpha) + this.shift;
     }
 }

@@ -466,6 +466,16 @@ public final class PresetOptions {
 				.translation(RTFTranslationKeys.GUI_SLIDER_RIVER_COUNT)
 				.range(0, 30)
 				.bind((p) -> p.rivers().riverCount, (p, v) -> p.rivers().riverCount = v)
+				.build(),
+			BoolOption.builder("rivers.raisedWater")
+				.translation(RTFTranslationKeys.GUI_BUTTON_RAISED_WATER)
+				.bind((p) -> p.rivers().raisedWater, (p, v) -> p.rivers().raisedWater = v)
+				.build(),
+			IntOption.builder("rivers.gorgeDepth")
+				.translation(RTFTranslationKeys.GUI_SLIDER_GORGE_DEPTH)
+				.range(4, 80)
+				.activeWhen((p) -> p.rivers().raisedWater)
+				.bind((p) -> p.rivers().gorgeDepth, (p, v) -> p.rivers().gorgeDepth = v)
 				.build()
 		),
 		river("mainRivers", RTFTranslationKeys.GUI_LABEL_MAIN_RIVERS, (p) -> p.rivers().mainRivers, 50, 200, 150),

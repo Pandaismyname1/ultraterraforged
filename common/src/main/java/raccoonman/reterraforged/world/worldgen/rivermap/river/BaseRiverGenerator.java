@@ -31,6 +31,9 @@ public abstract class BaseRiverGenerator<T extends Continent> implements RiverGe
     protected WetlandConfig wetland;
     protected T continent;
     protected Levels levels;
+    // rivers, lakes and wetlands above the sea follow the land rather than all lying at sea level
+    protected boolean raisedWater;
+    protected int gorgeDepth;
     
     public BaseRiverGenerator(T continent, GeneratorContext context) {
         this.continent = continent;
@@ -43,6 +46,8 @@ public abstract class BaseRiverGenerator<T extends Continent> implements RiverGe
         this.fork = RiverConfig.builder(context.levels).bankHeight(context.preset.rivers().branchRivers.minBankHeight, context.preset.rivers().branchRivers.maxBankHeight).bankWidth(context.preset.rivers().branchRivers.bankWidth).bedWidth(context.preset.rivers().branchRivers.bedWidth).bedDepth(context.preset.rivers().branchRivers.bedDepth).fade(context.preset.rivers().branchRivers.fade).length(4500).order(1).build();
         this.wetland = new WetlandConfig(context.preset.rivers().wetlands);
         this.lake = LakeConfig.of(context.preset.rivers().lakes, context.levels);
+        this.raisedWater = context.preset.rivers().raisedWater;
+        this.gorgeDepth = context.preset.rivers().gorgeDepth;
     }
     
     @Override
@@ -58,7 +63,7 @@ public abstract class BaseRiverGenerator<T extends Continent> implements RiverGe
             this.generateWetlands(river, random);
         }
         Network[] networks = rivers.stream().map(Network.Builder::build).toArray(Network[]::new);
-        return new Rivermap(x, z, networks, warp);
+        return new Rivermap(x, z, networks, warp, this.raisedWater, this.gorgeDepth);
     }
     
     public List<Network.Builder> generateRoots(int x, int z, Random random, GenWarp warp) {
@@ -99,6 +104,7 @@ public abstract class BaseRiverGenerator<T extends Continent> implements RiverGe
                             settings.valleySize = valleyWidth;
                             RiverWarp forkWarp = parent.carver.warp.createChild(0.15f, 0.75f, 0.65f, random);
                             RiverPopulator fork = new RiverPopulator(river, forkWarp, forkConfig, settings, this.levels);
+                            fork.junction = offset;
                             Network.Builder builder = Network.builder(fork);
                             parent.children.add(builder);
                             this.generateForks(builder, River.FORK_SPACING, config, random, warp, rivers, depth + 1);
@@ -144,7 +150,10 @@ public abstract class BaseRiverGenerator<T extends Continent> implements RiverGe
             float z1 = PosUtil.unpackRightf(start);
             float x2 = PosUtil.unpackLeftf(end);
             float z2 = PosUtil.unpackRightf(end);
-            builder.wetlands.add(new WetlandPopulator(random.nextInt(), new Vec2f(x1, z1), new Vec2f(x2, z2), width, this.levels));
+            WetlandPopulator wetland = new WetlandPopulator(random.nextInt(), new Vec2f(x1, z1), new Vec2f(x2, z2), width, this.levels);
+            wetland.startT = startPos;
+            wetland.endT = Math.min(1.0F, endPos);
+            builder.wetlands.add(wetland);
         }
         for (Network.Builder child : builder.children) {
             this.generateWetlands(child, random);

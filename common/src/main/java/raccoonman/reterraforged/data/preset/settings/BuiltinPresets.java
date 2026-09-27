@@ -100,7 +100,7 @@ public class BuiltinPresets {
 				new River(5, 2, 6, 20, 8, 0.75F),
 				new River(4, 1, 4, 14, 5, 0.975F), 
 				new Lake(0.3F, 10, 75, 150, 2, 10),
-				new Wetland(0.6F, 175, 225)
+				new Wetland(0.6F, 175, 225), false
 			), 
 			new FilterSettings(
 				new Erosion(135, 12, 0.7F, 0.7F, 0.5F, 0.5F),
@@ -145,7 +145,7 @@ public class BuiltinPresets {
 				new River(5, 2, 6, 20, 8, 0.507F),
 				new River(4, 1, 4, 14, 5, 0.493F), 
 				new Lake(0.462F, 10, 75, 150, 2, 10),
-				new Wetland(0.796F, 196, 255)
+				new Wetland(0.796F, 196, 255), false
 			), 
 			new FilterSettings(
 				new Erosion(100, 12, 0.699F, 0.699F, 0.5F, 0.5F),
@@ -190,7 +190,7 @@ public class BuiltinPresets {
 				new River(5, 1, 4, 20, 5, 0.504F),
 				new River(3, 1, 2, 12, 4, 0.5F), 
 				new Lake(0.671F, 8, 75, 150, 2, 7),
-				new Wetland(0.865F, 134, 201)
+				new Wetland(0.865F, 134, 201), false
 			), 
 			new FilterSettings(
 				new Erosion(175, 12, 0.648F, 0.657F, 0.5F, 0.5F),
@@ -235,7 +235,7 @@ public class BuiltinPresets {
 				new River(5, 2, 6, 20, 8, 0.507F),
 				new River(4, 1, 4, 14, 5, 0.493F), 
 				new Lake(0.462F, 10, 75, 150, 2, 10),
-				new Wetland(0.796F, 196, 255)
+				new Wetland(0.796F, 196, 255), false
 			), 
 			new FilterSettings(
 				new Erosion(100, 12, 0.699F, 0.699F, 0.5F, 0.5F),
@@ -280,7 +280,7 @@ public class BuiltinPresets {
 				new River(5, 1, 5, 28, 9, 0.27F),
 				new River(3, 1, 3, 18, 3, 0.7F), 
 				new Lake(0.595F, 10, 75, 150, 2, 10),
-				new Wetland(0.86F, 175, 225)
+				new Wetland(0.86F, 175, 225), false
 			), 
 			new FilterSettings(
 				new Erosion(165, 15, 0.612F, 0.652F, 0.5F, 0.5F),

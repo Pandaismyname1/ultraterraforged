@@ -15,6 +15,13 @@ import raccoonman.reterraforged.world.worldgen.rivermap.river.RiverWarp;
 import raccoonman.reterraforged.world.worldgen.terrain.TerrainType;
 
 public class RiverPopulator implements Comparable<RiverPopulator> {
+    // above the sea, the banks rise this many blocks above the water at their edge
+    private static final float BANK_RISE = 2.0F;
+    // and beyond it the valley sides rise no steeper than this, in blocks per block, so gorges can be climbed
+    private static final float SIDE_SLOPE = 1.0F;
+    // the outer part of the banks, as a share of their width, is raised into a low embankment where the land beside a
+    // river is lower than its water
+    private static final float LEVEE = 0.3F;
     public boolean main;
     private boolean connecting;
     private float fade;
@@ -29,6 +36,11 @@ public class RiverPopulator implements Comparable<RiverPopulator> {
     public RiverWarp warp;
     public RiverConfig config;
     public CurveFunction valleyCurve;
+    // where along its parent this fork flows in, or -1 for a river that runs to the sea
+    public float junction = -1.0F;
+    private Levels levels;
+    // the water's surface from the source to the mouth, for rivers above the sea; null for rivers at sea level
+    private float[] waterLevels;
     
     public RiverPopulator(River river, RiverWarp warp, RiverConfig config, Settings settings, Levels levels) {
         this.fade = settings.fadeIn;
@@ -45,6 +57,29 @@ public class RiverPopulator implements Comparable<RiverPopulator> {
         this.bedDepth = new Range(levels.water, config.bedHeight);
         this.banksDepth = new Range(config.minBankHeight, config.maxBankHeight);
         this.valleyCurve = settings.valleyCurve;
+        this.levels = levels;
+    }
+    
+    public void setWaterLevels(float[] waterLevels) {
+    	this.waterLevels = waterLevels;
+    }
+    
+    public boolean hasWaterLevels() {
+    	return this.waterLevels != null;
+    }
+    
+    // the water's surface at this point along the river, from 0 at the source to 1 at the mouth
+    public float waterLevelAt(float t) {
+    	return this.waterLevels == null ? this.waterLine : sample(this.waterLevels, t);
+    }
+    
+    private static float sample(float[] values, float t) {
+    	float position = NoiseUtil.clamp(t, 0.0F, 1.0F) * (values.length - 1);
+    	int index = (int) position;
+    	if (index >= values.length - 1) {
+    		return values[values.length - 1];
+    	}
+    	return NoiseUtil.lerp(values[index], values[index + 1], position - index);
     }
 
     @Override
@@ -63,7 +98,9 @@ public class RiverPopulator implements Comparable<RiverPopulator> {
         valleyAlpha = this.valleyCurve.apply(valleyAlpha);
         
         float mouthModifier = getMouthModifier(cell);
-        float bedHeight = this.getScaledSize(t, this.bedDepth);
+        // the bed lies as far below the river's own water as it would below the sea
+        float level = this.waterLevelAt(t);
+        float bedHeight = this.getScaledSize(t, this.bedDepth) + (level - this.waterLine);
         
         float riverDistance = Math.min(cell.riverDistance, 1.0F - valleyAlpha);
         cell.riverDistance = riverDistance;
@@ -72,21 +109,58 @@ public class RiverPopulator implements Comparable<RiverPopulator> {
 //        cell.height = Math.min(NoiseUtil.lerp(cell.height, bankHeight, valleyAlpha), cell.height);
 
         float banks = d2 * mouthModifier;
-        float banksAlpha = this.getDistanceAlpha(t, banks, this.banksWidth);
-        if (banksAlpha == 0.0F) {
+        float banksSize = this.getScaledSize(t, this.banksWidth);
+        if (this.waterLevels != null) {
+        	this.carveRaised(cell, banks, banksSize, bedHeight, level);
+        	return;
+        }
+        if (banks >= banksSize) {
             return;
         }
+        float banksAlpha = 1.0F - banks / banksSize;
         if (cell.height > bedHeight) {
             cell.height = Math.min(NoiseUtil.lerp(cell.height, bedHeight, banksAlpha), cell.height);
-            this.tag(cell, bedHeight);
+            this.tag(cell, bedHeight, level);
         }
         
         float bedAlpha = this.getDistanceAlpha(t, d2, this.bedWidth);
 
         if (bedAlpha != 0.0F && cell.height > bedHeight) {
             cell.height = NoiseUtil.lerp(cell.height, bedHeight, bedAlpha);
-            this.tag(cell, bedHeight);
+            this.tag(cell, bedHeight, level);
         }
+    }
+    
+    // a channel down to the bed, as below the sea, with banks rising a little above the water at its edge; beyond that
+    // the valley's sides rise at a climbable slope until they meet the land, so a river cutting through high ground
+    // runs in a valley as wide as it is deep
+    private void carveRaised(Cell cell, float banks, float banksSize, float bedHeight, float level) {
+    	float width = (float) Math.sqrt(banksSize);
+    	float distance = (float) Math.sqrt(banks);
+    	float bankTop = level + BANK_RISE * this.levels.unit;
+    	float target;
+    	if (distance < width) {
+    		target = NoiseUtil.lerp(bedHeight, bankTop, banks / banksSize);
+    	} else {
+    		target = bankTop + (distance - width) * SIDE_SLOPE * this.levels.unit;
+    	}
+    	if (cell.height > target) {
+    		cell.height = target;
+    		this.tag(cell, bedHeight, level);
+    	}
+    	if (level <= this.levels.water(1)) {
+    		return;
+    	}
+    	// (not across another river's water, like the parent a fork flows into)
+    	boolean water = cell.waterLevel > 0.0F || cell.terrain.isRiver() || cell.terrain.isLake() || cell.height < this.waterLine;
+    	if (distance > width * (1.0F - LEVEE) && distance < width + 2.0F && cell.height < level + this.levels.unit && !water) {
+    		// the land beside the river is lower than its water: an embankment keeps it in
+    		cell.height = level + this.levels.unit;
+    		cell.erosionMask = true;
+    	} else if (cell.height < level && distance < width) {
+    		// only the channel holds water; land lower than the river further out stays dry
+    		cell.waterLevel = cell.waterLevel > 0.0F ? Math.min(cell.waterLevel, level) : level;
+    	}
     }
 
     public RiverConfig createForkConfig(float t, Levels levels) {
@@ -134,12 +208,13 @@ public class RiverPopulator implements Comparable<RiverPopulator> {
         return NoiseUtil.lerp(range.min(), range.max(), t * this.fadeInv);
     }
     
-    private void tag(Cell cell, float bedHeight) {
-        if (cell.terrain.overridesRiver() && (cell.height < bedHeight || cell.height > this.waterLine)) {
+    private void tag(Cell cell, float bedHeight, float level) {
+        if (cell.terrain.overridesRiver() && (cell.height < bedHeight || cell.height > level)) {
             return;
         }
         cell.erosionMask = true;
-        if (cell.height <= this.waterLine) {
+        // under the water; above the sea, land level with the water is dry
+        if (level > this.waterLine ? cell.height < level : cell.height <= level) {
             cell.terrain = TerrainType.RIVER;
         }
     }

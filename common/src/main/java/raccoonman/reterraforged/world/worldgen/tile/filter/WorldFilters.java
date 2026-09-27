@@ -12,6 +12,7 @@ public class WorldFilters {
     private Steepness steepness;
     private BeachDetect beach;
     private PostProcessing processing;
+    private WaterRim waterRim;
     private FilterSettings settings;
     private WorldErosion<Erosion> erosion;
     private int erosionIterations;
@@ -24,6 +25,7 @@ public class WorldFilters {
         this.smoothing = Smoothing.make(context.preset.filters().smoothing, context.levels);
         this.steepness = Steepness.make(1, 10.0F, context.levels);
         this.processing = new PostProcessing(heightmap, context.levels);
+        this.waterRim = new WaterRim(context.levels);
         this.erosion = new WorldErosion<>(factory, (e, size) -> e.getSize() == size);
         this.erosionIterations = context.preset.filters().erosion.dropletsPerChunk;
         this.smoothingIterations = context.preset.filters().smoothing.iterations;
@@ -45,6 +47,8 @@ public class WorldFilters {
     }
     
     private void applyRequiredFilters(Tile tile, int seedX, int seedZ) {
+        // after erosion and smoothing, which can wear a river's banks below its water
+        this.waterRim.apply(tile, seedX, seedZ, 1);
         this.steepness.apply(tile, seedX, seedZ, 1);
         this.beach.apply(tile, seedX, seedZ, 1);
     }

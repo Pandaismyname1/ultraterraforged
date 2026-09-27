@@ -14,14 +14,35 @@ public class Rivermap implements ExpiringEntry {
     private Domain riverWarp;
     private Network[] networks;
     private long timestamp;
+    private boolean raisedWater;
+    private int gorgeDepth;
+    private volatile boolean levelled;
     
-    public Rivermap(int x, int z, Network[] networks, GenWarp warp) {
+    public Rivermap(int x, int z, Network[] networks, GenWarp warp, boolean raisedWater, int gorgeDepth) {
         this.timestamp = System.currentTimeMillis();
         this.x = x;
         this.z = z;
         this.networks = networks;
         this.lakeWarp = warp.lake();
         this.riverWarp = warp.river();
+        this.raisedWater = raisedWater;
+        this.gorgeDepth = gorgeDepth;
+    }
+    
+    /**
+     * Works out where the water of rivers, lakes and wetlands above the sea lies, from the land they run through; once,
+     * by the first heightmap to use this map.
+     */
+    public void levelWater(Heightmap heightmap) {
+    	if (!this.raisedWater || this.levelled) {
+    		return;
+    	}
+    	synchronized (this) {
+    		if (!this.levelled) {
+    			WaterLevels.level(this.networks, this.riverWarp, this.gorgeDepth, heightmap);
+    			this.levelled = true;
+    		}
+    	}
     }
     
     public void apply(Cell cell, float x, float z) {
@@ -57,6 +78,8 @@ public class Rivermap implements ExpiringEntry {
         if (instance != null && x == instance.getX() && z == instance.getZ()) {
             return instance;
         }
-        return heightmap.continent().getRivermap(x, z);
+        Rivermap rivermap = heightmap.continent().getRivermap(x, z);
+        rivermap.levelWater(heightmap);
+        return rivermap;
     }
 }

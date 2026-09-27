@@ -37,6 +37,18 @@ public final class TerrainViews {
 			return this.levels.scale(this.cell(x, z).height);
 		}
 
+		// under the water of a river, lake or wetland above the sea
+		public boolean raisedWater(int x, int z) {
+			Cell cell = this.cell(x, z);
+			return cell.waterLevel > 0.0F && this.levels.scale(cell.height) < this.levels.scale(cell.waterLevel);
+		}
+
+		// the top water block of a river, lake or wetland above the sea, or the sea's
+		public int waterY(int x, int z) {
+			Cell cell = this.cell(x, z);
+			return cell.waterLevel > 0.0F ? Math.max(this.levels.waterY, this.levels.scale(cell.waterLevel)) : this.levels.waterY;
+		}
+
 		public float exactY(int x, int z) {
 			return this.cell(x, z).height * this.levels.worldHeight;
 		}
@@ -103,8 +115,8 @@ public final class TerrainViews {
 				float light = ((exact - west) + (exact - north)) / (2.0F * view.zoom());
 				float shade = clamp(0.75F + light * 0.6F, 0.25F, 1.25F);
 				int color;
-				if (y < water || cell.terrain.isRiver() || cell.terrain.isLake()) {
-					float depth = clamp((water - y) / 40.0F, 0.0F, 1.0F);
+				if (y < water || cell.terrain.isRiver() || cell.terrain.isLake() || view.raisedWater(x, z)) {
+					float depth = clamp((Math.max(water, view.waterY(x, z)) - y) / 40.0F, 0.0F, 1.0F);
 					color = rgb(0.25F - depth * 0.15F, 0.45F - depth * 0.2F, 0.85F - depth * 0.3F);
 				} else {
 					float h = clamp((y - water) / 180.0F, 0.0F, 1.0F);

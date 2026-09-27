@@ -7,6 +7,7 @@ import net.minecraft.world.level.levelgen.NoiseSettings;
 import raccoonman.reterraforged.world.worldgen.GeneratorContext;
 import raccoonman.reterraforged.world.worldgen.WorldGenFlags;
 import raccoonman.reterraforged.world.worldgen.cell.Cell;
+import raccoonman.reterraforged.world.worldgen.rivermap.Rivermap;
 import raccoonman.reterraforged.world.worldgen.cell.noise.CellSampler;
 import raccoonman.reterraforged.world.worldgen.terrain.TerrainType;
 import raccoonman.reterraforged.world.worldgen.tile.Tile;
@@ -97,7 +98,7 @@ public class WorldLookup {
 		
 		cellProvider.setCacheCell(cell);
 		heightmap.applyContinent(cell, x, z);
-		heightmap.applyTerrain(cell, x, z, heightmap.continent().getRivermap(cell));
+		heightmap.applyTerrain(cell, x, z, Rivermap.get(cell, null, heightmap));
 		heightmap.applyClimate(cell, x, z);
 		if (cell.terrain == TerrainType.COAST && cell.height > this.waterLevel && cell.height <= this.beachLevel) {
 			cell.terrain = TerrainType.BEACH;

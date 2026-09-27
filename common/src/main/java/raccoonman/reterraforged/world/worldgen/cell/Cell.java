@@ -41,6 +41,8 @@ public class Cell {
     public float biomeRegionEdge;
     public float macroBiomeId;
     public float riverDistance;
+    // the surface of a river, lake or wetland above the sea, as a height; 0 elsewhere
+    public float waterLevel;
     public int continentX;
     public int continentZ;
     public boolean erosionMask;
@@ -87,6 +89,7 @@ public class Cell {
         this.biomeRegionEdge = other.biomeRegionEdge;
         this.macroBiomeId = other.macroBiomeId;
         this.riverDistance = other.riverDistance;
+        this.waterLevel = other.waterLevel;
         this.continentX = other.continentX;
         this.continentZ = other.continentZ;
         this.erosionMask = other.erosionMask;

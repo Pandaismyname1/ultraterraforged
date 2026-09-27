@@ -4,13 +4,16 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 public class RiverSettings {
+	private static final int DEFAULT_GORGE_DEPTH = 20;
 	public static final Codec<RiverSettings> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 		Codec.INT.fieldOf("seedOffset").forGetter((o) -> o.seedOffset),
 		Codec.INT.fieldOf("riverCount").forGetter((o) -> o.riverCount),
 		River.CODEC.fieldOf("mainRivers").forGetter((o) -> o.mainRivers),
 		River.CODEC.fieldOf("branchRivers").forGetter((o) -> o.branchRivers),
 		Lake.CODEC.fieldOf("lakes").forGetter((o) -> o.lakes),
-		Wetland.CODEC.fieldOf("wetlands").forGetter((o) -> o.wetlands)
+		Wetland.CODEC.fieldOf("wetlands").forGetter((o) -> o.wetlands),
+		PresetCodecs.defaulted(Codec.BOOL, "raisedWater", true).forGetter((o) -> o.raisedWater),
+		PresetCodecs.defaulted(Codec.INT, "gorgeDepth", DEFAULT_GORGE_DEPTH).forGetter((o) -> o.gorgeDepth)
 	).apply(instance, RiverSettings::new));
 	
     public int seedOffset;
@@ -19,18 +22,34 @@ public class RiverSettings {
     public River branchRivers;
     public Lake lakes;
     public Wetland wetlands;
+    // rivers, lakes and wetlands follow the land, with their water above the sea where the land is high, rather than
+    // all cutting down to sea level
+    public boolean raisedWater;
+    // with raised water, rivers cut at most this many blocks below the land beside them, and climb with the land
+    // where it rises higher
+    public int gorgeDepth;
     
     public RiverSettings(int seedOffset, int riverCount, River mainRivers, River branchRivers, Lake lakes, Wetland wetlands) {
+    	this(seedOffset, riverCount, mainRivers, branchRivers, lakes, wetlands, true, DEFAULT_GORGE_DEPTH);
+    }
+    
+    public RiverSettings(int seedOffset, int riverCount, River mainRivers, River branchRivers, Lake lakes, Wetland wetlands, boolean raisedWater) {
+    	this(seedOffset, riverCount, mainRivers, branchRivers, lakes, wetlands, raisedWater, DEFAULT_GORGE_DEPTH);
+    }
+    
+    public RiverSettings(int seedOffset, int riverCount, River mainRivers, River branchRivers, Lake lakes, Wetland wetlands, boolean raisedWater, int gorgeDepth) {
         this.seedOffset = seedOffset;
         this.riverCount = riverCount;
         this.mainRivers = mainRivers;
         this.branchRivers = branchRivers;
         this.lakes = lakes;
         this.wetlands = wetlands;
+        this.raisedWater = raisedWater;
+        this.gorgeDepth = gorgeDepth;
     }
     
     public RiverSettings copy() {
-    	return new RiverSettings(this.seedOffset, this.riverCount, this.mainRivers.copy(), this.branchRivers.copy(), this.lakes.copy(), this.wetlands.copy());
+    	return new RiverSettings(this.seedOffset, this.riverCount, this.mainRivers.copy(), this.branchRivers.copy(), this.lakes.copy(), this.wetlands.copy(), this.raisedWater, this.gorgeDepth);
     }
 
     public static class River {
