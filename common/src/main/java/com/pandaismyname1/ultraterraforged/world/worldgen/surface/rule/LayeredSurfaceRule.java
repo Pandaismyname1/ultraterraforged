@@ -2,12 +2,12 @@ package com.pandaismyname1.ultraterraforged.world.worldgen.surface.rule;
 
 import com.pandaismyname1.ultraterraforged.data.UTFCodecs;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup.RegistryLookup;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.SurfaceRules.Context;
 import com.pandaismyname1.ultraterraforged.registries.UTFRegistries;
@@ -29,8 +29,8 @@ public record LayeredSurfaceRule(TagKey<Layer> layers) implements SurfaceRules.R
 	}
 
 	@Override
-	public KeyDispatchDataCodec<LayeredSurfaceRule> codec() {
-		return UTFCodecs.keyDispatch(CODEC);
+	public MapCodec<LayeredSurfaceRule> codec() {
+		return UTFCodecs.asMap(CODEC);
 	}
 
 	public static Layer layer(TagKey<Layer> layers) {

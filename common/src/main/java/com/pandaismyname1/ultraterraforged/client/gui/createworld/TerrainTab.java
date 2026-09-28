@@ -14,6 +14,8 @@ import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.tabs.Tab;
+import net.minecraft.client.gui.layouts.Layout;
+import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.network.chat.CommonComponents;
@@ -51,6 +53,7 @@ public class TerrainTab implements Tab {
 	private final ScrollingPanel sliders;
 	private final TerrainPreview preview;
 	private final CycleButton<RenderMode> viewButton;
+	private final TabLayout layout = new TabLayout();
 	private int builtRevision = -1;
 	@Nullable
 	private PresetLibrary.Entry tooltipSource;
@@ -65,11 +68,11 @@ public class TerrainTab implements Tab {
 		this.status = new StringWidget(Component.empty(), minecraft.font);
 		this.presetButton = Button.builder(Component.empty(), (button) -> this.cyclePreset(minecraft.hasShiftDown() ? -1 : 1)).build();
 		this.advancedButton = Button.builder(Component.translatable(UTFTranslationKeys.GUI_TERRAIN_TAB_ADVANCED), (button) -> {
-			minecraft.setScreen(PresetConfigScreen.editing(this.screen, this.state.name(), this.state.preset(), this.state.baseline()));
+			minecraft.gui.setScreen(PresetConfigScreen.editing(this.screen, this.state.name(), this.state.preset(), this.state.baseline()));
 		}).build();
 		this.advancedButton.setTooltip(Tooltip.create(Component.translatable(UTFTranslationKeys.GUI_TERRAIN_TAB_ADVANCED_TOOLTIP)));
 		this.saveButton = Button.builder(Component.translatable(UTFTranslationKeys.GUI_SAVE_PRESET), (button) -> {
-			minecraft.setScreen(new SavePresetScreen(this.screen, this.state.name().getString(), this.state.preset().copy(), (saved) -> {
+			minecraft.gui.setScreen(new SavePresetScreen(this.screen, this.state.name().getString(), this.state.preset().copy(), (saved) -> {
 				this.reloadPresets();
 				this.state.select(saved);
 				this.state.selectUltraTerraForged();
@@ -119,8 +122,15 @@ public class TerrainTab implements Tab {
 		consumer.accept(this.viewButton);
 	}
 
+	// the Create World screen still places tabs with doLayout; this is for screens that place a tab's layout themselves
+	@Override
+	public Layout getLayout() {
+		return this.layout;
+	}
+
 	@Override
 	public void doLayout(ScreenRectangle area) {
+		this.layout.area = area;
 		int columnWidth = Math.min(210, (area.width() - PADDING * 3) / 2);
 		int previewSize = Math.max(64, Math.min(area.height() - PADDING * 2 - ROW - GAP, area.width() - columnWidth - PADDING * 3));
 		int left = area.left() + (area.width() - (columnWidth + PADDING + previewSize)) / 2;
@@ -236,6 +246,54 @@ public class TerrainTab implements Tab {
 			this.status.setMessage(Component.translatable(UTFTranslationKeys.GUI_TERRAIN_TAB_ACTIVE).withStyle(ChatFormatting.GREEN));
 		} else {
 			this.status.setMessage(Component.translatable(UTFTranslationKeys.GUI_TERRAIN_TAB_INACTIVE).withStyle(ChatFormatting.GRAY));
+		}
+	}
+
+	// the widgets are placed by hand in doLayout; this covers the area they were last placed in and moves them with it
+	private class TabLayout implements Layout {
+		private ScreenRectangle area = ScreenRectangle.empty();
+
+		@Override
+		public void visitChildren(Consumer<LayoutElement> consumer) {
+			TerrainTab.this.visitChildren(consumer::accept);
+		}
+
+		@Override
+		public void removeChildren() {
+		}
+
+		@Override
+		public void setX(int x) {
+			int dx = x - this.area.left();
+			this.visitChildren((child) -> child.setX(child.getX() + dx));
+			this.area = new ScreenRectangle(x, this.area.top(), this.area.width(), this.area.height());
+		}
+
+		@Override
+		public void setY(int y) {
+			int dy = y - this.area.top();
+			this.visitChildren((child) -> child.setY(child.getY() + dy));
+			this.area = new ScreenRectangle(this.area.left(), y, this.area.width(), this.area.height());
+		}
+
+		@Override
+		public int getX() {
+			return this.area.left();
+		}
+
+		@Override
+		public int getY() {
+			return this.area.top();
+		}
+
+		@Override
+		public int getWidth() {
+			return this.area.width();
+		}
+
+		@Override
+		public int getHeight() {
+			return this.area.height();
 		}
 	}
 }

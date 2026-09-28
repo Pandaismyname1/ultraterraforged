@@ -87,9 +87,9 @@ public class ClientTest implements ClientModInitializer {
 			ClientTickEvents.END_CLIENT_TICK.register((client) -> this.tick());
 			return;
 		}
-		this.step("title screen", () -> mc.screen instanceof TitleScreen, 40, () -> CreateWorldScreen.openFresh(mc, () -> mc.setScreen(new TitleScreen())));
-		this.step("create world screen", () -> mc.screen instanceof CreateWorldScreen, 20, () -> {
-			CreateWorldScreen screen = (CreateWorldScreen) mc.screen;
+		this.step("title screen", () -> mc.gui.screen() instanceof TitleScreen, 40, () -> CreateWorldScreen.openFresh(mc, () -> mc.gui.setScreen(new TitleScreen())));
+		this.step("create world screen", () -> mc.gui.screen() instanceof CreateWorldScreen, 20, () -> {
+			CreateWorldScreen screen = (CreateWorldScreen) mc.gui.screen();
 			this.log("default world type: " + screen.getUiState().getWorldType().describePreset().getString());
 			this.log("ultraterraforged selected: " + TerrainState.of(screen).isUltraTerraForgedSelected());
 			this.screenshot("01_game_tab");
@@ -97,57 +97,57 @@ public class ClientTest implements ClientModInitializer {
 		});
 		this.step("terrain tab", () -> true, 80, () -> {
 			this.screenshot("02_terrain_tab");
-			this.log("widgets: " + this.describeWidgets(mc.screen));
-			this.button(mc.screen, "Preset").onPress(PRESS);
+			this.log("widgets: " + this.describeWidgets(mc.gui.screen()));
+			this.button(mc.gui.screen(), "Preset").onPress(PRESS);
 		});
 		this.step("next preset", () -> true, 80, () -> {
-			TerrainState state = TerrainState.of((CreateWorldScreen) mc.screen);
+			TerrainState state = TerrainState.of((CreateWorldScreen) mc.gui.screen());
 			this.log("preset after cycling: " + state.name().getString());
 			this.screenshot("03_next_preset");
-			this.button(mc.screen, "Copy Code").onPress(PRESS);
+			this.button(mc.gui.screen(), "Copy Code").onPress(PRESS);
 			String code = mc.keyboardHandler.getClipboard();
 			this.log("share code: " + code.substring(0, Math.min(12, code.length())) + "... (" + code.length() + " characters)");
-			this.button(mc.screen, "Paste Code").onPress(PRESS);
+			this.button(mc.gui.screen(), "Paste Code").onPress(PRESS);
 			this.log("after pasting: preset " + state.name().getString() + ", edited " + state.isEdited());
 			PresetOptions.CONTINENT_SCALE.set(state.preset(), 900);
 			state.markEdited();
 		});
 		this.step("edited", () -> true, 80, () -> {
 			this.screenshot("04_small_continents");
-			this.button(mc.screen, "Advanced").onPress(PRESS);
+			this.button(mc.gui.screen(), "Advanced").onPress(PRESS);
 		});
-		this.step("advanced editor", () -> mc.screen instanceof PresetConfigScreen, 40, () -> {
+		this.step("advanced editor", () -> mc.gui.screen() instanceof PresetConfigScreen, 40, () -> {
 			this.screenshot("05_advanced_world");
-			this.log("editor widgets: " + this.describeWidgets(mc.screen));
-			this.searchBox(mc.screen).setValue("river");
+			this.log("editor widgets: " + this.describeWidgets(mc.gui.screen()));
+			this.searchBox(mc.gui.screen()).setValue("river");
 		});
 		this.step("search", () -> true, 40, () -> {
 			this.screenshot("06_search_river");
-			this.searchBox(mc.screen).setValue("");
-			this.button(mc.screen, "Page").onPress(PRESS);
-			this.button(mc.screen, "Page").onPress(PRESS);
+			this.searchBox(mc.gui.screen()).setValue("");
+			this.button(mc.gui.screen(), "Page").onPress(PRESS);
+			this.button(mc.gui.screen(), "Page").onPress(PRESS);
 		});
 		this.step("caves page", () -> true, 40, () -> {
 			this.screenshot("07_advanced_caves");
 			for (int i = 0; i < 5; i++) {
-				this.button(mc.screen, "Page").onPress(PRESS);
+				this.button(mc.gui.screen(), "Page").onPress(PRESS);
 			}
 		});
 		this.step("structures page", () -> true, 40, () -> {
 			this.screenshot("08_advanced_structures");
-			this.button(mc.screen, "Save As").onPress(PRESS);
+			this.button(mc.gui.screen(), "Save As").onPress(PRESS);
 		});
-		this.step("save preset screen", () -> mc.screen instanceof SavePresetScreen, 20, () -> {
-			this.searchBox(mc.screen).setValue(SAVED_PRESET);
+		this.step("save preset screen", () -> mc.gui.screen() instanceof SavePresetScreen, 20, () -> {
+			this.searchBox(mc.gui.screen()).setValue(SAVED_PRESET);
 			this.screenshot("09_save_preset");
-			this.button(mc.screen, "Save").onPress(PRESS);
+			this.button(mc.gui.screen(), "Save").onPress(PRESS);
 		});
-		this.step("saved", () -> mc.screen instanceof PresetConfigScreen, 20, () -> {
+		this.step("saved", () -> mc.gui.screen() instanceof PresetConfigScreen, 20, () -> {
 			this.log("saved preset file exists: " + Files.exists(PresetSharing.presetFolder().resolve(SAVED_PRESET + ".json")));
-			((PresetConfigScreen) mc.screen).doneButton.onPress(PRESS);
+			((PresetConfigScreen) mc.gui.screen()).doneButton.onPress(PRESS);
 		});
-		this.step("back from editor", () -> mc.screen instanceof CreateWorldScreen, 20, () -> {
-			CreateWorldScreen screen = (CreateWorldScreen) mc.screen;
+		this.step("back from editor", () -> mc.gui.screen() instanceof CreateWorldScreen, 20, () -> {
+			CreateWorldScreen screen = (CreateWorldScreen) mc.gui.screen();
 			TerrainState state = TerrainState.of(screen);
 			this.log("after editor: preset " + state.name().getString() + ", continent scale " + PresetOptions.CONTINENT_SCALE.get(state.preset()) + ", edited " + state.isEdited());
 			this.screenshot("10_back_in_terrain_tab");
@@ -200,14 +200,14 @@ public class ClientTest implements ClientModInitializer {
 			this.worldFolder = server.getWorldPath(LevelResource.ROOT).toAbsolutePath().normalize().getFileName().toString();
 			mc.level.disconnect(Component.literal("leaving"));
 			mc.disconnectWithSavingScreen();
-			mc.setScreen(new TitleScreen());
+			mc.gui.setScreen(new TitleScreen());
 		});
-		this.step("back at title", () -> mc.level == null && mc.screen instanceof TitleScreen, 40, () -> {
+		this.step("back at title", () -> mc.level == null && mc.gui.screen() instanceof TitleScreen, 40, () -> {
 			this.log("reopening world " + this.worldFolder);
-			mc.createWorldOpenFlows().openWorld(this.worldFolder, () -> mc.setScreen(new TitleScreen()));
+			mc.createWorldOpenFlows().openWorld(this.worldFolder, () -> mc.gui.setScreen(new TitleScreen()));
 		});
 		this.step("after reopening", () -> true, 100, () -> {
-			this.log("screen after reopening: " + (mc.screen == null ? "none (in world)" : mc.screen.getClass().getSimpleName() + " '" + mc.screen.getTitle().getString() + "'"));
+			this.log("screen after reopening: " + (mc.gui.screen() == null ? "none (in world)" : mc.gui.screen().getClass().getSimpleName() + " '" + mc.gui.screen().getTitle().getString() + "'"));
 			this.log("in world: " + (mc.level != null));
 			this.screenshot("12_reopened");
 			this.log("done");
@@ -218,10 +218,10 @@ public class ClientTest implements ClientModInitializer {
 	}
 
 	private void tour(Minecraft mc) {
-		this.step("title screen", () -> mc.screen instanceof TitleScreen, 40, () -> CreateWorldScreen.openFresh(mc, () -> mc.setScreen(new TitleScreen())));
-		this.step("create world screen", () -> mc.screen instanceof CreateWorldScreen, 40, () -> {
-			this.log("ultraterraforged selected: " + TerrainState.of((CreateWorldScreen) mc.screen).isUltraTerraForgedSelected() + ", preset " + TerrainState.of((CreateWorldScreen) mc.screen).name().getString());
-			this.button(mc.screen, "Create New World").onPress(PRESS);
+		this.step("title screen", () -> mc.gui.screen() instanceof TitleScreen, 40, () -> CreateWorldScreen.openFresh(mc, () -> mc.gui.setScreen(new TitleScreen())));
+		this.step("create world screen", () -> mc.gui.screen() instanceof CreateWorldScreen, 40, () -> {
+			this.log("ultraterraforged selected: " + TerrainState.of((CreateWorldScreen) mc.gui.screen()).isUltraTerraForgedSelected() + ", preset " + TerrainState.of((CreateWorldScreen) mc.gui.screen()).name().getString());
+			this.button(mc.gui.screen(), "Create New World").onPress(PRESS);
 		});
 		this.step("world loaded", () -> mc.level != null && mc.player != null, 200, () -> {
 			IntegratedServer server = mc.getSingleplayerServer();
@@ -374,7 +374,7 @@ public class ClientTest implements ClientModInitializer {
 			return;
 		}
 		if (++this.totalTicks > (TOUR ? TIMEOUT_TICKS * 8 : TIMEOUT_TICKS)) {
-			this.log("TIMEOUT waiting for: " + this.steps.get(this.stepIndex).name() + " (screen " + Minecraft.getInstance().screen + ")");
+			this.log("TIMEOUT waiting for: " + this.steps.get(this.stepIndex).name() + " (screen " + Minecraft.getInstance().gui.screen() + ")");
 			this.screenshot("timeout");
 			this.stepIndex = this.steps.size();
 			Minecraft.getInstance().stop();
@@ -503,7 +503,7 @@ public class ClientTest implements ClientModInitializer {
 
 	// since 1.21.5 the frame is read back from the graphics card and handed over once it's there
 	private void screenshot(String name) {
-		Screenshot.takeScreenshot(Minecraft.getInstance().getMainRenderTarget(), (image) -> {
+		Screenshot.takeScreenshot(Minecraft.getInstance().gameRenderer.mainRenderTarget(),(image) -> {
 			try (image) {
 				image.writeToFile(this.out.resolve(name + ".png"));
 			} catch (IOException e) {

@@ -22,20 +22,20 @@ config="ultraterraforged-neoforge.mixins.json"
 [[dependencies.ultraterraforged]]
     modId="neoforge"
     type="required"
-    versionRange="[26.1,27)"
+    versionRange="[26.2,27)"
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.ultraterraforged]]
     modId="minecraft"
     type="required"
-    versionRange="[26.1,26.2)"
+    versionRange="[26.2,26.3)"
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.ultraterraforged]]
     modId="terrablender"
     type="optional"
-    versionRange="[26.1.2.0.0,)"
+    versionRange="[26.2.0.0.0,)"
     ordering="AFTER"
     side="BOTH"

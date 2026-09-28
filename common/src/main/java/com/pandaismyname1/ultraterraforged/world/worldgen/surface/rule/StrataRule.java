@@ -10,6 +10,7 @@ import java.util.TreeSet;
 import org.jetbrains.annotations.Nullable;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.BlockPos;
@@ -18,7 +19,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.block.Block;
@@ -78,8 +78,8 @@ public record StrataRule(Identifier cacheId, Holder<Noise> selector, Holder<Nois
 	}
 
 	@Override
-	public KeyDispatchDataCodec<StrataRule> codec() {
-		return UTFCodecs.keyDispatch(CODEC);
+	public MapCodec<StrataRule> codec() {
+		return UTFCodecs.asMap(CODEC);
 	}
 
 	private List<StrataStack> generate(RandomSource random, int height) {

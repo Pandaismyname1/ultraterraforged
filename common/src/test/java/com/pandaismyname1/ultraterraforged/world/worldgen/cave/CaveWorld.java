@@ -116,7 +116,7 @@ final class CaveWorld {
 		org.mockito.Mockito.doAnswer((invocation) -> {
 			this.postprocessed.add(((BlockPos) invocation.getArgument(0)).immutable());
 			return null;
-		}).when(chunk).markPosForPostprocessing(any(BlockPos.class));
+		}).when(chunk).markPosForPostProcessing(any(BlockPos.class));
 		return chunk;
 	}
 

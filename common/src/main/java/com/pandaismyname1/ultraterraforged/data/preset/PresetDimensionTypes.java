@@ -51,7 +51,7 @@ public final class PresetDimensionTypes {
 		ctx.register(BuiltinDimensionTypes.OVERWORLD, new DimensionType(
 			false, true, false, false, 1.0,
 			-worldDepth, totalHeight, totalHeight,
-			BlockTags.INFINIBURN_OVERWORLD,
+			ctx.lookup(Registries.BLOCK).getOrThrow(BlockTags.INFINIBURN_OVERWORLD),
 			0.0F,
 			new DimensionType.MonsterSettings(UniformInt.of(0, 7), 0),
 			DimensionType.Skybox.OVERWORLD,

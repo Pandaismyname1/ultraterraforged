@@ -80,7 +80,7 @@ public final class RaisedWater {
 			boolean spills = dx == 0 || dz == 0 || dx == 15 || dz == 15
 				|| tops[i - 1] < top || tops[i + 1] < top || tops[i - 16] < top || tops[i + 16] < top;
 			if (spills) {
-				chunk.markPosForPostprocessing(pos.set(minX + dx, top, minZ + dz));
+				chunk.markPosForPostProcessing(pos.set(minX + dx, top, minZ + dz));
 			}
 		}
 	}

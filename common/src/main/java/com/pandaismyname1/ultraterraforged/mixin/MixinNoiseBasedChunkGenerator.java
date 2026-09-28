@@ -35,7 +35,6 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
 import com.pandaismyname1.ultraterraforged.world.worldgen.WorldGenFlags;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.Cell;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.NoiseUtil;
-import com.pandaismyname1.ultraterraforged.world.worldgen.surface.SurfaceRegion;
 
 @Mixin(value = NoiseBasedChunkGenerator.class, priority = 9001 /* we need this so we don't break noisium */)
 class MixinNoiseBasedChunkGenerator {
@@ -46,7 +45,6 @@ class MixinNoiseBasedChunkGenerator {
 	
 	@Inject(at = @At("HEAD"), method = "buildSurface", require = 1)
     public void buildSurface$HEAD(WorldGenRegion worldGenRegion, StructureManager structureManager, RandomState randomState, ChunkAccess chunkAccess, CallbackInfo callback) {
-		SurfaceRegion.set(worldGenRegion);
 		GeneratorContext generatorContext;
 		if((Object) randomState instanceof UTFRandomState utfRandomState && (generatorContext = utfRandomState.generatorContext()) != null) {
 			// the water of rivers and lakes above the sea, so the surface is built under it
@@ -56,7 +54,6 @@ class MixinNoiseBasedChunkGenerator {
 	
 	@Inject(at = @At("TAIL"), method = "buildSurface", require = 1)
     public void buildSurface$TAIL(WorldGenRegion worldGenRegion, StructureManager structureManager, RandomState randomState, ChunkAccess chunkAccess, CallbackInfo callback) {
-		SurfaceRegion.set(null);
 		GeneratorContext generatorContext;
 		if((Object) randomState instanceof UTFRandomState utfRandomState && (generatorContext = utfRandomState.generatorContext()) != null) {
 			// caves shaped by the land, carved into the finished surface

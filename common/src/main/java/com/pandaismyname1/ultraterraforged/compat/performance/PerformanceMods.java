@@ -14,7 +14,7 @@ import com.pandaismyname1.ultraterraforged.platform.ModLoaderUtil;
  * this file is updated from it when porting.
  */
 public final class PerformanceMods {
-	public static final String MINECRAFT_VERSION = "26.1.2";
+	public static final String MINECRAFT_VERSION = "26.2";
 	public static final String FABRIC = "fabric";
 	public static final String NEOFORGE = "neoforge";
 	// Sinytra Connector, which runs Fabric mods on NeoForge; none of the mods needs it on this version
@@ -99,9 +99,10 @@ public final class PerformanceMods {
 			List.of(Build.of("Lithium", "lithium", MODRINTH + "lithium")),
 			List.of(Build.of("Lithium", "lithium", MODRINTH + "lithium")),
 			null),
+		// no ModernFix for 26.2 yet on either loader
 		new Mod("modernFix", "ModernFix", MODRINTH + "modernfix", Category.GENERAL,
 			List.of(),
-			List.of(Build.of("ModernFix", "modernfix", MODRINTH + "modernfix")),
+			List.of(),
 			null),
 		new Mod("allTheLeaks", "AllTheLeaks", CURSEFORGE + "alltheleaks", Category.GENERAL,
 			List.of(),

@@ -5,10 +5,10 @@ import java.util.List;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.Holder;
-import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.SurfaceRules.Context;
@@ -29,8 +29,8 @@ record NoiseRule(Holder<Noise> noise, List<Pair<Float, SurfaceRules.RuleSource>>
 	}
 
 	@Override
-	public KeyDispatchDataCodec<NoiseRule> codec() {
-		return UTFCodecs.keyDispatch(CODEC);
+	public MapCodec<NoiseRule> codec() {
+		return UTFCodecs.asMap(CODEC);
 	}
 	
 	private static Codec<Pair<Float, SurfaceRules.RuleSource>> entryCodec() {

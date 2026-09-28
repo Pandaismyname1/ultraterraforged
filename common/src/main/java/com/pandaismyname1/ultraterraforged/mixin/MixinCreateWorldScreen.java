@@ -76,7 +76,7 @@ abstract class MixinCreateWorldScreen extends Screen implements TerrainState.Hol
 		method = "init",
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/client/gui/components/tabs/TabNavigationBar$Builder;addTabs([Lnet/minecraft/client/gui/components/tabs/Tab;)Lnet/minecraft/client/gui/components/tabs/TabNavigationBar$Builder;"
+			target = "Lnet/minecraft/client/gui/components/tabs/MenuTabBar$Builder;addTabs([Lnet/minecraft/client/gui/components/tabs/Tab;)Lnet/minecraft/client/gui/components/tabs/MenuTabBar$Builder;"
 		)
 	)
 	private Tab[] ultraterraforged$addTerrainTab(Tab[] tabs) {
@@ -97,7 +97,7 @@ abstract class MixinCreateWorldScreen extends Screen implements TerrainState.Hol
 		} catch (IOException | RuntimeException e) {
 			UTFCommon.LOGGER.error("Couldn't prepare the UltraTerraForged preset", e);
 			state.setPendingSelection(null);
-			SystemToast.addOrUpdate(this.minecraft.getToastManager(), SystemToast.SystemToastId.PACK_LOAD_FAILURE, Component.translatable(UTFTranslationKeys.GUI_TERRAIN_TAB_APPLY_FAILED), Component.literal(String.valueOf(e.getMessage())));
+			SystemToast.addOrUpdate(this.minecraft.gui.toastManager(), SystemToast.SystemToastId.PACK_LOAD_FAILURE, Component.translatable(UTFTranslationKeys.GUI_TERRAIN_TAB_APPLY_FAILED), Component.literal(String.valueOf(e.getMessage())));
 			callback.cancel();
 		}
 	}
@@ -126,7 +126,7 @@ abstract class MixinCreateWorldScreen extends Screen implements TerrainState.Hol
 			state.setPendingSelection(null);
 			// creating the world replaces this screen, which mustn't happen while it's ticking
 			this.minecraft.schedule(() -> {
-				if (this.minecraft.screen == (Object) this) {
+				if (this.minecraft.gui.screen() == (Object) this) {
 					this.onCreate();
 				}
 			});

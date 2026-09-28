@@ -9,7 +9,7 @@ import net.minecraft.world.level.levelgen.DensityFunction;
 
 record ClampToNearestUnit(DensityFunction function, int resolution) implements DensityFunction {
 	public static final Codec<ClampToNearestUnit> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-		DensityFunction.HOLDER_HELPER_CODEC.fieldOf("function").forGetter(ClampToNearestUnit::function),
+		DensityFunction.CODEC.fieldOf("function").forGetter(ClampToNearestUnit::function),
 		Codec.INT.fieldOf("resolution").forGetter(ClampToNearestUnit::resolution)
 	).apply(instance, ClampToNearestUnit::new));
 	
@@ -27,8 +27,8 @@ record ClampToNearestUnit(DensityFunction function, int resolution) implements D
 	}
 
 	@Override
-	public DensityFunction mapAll(Visitor visitor) {
-		return visitor.apply(new ClampToNearestUnit(this.function.mapAll(visitor), this.resolution));
+	public DensityFunction mapChildren(Visitor visitor) {
+		return new ClampToNearestUnit(visitor.apply(this.function), this.resolution);
 	}
 
 	@Override

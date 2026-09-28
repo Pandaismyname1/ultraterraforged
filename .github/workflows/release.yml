@@ -88,11 +88,8 @@ jobs:
           loaders: |
             fabric
             quilt
-          # one jar for the whole 26.1 line
           game-versions: |
-            26.1
-            26.1.1
-            26.1.2
+            26.2
           java: 25
           dependencies: |
             fabric-api(required)
@@ -111,11 +108,8 @@ jobs:
           changelog-file: CHANGELOG.md
           loaders: |
             neoforge
-          # one jar for the whole 26.1 line
           game-versions: |
-            26.1
-            26.1.1
-            26.1.2
+            26.2
           java: 25
           files: neoforge/build/libs/ultraterraforged-${{ steps.composite_version.outputs.composite_version }}-neoforge.jar
 

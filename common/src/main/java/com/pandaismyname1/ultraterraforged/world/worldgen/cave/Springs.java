@@ -72,6 +72,6 @@ final class Springs implements CaveFeatures.Feature {
 		}
 		carving.set(bx, y, bz, Blocks.WATER.defaultBlockState());
 		// it flows once the world ticks it
-		carving.chunk.markPosForPostprocessing(new BlockPos(bx, y, bz));
+		carving.chunk.markPosForPostProcessing(new BlockPos(bx, y, bz));
 	}
 }

@@ -9,9 +9,9 @@ import java.util.stream.Collectors;
 
 import com.google.common.base.Suppliers;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.SurfaceRules.Context;
 import net.minecraft.world.level.levelgen.SurfaceRules.SurfaceRule;
@@ -56,8 +56,8 @@ public class TBSurfaceRules {
 		}
 
 		@Override
-		public KeyDispatchDataCodec<TBRule> codec() {
-			return UTFCodecs.keyDispatch(CODEC);
+		public MapCodec<TBRule> codec() {
+			return UTFCodecs.asMap(CODEC);
 		}
 	}
 }

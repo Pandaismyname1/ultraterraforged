@@ -3,6 +3,7 @@ package com.pandaismyname1.ultraterraforged.world.worldgen.feature.template;
 import java.util.function.BiPredicate;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.tags.BlockItemTags;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
@@ -23,7 +24,7 @@ public class BlockUtils {
 
     public static boolean isVegetation(LevelAccessor world, BlockPos pos) {
         BlockState state = world.getBlockState(pos);
-        return state.is(BlockTags.SAPLINGS) || state.is(BlockTags.FLOWERS) || state.is(Blocks.VINE);
+        return state.is(BlockItemTags.SAPLINGS.block()) || state.is(BlockTags.FLOWERS) || state.is(Blocks.VINE);
     }
 
     public static boolean canTreeReplace(LevelAccessor world, BlockPos pos) {

@@ -2,9 +2,9 @@ package com.pandaismyname1.ultraterraforged.world.worldgen.surface.condition;
 
 import com.pandaismyname1.ultraterraforged.data.UTFCodecs;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.SurfaceRules;
@@ -37,8 +37,8 @@ public class HeightModificationDetection extends CellCondition {
 		}
 
 		@Override
-		public KeyDispatchDataCodec<Source> codec() {
-			return UTFCodecs.keyDispatch(CODEC);
+		public MapCodec<Source> codec() {
+			return UTFCodecs.asMap(CODEC);
 		}
 	}
 	

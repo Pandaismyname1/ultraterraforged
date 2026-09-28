@@ -1,11 +1,13 @@
 package com.pandaismyname1.ultraterraforged.data.preset;
 
+import net.minecraft.world.level.biome.Biome;
 import java.util.List;
 
 import com.mojang.datafixers.util.Pair;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biomes;
@@ -29,8 +31,8 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.util.Scaling;
 import terrablender.core.TerraBlender;
 
 public class PresetSurfaceLayerData {
-	private static final SurfaceRules.RuleSource ORANGE_TERRACOTTA = makeStateRule(Blocks.ORANGE_TERRACOTTA);
-	private static final SurfaceRules.RuleSource BROWN_TERRACOTTA = makeStateRule(Blocks.BROWN_TERRACOTTA);
+	private static final SurfaceRules.RuleSource ORANGE_TERRACOTTA = makeStateRule(Blocks.DYED_TERRACOTTA.orange());
+	private static final SurfaceRules.RuleSource BROWN_TERRACOTTA = makeStateRule(Blocks.DYED_TERRACOTTA.brown());
 	private static final SurfaceRules.RuleSource TERRACOTTA = makeStateRule(Blocks.TERRACOTTA);
     private static final SurfaceRules.RuleSource SMOOTH_SANDSTONE = makeStateRule(Blocks.SMOOTH_SANDSTONE);
 
@@ -43,6 +45,7 @@ public class PresetSurfaceLayerData {
     private static final SurfaceRules.RuleSource SAND = makeStateRule(Blocks.SAND);
 	
 	public static void bootstrap(Preset preset, BootstrapContext<LayeredSurfaceRule.Layer> ctx) {
+		HolderGetter<Biome> biomes = ctx.lookup(Registries.BIOME);
 		WorldSettings worldSettings = preset.world();
 		WorldSettings.Properties properties = worldSettings.properties;
 		
@@ -72,10 +75,10 @@ public class PresetSurfaceLayerData {
     	);
     }
 
-	private static LayeredSurfaceRule.Layer makeBadlandsErosion() {
+	private static LayeredSurfaceRule.Layer makeBadlandsErosion(HolderGetter<Biome> biomes) {
 		return LayeredSurfaceRule.layer(
 			SurfaceRules.ifTrue(
-				SurfaceRules.isBiome(Biomes.WOODED_BADLANDS),
+				SurfaceRules.isBiome(biomes, Biomes.WOODED_BADLANDS),
 				SurfaceRules.bandlands()
 			)
 		);
@@ -113,7 +116,7 @@ public class PresetSurfaceLayerData {
 //		);
 //	}
 	
-	private static LayeredSurfaceRule.Layer makeDesert(Scaling scaling, HolderGetter<Noise> noise) {
+	private static LayeredSurfaceRule.Layer makeDesert(HolderGetter<Biome> biomes, Scaling scaling, HolderGetter<Noise> noise) {
     	Holder<Noise> variance = noise.getOrThrow(PresetSurfaceNoise.DESERT);
     	float min = scaling.ground(10);
     	float level = scaling.ground(40);
@@ -121,7 +124,7 @@ public class PresetSurfaceLayerData {
     	SurfaceRules.ConditionSource aboveLevel = UTFSurfaceConditions.height(level, variance);
 		return LayeredSurfaceRule.layer(
 	    	SurfaceRules.ifTrue(
-	    		SurfaceRules.isBiome(Biomes.DESERT),
+	    		SurfaceRules.isBiome(biomes, Biomes.DESERT),
 	    		SurfaceRules.ifTrue(
 		    		UTFSurfaceConditions.height(min), 
 		    		SurfaceRules.sequence(
@@ -148,10 +151,10 @@ public class PresetSurfaceLayerData {
     	);
     }
 
-    private static LayeredSurfaceRule.Layer makeForest(HolderGetter<Noise> noise) {
+    private static LayeredSurfaceRule.Layer makeForest(HolderGetter<Biome> biomes, HolderGetter<Noise> noise) {
 		return LayeredSurfaceRule.layer(
 			SurfaceRules.ifTrue(
-				SurfaceRules.isBiome(Biomes.FOREST, Biomes.DARK_FOREST),
+				SurfaceRules.isBiome(biomes, Biomes.FOREST, Biomes.DARK_FOREST),
 				UTFSurfaceRules.noise(
 					noise.getOrThrow(PresetSurfaceNoise.FOREST), 
 					List.of(

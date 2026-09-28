@@ -10,7 +10,6 @@ import org.spongepowered.asm.mixin.Interface;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.resources.Identifier;
@@ -42,22 +41,6 @@ class MixinSurfaceSystem {
     	this.strata = new ConcurrentHashMap<>();
 	}
 	
-	@ModifyVariable(
-		at = @At("HEAD"),
-		method = "buildSurface",
-		name = "ruleSource",
-		ordinal = 0,
-		index = 7,
-		argsOnly = true
-	)
-	public SurfaceRules.RuleSource buildSurface(SurfaceRules.RuleSource source) {
-		// let our own surface api handle this instead
-//		if(TBIntegration.isEnabled() && source instanceof NamespacedSurfaceRuleSource namespacedRule) {
-//			return namespacedRule.base();
-//		}	
-		return source;
-	}
-
 	public List<StrataStack> ultraterraforged$UTFSurfaceSystem$getOrCreateStrata(Identifier cacheId, Function<RandomSource, List<StrataStack>> factory) {
 		return this.strata.computeIfAbsent(cacheId, (k) -> {
 			return factory.apply(this.strataRandom.fork());

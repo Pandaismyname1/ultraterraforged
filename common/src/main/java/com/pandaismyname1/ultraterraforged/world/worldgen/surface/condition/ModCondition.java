@@ -2,9 +2,9 @@ package com.pandaismyname1.ultraterraforged.world.worldgen.surface.condition;
 
 import com.pandaismyname1.ultraterraforged.data.UTFCodecs;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.SurfaceRules.Context;
 import com.pandaismyname1.ultraterraforged.platform.ModLoaderUtil;
@@ -21,7 +21,7 @@ record ModCondition(String modId) implements SurfaceRules.ConditionSource {
 	}
 
 	@Override
-	public KeyDispatchDataCodec<ModCondition> codec() {
-		return UTFCodecs.keyDispatch(CODEC);
+	public MapCodec<ModCondition> codec() {
+		return UTFCodecs.asMap(CODEC);
 	}
 }

@@ -4,9 +4,9 @@ import com.pandaismyname1.ultraterraforged.data.UTFCodecs;
 import org.jetbrains.annotations.Nullable;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
@@ -59,8 +59,8 @@ class NearGroundCondition extends SurfaceRules.LazyYCondition {
 		}
 
 		@Override
-		public KeyDispatchDataCodec<Source> codec() {
-			return UTFCodecs.keyDispatch(CODEC);
+		public MapCodec<Source> codec() {
+			return UTFCodecs.asMap(CODEC);
 		}
 	}
 }

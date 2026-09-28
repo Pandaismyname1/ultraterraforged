@@ -36,20 +36,21 @@ public class PerformanceModsTest {
 		assertEquals(Light.GREEN, fabric("c2me", "lithium", "sodium").light());
 
 		assertEquals(Light.RED, neoforge().light());
-		assertEquals(Light.ORANGE, neoforge("sodium", "lithium", "modernfix").light());
-		assertEquals(Light.YELLOW, neoforge("c2me", "lithium", "modernfix").light());
-		assertEquals(Light.GREEN, neoforge("c2me", "lithium", "modernfix", "sodium").light());
+		assertEquals(Light.ORANGE, neoforge("sodium", "lithium").light());
+		assertEquals(Light.YELLOW, neoforge("c2me").light());
+		assertEquals(Light.GREEN, neoforge("c2me", "lithium", "sodium").light());
 	}
 
 	@Test
 	void onlyModsWithABuildCount() {
 		Report fabric = fabric();
-		// no Noisium, AllTheLeaks or (on Fabric) ModernFix for 26.1, and C2ME OpenCL is optional
+		// no Noisium, AllTheLeaks or ModernFix for 26.2, and C2ME OpenCL is optional
 		assertEquals(3, fabric.available());
 		assertEquals(PerformanceMods.MODS.size(), fabric.statuses().size());
 		assertTrue(!status(fabric, "noisium").isAvailable());
 		assertTrue(!status(fabric, "modernFix").isAvailable());
-		assertEquals(4, neoforge().available());
+		assertEquals(3, neoforge().available());
+		assertTrue(!status(neoforge(), "modernFix").isAvailable());
 		assertEquals("C2ME", status(neoforge(), "c2me").recommended().name());
 	}
 

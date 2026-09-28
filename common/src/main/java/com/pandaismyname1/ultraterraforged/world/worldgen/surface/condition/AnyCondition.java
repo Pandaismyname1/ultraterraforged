@@ -4,9 +4,9 @@ import com.pandaismyname1.ultraterraforged.data.UTFCodecs;
 import java.util.List;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.SurfaceRules.Context;
 
@@ -30,7 +30,7 @@ public record AnyCondition(List<SurfaceRules.ConditionSource> conditions) implem
 	}
 
 	@Override
-	public KeyDispatchDataCodec<AnyCondition> codec() {
-		return UTFCodecs.keyDispatch(CODEC);
+	public MapCodec<AnyCondition> codec() {
+		return UTFCodecs.asMap(CODEC);
 	}
 }

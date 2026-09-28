@@ -131,7 +131,7 @@ public class OptionPage implements LinkedPageScreen.Page {
 		y += ROW + GAP;
 
 		this.add(Button.builder(Component.translatable(UTFTranslationKeys.GUI_SAVE_PRESET), (button) -> {
-			screen.minecraft.setScreen(new SavePresetScreen(screen, this.session.entry.getName().getString(), this.preset().copy(), (saved) -> {}));
+			screen.minecraft.gui.setScreen(new SavePresetScreen(screen, this.session.entry.getName().getString(), this.preset().copy(), (saved) -> {}));
 		}).bounds(rightX, y, half, ROW).tooltip(Tooltip.create(Component.translatable(UTFTranslationKeys.GUI_SAVE_PRESET_TOOLTIP))).build());
 		this.add(Button.builder(Component.translatable(UTFTranslationKeys.GUI_SHARE_COPY), (button) -> PresetSharing.copy(this.preset()))
 			.bounds(rightX + half + GAP, y, rightWidth - half - GAP, ROW)

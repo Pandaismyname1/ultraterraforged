@@ -36,12 +36,5 @@ public record NoiseSampler(Holder<Noise> noise, int seed) implements MappedFunct
 			return UTFCodecs.keyDispatch(CODEC);
 		}
 
-		@Override
-		public DensityFunction mapAll(Visitor visitor) {
-			DensityFunction self = visitor instanceof Noise.Visitor noiseVisitor ?
-				new Marker(Holder.direct(this.noise.value().mapAll(noiseVisitor))) : 
-				this;
-			return visitor.apply(self);
-		}
 	}
 }

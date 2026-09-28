@@ -20,8 +20,6 @@
   	"MixinServerPacksSource",
   	"MixinResourceManagerRegistryLoadTask",
   	"MixinNoiseBasedChunkGenerator",
-  	"MixinContext",
-  	"MixinSurfaceRules$BiomeConditionSource",
   	"terrablender.MixinParameterList",
   	"terrablender.MixinClimateSampler",
   	"terrablender.MixinTargetPoint",
