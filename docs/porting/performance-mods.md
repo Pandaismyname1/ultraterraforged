@@ -29,8 +29,9 @@ What the dev runs need that a real game doesn't:
   skipped fix). So `neoforge/build.gradle`'s `unpackDevMods` downloads the mods while Gradle configures the project,
   takes out the jars nested in them (Loom drops those: C2ME's modules are in `META-INF/jars/`), and puts every mod
   through Loom (`modLocalRuntime`), which renames the lambdas, and the libraries on the classpath as game libraries.
-  MixinExtras is left to NeoForge. **Sodium isn't in the NeoForge dev runs**: its jar is an early-loading service with
-  the mod nested in it, and the mod uses the service's classes, which it can't reach once Loom has remapped them.
+  MixinExtras is left to NeoForge. **The NeoForge dev runs use Embeddium instead of Sodium**: Sodium's jar is an
+  early-loading service with the mod nested in it, and the mod uses the service's classes, which it can't reach once
+  Loom has remapped them.
 - **1.20.1 only: the Forge dev game runs with Mojang's names; released Forge mods use SRG names**, so released jars can't just go in
   `forge/run/mods` (unlike Fabric, whose loader remaps the mods folder in dev). Everything goes through Loom, which
   remaps dependencies, and a few things need more:
@@ -80,8 +81,8 @@ Sinytra Connector counts once Connector is installed. A build that needs a newer
 
 ## 1.21.1 (current)
 
-Every mod has a build for both loaders except AllTheLeaks (NeoForge only), so the stand-ins (Radium, Canary, Embeddium)
-and Sinytra Connector drop out. What the dev runs use:
+Every mod has a build for both loaders except AllTheLeaks (NeoForge only), so Radium, Canary and Sinytra Connector drop
+out. Embeddium stays as an alternative to Sodium on NeoForge: it counts when installed, Sodium is what's recommended. What the dev runs use:
 
 | Mod | Fabric | NeoForge 21.1 |
 |---|---|---|
@@ -91,7 +92,7 @@ and Sinytra Connector drop out. What the dev runs use:
 | Lithium | 0.15.4 (`N08Z8wog`) | 0.15.4 (`DDUrRVCA`) |
 | ModernFix | 5.25.1 (`NnNX8LBn`) | 5.27.24 (`5HLHxQ2F`) |
 | AllTheLeaks | none | 1.1.13 (`curse.maven:alltheleaks-1091339:8943912`) |
-| Sodium | 0.8.13 (`SMxNOGZ6`) | 0.8.13 (`uMOpc5uV`) |
+| Sodium | 0.8.13 (`SMxNOGZ6`) | 0.8.13 (`uMOpc5uV`); Embeddium 1.0.15 (`J7b96IEd`) also counts, and is what the dev runs use |
 
 C2ME OpenCL is `optional` in `PerformanceMods` (see below): it counts towards the light only once installed. So the
 light asks for five mods on Fabric and six on NeoForge.

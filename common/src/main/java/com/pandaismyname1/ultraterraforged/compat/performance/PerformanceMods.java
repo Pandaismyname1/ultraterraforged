@@ -111,7 +111,8 @@ public final class PerformanceMods {
 			null),
 		new Mod("sodium", "Sodium", MODRINTH + "sodium", Category.CLIENT,
 			List.of(Build.of("Sodium", "sodium", MODRINTH + "sodium")),
-			List.of(Build.of("Sodium", "sodium", MODRINTH + "sodium")),
+			// Embeddium, the NeoForge fork, counts as much where it's installed instead
+			List.of(Build.of("Sodium", "sodium", MODRINTH + "sodium"), Build.alternative("Embeddium", "embeddium", MODRINTH + "embeddium")),
 			null)
 	);
 

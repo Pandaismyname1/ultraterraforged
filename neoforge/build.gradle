@@ -54,8 +54,9 @@ dependencies {
     // leaves them out. See docs/porting/performance-mods.md and unpackDevMods below.
     if (project.findProperty("utf.perfMods") != "false") {
         def dir = unpackDevMods([
-            // Not Sodium: its jar is an early-loading service with the mod nested in it, and the mod uses the service's
-            // classes, which the dev game can't give it once Loom has remapped them. It only changes rendering.
+            // Embeddium 1.0.15 rather than Sodium: Sodium's jar is an early-loading service with the mod nested in it, and
+            // the mod uses the service's classes, which the dev game can't give it once Loom has remapped them
+            "https://api.modrinth.com/maven/maven/modrinth/embeddium/J7b96IEd/embeddium-J7b96IEd.jar",
             // C2ME 0.4.0-alpha.0.122; not C2ME OpenCL: it needs Java 25, the dev game runs on 21
             "https://api.modrinth.com/maven/maven/modrinth/c2me-neoforge/yxOYFgnK/c2me-neoforge-yxOYFgnK.jar",
             "https://api.modrinth.com/maven/maven/modrinth/noisiumed/U3gpLtpO/noisiumed-U3gpLtpO.jar",   // Noisiumed 3.0.6

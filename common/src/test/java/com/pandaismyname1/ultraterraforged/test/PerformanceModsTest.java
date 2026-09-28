@@ -41,6 +41,8 @@ public class PerformanceModsTest {
 		assertEquals(Light.ORANGE, neoforge("sodium", "lithium", "modernfix", "alltheleaks").light());
 		assertEquals(Light.YELLOW, neoforge("c2me", "noisiumed", "lithium", "modernfix", "alltheleaks").light());
 		assertEquals(Light.GREEN, neoforge("c2me", "noisiumed", "lithium", "modernfix", "alltheleaks", "sodium").light());
+		// Embeddium stands in for Sodium on NeoForge
+		assertEquals(Light.GREEN, neoforge("c2me", "noisiumed", "lithium", "modernfix", "alltheleaks", "embeddium").light());
 	}
 
 	@Test
@@ -82,6 +84,7 @@ public class PerformanceModsTest {
 	void theModsThemselvesAreRecommended() {
 		assertEquals("Lithium", status(neoforge(), "lithium").recommended().name());
 		assertEquals("Sodium", status(neoforge(), "sodium").recommended().name());
+		assertEquals("Embeddium", status(neoforge("embeddium"), "sodium").installed().name());
 		assertEquals("Noisiumed", status(fabric(), "noisium").recommended().name());
 		PerformanceMods.Status noisium = status(neoforge("noisium"), "noisium");
 		assertNotNull(noisium.installed());

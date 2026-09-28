@@ -1,8 +1,10 @@
 package com.pandaismyname1.ultraterraforged.registries;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -55,27 +57,36 @@ public class UTFRegistries {
 	}
 
 	// copies entries between registry lookups, as building a registry patch does: knows the codecs of vanilla's
-	// worldgen registries and of UTF's
+	// datapack registries and of UTF's
 	public static Cloner.Factory cloner() {
 		Cloner.Factory factory = new Cloner.Factory();
 		RegistryDataLoader.WORLDGEN_REGISTRIES.forEach((data) -> data.runWithArguments(factory::addCodec));
+		RegistryDataLoader.DIMENSION_REGISTRIES.forEach((data) -> data.runWithArguments(factory::addCodec));
 		DATA_REGISTRY_CODECS.forEach((codec) -> codec.accept(factory));
 		return factory;
 	}
 
-	// the given lookup, plus an empty registry for each of UTF's datapack registries it lacks: building a registry
-	// patch looks up every registry it patches in the lookup it starts from
-	public static HolderLookup.Provider withDataRegistries(HolderLookup.Provider registries) {
+	// the registries cloner() can copy
+	private static Set<ResourceKey<? extends Registry<?>>> clonable() {
+		Set<ResourceKey<? extends Registry<?>>> keys = new HashSet<>(DATA_REGISTRIES);
+		RegistryDataLoader.WORLDGEN_REGISTRIES.forEach((data) -> keys.add(data.key()));
+		RegistryDataLoader.DIMENSION_REGISTRIES.forEach((data) -> keys.add(data.key()));
+		return keys;
+	}
+
+	// The lookup a preset's registry patch starts from: the given one without the registries cloner() can't copy (the
+	// loaders' and other mods', such as neoforge:structure_modifier, which a preset never patches, but which building a
+	// patch would otherwise try to copy), plus an empty registry for each of UTF's datapack registries it lacks, as
+	// building a patch looks up every registry it patches in the lookup it starts from.
+	public static HolderLookup.Provider patchBase(HolderLookup.Provider registries) {
+		Set<ResourceKey<? extends Registry<?>>> clonable = clonable();
 		List<ResourceKey<? extends Registry<?>>> missing = DATA_REGISTRIES.stream().filter((key) -> registries.lookup(key).isEmpty()).toList();
-		if (missing.isEmpty()) {
-			return registries;
-		}
 		List<HolderLookup.RegistryLookup<?>> empty = missing.stream().<HolderLookup.RegistryLookup<?>>map((key) -> emptyLookup(key)).toList();
 		return new HolderLookup.Provider() {
 
 			@Override
 			public Stream<ResourceKey<? extends Registry<?>>> listRegistries() {
-				return Stream.concat(registries.listRegistries(), missing.stream());
+				return Stream.concat(registries.listRegistries().filter(clonable::contains), missing.stream());
 			}
 
 			@SuppressWarnings("unchecked")
