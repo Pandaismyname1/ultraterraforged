@@ -24,6 +24,7 @@ public class UTFPlacementModifiers {
 	public static final PlacementModifierType<NoiseFilter> NOISE_FILTER = register("noise_filter", NoiseFilter.CODEC);
 	public static final PlacementModifierType<FastPoissonModifier> FAST_POISSON = register("fast_poission", FastPoissonModifier.CODEC);
 	public static final PlacementModifierType<LegacyCountExtraModifier> LEGACY_COUNT_EXTRA = register("legacy_count_extra", LegacyCountExtraModifier.CODEC);
+	public static final PlacementModifierType<ReplacesModifier> REPLACES = register("replaces", ReplacesModifier.CODEC);
 
     public static void bootstrap() {
     }

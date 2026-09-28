@@ -14,6 +14,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import com.pandaismyname1.ultraterraforged.world.worldgen.biome.modifier.BiomeModifiers;
 import net.neoforged.neoforge.common.world.BiomeGenerationSettingsBuilder;
 
 record ReplaceModifier(GenerationStep.Decoration step, Optional<HolderSet<Biome>> biomes, Map<ResourceKey<PlacedFeature>, Holder<PlacedFeature>> replacements) implements NeoForgeBiomeModifier {
@@ -30,7 +31,7 @@ record ReplaceModifier(GenerationStep.Decoration step, Optional<HolderSet<Biome>
 		}
 		List<Holder<PlacedFeature>> step = generationSettings.getFeatures(this.step);
 		step.replaceAll((f) -> {
-			Holder<PlacedFeature> replacement = f.unwrapKey().map(this.replacements::get).orElse(null);
+			Holder<PlacedFeature> replacement = f.unwrapKey().map(BiomeModifiers.distinctReplacements(this, this.replacements)::get).orElse(null);
 			return replacement != null ? replacement : f;
 		});
 	}

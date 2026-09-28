@@ -14,7 +14,7 @@ import com.pandaismyname1.ultraterraforged.platform.ModLoaderUtil;
  * this file is updated from it when porting.
  */
 public final class PerformanceMods {
-	public static final String MINECRAFT_VERSION = "1.21.1";
+	public static final String MINECRAFT_VERSION = "26.1.2";
 	public static final String FABRIC = "fabric";
 	public static final String NEOFORGE = "neoforge";
 	// Sinytra Connector, which runs Fabric mods on NeoForge; none of the mods needs it on this version
@@ -85,34 +85,31 @@ public final class PerformanceMods {
 			List.of(Build.of("C2ME", "c2me", MODRINTH + "c2me-neoforge")),
 			null),
 		new Mod("c2meOpenCl", "C2ME OpenCL", MODRINTH + "c2me-ocl", Category.WORLD_GENERATION,
-			// built for Java 25, while the launcher runs 1.21.1 on Java 21; C2ME itself runs on 21
 			List.of(Build.of("C2ME OpenCL", "c2me-opts-accel-opencl", MODRINTH + "c2me-ocl").needsJava(25)),
 			// the NeoForge build nests a mod with the id spelled with underscores
 			List.of(Build.of("C2ME OpenCL", "c2me_opts_accel_opencl", MODRINTH + "c2me-ocl").needsJava(25)),
-			// needs an OpenCL device, and crashes the game together with Noisium(ed) (tested on both loaders): Noisiumed
-			// is the one the light asks for
+			// needs an OpenCL device, so it counts towards the light only once installed
 			null, true),
+		// no Noisium, Noisiumed or AllTheLeaks for 26.x; they stay listed, greyed out
 		new Mod("noisium", "Noisium", MODRINTH + "noisiumed", Category.WORLD_GENERATION,
-			// Noisium itself is archived; Noisiumed is the maintained fork, and either does the job
-			List.of(Build.of("Noisiumed", "noisiumed", MODRINTH + "noisiumed"), Build.alternative("Noisium", "noisium", MODRINTH + "noisium")),
-			List.of(Build.of("Noisiumed", "noisiumed", MODRINTH + "noisiumed"), Build.alternative("Noisium", "noisium", MODRINTH + "noisium")),
+			List.of(),
+			List.of(),
 			null),
 		new Mod("lithium", "Lithium", MODRINTH + "lithium", Category.GENERAL,
 			List.of(Build.of("Lithium", "lithium", MODRINTH + "lithium")),
 			List.of(Build.of("Lithium", "lithium", MODRINTH + "lithium")),
 			null),
 		new Mod("modernFix", "ModernFix", MODRINTH + "modernfix", Category.GENERAL,
-			List.of(Build.of("ModernFix", "modernfix", MODRINTH + "modernfix")),
+			List.of(),
 			List.of(Build.of("ModernFix", "modernfix", MODRINTH + "modernfix")),
 			null),
 		new Mod("allTheLeaks", "AllTheLeaks", CURSEFORGE + "alltheleaks", Category.GENERAL,
 			List.of(),
-			List.of(Build.of("AllTheLeaks", "alltheleaks", CURSEFORGE + "alltheleaks")),
+			List.of(),
 			null),
 		new Mod("sodium", "Sodium", MODRINTH + "sodium", Category.CLIENT,
 			List.of(Build.of("Sodium", "sodium", MODRINTH + "sodium")),
-			// Embeddium, the NeoForge fork, counts as much where it's installed instead
-			List.of(Build.of("Sodium", "sodium", MODRINTH + "sodium"), Build.alternative("Embeddium", "embeddium", MODRINTH + "embeddium")),
+			List.of(Build.of("Sodium", "sodium", MODRINTH + "sodium")),
 			null)
 	);
 

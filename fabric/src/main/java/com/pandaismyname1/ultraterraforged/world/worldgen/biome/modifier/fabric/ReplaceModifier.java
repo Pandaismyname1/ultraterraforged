@@ -18,6 +18,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import com.pandaismyname1.ultraterraforged.world.worldgen.biome.modifier.BiomeModifiers;
 
 record ReplaceModifier(GenerationStep.Decoration step, Optional<HolderSet<Biome>> biomes, Map<ResourceKey<PlacedFeature>, Holder<PlacedFeature>> replacements) implements FabricBiomeModifier {
 	public static final Codec<ReplaceModifier> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -46,9 +47,10 @@ record ReplaceModifier(GenerationStep.Decoration step, Optional<HolderSet<Biome>
 	}
 	
 	private HolderSet<PlacedFeature> replace(HolderSet<PlacedFeature> features) {
+		Map<ResourceKey<PlacedFeature>, Holder<PlacedFeature>> replacements = BiomeModifiers.distinctReplacements(this, this.replacements);
 		List<Holder<PlacedFeature>> newList = new ArrayList<>(features.stream().toList());
 		newList.replaceAll((f) -> {
-			return f.unwrapKey().map(this.replacements::get).orElse(f);
+			return f.unwrapKey().map(replacements::get).orElse(f);
 		});
 		return HolderSet.direct(newList);
 	}

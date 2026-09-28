@@ -4,8 +4,8 @@ UltraTerraForged recommends a set of performance mods, shows in the Create World
 runs them in the dev environment. Which builds exist changes with every Minecraft version and loader, so this page
 records what was found for each version, what was tested with UltraTerraForged, and what to change when porting.
 
-State as of 2026-09-28, on the 1.21.1 branch (Fabric and NeoForge). The 1.20.1 branch (Fabric and Forge, whose jar
-also covers NeoForge 47.1) keeps its own copy of this page; its findings are kept below too.
+State as of 2026-09-28, on the 26.1 branch (Fabric and NeoForge, Minecraft 26.1 to 26.1.2). Each version branch keeps
+its own copy of this page; the findings for earlier versions are kept below.
 
 ## Where it lives
 
@@ -79,7 +79,26 @@ Sinytra Connector counts once Connector is installed. A build that needs a newer
 | [Sodium](https://modrinth.com/mod/sodium) | rendering | `sodium` | Client only. No Forge build: [Embeddium](https://modrinth.com/mod/embeddium) (`embeddium`) stands in. Official NeoForge builds from 1.21.1 |
 | [Sinytra Connector](https://modrinth.com/mod/connector) | runs Fabric mods on Forge/NeoForge | `connector` | Needs [Forgified Fabric API](https://modrinth.com/mod/forgified-fabric-api). Not a performance mod; lets the Forge list count Fabric-only mods |
 
-## 1.21.1 (current)
+## 26.1.2 (current)
+
+On 26.1 the game runs on Java 25 and isn't obfuscated, so the dev game and a real one use the same names: released jars
+go into the NeoForge dev game's mods folder as they are (`syncDevMods`), and the 1.21.1 unpack-and-remap step is gone.
+
+| Mod | Fabric | NeoForge 26.1.2 |
+|---|---|---|
+| C2ME | 0.4.0-alpha.0.62 (`o1m4A4Rk`) | 0.4.0-alpha.0.99 (`C4T7lj0z`) |
+| C2ME OpenCL | 0.4.0-alpha.0.62 (`FIySyMEQ`), optional | 0.4.0-alpha.0.99 (`wJrPp4yA`), optional |
+| Noisium | none | none |
+| Lithium | 0.24.7 (`Oqq8TOAV`) | 0.24.7 (`eZ0KJiEA`) |
+| ModernFix | none | 5.27.22 (`j7EoxpYe`) |
+| AllTheLeaks | none | none |
+| Sodium | 0.9.2 (`tZQ3jqnf`) | 0.9.2 (`zg4YQ9EL`) |
+
+The Fabric dev game also runs Voxy 0.2.18 (`Zt3LPI0b`, Fabric only), to look at generated terrain from far off, as the
+roadmap asked once a build existed. C2ME OpenCL stays optional: with no Noisium it has nothing to conflict with, but it
+needs a graphics card with OpenCL. The light asks for three mods on Fabric and four on NeoForge.
+
+## 1.21.1
 
 Every mod has a build for both loaders except AllTheLeaks (NeoForge only), so Radium, Canary and Sinytra Connector drop
 out. Embeddium stays as an alternative to Sodium on NeoForge: it counts when installed, Sodium is what's recommended. What the dev runs use:

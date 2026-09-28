@@ -14,11 +14,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Gradle, Loom and the mod run on Java 21
-      - name: Setup JDK 21
+      # Gradle, Loom and the mod run on Java 25 since Minecraft 26.1
+      - name: Setup JDK 25
         uses: actions/setup-java@v4
         with:
-          java-version: 21
+          java-version: 25
           distribution: 'temurin'
 
       - uses: actions/cache@v4

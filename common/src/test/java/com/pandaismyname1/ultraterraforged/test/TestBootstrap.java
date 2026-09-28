@@ -86,9 +86,15 @@ public final class TestBootstrap {
 		try {
 			Field frozen = MappedRegistry.class.getDeclaredField("frozen");
 			frozen.setAccessible(true);
+			// since 1.21.2 freezing builds the registry's tag set, and refuses to run again once it's built
+			Field allTags = MappedRegistry.class.getDeclaredField("allTags");
+			allTags.setAccessible(true);
+			java.lang.reflect.Method unboundTags = Class.forName("net.minecraft.core.MappedRegistry$TagSet").getDeclaredMethod("unbound");
+			unboundTags.setAccessible(true);
 			for (Registry<?> registry : BuiltInRegistries.REGISTRY) {
 				if (registry instanceof MappedRegistry<?> mapped && frozen.getBoolean(mapped)) {
 					frozen.setBoolean(mapped, false);
+					allTags.set(mapped, unboundTags.invoke(null));
 					unfrozen.add(mapped);
 				}
 			}

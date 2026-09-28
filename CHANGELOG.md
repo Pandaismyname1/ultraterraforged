@@ -1,7 +1,7 @@
 ### UltraTerraForged
 * UltraTerraForged is a continuation of ReTerraForged (by raccoonman, Steveplays28 and EdoEquin0x), which continued TerraForged (by dags and Won-Ton). Full credit and history are in the README and this repository, a fork of ReTerraForged.
 * It has its own mod id, `ultraterraforged`, and isn't compatible with worlds made with ReTerraForged. The first start copies `config/reterraforged` to `config/ultraterraforged`, keeping saved presets and modpack setups. Dedicated servers use `level-type=ultraterraforged:ultraterraforged`.
-* The first release for Minecraft 1.21.1, on Fabric (with Fabric API) and NeoForge 21.1. Its terrain generation is the same as in the 1.20.1 release.
+* The first release for Minecraft 26.1 to 26.1.2, on Fabric (with Fabric API) and NeoForge 26.1. It needs Java 25, as Minecraft 26.1 does. Its terrain generation is the same as in the 1.20.1 and 1.21.1 releases.
 
 ### Creating worlds
 * A Terrain tab in Create World: presets, the main settings as sliders, and a live map of the result. UltraTerraForged is the default world type (configurable).
@@ -19,8 +19,7 @@
 * `/utf locate <terrain>` finds landforms and puts you on their surface.
 
 ### Performance
-* The Terrain tab recommends performance mods and shows which are installed: C2ME, Noisium(ed), Lithium, ModernFix, AllTheLeaks (NeoForge) and Sodium. With them, new land generates as fast as vanilla or faster.
-* C2ME OpenCL is listed as optional: it needs Java 25 and a graphics card with OpenCL, and crashes the game together with Noisium(ed), so install one or the other.
+* The Terrain tab recommends performance mods and shows which are installed: C2ME, Lithium, ModernFix (NeoForge) and Sodium; C2ME OpenCL is optional, as it needs a graphics card with OpenCL. With them, new land generates as fast as vanilla or faster. Noisium and AllTheLeaks have no 26.1 builds.
 * Rock shelters no longer recompute the terrain for every block around a chunk (up to a third faster chunk generation in badlands and plateaus).
 
 ### Fixes
