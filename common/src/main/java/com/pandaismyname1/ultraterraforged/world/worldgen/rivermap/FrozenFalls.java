@@ -71,7 +71,7 @@ public final class FrozenFalls {
 						continue;
 					}
 					BlockState water = source.getBlockState(from.set(x + side[0], surface, z + side[1]));
-					boolean frozen = water.is(Blocks.ICE) || (water.is(Blocks.WATER) && !source.getNoiseBiome(QuartPos.fromBlock(from.getX()), QuartPos.fromBlock(surface), QuartPos.fromBlock(from.getZ())).value().warmEnoughToRain(from));
+					boolean frozen = water.is(Blocks.ICE) || (water.is(Blocks.WATER) && !source.getNoiseBiome(QuartPos.fromBlock(from.getX()), QuartPos.fromBlock(surface), QuartPos.fromBlock(from.getZ())).value().warmEnoughToRain(from, levels.waterLevel));
 					// open to the fall: this column is air just below the river's surface
 					if (frozen && chunk.getBlockState(pos.set(x, surface - 1, z)).isAir()) {
 						top = surface;
@@ -89,7 +89,7 @@ public final class FrozenFalls {
 					continue;
 				}
 				for (int y = bottom; y < top; y++) {
-					chunk.setBlockState(pos.set(x, y, z), ice, false);
+					chunk.setBlockState(pos.set(x, y, z), ice, 0);
 				}
 			}
 		}
@@ -100,12 +100,12 @@ public final class FrozenFalls {
 		int chunkX = blockX >> 4;
 		int chunkZ = blockZ >> 4;
 		ChunkPos pos = center.getPos();
-		if (chunkX == pos.x && chunkZ == pos.z) {
+		if (chunkX == pos.x() && chunkZ == pos.z()) {
 			return center;
 		}
 		for (ChunkAccess chunk : region) {
 			ChunkPos other = chunk.getPos();
-			if (other.x == chunkX && other.z == chunkZ) {
+			if (other.x() == chunkX && other.z() == chunkZ) {
 				return chunk;
 			}
 		}

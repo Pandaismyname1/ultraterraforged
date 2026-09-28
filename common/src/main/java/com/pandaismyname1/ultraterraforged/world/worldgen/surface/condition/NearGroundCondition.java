@@ -32,7 +32,7 @@ class NearGroundCondition extends SurfaceRules.LazyYCondition {
 		Tile.Chunk chunk = null;
 		if ((Object) context.randomState instanceof UTFRandomState randomState && (generatorContext = randomState.generatorContext()) != null) {
 			ChunkPos chunkPos = context.chunk.getPos();
-			chunk = generatorContext.cache.provideChunk(chunkPos.x, chunkPos.z);
+			chunk = generatorContext.cache.provideChunk(chunkPos.x(), chunkPos.z());
 		}
 		this.generatorContext = generatorContext;
 		this.chunk = chunk;

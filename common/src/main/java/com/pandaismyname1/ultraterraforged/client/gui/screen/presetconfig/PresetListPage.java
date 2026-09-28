@@ -22,7 +22,7 @@ import com.mojang.serialization.JsonOps;
 
 import io.netty.util.internal.StringUtil;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -80,7 +80,7 @@ class PresetListPage extends BisectedPage<PresetConfigScreen, PresetEntry, Abstr
 		
 		this.input = PresetWidgets.createEditBox(this.screen.font, (text) -> {
 			boolean isValid = this.isValidPresetName(text);
-			final int white = 14737632;
+			final int white = 0xFFE0E0E0;
 			final int red = 0xFFFF3F30;
 			this.createPreset.active = isValid;
 			this.input.setTextColor(isValid ? white : red);

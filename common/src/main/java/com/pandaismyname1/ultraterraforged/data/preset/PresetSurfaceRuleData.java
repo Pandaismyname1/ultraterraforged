@@ -8,7 +8,7 @@ import com.mojang.datafixers.util.Pair;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -78,8 +78,8 @@ public class PresetSurfaceRuleData {
     // where the salt crust noise is above this, it's a crack between the crust's polygons
     private static final float SALT_CRACK = 0.983F;
 
-    private static final ResourceLocation STRATA_CACHE_ID = UTFCommon.location("default");
-    private static final ResourceLocation DEEP_STRATA_CACHE_ID = UTFCommon.location("deep");
+    private static final Identifier STRATA_CACHE_ID = UTFCommon.location("default");
+    private static final Identifier DEEP_STRATA_CACHE_ID = UTFCommon.location("deep");
     private static final int STRATA_VARIANTS = 100;
     // thin beds, so a cliff shows many alternating layers
     private static final int STRATA_MIN_THICKNESS = 1;

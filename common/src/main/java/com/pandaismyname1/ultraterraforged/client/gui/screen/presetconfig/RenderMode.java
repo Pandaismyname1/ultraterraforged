@@ -2,6 +2,7 @@ package com.pandaismyname1.ultraterraforged.client.gui.screen.presetconfig;
 
 import java.awt.Color;
 
+import net.minecraft.util.ARGB;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.Cell;
 import com.pandaismyname1.ultraterraforged.world.worldgen.heightmap.Levels;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.NoiseUtil;
@@ -217,7 +218,8 @@ public enum RenderMode {
         return rgba(red, green, blue);
     }
 
+    // ARGB, the pixel order of NativeImage since 1.21.2
     private static int rgba(int r, int g, int b) {
-        return r + (g << 8) + (b << 16) + (255 << 24);
+        return ARGB.color(255, r, g, b);
     }
 }

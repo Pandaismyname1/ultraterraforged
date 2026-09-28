@@ -32,7 +32,7 @@ public class LocateTerrainCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> commandDispatcher, CommandBuildContext commandBuildContext) {
     	commandDispatcher.register(
-    		Commands.literal("utf").requires((stack) -> stack.hasPermission(2)).then(
+    		Commands.literal("utf").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)).then(
     			Commands.literal("locate").then(
     				TerrainArgument.terrain("terrain").executes((ctx) -> {
 	    				CommandSourceStack stack = ctx.getSource();
@@ -56,8 +56,8 @@ public class LocateTerrainCommand {
     private static Component createTeleportMessage(BlockPos pos) {
         return ComponentUtils.wrapInSquareBrackets(Component.translatable("chat.coordinates", pos.getX(), pos.getY(), pos.getZ())).withStyle(s -> s
         	.withColor(ChatFormatting.GREEN)
-        	.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tp @s " + pos.getX() + " " + pos.getY() + " " + pos.getZ()))
-        	.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("chat.coordinates.tooltip")))
+        	.withClickEvent(new ClickEvent.SuggestCommand("/tp @s " + pos.getX() + " " + pos.getY() + " " + pos.getZ()))
+        	.withHoverEvent(new HoverEvent.ShowText(Component.translatable("chat.coordinates.tooltip")))
         );
     }
 

@@ -1,11 +1,12 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.noise.domain;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noise.Visitor;
 
 public record DirectWarp() implements Domain {
-	public static final Codec<DirectWarp> CODEC = Codec.unit(DirectWarp::new);
+	public static final Codec<DirectWarp> CODEC = MapCodec.unit(DirectWarp::new).codec();
 	
 	@Override
 	public float getOffsetX(float x, float z, int seed) {

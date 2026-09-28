@@ -114,9 +114,8 @@ public class OptionPage implements LinkedPageScreen.Page {
 
 		int y = TOP;
 		List<Integer> indices = IntStream.range(0, this.session.pages.size()).boxed().toList();
-		this.add(CycleButton.<Integer>builder((i) -> Component.translatable(this.session.pages.get(i).titleKey()))
+		this.add(CycleButton.<Integer>builder((i) -> Component.translatable(this.session.pages.get(i).titleKey()), this.index)
 			.withValues(indices)
-			.withInitialValue(this.index)
 			.create(rightX, y, rightWidth, ROW, Component.translatable(UTFTranslationKeys.GUI_EDITOR_PAGE), (button, page) -> screen.setPage(new OptionPage(this.session, page))));
 		y += ROW + GAP;
 
@@ -125,9 +124,8 @@ public class OptionPage implements LinkedPageScreen.Page {
 			.bounds(rightX, y, half, ROW)
 			.tooltip(Tooltip.create(Component.translatable(UTFTranslationKeys.GUI_EDITOR_RESET_PAGE_TOOLTIP)))
 			.build());
-		this.add(CycleButton.<RenderMode>builder(OptionWidgets::enumName)
+		this.add(CycleButton.<RenderMode>builder(OptionWidgets::enumName, this.session.preview.mode())
 			.withValues(RenderMode.values())
-			.withInitialValue(this.session.preview.mode())
 			.displayOnlyValue()
 			.create(rightX + half + GAP, y, rightWidth - half - GAP, ROW, Component.translatable(UTFTranslationKeys.GUI_TERRAIN_TAB_VIEW), (button, mode) -> this.session.preview.setMode(mode)));
 		y += ROW + GAP;

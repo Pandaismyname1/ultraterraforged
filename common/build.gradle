@@ -16,7 +16,7 @@ configurations.compileClasspath {
 
 dependencies {
     // Fabric loader provides the @Environment annotations and the Mixin library for common code.
-    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+    implementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
     compileOnly "com.github.glitchfiend:TerraBlender-common:${rootProject.minecraft_version}-${rootProject.terrablender_version}"
     compileOnly "com.electronwill.night-config:toml:3.6.7"
 }

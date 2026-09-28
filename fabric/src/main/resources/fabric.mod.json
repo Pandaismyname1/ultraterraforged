@@ -27,6 +27,7 @@
       "com.pandaismyname1.ultraterraforged.fabric.UTFFabric"
     ]
   },
+  "accessWidener": "ultraterraforged.accesswidener",
   "mixins": [
     "ultraterraforged-common.mixins.json",
     "ultraterraforged-fabric.mixins.json"
@@ -34,7 +35,7 @@
   "depends": {
     "fabricloader": ">=0.16.0",
     "fabric-api": ">=${fabric_api_version}",
-    "minecraft": "~${minecraft_version}",
-    "java": ">=21"
+    "minecraft": ">=26.1 <26.2",
+    "java": ">=25"
   }
 }

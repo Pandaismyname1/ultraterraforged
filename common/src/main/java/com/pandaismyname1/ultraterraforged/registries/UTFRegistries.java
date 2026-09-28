@@ -85,14 +85,14 @@ public class UTFRegistries {
 		return new HolderLookup.Provider() {
 
 			@Override
-			public Stream<ResourceKey<? extends Registry<?>>> listRegistries() {
-				return Stream.concat(registries.listRegistries().filter(clonable::contains), missing.stream());
+			public Stream<ResourceKey<? extends Registry<?>>> listRegistryKeys() {
+				return Stream.concat(registries.listRegistryKeys().filter(clonable::contains), missing.stream());
 			}
 
 			@SuppressWarnings("unchecked")
 			@Override
-			public <T> Optional<HolderLookup.RegistryLookup<T>> lookup(ResourceKey<? extends Registry<? extends T>> key) {
-				Optional<HolderLookup.RegistryLookup<T>> lookup = registries.lookup(key);
+			public <T> Optional<? extends HolderLookup.RegistryLookup<T>> lookup(ResourceKey<? extends Registry<? extends T>> key) {
+				Optional<? extends HolderLookup.RegistryLookup<T>> lookup = registries.lookup(key);
 				if (lookup.isPresent()) {
 					return lookup;
 				}
@@ -103,7 +103,7 @@ public class UTFRegistries {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private static HolderLookup.RegistryLookup<?> emptyLookup(ResourceKey<? extends Registry<?>> key) {
-		return new MappedRegistry(key, Lifecycle.stable()).asLookup();
+		return new MappedRegistry(key, Lifecycle.stable());
 	}
 	
 	public static <T> ResourceKey<T> createKey(ResourceKey<? extends Registry<T>> registryKey, String valueKey) {

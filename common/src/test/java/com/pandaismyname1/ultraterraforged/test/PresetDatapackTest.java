@@ -15,7 +15,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 import com.pandaismyname1.ultraterraforged.preset.option.PresetOptions;
 
@@ -71,10 +71,10 @@ public class PresetDatapackTest {
 	@Test
 	void structureSpacingAndDisablingReachTheStructureSets() {
 		Preset preset = defaultPreset();
-		ResourceLocation villages = ResourceLocation.parse("villages");
+		Identifier villages = Identifier.parse("villages");
 		preset.structures().getOrCreate(villages).spacing = 20;
 		preset.structures().getOrCreate(villages).separation = 25;
-		preset.structures().getOrCreate(ResourceLocation.parse("pillager_outposts")).enabled = false;
+		preset.structures().getOrCreate(Identifier.parse("pillager_outposts")).enabled = false;
 
 		PresetDatapack.Result pack = PresetDatapack.generate(preset);
 		assertTrue(pack.errors().isEmpty(), String.join("\n", pack.errors()));

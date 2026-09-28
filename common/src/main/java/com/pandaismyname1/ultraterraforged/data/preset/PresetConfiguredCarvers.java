@@ -65,6 +65,6 @@ public class PresetConfiguredCarvers {
 	}
 	
 	private static FloatProvider modifiedRavineYScale(CaveSettings caveSettings) {
-		return caveSettings.legacyCarverDistribution ? new LegacyCanyonYScale() : UniformFloat.of(-0.125F, 0.125F);
+		return caveSettings.legacyCarverDistribution ? (FloatProvider) new LegacyCanyonYScale() : UniformFloat.of(-0.125F, 0.125F);
 	}
 }

@@ -28,7 +28,7 @@ public final class PresetBiomeModifier implements BiomeModifier {
 		if (phase != Phase.AFTER_EVERYTHING || server == null) {
 			return;
 		}
-		server.registryAccess().registry(UTFRegistries.BIOME_MODIFIER).ifPresent((modifiers) -> {
+		server.registryAccess().lookup(UTFRegistries.BIOME_MODIFIER).ifPresent((modifiers) -> {
 			if (reported != server) {
 				reported = server;
 				UTFCommon.LOGGER.info("Applying the {} biome modifiers of the world's preset", modifiers.size());

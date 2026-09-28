@@ -25,8 +25,7 @@ configurations {
         canBeConsumed = false
     }
 
-    // mods the dev runs load like a mods folder would, unremapped: for mods made of nested jars, which the classpath
-    // doesn't unpack. Fabric loader remaps them itself when the game starts.
+    // mods the dev runs load like a mods folder would: for mods made of nested jars, which the classpath doesn't unpack
     devModsFolder {
         canBeResolved = true
         canBeConsumed = false
@@ -35,22 +34,22 @@ configurations {
 }
 
 dependencies {
-    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
-    modApi("net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}") { exclude group: "net.fabricmc", module: "fabric-loader" }
+    implementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+    api("net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}") { exclude group: "net.fabricmc", module: "fabric-loader" }
 
-    common(project(path: ":common", configuration: "namedElements")) { transitive = false }
+    common(project(path: ":common")) { transitive = false }
     shadowBundle(project(path: ":common", configuration: "transformProductionFabric")) { transitive = false }
 
     // Performance mods, in the dev runs only: the ones PerformanceMods lists for Fabric on this version, pinned to
     // Modrinth version ids (the version numbers are shared between loaders). -Putf.perfMods=false leaves them out, to
     // measure or debug UltraTerraForged on its own. See docs/porting/performance-mods.md.
     if (project.findProperty("utf.perfMods") != "false") {
-        // C2ME 0.4.0-alpha.0.29: its modules are nested jars. Not C2ME OpenCL: it needs Java 25, the dev game runs on 21.
-        devModsFolder "maven.modrinth:c2me-fabric:RMHYO1LJ"
-        modLocalRuntime "maven.modrinth:noisiumed:8mNj0Di8"     // Noisiumed 3.0.6
-        modLocalRuntime "maven.modrinth:lithium:N08Z8wog"       // Lithium 0.15.4
-        modLocalRuntime "maven.modrinth:modernfix:NnNX8LBn"     // ModernFix 5.25.1
-        modLocalRuntime "maven.modrinth:sodium:SMxNOGZ6"        // Sodium 0.8.13
+        // C2ME and C2ME OpenCL 0.4.0-alpha.0.62: their modules are nested jars. OpenCL needs Java 25, which 26.1 runs on.
+        devModsFolder "maven.modrinth:c2me-fabric:o1m4A4Rk"
+        devModsFolder "maven.modrinth:c2me-ocl:FIySyMEQ"
+        localRuntime "maven.modrinth:lithium:Oqq8TOAV"          // Lithium 0.24.7
+        localRuntime "maven.modrinth:sodium:tZQ3jqnf"           // Sodium 0.9.2
+        localRuntime "maven.modrinth:voxy:Zt3LPI0b"             // Voxy 0.2.18: level of detail, to see generated terrain from far off
     }
 }
 
@@ -68,18 +67,14 @@ processResources {
     }
 }
 
+// the released jar: nothing to remap since 26.1
 shadowJar {
     exclude "architectury.common.json"
 
     configurations = [project.configurations.shadowBundle]
-    archiveClassifier = "dev-shadow"
-}
-
-remapJar {
-    injectAccessWidener = true
-    inputFile.set shadowJar.archiveFile
     archiveClassifier = "fabric"
 }
+
 
 jar {
     archiveClassifier = "dev"
@@ -119,9 +114,6 @@ loom {
     runs {
         configureEach {
             property "fabric.addMods", devModsDir.get().asFile.absolutePath
-            // the dev game runs LWJGL 3.3.2, which Sodium refuses at startup; launchers ship 3.3.1, so only turn the
-            // check off here
-            property "sodium.checks.issue2561", "false"
         }
         // new worlds in the dev game start in creative with cheats, to fly around and inspect terrain
         client {
@@ -148,8 +140,8 @@ publishing {
         register("maven", MavenPublication) {
             artifactId = "${rootProject.archives_base_name}-${project.name}"
             version = project.ext.mavenVersion
-            artifact(remapJar) {
-                builtBy remapJar
+            artifact(shadowJar) {
+                builtBy shadowJar
                 classifier ""
             }
             artifact(sourcesJar) {

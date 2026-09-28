@@ -15,9 +15,9 @@ import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.GrassBlock;
 import net.minecraft.world.level.block.SnowLayerBlock;
-import net.minecraft.world.level.block.SnowyDirtBlock;
+import net.minecraft.world.level.block.SnowyBlock;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.block.SpreadingSnowyDirtBlock;
+import net.minecraft.world.level.block.SpreadingSnowyBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -60,9 +60,9 @@ public class ErodeSnowFeature extends Feature<Config> {
 		GeneratorContext generatorContext;
 		if((Object) randomState instanceof UTFRandomState utfRandomState && (generatorContext = utfRandomState.generatorContext()) != null) {
 			ChunkGenerator generator = placeContext.chunkGenerator();
-			ChunkPos chunkPos = new ChunkPos(placeContext.origin());
-			int chunkX = chunkPos.x;
-			int chunkZ = chunkPos.z;
+			ChunkPos chunkPos = ChunkPos.containing(placeContext.origin());
+			int chunkX = chunkPos.x();
+			int chunkZ = chunkPos.z();
 			ChunkAccess chunk = level.getChunk(chunkX, chunkZ);
 			Tile.Chunk tileChunk = generatorContext.cache.provideAtChunk(chunkX, chunkZ).getChunkReader(chunkX, chunkZ);
 			com.pandaismyname1.ultraterraforged.world.worldgen.heightmap.Heightmap heightmap = generatorContext.localHeightmap.get();
@@ -171,16 +171,16 @@ public class ErodeSnowFeature extends Feature<Config> {
     	if (!biome.hasPrecipitation()) {
     		return;
     	}
-    	boolean cold = biome.coldEnoughToSnow(pos.offset(0, blocks, 0));
+    	boolean cold = biome.coldEnoughToSnow(pos.offset(0, blocks, 0), level.getSeaLevel());
     	BlockState state = chunk.getBlockState(pos);
     	if (cold && state.isAir()) {
     		BlockState snow = Blocks.SNOW.defaultBlockState();
     		if (snow.canSurvive(level, pos)) {
-    			chunk.setBlockState(pos, snow, false);
+    			chunk.setBlockState(pos, snow, 0);
     			pos.setY(top - 1);
     			BlockState below = chunk.getBlockState(pos);
-    			if (below.hasProperty(SnowyDirtBlock.SNOWY)) {
-    				chunk.setBlockState(pos, below.setValue(SnowyDirtBlock.SNOWY, true), false);
+    			if (below.hasProperty(SnowyBlock.SNOWY)) {
+    				chunk.setBlockState(pos, below.setValue(SnowyBlock.SNOWY, true), 0);
     			}
     		}
     	} else if (!cold && state.is(Blocks.SNOW)) {
@@ -193,13 +193,13 @@ public class ErodeSnowFeature extends Feature<Config> {
     }
 
     private static void erodeSnow(ChunkAccess chunk, BlockPos.MutableBlockPos pos) {
-        chunk.setBlockState(pos, Blocks.AIR.defaultBlockState(), false);
+        chunk.setBlockState(pos, Blocks.AIR.defaultBlockState(), 0);
 
         if (pos.getY() > 0) {
             pos.setY(pos.getY() - 1);
             BlockState below = chunk.getBlockState(pos);
             if (below.hasProperty(GrassBlock.SNOWY)) {
-                chunk.setBlockState(pos, below.setValue(GrassBlock.SNOWY, false), false);
+                chunk.setBlockState(pos, below.setValue(GrassBlock.SNOWY, false), 0);
             }
         }
     }
@@ -213,7 +213,7 @@ public class ErodeSnowFeature extends Feature<Config> {
             if (layer.is(Blocks.AIR)) {
                 return;
             }
-            chunk.setBlockState(pos, layer, false);
+            chunk.setBlockState(pos, layer, 0);
 
            fixBaseBlock(chunk, pos, layer, level);
         }
@@ -224,10 +224,10 @@ public class ErodeSnowFeature extends Feature<Config> {
             pos.move(Direction.DOWN);
             BlockState belowState = chunk.getBlockState(pos);
 
-            if(level > 1 && belowState.getBlock() instanceof SpreadingSnowyDirtBlock) {
-                chunk.setBlockState(pos, Blocks.DIRT.defaultBlockState(), false);
+            if(level > 1 && belowState.getBlock() instanceof SpreadingSnowyBlock) {
+                chunk.setBlockState(pos, Blocks.DIRT.defaultBlockState(), 0);
             } else if(level > 0) {
-                chunk.setBlockState(pos, Blocks.SNOW_BLOCK.defaultBlockState(), false);
+                chunk.setBlockState(pos, Blocks.SNOW_BLOCK.defaultBlockState(), 0);
             }
         }
     }

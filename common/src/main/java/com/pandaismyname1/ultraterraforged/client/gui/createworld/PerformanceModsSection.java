@@ -7,13 +7,14 @@ import java.util.Locale;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -81,7 +82,7 @@ final class PerformanceModsSection {
 	}
 
 	// a small round lamp with a darker rim, 8 pixels across, centred on the given height
-	private static void drawLamp(GuiGraphics graphics, int x, int middle, PerformanceMods.Light light) {
+	private static void drawLamp(GuiGraphicsExtractor graphics, int x, int middle, PerformanceMods.Light light) {
 		int color = color(light);
 		graphics.fill(x + 1, middle - 4, x + 7, middle + 4, 0xFF202020);
 		graphics.fill(x, middle - 3, x + 8, middle + 3, 0xFF202020);
@@ -106,15 +107,15 @@ final class PerformanceModsSection {
 		}
 
 		@Override
-		protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+		protected void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
 			Font font = Minecraft.getInstance().font;
 			int middle = this.getY() + this.height / 2;
 			drawLamp(graphics, this.getX(), middle, this.report.light());
-			graphics.drawString(font, count(this.report), this.getX() + 11, middle - 4, this.isHoveredOrFocused() ? 0xFFFFFFFF : 0xFFA0A0A0);
+			graphics.text(font, count(this.report), this.getX() + 11, middle - 4, this.isHoveredOrFocused() ? 0xFFFFFFFF : 0xFFA0A0A0);
 		}
 
 		@Override
-		public void onClick(double mouseX, double mouseY) {
+		public void onClick(MouseButtonEvent event, boolean doubleClick) {
 			this.show.run();
 		}
 
@@ -143,15 +144,15 @@ final class PerformanceModsSection {
 		}
 
 		@Override
-		protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+		protected void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
 			Font font = Minecraft.getInstance().font;
 			int middle = this.getY() + this.height / 2;
 			int x = this.getX() + 1;
 			int color = color(this.report.light());
 			drawLamp(graphics, x, middle, this.report.light());
-			graphics.drawString(font, this.getMessage().copy().withStyle(ChatFormatting.BOLD), x + 13, middle - 4, 0xFFFFFFFF);
+			graphics.text(font, this.getMessage().copy().withStyle(ChatFormatting.BOLD), x + 13, middle - 4, 0xFFFFFFFF);
 			Component count = count(this.report);
-			graphics.drawString(font, count, this.getX() + this.width - font.width(count) - 2, middle - 4, color);
+			graphics.text(font, count, this.getX() + this.width - font.width(count) - 2, middle - 4, color);
 		}
 
 		@Override
@@ -219,7 +220,7 @@ final class PerformanceModsSection {
 		}
 
 		@Override
-		protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+		protected void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
 			Font font = Minecraft.getInstance().font;
 			if (this.isHoveredOrFocused()) {
 				graphics.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, 0x30FFFFFF);
@@ -227,18 +228,18 @@ final class PerformanceModsSection {
 			int middle = this.getY() + this.height / 2 - 4;
 			boolean installed = this.status.installed() != null;
 			boolean available = this.status.isAvailable();
-			graphics.drawString(font, installed ? "✔" : available ? "○" : "-", this.getX() + 2, middle, installed ? 0xFF55FF55 : available ? 0xFFFFD040 : 0xFF606060);
+			graphics.text(font, installed ? "✔" : available ? "○" : "-", this.getX() + 2, middle, installed ? 0xFF55FF55 : available ? 0xFFFFD040 : 0xFF606060);
 			// an installed stand-in shows under its own name
 			PerformanceMods.Build shown = installed ? this.status.installed() : this.status.recommended();
 			Component name = shown != null && !shown.name().equals(this.status.mod().name())
 				? Component.literal(shown.name()).append(Component.literal(" (" + this.status.mod().name() + ")").withStyle(ChatFormatting.GRAY))
 				: this.getMessage();
-			graphics.drawString(font, name, this.getX() + 13, middle, available ? 0xFFFFFFFF : 0xFF909090);
-			graphics.drawString(font, this.state, this.getX() + this.width - font.width(this.state) - 2, middle, this.stateColor);
+			graphics.text(font, name, this.getX() + 13, middle, available ? 0xFFFFFFFF : 0xFF909090);
+			graphics.text(font, this.state, this.getX() + this.width - font.width(this.state) - 2, middle, this.stateColor);
 		}
 
 		@Override
-		public void onClick(double mouseX, double mouseY) {
+		public void onClick(MouseButtonEvent event, boolean doubleClick) {
 			ConfirmLinkScreen.confirmLinkNow(this.screen, this.url, true);
 		}
 

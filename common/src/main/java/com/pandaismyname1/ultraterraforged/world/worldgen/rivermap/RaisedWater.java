@@ -25,7 +25,7 @@ public final class RaisedWater {
 
 	public static void fill(ChunkAccess chunk, GeneratorContext context) {
 		ChunkPos chunkPos = chunk.getPos();
-		Tile.Chunk cells = context.cache.provideAtChunk(chunkPos.x, chunkPos.z).getChunkReader(chunkPos.x, chunkPos.z);
+		Tile.Chunk cells = context.cache.provideAtChunk(chunkPos.x(), chunkPos.z()).getChunkReader(chunkPos.x(), chunkPos.z());
 		Levels levels = context.levels;
 		int[] surfaces = new int[256];
 		boolean any = false;
@@ -46,7 +46,7 @@ public final class RaisedWater {
 		}
 		int minX = chunkPos.getMinBlockX();
 		int minZ = chunkPos.getMinBlockZ();
-		int bottom = chunk.getMinBuildHeight();
+		int bottom = chunk.getMinY();
 		BlockState water = Blocks.WATER.defaultBlockState();
 		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 		// the top water block of each column, or NONE
@@ -62,7 +62,7 @@ public final class RaisedWater {
 			for (int y = surface; y >= Math.max(bottom, surface - MAX_DEPTH); y--) {
 				BlockState state = chunk.getBlockState(pos.set(x, y, z));
 				if (state.isAir()) {
-					chunk.setBlockState(pos, water, false);
+					chunk.setBlockState(pos, water, 0);
 					tops[i] = Math.max(tops[i], y);
 				} else if (state.getFluidState().isEmpty()) {
 					break;

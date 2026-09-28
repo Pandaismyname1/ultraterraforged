@@ -27,7 +27,8 @@ public class Slider extends AbstractSliderButton {
         this.updateMessage();
     }
     
-    public void setValue(double value) {
+    // sets the position without applying it; not named setValue, which AbstractSliderButton now calls when dragged
+    public void setSliderValue(double value) {
     	this.value = value;
     }
     

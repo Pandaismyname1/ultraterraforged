@@ -100,14 +100,14 @@ final class CaveWorld {
 		ChunkAccess chunk = mock(ChunkAccess.class, org.mockito.Mockito.withSettings().stubOnly());
 		ChunkPos pos = new ChunkPos(chunkX, chunkZ);
 		when(chunk.getPos()).thenReturn(pos);
-		when(chunk.getMinBuildHeight()).thenReturn(BOTTOM);
-		when(chunk.getMaxBuildHeight()).thenReturn(320);
+		when(chunk.getMinY()).thenReturn(BOTTOM);
+		when(chunk.getMaxY()).thenReturn(319);
 		when(chunk.getHeight(any(Heightmap.Types.class), anyInt(), anyInt())).thenAnswer((invocation) -> this.ground(pos.getMinBlockX() + (int) invocation.getArgument(1), pos.getMinBlockZ() + (int) invocation.getArgument(2)));
 		when(chunk.getBlockState(any(BlockPos.class))).thenAnswer((invocation) -> {
 			BlockPos at = invocation.getArgument(0);
 			return this.get(at.getX(), at.getY(), at.getZ());
 		});
-		when(chunk.setBlockState(any(BlockPos.class), any(BlockState.class), anyBoolean())).thenAnswer((invocation) -> {
+		when(chunk.setBlockState(any(BlockPos.class), any(BlockState.class), anyInt())).thenAnswer((invocation) -> {
 			BlockPos at = invocation.getArgument(0);
 			BlockState old = this.get(at.getX(), at.getY(), at.getZ());
 			this.carved.put(at.asLong(), invocation.getArgument(1));

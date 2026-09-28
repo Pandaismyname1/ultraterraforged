@@ -65,7 +65,7 @@ public final class ServerPresets {
 			return false;
 		}
 		String levelType = properties.getProperty("level-type", "").trim().toLowerCase(Locale.ROOT);
-		return levelType.equals(UTFWorldPresets.ULTRATERRAFORGED.location().toString());
+		return levelType.equals(UTFWorldPresets.ULTRATERRAFORGED.identifier().toString());
 	}
 
 	static Preset loadOrCreatePreset(Path file, Supplier<PresetLibrary.Entry> defaultPreset) throws IOException {

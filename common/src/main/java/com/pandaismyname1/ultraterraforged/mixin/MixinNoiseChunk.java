@@ -41,10 +41,6 @@ class MixinNoiseChunk {
 	
 	@Shadow
     @Final
-    private DensityFunction initialDensityNoJaggedness;
-    
-	@Shadow
-    @Final
 	int firstNoiseX;
 	
 	@Shadow
@@ -137,25 +133,5 @@ class MixinNoiseChunk {
 		if((Object) this.randomState instanceof UTFRandomState randomState && function instanceof CellSampler mapped) {
 			callback.setReturnValue(mapped.new CacheChunk(this.chunk, this.cache2d, this.chunkX, this.chunkZ));
 		}
-	}
-	@Redirect(
-		at = @At(
-			value = "INVOKE",
-			target = "Lnet/minecraft/world/level/levelgen/NoiseSettings;height()I"
-		),
-		require = 1,
-		method = "computePreliminarySurfaceLevel"
-	)
-	private int computePreliminarySurfaceLevel(NoiseSettings settings, long packedPos) {
-        int blockX = ColumnPos.getX(packedPos);
-        int blockZ = ColumnPos.getZ(packedPos);
-        int generationHeight;
-		GeneratorContext generatorContext;
-        if((Object) this.randomState instanceof UTFRandomState utfRandomState && (generatorContext = utfRandomState.generatorContext()) != null) {
-        	generationHeight = generatorContext.lookup.getGenerationHeight(SectionPos.blockToSectionCoord(blockX), SectionPos.blockToSectionCoord(blockZ), this.generatorSettings, false);
-        } else {
-        	generationHeight = this.generatorSettings.noiseSettings().height();
-        }
-        return generationHeight;
 	}
 }

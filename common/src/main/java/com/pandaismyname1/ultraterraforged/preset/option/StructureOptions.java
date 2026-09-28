@@ -13,7 +13,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.levelgen.structure.placement.ConcentricRingsStructurePlacement;
 import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement;
@@ -36,12 +36,12 @@ public final class StructureOptions {
 		List<Category> categories = new ArrayList<>();
 		structureSets.listElements()
 			.filter(filter)
-			.sorted(Comparator.comparing((Holder.Reference<StructureSet> holder) -> holder.key().location()))
-			.forEach((holder) -> categories.add(category(holder.key().location(), holder.value())));
+			.sorted(Comparator.comparing((Holder.Reference<StructureSet> holder) -> holder.key().identifier()))
+			.forEach((holder) -> categories.add(category(holder.key().identifier(), holder.value())));
 		return new Page("structures", UTFTranslationKeys.GUI_STRUCTURE_SETTINGS_TITLE, categories);
 	}
 
-	public static Category category(ResourceLocation id, StructureSet set) {
+	public static Category category(Identifier id, StructureSet set) {
 		String path = "structures." + id + ".";
 		StructurePlacement placement = set.placement();
 		List<Option<?>> options = new ArrayList<>();
@@ -97,7 +97,7 @@ public final class StructureOptions {
 	}
 
 	// "minecraft:woodland_mansions" becomes "Woodland Mansions", modded sets keep their namespace
-	public static Component displayName(ResourceLocation id) {
+	public static Component displayName(Identifier id) {
 		StringBuilder name = new StringBuilder();
 		for (String word : id.getPath().replace('/', ' ').replace('_', ' ').split(" ")) {
 			if (word.isEmpty()) {
@@ -109,13 +109,13 @@ public final class StructureOptions {
 			name.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1));
 		}
 		MutableComponent component = Component.literal(name.toString());
-		if (!id.getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE)) {
+		if (!id.getNamespace().equals(Identifier.DEFAULT_NAMESPACE)) {
 			component.append(Component.literal(" (" + id.getNamespace() + ")").withStyle(ChatFormatting.GRAY));
 		}
 		return component;
 	}
 
-	private static IntOption ringOption(ResourceLocation id, String path, String translationKey, int min, int max, int registered, Predicate<Preset> isEnabled, Function<StructureSetEntry, Integer> getter, BiConsumer<StructureSetEntry, Integer> setter) {
+	private static IntOption ringOption(Identifier id, String path, String translationKey, int min, int max, int registered, Predicate<Preset> isEnabled, Function<StructureSetEntry, Integer> getter, BiConsumer<StructureSetEntry, Integer> setter) {
 		return IntOption.builder(path)
 			.translation(translationKey)
 			.range(min, Math.max(max, registered))
@@ -124,11 +124,11 @@ public final class StructureOptions {
 			.build();
 	}
 
-	private static <T> T entry(Preset preset, ResourceLocation id, Function<StructureSetEntry, T> getter, T registered) {
+	private static <T> T entry(Preset preset, Identifier id, Function<StructureSetEntry, T> getter, T registered) {
 		return preset.structures().get(id).map(getter).orElse(registered);
 	}
 
-	private static <T> void override(Preset preset, ResourceLocation id, BiConsumer<StructureSetEntry, T> setter, T value, T registered) {
+	private static <T> void override(Preset preset, Identifier id, BiConsumer<StructureSetEntry, T> setter, T value, T registered) {
 		StructureSettings structures = preset.structures();
 		setter.accept(structures.getOrCreate(id), Objects.equals(value, registered) ? null : value);
 		structures.clean(id);

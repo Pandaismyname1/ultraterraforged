@@ -23,6 +23,7 @@ import com.pandaismyname1.ultraterraforged.UTFCommon;
 import com.pandaismyname1.ultraterraforged.client.ClientConfig;
 import com.pandaismyname1.ultraterraforged.client.data.UTFTranslationKeys;
 import com.pandaismyname1.ultraterraforged.client.gui.createworld.PresetApplier;
+import com.pandaismyname1.ultraterraforged.client.gui.createworld.TerrainPreview;
 import com.pandaismyname1.ultraterraforged.client.gui.createworld.TerrainState;
 import com.pandaismyname1.ultraterraforged.client.gui.createworld.TerrainTab;
 
@@ -30,7 +31,7 @@ import com.pandaismyname1.ultraterraforged.client.gui.createworld.TerrainTab;
 abstract class MixinCreateWorldScreen extends Screen implements TerrainState.Holder {
 	@Shadow
 	@Final
-	WorldCreationUiState uiState;
+	private WorldCreationUiState uiState;
 	@Shadow
 	private boolean recreated;
 	@Shadow
@@ -96,7 +97,7 @@ abstract class MixinCreateWorldScreen extends Screen implements TerrainState.Hol
 		} catch (IOException | RuntimeException e) {
 			UTFCommon.LOGGER.error("Couldn't prepare the UltraTerraForged preset", e);
 			state.setPendingSelection(null);
-			SystemToast.addOrUpdate(this.minecraft.getToasts(), SystemToast.SystemToastId.PACK_LOAD_FAILURE, Component.translatable(UTFTranslationKeys.GUI_TERRAIN_TAB_APPLY_FAILED), Component.literal(String.valueOf(e.getMessage())));
+			SystemToast.addOrUpdate(this.minecraft.getToastManager(), SystemToast.SystemToastId.PACK_LOAD_FAILURE, Component.translatable(UTFTranslationKeys.GUI_TERRAIN_TAB_APPLY_FAILED), Component.literal(String.valueOf(e.getMessage())));
 			callback.cancel();
 		}
 	}
@@ -111,13 +112,20 @@ abstract class MixinCreateWorldScreen extends Screen implements TerrainState.Hol
 		this.ultraterraforged$createOncePresetLoaded();
 	}
 
+	// the preview texture is shared by the Terrain tab and the editor, which only open from this screen
+	@Override
+	public void removed() {
+		super.removed();
+		TerrainPreview.releaseTexture();
+	}
+
 	@Unique
 	private void ultraterraforged$createOncePresetLoaded() {
 		TerrainState state = this.ultraterraforged$getTerrainState();
 		if (PresetApplier.isReadyToCreate(state)) {
 			state.setPendingSelection(null);
 			// creating the world replaces this screen, which mustn't happen while it's ticking
-			this.minecraft.tell(() -> {
+			this.minecraft.schedule(() -> {
 				if (this.minecraft.screen == (Object) this) {
 					this.onCreate();
 				}

@@ -47,11 +47,11 @@ public final class CaveCarving {
 		this.context = context;
 		this.levels = context.levels;
 		ChunkPos chunkPos = chunk.getPos();
-		this.chunkX = chunkPos.x;
-		this.chunkZ = chunkPos.z;
+		this.chunkX = chunkPos.x();
+		this.chunkZ = chunkPos.z();
 		this.minX = chunkPos.getMinBlockX();
 		this.minZ = chunkPos.getMinBlockZ();
-		this.bottom = chunk.getMinBuildHeight();
+		this.bottom = chunk.getMinY();
 		for (int dz = 0; dz < 16; dz++) {
 			for (int dx = 0; dx < 16; dx++) {
 				this.ground[dz << 4 | dx] = chunk.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, dx, dz);
@@ -150,7 +150,7 @@ public final class CaveCarving {
 		}
 		BlockState fill = y <= water ? WATER : AIR;
 		if (state != fill) {
-			this.chunk.setBlockState(this.pos, fill, false);
+			this.chunk.setBlockState(this.pos, fill, 0);
 		}
 	}
 
@@ -186,7 +186,7 @@ public final class CaveCarving {
 					if (state.isAir() || state.is(Blocks.BEDROCK) || !state.getFluidState().isEmpty()) {
 						continue;
 					}
-					this.chunk.setBlockState(this.pos, lining.at(x, y, z), false);
+					this.chunk.setBlockState(this.pos, lining.at(x, y, z), 0);
 				}
 			}
 		}
@@ -204,7 +204,7 @@ public final class CaveCarving {
 	}
 
 	public void set(int x, int y, int z, BlockState state) {
-		this.chunk.setBlockState(this.pos.set(x, y, z), state, false);
+		this.chunk.setBlockState(this.pos.set(x, y, z), state, 0);
 	}
 
 	// whether a block is in this chunk

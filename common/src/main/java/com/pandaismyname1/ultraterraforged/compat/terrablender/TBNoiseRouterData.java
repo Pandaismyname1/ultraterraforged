@@ -3,14 +3,14 @@ package com.pandaismyname1.ultraterraforged.compat.terrablender;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.DensityFunction;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.CellField;
 import com.pandaismyname1.ultraterraforged.world.worldgen.densityfunction.UTFDensityFunctions;
 import terrablender.core.TerraBlender;
 
 public class TBNoiseRouterData {
-	public static final ResourceKey<DensityFunction> UNIQUENESS = ResourceKey.create(Registries.DENSITY_FUNCTION, ResourceLocation.fromNamespaceAndPath(TerraBlender.MOD_ID, "uniqueness"));
+	public static final ResourceKey<DensityFunction> UNIQUENESS = ResourceKey.create(Registries.DENSITY_FUNCTION, Identifier.fromNamespaceAndPath(TerraBlender.MOD_ID, "uniqueness"));
 	
 	public static void bootstrap(BootstrapContext<DensityFunction> ctx) {
 		ctx.register(UNIQUENESS, UTFDensityFunctions.cell(CellField.BIOME_REGION));

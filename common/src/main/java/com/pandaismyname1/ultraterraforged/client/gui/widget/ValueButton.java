@@ -6,7 +6,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
-public class ValueButton<T> extends Button {
+public class ValueButton<T> extends Button.Plain {
 	private Component name;
 	private T value;
 	

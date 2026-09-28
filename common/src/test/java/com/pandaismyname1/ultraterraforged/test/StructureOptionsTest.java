@@ -17,7 +17,7 @@ import com.mojang.serialization.JsonOps;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.registries.VanillaRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 import com.pandaismyname1.ultraterraforged.preset.option.BoolOption;
 import com.pandaismyname1.ultraterraforged.preset.option.Category;
@@ -27,7 +27,7 @@ import com.pandaismyname1.ultraterraforged.preset.option.Page;
 import com.pandaismyname1.ultraterraforged.preset.option.StructureOptions;
 
 public class StructureOptionsTest {
-	private static final ResourceLocation VILLAGES = ResourceLocation.parse("villages");
+	private static final Identifier VILLAGES = Identifier.parse("villages");
 	private static Map<String, Option<?>> options;
 
 	@BeforeAll
@@ -80,8 +80,8 @@ public class StructureOptionsTest {
 
 	@Test
 	void displayNamesAreReadable() {
-		assertEquals("Woodland Mansions", StructureOptions.displayName(ResourceLocation.parse("woodland_mansions")).getString());
-		assertEquals("Big Towers (somemod)", StructureOptions.displayName(ResourceLocation.fromNamespaceAndPath("somemod", "big_towers")).getString());
+		assertEquals("Woodland Mansions", StructureOptions.displayName(Identifier.parse("woodland_mansions")).getString());
+		assertEquals("Big Towers (somemod)", StructureOptions.displayName(Identifier.fromNamespaceAndPath("somemod", "big_towers")).getString());
 	}
 
 	@Test
@@ -93,7 +93,7 @@ public class StructureOptionsTest {
 		Preset preset = Preset.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow((error) -> new AssertionError(error));
 		assertEquals(40, preset.structures().get(VILLAGES).orElseThrow().spacing);
 		assertEquals(null, preset.structures().get(VILLAGES).orElseThrow().enabled);
-		assertEquals(Boolean.FALSE, preset.structures().get(ResourceLocation.parse("igloos")).orElseThrow().enabled);
+		assertEquals(Boolean.FALSE, preset.structures().get(Identifier.parse("igloos")).orElseThrow().enabled);
 	}
 
 	private static Preset preset() {

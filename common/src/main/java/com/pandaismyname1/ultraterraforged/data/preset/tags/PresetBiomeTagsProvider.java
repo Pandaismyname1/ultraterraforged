@@ -6,14 +6,14 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.tags.TagsProvider;
+import net.minecraft.data.tags.KeyTagProvider;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.MiscellaneousSettings;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 import com.pandaismyname1.ultraterraforged.tags.UTFBiomeTags;
 
-public class PresetBiomeTagsProvider extends TagsProvider<Biome> {
+public class PresetBiomeTagsProvider extends KeyTagProvider<Biome> {
 	private Preset preset;
 	
 	public PresetBiomeTagsProvider(Preset preset, PackOutput packOutput, CompletableFuture<Provider> completableFuture) {

@@ -10,18 +10,18 @@ import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * Per structure set overrides. Only changed sets are stored, and within a set only the changed values; everything
  * else comes from the structure set as registered by vanilla, the datapacks and other mods.
  */
 public class StructureSettings {
-	public static final Codec<StructureSettings> CODEC = Codec.unboundedMap(ResourceLocation.CODEC, StructureSetEntry.CODEC).xmap(StructureSettings::new, (settings) -> new TreeMap<>(settings.entries));
+	public static final Codec<StructureSettings> CODEC = Codec.unboundedMap(Identifier.CODEC, StructureSetEntry.CODEC).xmap(StructureSettings::new, (settings) -> new TreeMap<>(settings.entries));
 
-	public final Map<ResourceLocation, StructureSetEntry> entries;
+	public final Map<Identifier, StructureSetEntry> entries;
 
-	public StructureSettings(Map<ResourceLocation, StructureSetEntry> entries) {
+	public StructureSettings(Map<Identifier, StructureSetEntry> entries) {
 		this.entries = new HashMap<>();
 		entries.forEach((key, entry) -> this.entries.put(key, entry.copy()));
 	}
@@ -30,16 +30,16 @@ public class StructureSettings {
 		this(Map.of());
 	}
 
-	public Optional<StructureSetEntry> get(ResourceLocation set) {
+	public Optional<StructureSetEntry> get(Identifier set) {
 		return Optional.ofNullable(this.entries.get(set));
 	}
 
-	public StructureSetEntry getOrCreate(ResourceLocation set) {
+	public StructureSetEntry getOrCreate(Identifier set) {
 		return this.entries.computeIfAbsent(set, (key) -> new StructureSetEntry());
 	}
 
 	// drops the entry once it no longer overrides anything, so reset sets don't linger in the file
-	public void clean(ResourceLocation set) {
+	public void clean(Identifier set) {
 		StructureSetEntry entry = this.entries.get(set);
 		if (entry != null && entry.isEmpty()) {
 			this.entries.remove(set);

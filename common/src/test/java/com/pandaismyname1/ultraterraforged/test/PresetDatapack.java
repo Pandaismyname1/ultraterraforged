@@ -20,7 +20,7 @@ import net.minecraft.data.registries.VanillaRegistries;
 import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 import com.pandaismyname1.ultraterraforged.registries.UTFRegistries;
 import com.pandaismyname1.ultraterraforged.world.worldgen.biome.modifier.BiomeModifier;
@@ -64,7 +64,7 @@ public final class PresetDatapack {
 	private static <T> void dump(HolderLookup.Provider provider, RegistryOps<JsonElement> ops, ResourceKey<? extends Registry<?>> registryKey, Codec<?> codec, Map<String, JsonElement> files, List<String> errors) {
 		provider.lookup((ResourceKey<? extends Registry<T>>) registryKey).ifPresent((lookup) -> {
 			lookup.listElements().forEach((Holder.Reference<T> holder) -> {
-				String path = path(registryKey.location(), holder.key().location());
+				String path = path(registryKey.identifier(), holder.key().identifier());
 				DataResult<JsonElement> result = ((Codec<T>) codec).encodeStart(ops, holder.value());
 				result.error().ifPresent((error) -> errors.add(path + ": " + error.message()));
 				result.result().ifPresent((json) -> files.put(path, json));
@@ -73,8 +73,8 @@ public final class PresetDatapack {
 	}
 
 	// data/<namespace>/<registry>/<path>.json, with non-vanilla registries prefixed by their namespace
-	public static String path(ResourceLocation registry, ResourceLocation element) {
-		String registryPath = registry.getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE) ? registry.getPath() : registry.getNamespace() + "/" + registry.getPath();
+	public static String path(Identifier registry, Identifier element) {
+		String registryPath = registry.getNamespace().equals(Identifier.DEFAULT_NAMESPACE) ? registry.getPath() : registry.getNamespace() + "/" + registry.getPath();
 		return "data/" + element.getNamespace() + "/" + registryPath + "/" + element.getPath() + ".json";
 	}
 

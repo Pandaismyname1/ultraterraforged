@@ -4,11 +4,12 @@ import java.nio.file.Files;
 import java.util.function.Consumer;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.toasts.SystemToast.SystemToastId;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import com.pandaismyname1.ultraterraforged.UTFCommon;
@@ -86,20 +87,20 @@ public class SavePresetScreen extends Screen {
 	}
 
 	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+	public boolean keyPressed(KeyEvent event) {
 		// enter saves
-		if ((keyCode == 257 || keyCode == 335) && this.save.active) {
+		if ((event.key() == 257 || event.key() == 335) && this.save.active) {
 			this.save();
 			return true;
 		}
-		return super.keyPressed(keyCode, scanCode, modifiers);
+		return super.keyPressed(event);
 	}
 
 	@Override
-	public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-		super.render(graphics, mouseX, mouseY, partialTick);
-		graphics.drawCenteredString(this.font, this.title, this.width / 2, this.height / 2 - 60, 0xFFFFFF);
-		graphics.drawCenteredString(this.font, this.hint, this.width / 2, this.height / 2 - 4, 0xFFFFFF);
+	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+		super.extractRenderState(graphics, mouseX, mouseY, partialTick);
+		graphics.centeredText(this.font, this.title, this.width / 2, this.height / 2 - 60, 0xFFFFFFFF);
+		graphics.centeredText(this.font, this.hint, this.width / 2, this.height / 2 - 4, 0xFFFFFFFF);
 	}
 
 	@Override

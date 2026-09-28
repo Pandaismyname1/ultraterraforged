@@ -22,7 +22,7 @@ public class BlockReader implements BlockGetter {
 	}
 
 	@Override
-	public int getMinBuildHeight() {
+	public int getMinY() {
 		return 0;
 	}
 

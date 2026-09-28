@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -36,9 +36,13 @@ public class WidgetList<T extends AbstractWidget> extends ContainerObjectSelecti
     	this.renderSelected = renderSelected;
     }
     
+    // entries of a container list aren't selectable, so the outline is drawn here
     @Override
-    protected boolean isSelectedItem(int i) {
-        return this.renderSelected && Objects.equals(this.getSelected(), this.children().get(i));
+    protected void extractItem(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks, Entry<T> entry) {
+        if (this.renderSelected && Objects.equals(this.getSelected(), entry)) {
+            this.extractSelection(graphics, entry, this.isFocused() ? 0xFFFFFFFF : 0xFF808080);
+        }
+        super.extractItem(graphics, mouseX, mouseY, partialTicks, entry);
     }
 
     @Override
@@ -47,8 +51,8 @@ public class WidgetList<T extends AbstractWidget> extends ContainerObjectSelecti
     }
 
     @Override
-    protected int getScrollbarPosition() {
-        return this.getRowRight();
+    protected int scrollBarX() {
+        return this.getRowRight() + 2;
     }
 
     public static class Entry<T extends AbstractWidget> extends ContainerObjectSelectionList.Entry<Entry<T>> {
@@ -68,15 +72,20 @@ public class WidgetList<T extends AbstractWidget> extends ContainerObjectSelecti
         }
 
         @Override
-        public void render(GuiGraphics guiGraphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean hovered, float partialTicks) {
+        public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean hovered, float partialTicks) {
+            // the same area 1.21.1 passed to render
+            int left = this.getContentX();
+            int top = this.getContentY();
+            int width = this.getWidth();
+            int height = this.getContentHeight();
             int optionWidth = Math.min(396, width);
             int padding = (width - optionWidth) / 2;
             widget.setX(left + padding);
             widget.setY(top);
             widget.visible = true;
             widget.setWidth(optionWidth);
-            widget.height = height - 1;	
-            widget.render(guiGraphics, mouseX, mouseY, partialTicks);
+            widget.height = height - 1;
+            widget.extractRenderState(graphics, mouseX, mouseY, partialTicks);
         }
 
 		@Override

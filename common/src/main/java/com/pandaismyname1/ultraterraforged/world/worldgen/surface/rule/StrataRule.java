@@ -16,7 +16,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.util.RandomSource;
@@ -43,9 +43,9 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.surface.UTFSurfaceSyst
  * @param excluded rocks never to layer, even though a mod tagged them as stone
  * @param base the main rock, like stone above deepslate, which fills about {@code baseShare} of the layers
  */
-public record StrataRule(ResourceLocation cacheId, Holder<Noise> selector, Holder<Noise> offset, Holder<Noise> thickness, Block base, float baseShare, TagKey<Block> materials, TagKey<Block> excluded, int variants, int minThickness, int maxThickness) implements SurfaceRules.RuleSource {
+public record StrataRule(Identifier cacheId, Holder<Noise> selector, Holder<Noise> offset, Holder<Noise> thickness, Block base, float baseShare, TagKey<Block> materials, TagKey<Block> excluded, int variants, int minThickness, int maxThickness) implements SurfaceRules.RuleSource {
 	public static final Codec<StrataRule> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-		ResourceLocation.CODEC.fieldOf("cache_id").forGetter(StrataRule::cacheId),
+		Identifier.CODEC.fieldOf("cache_id").forGetter(StrataRule::cacheId),
 		Noise.CODEC.fieldOf("selector").forGetter(StrataRule::selector),
 		Noise.CODEC.fieldOf("offset").forGetter(StrataRule::offset),
 		Noise.CODEC.fieldOf("thickness").forGetter(StrataRule::thickness),
@@ -69,8 +69,9 @@ public record StrataRule(ResourceLocation cacheId, Holder<Noise> selector, Holde
 		if (!((Object) ctx.system instanceof UTFSurfaceSystem surfaceSystem) || !((Object) ctx.randomState instanceof UTFRandomState randomState)) {
 			throw new IllegalStateException("Strata need UltraTerraForged's surface system");
 		}
-		int bottom = ctx.chunk.getMinBuildHeight();
-		int height = ctx.chunk.getMaxBuildHeight() - bottom + MARGIN * 2;
+		int bottom = ctx.chunk.getMinY();
+		// getMaxY() is the top block, one below what getMaxBuildHeight() was
+		int height = ctx.chunk.getMaxY() + 1 - bottom + MARGIN * 2;
 		List<StrataStack> stacks = surfaceSystem.getOrCreateStrata(this.cacheId, (random) -> this.generate(random, height));
 		// the noises are seeded by the world, so every world has its own regions and folds
 		return new Rule(stacks, bottom, randomState.wrap(this.selector.value()), randomState.wrap(this.offset.value()), randomState.wrap(this.thickness.value()));
@@ -98,7 +99,7 @@ public record StrataRule(ResourceLocation cacheId, Holder<Noise> selector, Holde
 	 */
 	private List<BlockState> findMaterials() {
 		Set<Block> blocks = new TreeSet<>(Comparator.comparing((Block block) -> BuiltInRegistries.BLOCK.getKey(block)));
-		BuiltInRegistries.BLOCK.getTag(this.materials).ifPresent((tag) -> tag.forEach((holder) -> blocks.add(holder.value())));
+		BuiltInRegistries.BLOCK.getTagOrEmpty(this.materials).forEach((holder) -> blocks.add(holder.value()));
 		List<BlockState> materials = new ArrayList<>();
 		for (Block block : blocks) {
 			BlockState state = block.defaultBlockState();

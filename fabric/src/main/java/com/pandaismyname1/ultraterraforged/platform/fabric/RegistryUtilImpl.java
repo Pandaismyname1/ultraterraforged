@@ -16,7 +16,7 @@ public class RegistryUtilImpl {
 
 	@SuppressWarnings("unchecked")
 	public static <T> Registry<T> createRegistry(ResourceKey<? extends Registry<T>> key) {
-		return FabricRegistryBuilder.createSimple((ResourceKey<Registry<T>>) key).buildAndRegister();
+		return FabricRegistryBuilder.create((ResourceKey<Registry<T>>) key).buildAndRegister();
 	}
 
 	public static <T> void createDataRegistry(ResourceKey<? extends Registry<T>> key, Codec<T> codec) {

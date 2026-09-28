@@ -1,6 +1,6 @@
 plugins {
     id "architectury-plugin" version "3.5.170"
-    id "dev.architectury.loom" version "1.17.493" apply false
+    id "dev.architectury.loom-no-remap" version "1.17.493" apply false
     id "com.gradleup.shadow" version "9.6.1" apply false
 }
 
@@ -8,16 +8,12 @@ architectury {
     minecraft = rootProject.minecraft_version
 }
 
+// 26.1 is the first Minecraft without obfuscation: no mappings, nothing to remap
 subprojects {
-    apply plugin: "dev.architectury.loom"
-
-    loom {
-        silentMojangMappingsLicense()
-    }
+    apply plugin: "dev.architectury.loom-no-remap"
 
     dependencies {
         minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
-        mappings loom.officialMojangMappings()
     }
 }
 

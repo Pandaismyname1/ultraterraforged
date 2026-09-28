@@ -5,11 +5,11 @@ import net.neoforged.fml.loading.FMLLoader;
 public class ModLoaderUtilImpl {
 	
 	public static boolean isLoaded(String modId) {
-		return FMLLoader.getLoadingModList().getModFileById(modId) != null;
+		return FMLLoader.getCurrent().getLoadingModList().getModFileById(modId) != null;
 	}
 
 	public static boolean isDedicatedServer() {
-		return FMLLoader.getDist().isDedicatedServer();
+		return FMLLoader.getCurrent().getDist().isDedicatedServer();
 	}
 
 	public static String loaderName() {

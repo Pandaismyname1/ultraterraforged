@@ -1,9 +1,11 @@
 package com.pandaismyname1.ultraterraforged.mixin;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 import net.minecraft.core.HolderSet;
@@ -17,7 +19,13 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 public interface MixinBiomeGenerationSettings {
 	@Accessor
 	List<HolderSet<PlacedFeature>> getFeatures();
-	
+
+	// what vanilla works out once from the features, and has to be worked out again when they change
+	@Mutable
 	@Accessor
-	void setFlowerFeatures(Supplier<List<ConfiguredFeature<?, ?>>> flowerFeatures);
+	void setBoneMealFeatures(Supplier<List<ConfiguredFeature<?, ?>>> boneMealFeatures);
+
+	@Mutable
+	@Accessor
+	void setFeatureSet(Supplier<Set<PlacedFeature>> featureSet);
 }

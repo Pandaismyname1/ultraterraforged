@@ -54,12 +54,8 @@ public final class PresetRenderer {
 		int size = tile.getBlockSize().size();
 		BufferedImage image = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
 		tile.iterate((cell, x, z) -> {
-			// RenderMode packs colors as ABGR for NativeImage
-			int abgr = mode.getColor(cell, levels);
-			int r = abgr & 0xFF;
-			int g = (abgr >> 8) & 0xFF;
-			int b = (abgr >> 16) & 0xFF;
-			image.setRGB(x, z, (r << 16) | (g << 8) | b);
+			// RenderMode packs colors as ARGB, as NativeImage takes them since 1.21.2
+			image.setRGB(x, z, mode.getColor(cell, levels) & 0xFFFFFF);
 		});
 		Files.createDirectories(path.getParent());
 		ImageIO.write(image, "png", path.toFile());

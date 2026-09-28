@@ -44,7 +44,7 @@ abstract class MixinContext {
 	    	
 	    	for(int x = -1; x <= 1; x++) {
 	    		for(int z = -1; z <= 1; z++) {
-	    			ChunkAccess chunk = region.getChunk(centerPos.x + x, centerPos.z + z);
+	    			ChunkAccess chunk = region.getChunk(centerPos.x() + x, centerPos.z() + z);
 	    			
 	    			for(LevelChunkSection section : chunk.getSections()) {
 	    				section.getBiomes().getAll((biome) -> {

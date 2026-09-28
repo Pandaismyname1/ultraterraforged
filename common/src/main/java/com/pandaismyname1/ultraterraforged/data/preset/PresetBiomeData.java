@@ -11,7 +11,6 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import com.pandaismyname1.ultraterraforged.UTFCommon;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.MiscellaneousSettings;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
-import com.pandaismyname1.ultraterraforged.world.worldgen.biome.UTFBiomes;
 
 public final class PresetBiomeData {
     public static final ResourceKey<Biome> BRYCE = createKey("bryce");

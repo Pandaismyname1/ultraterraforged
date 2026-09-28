@@ -10,7 +10,7 @@ import com.mojang.serialization.Codec;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
@@ -38,7 +38,7 @@ public final class RegistryUtilImpl {
 
 	public static <T> void register(Registry<T> registry, String name, T value) {
 		ResourceKey<? extends Registry<T>> key = registry.key();
-		ENTRIES.computeIfAbsent(key, (k) -> Collections.synchronizedList(new ArrayList<>())).add(new Entry<>(key, UTFRegistries.createKey(key, name).location(), value));
+		ENTRIES.computeIfAbsent(key, (k) -> Collections.synchronizedList(new ArrayList<>())).add(new Entry<>(key, UTFRegistries.createKey(key, name).identifier(), value));
 	}
 
 	public static <T> Registry<T> createRegistry(ResourceKey<? extends Registry<T>> key) {
@@ -51,7 +51,7 @@ public final class RegistryUtilImpl {
 		DATA_REGISTRIES.add(new DataRegistry<>(key, codec));
 	}
 
-	private record Entry<T>(ResourceKey<? extends Registry<T>> registry, ResourceLocation name, T value) {
+	private record Entry<T>(ResourceKey<? extends Registry<T>> registry, Identifier name, T value) {
 
 		void register(RegisterEvent event) {
 			event.register(this.registry, this.name, this::value);

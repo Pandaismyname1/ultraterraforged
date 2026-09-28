@@ -25,7 +25,7 @@ abstract class CellCondition extends LazyXZCondition {
 		//TODO store this in SurfaceRules$Context instead so we can cache the chunk lookup
 		if((Object) context.randomState instanceof UTFRandomState randomState && (this.generatorContext = randomState.generatorContext()) != null) {
 			ChunkPos chunkPos = context.chunk.getPos();
-			this.chunk = this.generatorContext.cache.provideChunk(chunkPos.x, chunkPos.z);
+			this.chunk = this.generatorContext.cache.provideChunk(chunkPos.x(), chunkPos.z());
 		}
 		this.lastXZ = Long.MIN_VALUE;
 	}

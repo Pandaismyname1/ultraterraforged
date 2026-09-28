@@ -24,7 +24,7 @@ public class PresetBlockTagsTest {
 	@Test
 	void tagsGenerateOnTheirOwn(@TempDir Path dir) throws Exception {
 		TestBootstrap.init();
-		DataGenerator generator = new DataGenerator(dir.resolve("cache"), SharedConstants.getCurrentVersion(), true);
+		DataGenerator generator = new DataGenerator.Cached(dir.resolve("cache"), SharedConstants.getCurrentVersion(), true);
 		DataGenerator.PackGenerator pack = generator.new PackGenerator(true, "preset", new PackOutput(dir.resolve("pack")));
 		pack.addProvider((output) -> new PresetBlockTagsProvider(output, CompletableFuture.completedFuture(VanillaRegistries.createLookup())));
 		generator.run();

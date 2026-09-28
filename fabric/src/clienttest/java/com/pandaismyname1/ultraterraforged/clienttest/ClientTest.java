@@ -15,6 +15,7 @@ import com.mojang.blaze3d.platform.NativeImage;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.Screenshot;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.AbstractButton;
@@ -86,7 +87,7 @@ public class ClientTest implements ClientModInitializer {
 			ClientTickEvents.END_CLIENT_TICK.register((client) -> this.tick());
 			return;
 		}
-		this.step("title screen", () -> mc.screen instanceof TitleScreen, 40, () -> CreateWorldScreen.openFresh(mc, mc.screen));
+		this.step("title screen", () -> mc.screen instanceof TitleScreen, 40, () -> CreateWorldScreen.openFresh(mc, () -> mc.setScreen(new TitleScreen())));
 		this.step("create world screen", () -> mc.screen instanceof CreateWorldScreen, 20, () -> {
 			CreateWorldScreen screen = (CreateWorldScreen) mc.screen;
 			this.log("default world type: " + screen.getUiState().getWorldType().describePreset().getString());
@@ -97,23 +98,23 @@ public class ClientTest implements ClientModInitializer {
 		this.step("terrain tab", () -> true, 80, () -> {
 			this.screenshot("02_terrain_tab");
 			this.log("widgets: " + this.describeWidgets(mc.screen));
-			this.button(mc.screen, "Preset").onPress();
+			this.button(mc.screen, "Preset").onPress(PRESS);
 		});
 		this.step("next preset", () -> true, 80, () -> {
 			TerrainState state = TerrainState.of((CreateWorldScreen) mc.screen);
 			this.log("preset after cycling: " + state.name().getString());
 			this.screenshot("03_next_preset");
-			this.button(mc.screen, "Copy Code").onPress();
+			this.button(mc.screen, "Copy Code").onPress(PRESS);
 			String code = mc.keyboardHandler.getClipboard();
 			this.log("share code: " + code.substring(0, Math.min(12, code.length())) + "... (" + code.length() + " characters)");
-			this.button(mc.screen, "Paste Code").onPress();
+			this.button(mc.screen, "Paste Code").onPress(PRESS);
 			this.log("after pasting: preset " + state.name().getString() + ", edited " + state.isEdited());
 			PresetOptions.CONTINENT_SCALE.set(state.preset(), 900);
 			state.markEdited();
 		});
 		this.step("edited", () -> true, 80, () -> {
 			this.screenshot("04_small_continents");
-			this.button(mc.screen, "Advanced").onPress();
+			this.button(mc.screen, "Advanced").onPress(PRESS);
 		});
 		this.step("advanced editor", () -> mc.screen instanceof PresetConfigScreen, 40, () -> {
 			this.screenshot("05_advanced_world");
@@ -123,34 +124,34 @@ public class ClientTest implements ClientModInitializer {
 		this.step("search", () -> true, 40, () -> {
 			this.screenshot("06_search_river");
 			this.searchBox(mc.screen).setValue("");
-			this.button(mc.screen, "Page").onPress();
-			this.button(mc.screen, "Page").onPress();
+			this.button(mc.screen, "Page").onPress(PRESS);
+			this.button(mc.screen, "Page").onPress(PRESS);
 		});
 		this.step("caves page", () -> true, 40, () -> {
 			this.screenshot("07_advanced_caves");
 			for (int i = 0; i < 5; i++) {
-				this.button(mc.screen, "Page").onPress();
+				this.button(mc.screen, "Page").onPress(PRESS);
 			}
 		});
 		this.step("structures page", () -> true, 40, () -> {
 			this.screenshot("08_advanced_structures");
-			this.button(mc.screen, "Save As").onPress();
+			this.button(mc.screen, "Save As").onPress(PRESS);
 		});
 		this.step("save preset screen", () -> mc.screen instanceof SavePresetScreen, 20, () -> {
 			this.searchBox(mc.screen).setValue(SAVED_PRESET);
 			this.screenshot("09_save_preset");
-			this.button(mc.screen, "Save").onPress();
+			this.button(mc.screen, "Save").onPress(PRESS);
 		});
 		this.step("saved", () -> mc.screen instanceof PresetConfigScreen, 20, () -> {
 			this.log("saved preset file exists: " + Files.exists(PresetSharing.presetFolder().resolve(SAVED_PRESET + ".json")));
-			((PresetConfigScreen) mc.screen).doneButton.onPress();
+			((PresetConfigScreen) mc.screen).doneButton.onPress(PRESS);
 		});
 		this.step("back from editor", () -> mc.screen instanceof CreateWorldScreen, 20, () -> {
 			CreateWorldScreen screen = (CreateWorldScreen) mc.screen;
 			TerrainState state = TerrainState.of(screen);
 			this.log("after editor: preset " + state.name().getString() + ", continent scale " + PresetOptions.CONTINENT_SCALE.get(state.preset()) + ", edited " + state.isEdited());
 			this.screenshot("10_back_in_terrain_tab");
-			this.button(screen, "Create New World").onPress();
+			this.button(screen, "Create New World").onPress(PRESS);
 		});
 		this.step("world loaded", () -> mc.level != null && mc.player != null, 200, () -> {
 			this.screenshot("11_in_world");
@@ -197,8 +198,8 @@ public class ClientTest implements ClientModInitializer {
 			IntegratedServer server = mc.getSingleplayerServer();
 			this.log("worldgen settings lifecycle: " + server.getWorldData().worldGenSettingsLifecycle());
 			this.worldFolder = server.getWorldPath(LevelResource.ROOT).toAbsolutePath().normalize().getFileName().toString();
-			mc.level.disconnect();
-			mc.disconnect(new GenericMessageScreen(Component.literal("leaving")));
+			mc.level.disconnect(Component.literal("leaving"));
+			mc.disconnectWithSavingScreen();
 			mc.setScreen(new TitleScreen());
 		});
 		this.step("back at title", () -> mc.level == null && mc.screen instanceof TitleScreen, 40, () -> {
@@ -217,10 +218,10 @@ public class ClientTest implements ClientModInitializer {
 	}
 
 	private void tour(Minecraft mc) {
-		this.step("title screen", () -> mc.screen instanceof TitleScreen, 40, () -> CreateWorldScreen.openFresh(mc, mc.screen));
+		this.step("title screen", () -> mc.screen instanceof TitleScreen, 40, () -> CreateWorldScreen.openFresh(mc, () -> mc.setScreen(new TitleScreen())));
 		this.step("create world screen", () -> mc.screen instanceof CreateWorldScreen, 40, () -> {
 			this.log("ultraterraforged selected: " + TerrainState.of((CreateWorldScreen) mc.screen).isUltraTerraForgedSelected() + ", preset " + TerrainState.of((CreateWorldScreen) mc.screen).name().getString());
-			this.button(mc.screen, "Create New World").onPress();
+			this.button(mc.screen, "Create New World").onPress(PRESS);
 		});
 		this.step("world loaded", () -> mc.level != null && mc.player != null, 200, () -> {
 			IntegratedServer server = mc.getSingleplayerServer();
@@ -412,6 +413,8 @@ public class ClientTest implements ClientModInitializer {
 		throw new IllegalStateException("No text box in " + this.describeWidgets(screen));
 	}
 
+	private static final KeyEvent PRESS = new KeyEvent(org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER, 0, 0);
+
 	private AbstractButton button(Screen screen, String text) {
 		for (var child : screen.children()) {
 			if (child instanceof AbstractButton button && button.visible && button.getMessage().getString().startsWith(text)) {
@@ -450,7 +453,7 @@ public class ClientTest implements ClientModInitializer {
 	// a vertical cut through the terrain from the bottom of the world to just above the surface, and the rocks in it
 	private void slice(ServerLevel level, BlockPos center, String name) {
 		int width = 256;
-		int minY = level.getMinBuildHeight();
+		int minY = level.getMinY();
 		int top = minY;
 		net.minecraft.world.level.block.state.BlockState[][] states = new net.minecraft.world.level.block.state.BlockState[width][];
 		java.util.Map<String, Integer> counts = new java.util.TreeMap<>();
@@ -459,8 +462,8 @@ public class ClientTest implements ClientModInitializer {
 			int x = center.getX() - width / 2 + dx;
 			int surface = level.getChunk(x >> 4, center.getZ() >> 4).getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE_WG, x & 15, center.getZ() & 15);
 			top = Math.max(top, surface);
-			states[dx] = new net.minecraft.world.level.block.state.BlockState[level.getMaxBuildHeight() - minY];
-			for (int y = minY; y < level.getMaxBuildHeight(); y++) {
+			states[dx] = new net.minecraft.world.level.block.state.BlockState[level.getMaxY() + 1 - minY];
+			for (int y = minY; y <= level.getMaxY(); y++) {
 				net.minecraft.world.level.block.state.BlockState state = level.getBlockState(pos.set(x, y, center.getZ()));
 				states[dx][y - minY] = state;
 				if (!state.isAir()) {
@@ -468,17 +471,17 @@ public class ClientTest implements ClientModInitializer {
 				}
 			}
 		}
-		int height = Math.min(level.getMaxBuildHeight(), top + 10) - minY;
+		int height = Math.min(level.getMaxY() + 1, top + 10) - minY;
 		try (NativeImage image = new NativeImage(width * SLICE_SCALE, height * SLICE_SCALE, true)) {
 			for (int dx = 0; dx < width; dx++) {
 				for (int dy = 0; dy < height; dy++) {
 					net.minecraft.world.level.block.state.BlockState state = states[dx][dy];
 					int color = state.isAir() ? 0x201010 : ROCK_COLORS.getOrDefault(state.getBlock(), state.getMapColor(level, pos.set(center.getX() - width / 2 + dx, dy + minY, center.getZ())).col);
-					// NativeImage is ABGR
-					int abgr = 0xFF000000 | (color & 0xFF) << 16 | (color & 0xFF00) | (color >> 16 & 0xFF);
+					// NativeImage is ARGB since 1.21.2
+					int argb = 0xFF000000 | color;
 					for (int px = 0; px < SLICE_SCALE; px++) {
 						for (int py = 0; py < SLICE_SCALE; py++) {
-							image.setPixelRGBA(dx * SLICE_SCALE + px, (height - 1 - dy) * SLICE_SCALE + py, abgr);
+							image.setPixel(dx * SLICE_SCALE + px, (height - 1 - dy) * SLICE_SCALE + py, argb);
 						}
 					}
 				}
@@ -498,12 +501,15 @@ public class ClientTest implements ClientModInitializer {
 		}
 	}
 
+	// since 1.21.5 the frame is read back from the graphics card and handed over once it's there
 	private void screenshot(String name) {
-		try (NativeImage image = Screenshot.takeScreenshot(Minecraft.getInstance().getMainRenderTarget())) {
-			image.writeToFile(this.out.resolve(name + ".png"));
-		} catch (IOException e) {
-			this.log("screenshot " + name + " failed: " + e);
-		}
+		Screenshot.takeScreenshot(Minecraft.getInstance().getMainRenderTarget(), (image) -> {
+			try (image) {
+				image.writeToFile(this.out.resolve(name + ".png"));
+			} catch (IOException e) {
+				this.log("screenshot " + name + " failed: " + e);
+			}
+		});
 	}
 
 	void log(String line) {

@@ -8,7 +8,7 @@ import com.mojang.serialization.Codec;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import com.pandaismyname1.ultraterraforged.compat.terrablender.TBSurfaceRules;

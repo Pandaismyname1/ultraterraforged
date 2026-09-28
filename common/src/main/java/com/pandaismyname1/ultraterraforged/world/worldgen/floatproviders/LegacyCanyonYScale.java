@@ -1,14 +1,13 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.floatproviders;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.valueproviders.FloatProvider;
-import net.minecraft.util.valueproviders.FloatProviderType;
 
 @Deprecated
-public class LegacyCanyonYScale extends FloatProvider {
-	public static final Codec<LegacyCanyonYScale> CODEC = Codec.unit(LegacyCanyonYScale::new);
+public class LegacyCanyonYScale implements FloatProvider {
+	public static final MapCodec<LegacyCanyonYScale> CODEC = MapCodec.unit(LegacyCanyonYScale::new);
 	
 	@Override
 	public float sample(RandomSource random) {
@@ -16,17 +15,17 @@ public class LegacyCanyonYScale extends FloatProvider {
 	}
 
 	@Override
-	public float getMinValue() {
+	public float min() {
 		return -1.0F;
 	}
 
 	@Override
-	public float getMaxValue() {
+	public float max() {
 		return 1.0F;
 	}
 
 	@Override
-	public FloatProviderType<LegacyCanyonYScale> getType() {
-		return UTFFloatProviderTypes.LEGACY_CANYON_Y_SCALE;
+	public MapCodec<LegacyCanyonYScale> codec() {
+		return CODEC;
 	}
 }

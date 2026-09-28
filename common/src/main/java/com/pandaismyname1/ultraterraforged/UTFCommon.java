@@ -3,7 +3,7 @@ package com.pandaismyname1.ultraterraforged;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import com.pandaismyname1.ultraterraforged.compat.terrablender.TBCompat;
 import com.pandaismyname1.ultraterraforged.compat.terrablender.TBSurfaceRules;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
@@ -66,8 +66,8 @@ public class UTFCommon {
 		UTFRegistries.createDataRegistry(UTFRegistries.PRESET, Preset.CODEC);
 	}
 	
-	public static ResourceLocation location(String name) {
-		if (name.contains(":")) return ResourceLocation.parse(name);
-		return ResourceLocation.fromNamespaceAndPath(UTFCommon.MOD_ID, name);
+	public static Identifier location(String name) {
+		if (name.contains(":")) return Identifier.parse(name);
+		return Identifier.fromNamespaceAndPath(UTFCommon.MOD_ID, name);
 	}
 }

@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.PositionalRandomFactory;
@@ -29,9 +29,9 @@ import terrablender.worldgen.surface.NamespacedSurfaceRuleSource;
 @Mixin(SurfaceSystem.class)
 @Implements(@Interface(iface = UTFSurfaceSystem.class, prefix = UTFCommon.MOD_ID + "$UTFSurfaceSystem$"))
 class MixinSurfaceSystem {
-	private static final ResourceLocation STRATA_RANDOM = UTFCommon.location("strata");
+	private static final Identifier STRATA_RANDOM = UTFCommon.location("strata");
 	private RandomSource strataRandom;
-	private Map<ResourceLocation, List<StrataStack>> strata;
+	private Map<Identifier, List<StrataStack>> strata;
 	
 	@Inject(
 		at = @At("TAIL"),
@@ -58,7 +58,7 @@ class MixinSurfaceSystem {
 		return source;
 	}
 
-	public List<StrataStack> ultraterraforged$UTFSurfaceSystem$getOrCreateStrata(ResourceLocation cacheId, Function<RandomSource, List<StrataStack>> factory) {
+	public List<StrataStack> ultraterraforged$UTFSurfaceSystem$getOrCreateStrata(Identifier cacheId, Function<RandomSource, List<StrataStack>> factory) {
 		return this.strata.computeIfAbsent(cacheId, (k) -> {
 			return factory.apply(this.strataRandom.fork());
 		});

@@ -99,7 +99,11 @@ public class PresetNoiseRouterData {
         DensityFunction oreVeinB = NoiseRouterData.yLimitedInterpolatable(y, DensityFunctions.noise(noiseParams.getOrThrow(Noises.ORE_VEIN_B), 4.0, 4.0), minY, maxY, 0).abs();
         DensityFunction oreVein = DensityFunctions.add(DensityFunctions.constant(-0.08F), DensityFunctions.max(oreVeinA, oreVeinB));
         DensityFunction oreGap = DensityFunctions.noise(noiseParams.getOrThrow(Noises.ORE_GAP));
-        return new NoiseRouter(aquiferBarrier, aquiferFluidLevelFloodedness, aquiferFluidLevelSpread, aquiferLava, temperature, vegetation, NoiseRouterData.getFunction(densityFunctions, NoiseRouterData.CONTINENTS), NoiseRouterData.getFunction(densityFunctions, NoiseRouterData.EROSION), depth, NoiseRouterData.getFunction(densityFunctions, NoiseRouterData.RIDGES), slideOverworld(DensityFunctions.add(initialDensity, DensityFunctions.constant(UNIT * -90)).clamp(-64.0, 64.0), -worldDepth), finalDensity, oreVeininess, oreVein, oreGap);
+        // Since 1.21.9 the router gives the surface's height here, not a density. It's found as NoiseChunk found it before:
+        // from the top down, one noise cell (8 blocks) at a time, the first height where the density passes NOISE_ZERO.
+        DensityFunction initialDensityWithoutJaggedness = slideOverworld(DensityFunctions.add(initialDensity, DensityFunctions.constant(UNIT * -90)).clamp(-64.0, 64.0), -worldDepth);
+        DensityFunction preliminarySurfaceLevel = DensityFunctions.findTopSurface(DensityFunctions.add(initialDensityWithoutJaggedness, DensityFunctions.constant(-NoiseRouterData.NOISE_ZERO)), DensityFunctions.constant(properties.worldHeight), -worldDepth, 8);
+        return new NoiseRouter(aquiferBarrier, aquiferFluidLevelFloodedness, aquiferFluidLevelSpread, aquiferLava, temperature, vegetation, NoiseRouterData.getFunction(densityFunctions, NoiseRouterData.CONTINENTS), NoiseRouterData.getFunction(densityFunctions, NoiseRouterData.EROSION), depth, NoiseRouterData.getFunction(densityFunctions, NoiseRouterData.RIDGES), preliminarySurfaceLevel, finalDensity, oreVeininess, oreVein, oreGap);
 	}
 
     private static DensityFunction underground(float cheeseCaveProbability, HolderGetter<DensityFunction> densityFunctions, HolderGetter<NormalNoise.NoiseParameters> noiseParams, DensityFunction slopedCheese) {

@@ -15,7 +15,6 @@ import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.tabs.Tab;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -62,8 +61,9 @@ public class TerrainTab implements Tab {
 		this.reloadPresets();
 
 		Minecraft minecraft = Minecraft.getInstance();
-		this.status = new StringWidget(Component.empty(), minecraft.font).alignLeft();
-		this.presetButton = Button.builder(Component.empty(), (button) -> this.cyclePreset(Screen.hasShiftDown() ? -1 : 1)).build();
+		// StringWidget is always left aligned now
+		this.status = new StringWidget(Component.empty(), minecraft.font);
+		this.presetButton = Button.builder(Component.empty(), (button) -> this.cyclePreset(minecraft.hasShiftDown() ? -1 : 1)).build();
 		this.advancedButton = Button.builder(Component.translatable(UTFTranslationKeys.GUI_TERRAIN_TAB_ADVANCED), (button) -> {
 			minecraft.setScreen(PresetConfigScreen.editing(this.screen, this.state.name(), this.state.preset(), this.state.baseline()));
 		}).build();
@@ -88,9 +88,8 @@ public class TerrainTab implements Tab {
 		this.sliders = new ScrollingPanel();
 		this.performanceLight = PerformanceModsSection.light(this.sliders::scrollToBottom);
 		this.preview = new TerrainPreview(this.state);
-		this.viewButton = CycleButton.<RenderMode>builder(OptionWidgets::enumName)
+		this.viewButton = CycleButton.<RenderMode>builder(OptionWidgets::enumName, this.preview.mode())
 			.withValues(RenderMode.values())
-			.withInitialValue(this.preview.mode())
 			.create(0, 0, 0, 0, Component.translatable(UTFTranslationKeys.GUI_TERRAIN_TAB_VIEW), (button, mode) -> this.preview.setMode(mode));
 		this.rebuildSliders();
 		this.updateLabels();
@@ -99,6 +98,11 @@ public class TerrainTab implements Tab {
 	@Override
 	public Component getTabTitle() {
 		return Component.translatable(UTFTranslationKeys.GUI_TERRAIN_TAB_TITLE);
+	}
+
+	@Override
+	public Component getTabExtraNarration() {
+		return Component.empty();
 	}
 
 	@Override
@@ -125,7 +129,8 @@ public class TerrainTab implements Tab {
 		this.status.setX(left);
 		this.status.setY(top);
 		int lightWidth = PerformanceModsSection.lightWidth();
-		this.status.setWidth(columnWidth - lightWidth - GAP);
+		// the text is cut off there, and setMessage resets the width to the text's
+		this.status.setMaxWidth(columnWidth - lightWidth - GAP);
 		this.status.height = 12;
 		this.performanceLight.setX(left + columnWidth - lightWidth);
 		this.performanceLight.setY(top);

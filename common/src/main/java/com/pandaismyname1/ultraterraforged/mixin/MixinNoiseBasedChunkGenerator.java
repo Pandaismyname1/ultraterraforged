@@ -75,7 +75,7 @@ class MixinNoiseBasedChunkGenerator {
 		GeneratorContext generatorContext;
 		ChunkPos chunkPos = chunkAccess2.getPos();
 		if((Object) randomState instanceof UTFRandomState utfRandomState && (generatorContext = utfRandomState.generatorContext()) != null) {
-			return generatorContext.lookup.getGenerationHeight(chunkPos.x, chunkPos.z, this.settings.value(), true);
+			return generatorContext.lookup.getGenerationHeight(chunkPos.x(), chunkPos.z(), this.settings.value(), true);
 		} else {
     		return settings.height();
     	}

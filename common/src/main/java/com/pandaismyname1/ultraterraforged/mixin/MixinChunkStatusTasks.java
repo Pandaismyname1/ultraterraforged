@@ -46,7 +46,7 @@ public class MixinChunkStatusTasks {
 		GeneratorContext context = ultraterraforged$context(worldGenContext);
 		if(context != null) {
 			ChunkPos chunkPos = centerChunk.getPos();
-			context.cache.queueAtChunk(chunkPos.x, chunkPos.z);
+			context.cache.queueAtChunk(chunkPos.x(), chunkPos.z());
 
 			WorldGenFlags.setFastCellLookups(false);
 		}
@@ -83,7 +83,7 @@ public class MixinChunkStatusTasks {
 				FrozenFalls.apply(centerChunk, region, context);
 			}
 			ChunkPos chunkPos = centerChunk.getPos();
-			context.cache.dropAtChunk(chunkPos.x, chunkPos.z);
+			context.cache.dropAtChunk(chunkPos.x(), chunkPos.z());
 		}
 	}
 }

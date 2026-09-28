@@ -13,13 +13,15 @@ import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import com.pandaismyname1.ultraterraforged.UTFCommon;
 import com.pandaismyname1.ultraterraforged.client.data.UTFTranslationKeys;
@@ -49,10 +51,9 @@ public class TerrainPreview extends AbstractWidget {
 
 	private static final ScheduledExecutorService EXECUTOR = Executors.newSingleThreadScheduledExecutor(ThreadPools.daemonFactory("UTF-Preview"));
 	private static final AtomicInteger GENERATION = new AtomicInteger();
+	private static final Identifier TEXTURE_ID = UTFCommon.location("preview/terrain");
 	@Nullable
 	private static DynamicTexture texture;
-	@Nullable
-	private static ResourceLocation textureId;
 
 	private final PreviewSource state;
 	private RenderMode mode = RenderMode.BIOME_TYPE;
@@ -68,8 +69,8 @@ public class TerrainPreview extends AbstractWidget {
 	private Rendered rendered;
 	private boolean loading;
 
-	// what's currently in the texture, for the hover readout
-	private record Rendered(Tile tile, float centerX, float centerZ, float zoom) {
+	// what's currently in the texture, for the hover readout; the pixels are kept to upload again after a release
+	private record Rendered(Tile tile, float centerX, float centerZ, float zoom, int[] pixels) {
 	}
 
 	public TerrainPreview(PreviewSource state) {
@@ -137,7 +138,7 @@ public class TerrainPreview extends AbstractWidget {
 					pixels[z * RESOLUTION + x] = mode.getColor(cell, levels);
 				}
 			});
-			Rendered rendered = new Rendered(tile, centerX, centerZ, zoom);
+			Rendered rendered = new Rendered(tile, centerX, centerZ, zoom, pixels);
 			Minecraft.getInstance().execute(() -> {
 				if (generation == GENERATION.get()) {
 					upload(pixels);
@@ -153,35 +154,47 @@ public class TerrainPreview extends AbstractWidget {
 
 	private static void upload(int[] pixels) {
 		if (texture == null) {
-			texture = new DynamicTexture(new NativeImage(RESOLUTION, RESOLUTION, false));
-			textureId = Minecraft.getInstance().getTextureManager().register(UTFCommon.MOD_ID + "-terrain-preview", texture);
+			texture = new DynamicTexture(TEXTURE_ID::toString, new NativeImage(RESOLUTION, RESOLUTION, false));
+			Minecraft.getInstance().getTextureManager().register(TEXTURE_ID, texture);
 		}
 		NativeImage image = texture.getPixels();
 		for (int z = 0; z < RESOLUTION; z++) {
 			for (int x = 0; x < RESOLUTION; x++) {
-				image.setPixelRGBA(x, z, pixels[z * RESOLUTION + x]);
+				// RenderMode colours are ARGB, like NativeImage
+				image.setPixel(x, z, pixels[z * RESOLUTION + x]);
 			}
 		}
 		texture.upload();
 	}
 
+	// frees the texture once the Create World screen is gone; a preview that's shown again uploads its last image
+	public static void releaseTexture() {
+		if (texture != null) {
+			Minecraft.getInstance().getTextureManager().release(TEXTURE_ID);
+			texture = null;
+		}
+	}
+
 	@Override
-	protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+	protected void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
 		if (this.state.revision() != this.renderedRevision || this.state.seed() != this.renderedSeed) {
 			this.refresh();
+		}
+		if (this.rendered != null && texture == null) {
+			upload(this.rendered.pixels());
 		}
 		int x = this.getX();
 		int y = this.getY();
 		graphics.fill(x - 1, y - 1, x + this.width + 1, y + this.height + 1, 0xFF000000);
-		if (this.rendered != null && textureId != null) {
-			graphics.blit(textureId, x, y, 0, 0, this.width, this.height, this.width, this.height);
+		if (this.rendered != null) {
+			graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE_ID, x, y, 0, 0, this.width, this.height, this.width, this.height);
 		} else {
 			graphics.fill(x, y, x + this.width, y + this.height, 0xFF202020);
 		}
 
 		Font font = Minecraft.getInstance().font;
 		if (this.loading) {
-			graphics.drawString(font, Component.translatable(UTFTranslationKeys.GUI_TERRAIN_TAB_PREVIEW_LOADING), x + 4, y + 4, 0xFFFFFF);
+			graphics.text(font, Component.translatable(UTFTranslationKeys.GUI_TERRAIN_TAB_PREVIEW_LOADING), x + 4, y + 4, 0xFFFFFFFF);
 		}
 		if (this.rendered != null && this.isMouseOver(mouseX, mouseY)) {
 			this.renderReadout(graphics, font, mouseX, mouseY);
@@ -189,12 +202,12 @@ public class TerrainPreview extends AbstractWidget {
 			// only where it fits, the editor's preview can be small
 			Component hint = Component.translatable(UTFTranslationKeys.GUI_TERRAIN_TAB_PREVIEW_HINT).withStyle(ChatFormatting.GRAY);
 			if (font.width(hint) <= this.width - 8) {
-				graphics.drawString(font, hint, x + 4, y + this.height - 12, 0xFFFFFF);
+				graphics.text(font, hint, x + 4, y + this.height - 12, 0xFFFFFFFF);
 			}
 		}
 	}
 
-	private void renderReadout(GuiGraphics graphics, Font font, int mouseX, int mouseY) {
+	private void renderReadout(GuiGraphicsExtractor graphics, Font font, int mouseX, int mouseY) {
 		Rendered rendered = this.rendered;
 		int pixelX = Mth.clamp((int) ((mouseX - this.getX()) * (float) RESOLUTION / this.width), 0, RESOLUTION - 1);
 		int pixelZ = Mth.clamp((int) ((mouseY - this.getY()) * (float) RESOLUTION / this.height), 0, RESOLUTION - 1);
@@ -205,7 +218,7 @@ public class TerrainPreview extends AbstractWidget {
 		String text = blockX + ", " + blockZ + "  " + terrain + "  " + cell.biomeType.name().toLowerCase();
 		int y = this.getY() + this.height - 12;
 		graphics.fill(this.getX(), y - 2, this.getX() + this.width, this.getY() + this.height, 0xA0000000);
-		graphics.drawString(font, text, this.getX() + 4, y, 0xFFFFFF);
+		graphics.text(font, text, this.getX() + 4, y, 0xFFFFFFFF);
 	}
 
 	@Override
@@ -219,7 +232,7 @@ public class TerrainPreview extends AbstractWidget {
 	}
 
 	@Override
-	protected void onDrag(double mouseX, double mouseY, double dragX, double dragY) {
+	protected void onDrag(MouseButtonEvent event, double dragX, double dragY) {
 		float blocksPerScreenPixel = this.zoom * RESOLUTION / (float) this.width;
 		this.panX -= dragX * blocksPerScreenPixel;
 		this.panZ -= dragY * blocksPerScreenPixel;

@@ -9,31 +9,36 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.google.common.collect.ImmutableList;
 
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.packs.resources.ResourceManager;
 
 public class FeatureTemplateManager {
-	private MinecraftServer server;
-	private ResourceManager resourceManager;
-	private Map<ResourceLocation, FeatureTemplate> cache;
+	private final MinecraftServer server;
+	private volatile ResourceManager resourceManager;
+	private final Map<Identifier, FeatureTemplate> cache;
 	
-	public FeatureTemplateManager(MinecraftServer server, ResourceManager resourceManager) {
+	public FeatureTemplateManager(MinecraftServer server) {
 		this.server = server;
-		this.resourceManager = resourceManager;
+		this.resourceManager = server.getResourceManager();
 		this.cache = new ConcurrentHashMap<>();
 	}
 	
-	public void onReload(ResourceManager resourceManager) {
-		this.resourceManager = resourceManager;
-		this.cache.clear();
-	}
-	
-	public FeatureTemplate load(ResourceLocation location) {
+	public FeatureTemplate load(Identifier location) {
+		// /reload gives the server a new resource manager: the templates are read again from it
+		ResourceManager current = this.server.getResourceManager();
+		if (current != this.resourceManager) {
+			synchronized (this) {
+				if (current != this.resourceManager) {
+					this.cache.clear();
+					this.resourceManager = current;
+				}
+			}
+		}
 		return this.cache.computeIfAbsent(location, this::read);
 	}
 	
-	private FeatureTemplate read(ResourceLocation location) {
+	private FeatureTemplate read(Identifier location) {
 		return this.resourceManager.getResource(location).flatMap((resource) -> {
 			try(InputStream stream = resource.open()) {
 				return FeatureTemplate.load(this.server.registryAccess().lookupOrThrow(Registries.BLOCK).filterFeatures(this.server.getWorldData().enabledFeatures()), stream);

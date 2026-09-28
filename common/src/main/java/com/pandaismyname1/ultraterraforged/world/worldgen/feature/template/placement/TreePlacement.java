@@ -1,6 +1,7 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.feature.template.placement;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
@@ -9,7 +10,7 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.feature.template.decor
 import com.pandaismyname1.ultraterraforged.world.worldgen.feature.template.template.Dimensions;
 
 record TreePlacement() implements TemplatePlacement<TreeContext> {
-	public static final Codec<TreePlacement> CODEC = Codec.unit(TreePlacement::new);
+	public static final Codec<TreePlacement> CODEC = MapCodec.unit(TreePlacement::new).codec();
 	
     @Override
     public boolean canPlaceAt(LevelAccessor world, BlockPos pos, Dimensions dimensions) {

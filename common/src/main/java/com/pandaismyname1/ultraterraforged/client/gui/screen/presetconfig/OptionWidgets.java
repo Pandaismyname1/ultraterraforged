@@ -4,11 +4,12 @@ import java.util.List;
 import java.util.function.Function;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -67,7 +68,7 @@ public final class OptionWidgets {
 	}
 
 	// a bar along the left edge of options the player changed
-	private static void renderModified(GuiGraphics graphics, AbstractWidget widget, boolean modified) {
+	private static void renderModified(GuiGraphicsExtractor graphics, AbstractWidget widget, boolean modified) {
 		if (modified) {
 			graphics.fill(widget.getX() - 4, widget.getY() + 1, widget.getX() - 2, widget.getY() + widget.getHeight() - 1, MODIFIED_COLOR);
 		}
@@ -102,27 +103,27 @@ public final class OptionWidgets {
 		}
 
 		@Override
-		public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-			super.renderWidget(graphics, mouseX, mouseY, partialTick);
+		public void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+			super.extractWidgetRenderState(graphics, mouseX, mouseY, partialTick);
 			renderModified(graphics, this, this.option.isModified(this.preset, this.baseline));
 		}
 
 		@Override
-		public boolean mouseClicked(double mouseX, double mouseY, int button) {
-			if (this.active && this.visible && Screen.hasControlDown() && this.clicked(mouseX, mouseY)) {
+		public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+			if (this.active && this.visible && event.hasControlDown() && this.isMouseOver(event.x(), event.y())) {
 				this.option.resetTo(this.preset, this.baseline);
-				this.setValue(this.getSliderValue(this.option.get(this.preset).floatValue()));
+				this.setSliderValue(this.getSliderValue(this.option.get(this.preset).floatValue()));
 				this.applyValue();
 				this.updateMessage();
-				this.playDownSound(net.minecraft.client.Minecraft.getInstance().getSoundManager());
+				this.playDownSound(Minecraft.getInstance().getSoundManager());
 				return true;
 			}
-			return super.mouseClicked(mouseX, mouseY, button);
+			return super.mouseClicked(event, doubleClick);
 		}
 	}
 
 	// a cycling button that, unlike the vanilla one, can be reset; shift+click cycles backwards
-	private static class OptionCycleButton<T> extends Button {
+	private static class OptionCycleButton<T> extends Button.Plain {
 		private final Option<T> option;
 		private final Preset preset;
 		private final Preset baseline;
@@ -133,7 +134,7 @@ public final class OptionWidgets {
 		public OptionCycleButton(Option<T> option, Preset preset, Preset baseline, List<T> values, Function<T, Component> nameGetter, Runnable onChange, Component name) {
 			super(-1, -1, -1, -1, CommonComponents.EMPTY, (button) -> {
 				if (button instanceof OptionCycleButton<?> self) {
-					self.cycle(Screen.hasShiftDown() ? -1 : 1);
+					self.cycle(Minecraft.getInstance().hasShiftDown() ? -1 : 1);
 					onChange.run();
 				}
 			}, DEFAULT_NARRATION);
@@ -148,13 +149,13 @@ public final class OptionWidgets {
 		}
 
 		@Override
-		public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-			super.renderWidget(graphics, mouseX, mouseY, partialTick);
+		protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+			super.extractContents(graphics, mouseX, mouseY, partialTick);
 			renderModified(graphics, this, this.option.isModified(this.preset, this.baseline));
 		}
 
 		private void cycle(int direction) {
-			if (Screen.hasControlDown()) {
+			if (Minecraft.getInstance().hasControlDown()) {
 				this.option.resetTo(this.preset, this.baseline);
 			} else {
 				int index = this.values.indexOf(this.option.get(this.preset));

@@ -11,7 +11,7 @@ import net.minecraft.data.DataGenerator.PackGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.metadata.PackMetadataGenerator;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import com.pandaismyname1.ultraterraforged.client.data.UTFLanguageProvider;
 import com.pandaismyname1.ultraterraforged.client.data.UTFTranslationKeys;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
@@ -32,7 +32,7 @@ public class UTFDataGen {
 	
 	@Deprecated
 	public static DataGenerator makePreset(Preset preset, HolderLookup.Provider registryAccess, Path dataGenPath, Path dataGenOutputPath) {
-		DataGenerator dataGenerator = new DataGenerator(dataGenPath, SharedConstants.getCurrentVersion(), true);
+		DataGenerator dataGenerator = new DataGenerator.Cached(dataGenPath, SharedConstants.getCurrentVersion(), true);
 		PackGenerator packGenerator = dataGenerator.new PackGenerator(true, "preset", new PackOutput(dataGenOutputPath));
 		// built up front rather than on the common pool: on Forge, classes first loaded from common pool threads can't see mod classes
 		CompletableFuture<HolderLookup.Provider> lookup = CompletableFuture.completedFuture(preset.buildPatch(registryAccess));
@@ -60,6 +60,6 @@ public class UTFDataGen {
 	}
 	
 	public interface DataPackFactory {
-		DataGenerator.PackGenerator createPack(ResourceLocation id);
+		DataGenerator.PackGenerator createPack(Identifier id);
 	}
 }

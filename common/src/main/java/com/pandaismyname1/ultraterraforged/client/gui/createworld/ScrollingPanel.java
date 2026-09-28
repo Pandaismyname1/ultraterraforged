@@ -5,9 +5,10 @@ import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.util.Mth;
 
@@ -72,7 +73,7 @@ public class ScrollingPanel extends AbstractWidget {
 	}
 
 	@Override
-	protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+	protected void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
 		this.layoutChildren();
 		// children outside the panel must not react to the mouse
 		boolean inside = this.isMouseOver(mouseX, mouseY);
@@ -82,7 +83,7 @@ public class ScrollingPanel extends AbstractWidget {
 		graphics.enableScissor(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height);
 		for (AbstractWidget child : this.children) {
 			if (child.visible) {
-				child.render(graphics, childMouseX, childMouseY, partialTick);
+				child.extractRenderState(graphics, childMouseX, childMouseY, partialTick);
 			}
 		}
 		graphics.disableScissor();
@@ -98,13 +99,13 @@ public class ScrollingPanel extends AbstractWidget {
 	}
 
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		if (!this.active || !this.visible || !this.isMouseOver(mouseX, mouseY)) {
+	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		if (!this.active || !this.visible || !this.isMouseOver(event.x(), event.y())) {
 			return false;
 		}
 		this.layoutChildren();
 		for (AbstractWidget child : this.children) {
-			if (child.visible && child.isMouseOver(mouseX, mouseY) && child.mouseClicked(mouseX, mouseY, button)) {
+			if (child.visible && child.isMouseOver(event.x(), event.y()) && child.mouseClicked(event, doubleClick)) {
 				this.pressed = child;
 				return true;
 			}
@@ -113,16 +114,16 @@ public class ScrollingPanel extends AbstractWidget {
 	}
 
 	@Override
-	public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-		return this.pressed != null && this.pressed.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+	public boolean mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
+		return this.pressed != null && this.pressed.mouseDragged(event, dragX, dragY);
 	}
 
 	@Override
-	public boolean mouseReleased(double mouseX, double mouseY, int button) {
+	public boolean mouseReleased(MouseButtonEvent event) {
 		if (this.pressed != null) {
 			AbstractWidget pressed = this.pressed;
 			this.pressed = null;
-			return pressed.mouseReleased(mouseX, mouseY, button);
+			return pressed.mouseReleased(event);
 		}
 		return false;
 	}
