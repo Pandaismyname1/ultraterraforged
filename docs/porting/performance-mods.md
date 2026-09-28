@@ -79,7 +79,22 @@ Sinytra Connector counts once Connector is installed. A build that needs a newer
 | [Sodium](https://modrinth.com/mod/sodium) | rendering | `sodium` | Client only. No Forge build: [Embeddium](https://modrinth.com/mod/embeddium) (`embeddium`) stands in. Official NeoForge builds from 1.21.1 |
 | [Sinytra Connector](https://modrinth.com/mod/connector) | runs Fabric mods on Forge/NeoForge | `connector` | Needs [Forgified Fabric API](https://modrinth.com/mod/forgified-fabric-api). Not a performance mod; lets the Forge list count Fabric-only mods |
 
-## 26.2 (current, the `26.2` branch)
+## 26.3 (current, the `26.3` branch)
+
+As 26.2, minus C2ME OpenCL, which has no 26.3 build yet (it stays listed, greyed out), and Voxy, also not yet out for
+26.3. The light asks for C2ME, Lithium and Sodium on both loaders. Sodium is an alpha for 26.3.
+
+| Mod | Fabric | NeoForge 26.3.0.31-beta |
+|---|---|---|
+| C2ME | 0.4.2-alpha.0.88 (`sSoXjAqP`) | 0.4.2-alpha.0.100 (`xXHRHMRL`) |
+| C2ME OpenCL | none | none |
+| Noisium | none | none |
+| Lithium | 0.26.2 (`xS0Q8LSi`) | 0.26.2 (`1rb9wI5K`) |
+| ModernFix | none | none |
+| AllTheLeaks | none | none |
+| Sodium | 0.9.3-alpha.1 (`v4PSXean`) | 0.9.3-alpha.1 (`NM9w06Kr`) |
+
+## 26.2 (the `26.2` branch)
 
 The same setup as 26.1.2 (released jars straight into the NeoForge dev game's mods folder). ModernFix has no 26.2 build
 on either loader, so the light asks for three mods on both: C2ME, Lithium and Sodium, with C2ME OpenCL optional.

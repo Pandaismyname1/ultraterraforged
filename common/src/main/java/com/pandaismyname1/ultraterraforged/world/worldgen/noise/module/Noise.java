@@ -3,12 +3,12 @@ package com.pandaismyname1.ultraterraforged.world.worldgen.noise.module;
 import com.mojang.serialization.Codec;
 
 import net.minecraft.core.Holder;
-import net.minecraft.resources.RegistryFileCodec;
+import net.minecraft.core.registries.codec.RegistryCodecs;
 import com.pandaismyname1.ultraterraforged.registries.UTFRegistries;
 
 public interface Noise {
     public static final Codec<Noise> DIRECT_CODEC = Noises.DIRECT_CODEC;
-    public static final Codec<Holder<Noise>> CODEC = RegistryFileCodec.create(UTFRegistries.NOISE, DIRECT_CODEC);
+    public static final Codec<Holder<Noise>> CODEC = RegistryCodecs.holder(UTFRegistries.NOISE, DIRECT_CODEC);
     public static final Codec<Noise> HOLDER_HELPER_CODEC = CODEC.xmap(Noises.HolderHolder::new, noise -> {
         if (noise instanceof Noises.HolderHolder holderHolder) {
             return holderHolder.holder();

@@ -1,6 +1,7 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.feature.placement;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.BlockPos;
@@ -8,11 +9,10 @@ import net.minecraft.core.Holder;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.placement.PlacementContext;
 import net.minecraft.world.level.levelgen.placement.PlacementFilter;
-import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noise;
 
-class NoiseFilter extends PlacementFilter {
-	public static final Codec<NoiseFilter> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+class NoiseFilter implements PlacementFilter {
+	public static final MapCodec<NoiseFilter> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
 		Noise.CODEC.fieldOf("noise").forGetter((filter) -> filter.noise),
 		Codec.FLOAT.fieldOf("threshold").forGetter((filter) -> filter.threshold)
 	).apply(instance, NoiseFilter::new));
@@ -26,12 +26,12 @@ class NoiseFilter extends PlacementFilter {
 	}
 	
 	@Override
-	protected boolean shouldPlace(PlacementContext ctx, RandomSource rand, BlockPos pos) {
+	public boolean shouldPlace(PlacementContext ctx, RandomSource rand, BlockPos pos) {
 		return this.noise.value().compute(pos.getX(), pos.getZ(), (int) ctx.getLevel().getSeed()) > this.threshold;
 	}
 	
 	@Override
-	public PlacementModifierType<NoiseFilter> type() {
-		return UTFPlacementModifiers.NOISE_FILTER;
+	public MapCodec<NoiseFilter> codec() {
+		return CODEC;
 	}
 }

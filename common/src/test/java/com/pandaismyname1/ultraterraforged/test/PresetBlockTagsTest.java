@@ -26,7 +26,7 @@ public class PresetBlockTagsTest {
 		TestBootstrap.init();
 		DataGenerator generator = new DataGenerator.Cached(dir.resolve("cache"), SharedConstants.getCurrentVersion(), true);
 		DataGenerator.PackGenerator pack = generator.new PackGenerator(true, "preset", new PackOutput(dir.resolve("pack")));
-		pack.addProvider((output) -> new PresetBlockTagsProvider(output, CompletableFuture.completedFuture(VanillaRegistries.createLookup())));
+		pack.addProvider((output) -> new PresetBlockTagsProvider(output, CompletableFuture.completedFuture(VanillaRegistries.createWorldLookup())));
 		generator.run();
 
 		Path rock = dir.resolve("pack/data/ultraterraforged/tags/block/rock.json");

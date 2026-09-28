@@ -1,16 +1,16 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.feature.placement;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.placement.PlacementContext;
-import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.Cell;
 
 class MacroBiomeFilter extends CellFilter {
-	public static final Codec<MacroBiomeFilter> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+	public static final MapCodec<MacroBiomeFilter> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
 		Codec.FLOAT.fieldOf("chance").forGetter((filter) -> filter.chance)
 	).apply(instance, MacroBiomeFilter::new));
 
@@ -26,7 +26,7 @@ class MacroBiomeFilter extends CellFilter {
 	}
 	
 	@Override
-	public PlacementModifierType<MacroBiomeFilter> type() {
-		return UTFPlacementModifiers.MACRO_BIOME_FILTER;
+	public MapCodec<MacroBiomeFilter> codec() {
+		return CODEC;
 	}
 }

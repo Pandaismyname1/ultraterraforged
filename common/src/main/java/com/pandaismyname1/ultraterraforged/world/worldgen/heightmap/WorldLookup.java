@@ -14,6 +14,8 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.tile.Tile;
 import com.pandaismyname1.ultraterraforged.world.worldgen.tile.TileCache;
 
 public class WorldLookup {
+	// the height of the preset's noise cells (its interpolated density); the filled height ends on a cell's top
+	private static final int CELL_HEIGHT = 8;
 	private GeneratorContext context;
 	private float waterLevel;
 	private float beachLevel;
@@ -33,7 +35,7 @@ public class WorldLookup {
 		
 		int minY = noiseSettings.minY();
 		int genHeight = noiseSettings.height();
-		int cellHeight = noiseSettings.getCellHeight();
+		int cellHeight = CELL_HEIGHT;
 		
 		if(!WorldGenFlags.cullNoiseSections()) {
 			return genHeight;

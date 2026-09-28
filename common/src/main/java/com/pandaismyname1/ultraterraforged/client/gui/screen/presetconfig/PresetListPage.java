@@ -17,12 +17,12 @@ import org.jetbrains.annotations.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonWriter;
+import com.mojang.blaze3d.Blaze3D;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 
 import io.netty.util.internal.StringUtil;
 import net.minecraft.ChatFormatting;
-import net.minecraft.util.Util;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -108,11 +108,11 @@ class PresetListPage extends BisectedPage<PresetConfigScreen, PresetEntry, Abstr
 			this.rebuildPresets();
 		});
 		this.openPresetFolder = PresetWidgets.createThrowingButton(UTFTranslationKeys.GUI_BUTTON_OPEN_PRESET_FOLDER, () -> {
-			Util.getPlatform().openUri(PRESET_PATH.toUri());
+			Blaze3D.openPath(PRESET_PATH);
 			this.rebuildPresets();
 		});
 		this.openExportFolder = PresetWidgets.createThrowingButton(UTFTranslationKeys.GUI_BUTTON_OPEN_EXPORT_FOLDER, () -> {
-			Util.getPlatform().openUri(EXPORT_PATH.toUri());
+			Blaze3D.openPath(EXPORT_PATH);
 			this.rebuildPresets();
 		});
 		this.exportAsDatapack = PresetWidgets.createThrowingButton(UTFTranslationKeys.GUI_BUTTON_EXPORT_AS_DATAPACK, () -> {

@@ -45,7 +45,7 @@ public final class ServerPresets {
 		try {
 			Preset preset = loadOrCreatePreset(ConfigUtil.utf(PRESET_FILE), PresetLibrary::defaultPreset);
 			// the server hasn't loaded its registries yet, so generate against vanilla's built-in worldgen
-			PresetPacks.export(preset, VanillaRegistries.createLookup(), datapackDir.resolve(PresetPacks.WORLD_PACK_NAME));
+			PresetPacks.export(preset, VanillaRegistries.createWorldLookup(), datapackDir.resolve(PresetPacks.WORLD_PACK_NAME));
 			UTFCommon.LOGGER.info("Creating a UltraTerraForged world with the preset from {}", ConfigUtil.utf(PRESET_FILE));
 		} catch (IOException | RuntimeException e) {
 			// failing here would silently produce vanilla terrain, so stop instead

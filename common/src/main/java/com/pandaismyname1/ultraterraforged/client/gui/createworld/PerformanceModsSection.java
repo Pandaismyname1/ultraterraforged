@@ -1,5 +1,6 @@
 package com.pandaismyname1.ultraterraforged.client.gui.createworld;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -240,7 +241,7 @@ final class PerformanceModsSection {
 
 		@Override
 		public void onClick(MouseButtonEvent event, boolean doubleClick) {
-			ConfirmLinkScreen.confirmLinkNow(this.screen, this.url, true);
+			ConfirmLinkScreen.confirmLinkNow(this.screen, URI.create(this.url), true);
 		}
 
 		@Override

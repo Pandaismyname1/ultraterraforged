@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 import net.minecraft.core.HolderSet;
 import net.minecraft.world.level.biome.BiomeGenerationSettings;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 //TODO do this with access wideners instead
@@ -20,10 +20,11 @@ public interface MixinBiomeGenerationSettings {
 	@Accessor
 	List<HolderSet<PlacedFeature>> getFeatures();
 
-	// what vanilla works out once from the features, and has to be worked out again when they change
+	// what vanilla works out once from the features, and has to be worked out again when they change; since 26.3 a
+	// configured feature is a Feature
 	@Mutable
 	@Accessor
-	void setBoneMealFeatures(Supplier<List<ConfiguredFeature<?, ?>>> boneMealFeatures);
+	void setBoneMealFeatures(Supplier<List<Feature>> boneMealFeatures);
 
 	@Mutable
 	@Accessor

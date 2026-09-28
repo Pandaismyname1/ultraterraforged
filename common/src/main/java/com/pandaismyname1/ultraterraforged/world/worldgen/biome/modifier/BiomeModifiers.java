@@ -31,8 +31,10 @@ public class BiomeModifiers {
 	 * of two vanilla ones (the trees of plains and of rivers, say) breaks that when vanilla orders those two differently
 	 * around a third, as 26.1 does with its bushes, and vanilla then refuses to generate. So a replacement used for more
 	 * than one feature is copied once per replaced feature, and each copy takes that feature's place everywhere: the order
-	 * stays vanilla's. Vanilla tells features apart by their content, so each copy's placement starts with a ReplacesModifier
-	 * naming the feature it stands in for. The copies are made once per modifier, so every biome gets the same ones.
+	 * stays vanilla's. Up to 26.2 vanilla told features apart by their content, so each copy's placement starts with a
+	 * ReplacesModifier naming the feature it stands in for. 26.3's FeatureSorter tells them apart by identity instead, which
+	 * the copies being separate objects already covers; the modifier stays so they differ by content too (hasFeature, sets).
+	 * The copies are made once per modifier, so every biome gets the same ones, which identity needs.
 	 */
 	public static Map<ResourceKey<PlacedFeature>, Holder<PlacedFeature>> distinctReplacements(Object modifier, Map<ResourceKey<PlacedFeature>, Holder<PlacedFeature>> replacements) {
 		return DISTINCT_REPLACEMENTS.computeIfAbsent(modifier, (m) -> {

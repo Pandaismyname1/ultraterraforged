@@ -23,7 +23,7 @@ import com.pandaismyname1.ultraterraforged.preset.option.PresetOptions;
 public class PresetDatapackTest {
 	private static final String PRESET_FILE = "data/ultraterraforged/ultraterraforged/worldgen/preset/preset.json";
 	private static final String NOISE_SETTINGS = "data/minecraft/worldgen/noise_settings/overworld.json";
-	private static final String CAVE_CARVER = "data/minecraft/worldgen/configured_carver/cave.json";
+	private static final String CAVE_CARVER = "data/minecraft/worldgen/carver/cave.json";
 	private static final String VILLAGES = "data/minecraft/worldgen/structure_set/villages.json";
 
 	@BeforeAll
@@ -60,7 +60,7 @@ public class PresetDatapackTest {
 	void caveSettingsReachTheCarvers() {
 		Preset preset = defaultPreset();
 		preset.caves().caveCarverProbability = 0.5F;
-		assertEquals(0.5F, file(preset, CAVE_CARVER).getAsJsonObject().getAsJsonObject("config").get("probability").getAsFloat());
+		assertEquals(0.5F, file(preset, CAVE_CARVER).getAsJsonObject().get("probability").getAsFloat());
 	}
 
 	@Test

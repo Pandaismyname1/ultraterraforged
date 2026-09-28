@@ -44,12 +44,10 @@ dependencies {
     // Modrinth version ids (the version numbers are shared between loaders). -Putf.perfMods=false leaves them out, to
     // measure or debug UltraTerraForged on its own. See docs/porting/performance-mods.md.
     if (project.findProperty("utf.perfMods") != "false") {
-        // C2ME and C2ME OpenCL 0.4.2-alpha.0.52: their modules are nested jars. OpenCL needs Java 25, which 26.x runs on.
-        devModsFolder "maven.modrinth:c2me-fabric:LmKTn6Yc"
-        devModsFolder "maven.modrinth:c2me-ocl:K2szayOS"
-        localRuntime "maven.modrinth:lithium:f7vZ0VWU"          // Lithium 0.25.3
-        localRuntime "maven.modrinth:sodium:xJZxADzI"           // Sodium 0.9.2
-        localRuntime "maven.modrinth:voxy:LzyXnE51"             // Voxy 0.2.19: level of detail, to see generated terrain from far off
+        // C2ME 0.4.2-alpha.0.88: its modules are nested jars. No C2ME OpenCL or Voxy for 26.3 yet.
+        devModsFolder "maven.modrinth:c2me-fabric:sSoXjAqP"
+        localRuntime "maven.modrinth:lithium:xS0Q8LSi"          // Lithium 0.26.2
+        localRuntime "maven.modrinth:sodium:v4PSXean"           // Sodium 0.9.3-alpha.1
     }
 }
 

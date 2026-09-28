@@ -37,13 +37,14 @@ public final class PresetDimensionTypes {
 		HolderGetter<Timeline> timelines = ctx.lookup(Registries.TIMELINE);
 		HolderGetter<WorldClock> clocks = ctx.lookup(Registries.WORLD_CLOCK);
 		EnvironmentAttributeMap overworldAttributes = EnvironmentAttributeMap.builder()
-			.set(EnvironmentAttributes.FOG_COLOR, -4138753)
-			.set(EnvironmentAttributes.SKY_COLOR, OverworldBiomes.calculateSkyColor(0.8F))
-			.set(EnvironmentAttributes.AMBIENT_LIGHT_COLOR, -16119286)
-			.set(EnvironmentAttributes.CLOUD_COLOR, ARGB.white(0.8F))
+			.set(EnvironmentAttributes.FOG_COLOR, ARGB.vector3fFromRGB24(-4138753))
+			.set(EnvironmentAttributes.SKY_COLOR, ARGB.vector3fFromRGB24(OverworldBiomes.calculateSkyColor(0.8F)))
+			.set(EnvironmentAttributes.AMBIENT_LIGHT_COLOR, ARGB.vector3fFromRGB24(-16119286))
+			.set(EnvironmentAttributes.CLOUD_COLOR, ARGB.vector4fFromARGB32(ARGB.white(0.8F)))
 			.set(EnvironmentAttributes.CLOUD_HEIGHT, 192.33F)
 			.set(EnvironmentAttributes.BACKGROUND_MUSIC, BackgroundMusic.OVERWORLD)
 			.set(EnvironmentAttributes.BED_RULE, BedRule.CAN_SLEEP_WHEN_DARK)
+			.set(EnvironmentAttributes.STRAW_BED_RULE, BedRule.DESTROY_ON_LEAVE)
 			.set(EnvironmentAttributes.RESPAWN_ANCHOR_WORKS, false)
 			.set(EnvironmentAttributes.NETHER_PORTAL_SPAWNS_PIGLINS, true)
 			.set(EnvironmentAttributes.AMBIENT_SOUNDS, AmbientSounds.LEGACY_CAVE_SETTINGS)

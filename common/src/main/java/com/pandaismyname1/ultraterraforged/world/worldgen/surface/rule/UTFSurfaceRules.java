@@ -10,7 +10,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.level.levelgen.SurfaceRules;
+import net.minecraft.world.level.levelgen.material.rule.MaterialRule;
 import com.pandaismyname1.ultraterraforged.compat.terrablender.TBSurfaceRules;
 import com.pandaismyname1.ultraterraforged.platform.RegistryUtil;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noise;
@@ -27,11 +27,11 @@ public class UTFSurfaceRules {
 		return new LayeredSurfaceRule(layers);
 	}
 	
-	public static NoiseRule noise(Holder<Noise> noise, List<Pair<Float, SurfaceRules.RuleSource>> rules) {
+	public static NoiseRule noise(Holder<Noise> noise, List<Pair<Float, MaterialRule>> rules) {
 		return new NoiseRule(noise, rules);
 	}
 	
-	public static void register(String name, Codec<? extends SurfaceRules.RuleSource> value) {
-		RegistryUtil.register(BuiltInRegistries.MATERIAL_RULE, name, UTFCodecs.entry(value));
+	public static void register(String name, Codec<? extends MaterialRule> value) {
+		RegistryUtil.register(BuiltInRegistries.MATERIAL_RULE_TYPE, name, UTFCodecs.entry(value));
 	}
 }

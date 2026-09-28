@@ -1,21 +1,23 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.biome.spawn;
 
 import java.util.List;
+import java.util.Map;
 
-import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.biome.Climate;
-import net.minecraft.world.level.biome.Climate.ParameterPoint;
+import net.minecraft.world.level.levelgen.NoiseRouterData;
+import net.minecraft.world.level.levelgen.SpawnTargetPoint;
+import net.minecraft.world.level.levelgen.densityfunction.DensityFunction;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
 import com.pandaismyname1.ultraterraforged.world.worldgen.util.PosUtil;
 
 public enum SpawnType implements StringRepresentable {
     CONTINENT_CENTER("CONTINENT_CENTER") {
         private static final Climate.Parameter FULL_RANGE = Climate.Parameter.span(-1.0F, 1.0F);
-        private static final Climate.Parameter SURFACE_DEPTH = Climate.Parameter.point(0.0F);
         private static final Climate.Parameter INLAND_CONTINENTALNESS = Climate.Parameter.span(-0.11F, 0.55F);
 
 		@Override
@@ -23,12 +25,19 @@ public enum SpawnType implements StringRepresentable {
     		long center = ctx.localHeightmap.get().continent().getNearestCenter(0.0F, 0.0F);
     		return new BlockPos(PosUtil.unpackLeft(center), 0, PosUtil.unpackRight(center));
     	}
-    	
+
+		// inland, anywhere in the climate
 		@Override
-		public List<ParameterPoint> getParameterPoints() {
-			return List.of(new Climate.ParameterPoint(FULL_RANGE, FULL_RANGE, Climate.Parameter.span(INLAND_CONTINENTALNESS, FULL_RANGE), FULL_RANGE, SURFACE_DEPTH, FULL_RANGE, 0L), new Climate.ParameterPoint(FULL_RANGE, FULL_RANGE, Climate.Parameter.span(INLAND_CONTINENTALNESS, FULL_RANGE), FULL_RANGE, SURFACE_DEPTH, FULL_RANGE, 0L));
+		public List<SpawnTargetPoint> getTargetPoints(HolderGetter<DensityFunction> functions) {
+			return List.of(new SpawnTargetPoint(Map.of(
+				functions.getOrThrow(NoiseRouterData.OVERWORLD_FUNCTIONS.temperature()), FULL_RANGE,
+				functions.getOrThrow(NoiseRouterData.OVERWORLD_FUNCTIONS.vegetation()), FULL_RANGE,
+				functions.getOrThrow(NoiseRouterData.OVERWORLD_FUNCTIONS.continents()), Climate.Parameter.span(INLAND_CONTINENTALNESS, FULL_RANGE),
+				functions.getOrThrow(NoiseRouterData.OVERWORLD_FUNCTIONS.erosion()), FULL_RANGE,
+				functions.getOrThrow(NoiseRouterData.RIDGES), FULL_RANGE
+			)));
 		}
-	}, 
+	},
     ISLANDS("ISLANDS") {
 
 		@Override
@@ -37,8 +46,8 @@ public enum SpawnType implements StringRepresentable {
 		}
 
 		@Override
-		public List<ParameterPoint> getParameterPoints() {
-			return ImmutableList.of();
+		public List<SpawnTargetPoint> getTargetPoints(HolderGetter<DensityFunction> functions) {
+			return List.of();
 		}
 	},
     WORLD_ORIGIN("WORLD_ORIGIN") {
@@ -49,25 +58,26 @@ public enum SpawnType implements StringRepresentable {
 		}
 
 		@Override
-		public List<ParameterPoint> getParameterPoints() {
-			return ImmutableList.of();
+		public List<SpawnTargetPoint> getTargetPoints(HolderGetter<DensityFunction> functions) {
+			return List.of();
 		}
 	};
-	
+
 	public static final Codec<SpawnType> CODEC = StringRepresentable.fromEnum(SpawnType::values);
 
 	private String name;
-	
+
 	private SpawnType(String name) {
 		this.name = name;
 	}
-	
+
 	@Override
 	public String getSerializedName() {
 		return this.name;
 	}
-	
+
 	public abstract BlockPos getSearchCenter(GeneratorContext ctx);
-	
-	public abstract List<ParameterPoint> getParameterPoints();
+
+	// where around the search center the spawn may be, as the noise settings' spawn target; none spawns at the center
+	public abstract List<SpawnTargetPoint> getTargetPoints(HolderGetter<DensityFunction> functions);
 }

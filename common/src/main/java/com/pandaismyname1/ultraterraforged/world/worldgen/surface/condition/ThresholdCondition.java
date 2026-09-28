@@ -1,6 +1,6 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.surface.condition;
 
-import net.minecraft.world.level.levelgen.SurfaceRules.Context;
+import net.minecraft.world.level.levelgen.material.MaterialRuleContext;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.Cell;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noise;
 
@@ -8,7 +8,7 @@ abstract class ThresholdCondition extends CellCondition {
 	private Noise threshold;
 	private Noise variance;
 	
-	public ThresholdCondition(Context context, Noise threshold, Noise variance) {
+	public ThresholdCondition(MaterialRuleContext context, Noise threshold, Noise variance) {
 		super(context);
 		
 		this.threshold = threshold;

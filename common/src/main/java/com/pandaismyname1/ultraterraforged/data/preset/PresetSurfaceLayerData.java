@@ -13,10 +13,10 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.levelgen.SurfaceRules;
+import net.minecraft.world.level.levelgen.material.MaterialRules;
+import net.minecraft.world.level.levelgen.material.condition.MaterialCondition;
+import net.minecraft.world.level.levelgen.material.rule.MaterialRule;
 import com.pandaismyname1.ultraterraforged.UTFCommon;
-import com.pandaismyname1.ultraterraforged.compat.terrablender.TBCompat;
-import com.pandaismyname1.ultraterraforged.compat.terrablender.TBSurfaceRules;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.SurfaceSettings;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.WorldSettings;
@@ -28,21 +28,20 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.surface.condition.UTFS
 import com.pandaismyname1.ultraterraforged.world.worldgen.surface.rule.LayeredSurfaceRule;
 import com.pandaismyname1.ultraterraforged.world.worldgen.surface.rule.UTFSurfaceRules;
 import com.pandaismyname1.ultraterraforged.world.worldgen.util.Scaling;
-import terrablender.core.TerraBlender;
 
 public class PresetSurfaceLayerData {
-	private static final SurfaceRules.RuleSource ORANGE_TERRACOTTA = makeStateRule(Blocks.DYED_TERRACOTTA.orange());
-	private static final SurfaceRules.RuleSource BROWN_TERRACOTTA = makeStateRule(Blocks.DYED_TERRACOTTA.brown());
-	private static final SurfaceRules.RuleSource TERRACOTTA = makeStateRule(Blocks.TERRACOTTA);
-    private static final SurfaceRules.RuleSource SMOOTH_SANDSTONE = makeStateRule(Blocks.SMOOTH_SANDSTONE);
+	private static final MaterialRule ORANGE_TERRACOTTA = makeStateRule(Blocks.DYED_TERRACOTTA.orange());
+	private static final MaterialRule BROWN_TERRACOTTA = makeStateRule(Blocks.DYED_TERRACOTTA.brown());
+	private static final MaterialRule TERRACOTTA = makeStateRule(Blocks.TERRACOTTA);
+    private static final MaterialRule SMOOTH_SANDSTONE = makeStateRule(Blocks.SMOOTH_SANDSTONE);
 
-	private static final SurfaceRules.RuleSource GRASS = makeStateRule(Blocks.GRASS_BLOCK);
-	private static final SurfaceRules.RuleSource DIRT = makeStateRule(Blocks.DIRT);
-	private static final SurfaceRules.RuleSource PODZOL = makeStateRule(Blocks.PODZOL);
-	private static final SurfaceRules.RuleSource STONE = makeStateRule(Blocks.STONE);
-    private static final SurfaceRules.RuleSource COARSE_DIRT = makeStateRule(Blocks.COARSE_DIRT);
-    private static final SurfaceRules.RuleSource GRAVEL = makeStateRule(Blocks.GRAVEL);
-    private static final SurfaceRules.RuleSource SAND = makeStateRule(Blocks.SAND);
+	private static final MaterialRule GRASS = makeStateRule(Blocks.GRASS_BLOCK);
+	private static final MaterialRule DIRT = makeStateRule(Blocks.DIRT);
+	private static final MaterialRule PODZOL = makeStateRule(Blocks.PODZOL);
+	private static final MaterialRule STONE = makeStateRule(Blocks.STONE);
+    private static final MaterialRule COARSE_DIRT = makeStateRule(Blocks.COARSE_DIRT);
+    private static final MaterialRule GRAVEL = makeStateRule(Blocks.GRAVEL);
+    private static final MaterialRule SAND = makeStateRule(Blocks.SAND);
 	
 	public static void bootstrap(Preset preset, BootstrapContext<LayeredSurfaceRule.Layer> ctx) {
 		HolderGetter<Biome> biomes = ctx.lookup(Registries.BIOME);
@@ -62,11 +61,11 @@ public class PresetSurfaceLayerData {
 
     private static LayeredSurfaceRule.Layer makeDirtErosion(HolderGetter<Noise> noise, SurfaceSettings.Erosion settings) {
 		return LayeredSurfaceRule.layer(
-	    	SurfaceRules.ifTrue(
+	    	MaterialRules.ifTrue(
 	    		erosionBiomeCheck(),
-	    		SurfaceRules.ifTrue(
+	    		MaterialRules.ifTrue(
 		    		UTFSurfaceConditions.steepness(settings.dirtSteepness, noise.getOrThrow(PresetSurfaceNoise.STEEPNESS_VARIANCE)),
-		    		SurfaceRules.ifTrue(
+		    		MaterialRules.ifTrue(
 		    			UTFSurfaceConditions.height(noise.getOrThrow(PresetSurfaceNoise.ERODED_DIRT), noise.getOrThrow(PresetSurfaceNoise.HEIGHT_VARIANCE)),
 		    			COARSE_DIRT
 		    		)
@@ -77,38 +76,38 @@ public class PresetSurfaceLayerData {
 
 	private static LayeredSurfaceRule.Layer makeBadlandsErosion(HolderGetter<Biome> biomes) {
 		return LayeredSurfaceRule.layer(
-			SurfaceRules.ifTrue(
-				SurfaceRules.isBiome(biomes, Biomes.WOODED_BADLANDS),
-				SurfaceRules.bandlands()
+			MaterialRules.ifTrue(
+				MaterialRules.isBiome(biomes, Biomes.WOODED_BADLANDS),
+				MaterialRules.bandlands()
 			)
 		);
 	}
 	
 //	private static LayeredSurfaceRule.Layer makeErosion(SurfaceSettings.Erosion erosion, HolderGetter<Noise> noise) {
-//		SurfaceRules.ConditionSource erodedRock = UTFSurfaceConditions.steepness(erosion.rockSteepness, noise.getOrThrow(PresetSurfaceNoise.STEEPNESS_VARIANCE));
-//		SurfaceRules.ConditionSource erodedRockVariance = UTFSurfaceConditions.height(noise.getOrThrow(PresetSurfaceNoise.ERODED_ROCK), noise.getOrThrow(PresetSurfaceNoise.HEIGHT_VARIANCE));
-//		SurfaceRules.RuleSource erodedMaterial = UTFSurfaceRules.layered(UTFSurfaceLayerTags.EROSION_MATERIAL);
-//		SurfaceRules.RuleSource erode = SurfaceRules.sequence(
-//			SurfaceRules.ifTrue(
+//		MaterialCondition erodedRock = UTFSurfaceConditions.steepness(erosion.rockSteepness, noise.getOrThrow(PresetSurfaceNoise.STEEPNESS_VARIANCE));
+//		MaterialCondition erodedRockVariance = UTFSurfaceConditions.height(noise.getOrThrow(PresetSurfaceNoise.ERODED_ROCK), noise.getOrThrow(PresetSurfaceNoise.HEIGHT_VARIANCE));
+//		MaterialRule erodedMaterial = UTFSurfaceRules.layered(UTFSurfaceLayerTags.EROSION_MATERIAL);
+//		MaterialRule erode = MaterialRules.sequence(
+//			MaterialRules.ifTrue(
 //				erodedRock, 
 //				erodedMaterial
 //			),	
-//			SurfaceRules.ifTrue(
+//			MaterialRules.ifTrue(
 //				erodedRockVariance,
 //				erodedMaterial
 //			)
 //		);
 //		return LayeredSurfaceRule.layer(
 //			SurfaceRuleData.overworld(),
-//			SurfaceRules.ifTrue(
-//				SurfaceRules.abovePreliminarySurface(),
-//				SurfaceRules.sequence(
-//					SurfaceRules.ifTrue(
-//						SurfaceRules.ON_FLOOR, 
+//			MaterialRules.ifTrue(
+//				MaterialRules.abovePreliminarySurface(),
+//				MaterialRules.sequence(
+//					MaterialRules.ifTrue(
+//						ON_FLOOR, 
 //						erode
 //					),
-//					SurfaceRules.ifTrue(
-//						SurfaceRules.UNDER_FLOOR,
+//					MaterialRules.ifTrue(
+//						UNDER_FLOOR,
 //						erode
 //					)
 //				)
@@ -121,27 +120,27 @@ public class PresetSurfaceLayerData {
     	float min = scaling.ground(10);
     	float level = scaling.ground(40);
     	
-    	SurfaceRules.ConditionSource aboveLevel = UTFSurfaceConditions.height(level, variance);
+    	MaterialCondition aboveLevel = UTFSurfaceConditions.height(level, variance);
 		return LayeredSurfaceRule.layer(
-	    	SurfaceRules.ifTrue(
-	    		SurfaceRules.isBiome(biomes, Biomes.DESERT),
-	    		SurfaceRules.ifTrue(
+	    	MaterialRules.ifTrue(
+	    		MaterialRules.isBiome(biomes, Biomes.DESERT),
+	    		MaterialRules.ifTrue(
 		    		UTFSurfaceConditions.height(min), 
-		    		SurfaceRules.sequence(
-		    			SurfaceRules.ifTrue(
+		    		MaterialRules.sequence(
+		    			MaterialRules.ifTrue(
 		    				UTFSurfaceConditions.steepness(0.15F), 
-		    				SurfaceRules.ifTrue(
+		    				MaterialRules.ifTrue(
 		    					aboveLevel, 
-		    					SurfaceRules.sequence(
-		    						SurfaceRules.ifTrue(UTFSurfaceConditions.steepness(0.975F), TERRACOTTA),
-		    						SurfaceRules.ifTrue(UTFSurfaceConditions.steepness(0.85F), BROWN_TERRACOTTA),
-		    						SurfaceRules.ifTrue(UTFSurfaceConditions.steepness(0.75F), ORANGE_TERRACOTTA),
-		    						SurfaceRules.ifTrue(UTFSurfaceConditions.steepness(0.65F), TERRACOTTA), 
+		    					MaterialRules.sequence(
+		    						MaterialRules.ifTrue(UTFSurfaceConditions.steepness(0.975F), TERRACOTTA),
+		    						MaterialRules.ifTrue(UTFSurfaceConditions.steepness(0.85F), BROWN_TERRACOTTA),
+		    						MaterialRules.ifTrue(UTFSurfaceConditions.steepness(0.75F), ORANGE_TERRACOTTA),
+		    						MaterialRules.ifTrue(UTFSurfaceConditions.steepness(0.65F), TERRACOTTA), 
 		    						SMOOTH_SANDSTONE
 		    					)
 		    				)
 		    			),
-		        		SurfaceRules.ifTrue(
+		        		MaterialRules.ifTrue(
 		        			UTFSurfaceConditions.steepness(0.3F), 
 		        			SMOOTH_SANDSTONE
 		            	)
@@ -153,8 +152,8 @@ public class PresetSurfaceLayerData {
 
     private static LayeredSurfaceRule.Layer makeForest(HolderGetter<Biome> biomes, HolderGetter<Noise> noise) {
 		return LayeredSurfaceRule.layer(
-			SurfaceRules.ifTrue(
-				SurfaceRules.isBiome(biomes, Biomes.FOREST, Biomes.DARK_FOREST),
+			MaterialRules.ifTrue(
+				MaterialRules.isBiome(biomes, Biomes.FOREST, Biomes.DARK_FOREST),
 				UTFSurfaceRules.noise(
 					noise.getOrThrow(PresetSurfaceNoise.FOREST), 
 					List.of(
@@ -169,7 +168,7 @@ public class PresetSurfaceLayerData {
 
     private static LayeredSurfaceRule.Layer makeRiverBank(HolderGetter<Noise> noise) {
 		return LayeredSurfaceRule.layer(
-			SurfaceRules.ifTrue(
+			MaterialRules.ifTrue(
 				UTFSurfaceConditions.riverBank(0.002F),
 				UTFSurfaceRules.noise(
 					noise.getOrThrow(PresetSurfaceNoise.RIVER_BANK), 
@@ -182,12 +181,12 @@ public class PresetSurfaceLayerData {
     	);
     }
 	
-    private static SurfaceRules.ConditionSource erosionBiomeCheck() {
-    	return SurfaceRules.not(UTFSurfaceConditions.biomeTag(UTFBiomeTags.EROSION_BLACKLIST));
+    private static MaterialCondition erosionBiomeCheck() {
+    	return MaterialRules.not(UTFSurfaceConditions.biomeTag(UTFBiomeTags.EROSION_BLACKLIST));
     }
     
-    private static SurfaceRules.RuleSource makeStateRule(Block block) {
-        return SurfaceRules.state(block.defaultBlockState());
+    private static MaterialRule makeStateRule(Block block) {
+        return MaterialRules.state(block.defaultBlockState());
     }
 
     public static ResourceKey<LayeredSurfaceRule.Layer> createKey(String name) {

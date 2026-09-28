@@ -43,7 +43,8 @@ public class PresetBlockTagsProvider extends TagsProvider<Block> {
 		// deepslate is layered on its own, with the rocks ores turn into deepslate ores in
 		this.tag(UTFBlockTags.DEEP_ROCK).addOptionalTag(BlockTags.DEEPSLATE_ORE_REPLACEABLES);
 		this.tag(UTFBlockTags.STRATA_EXCLUDED).add(key(Blocks.DEEPSLATE));
-		this.tag(BlockTags.OVERWORLD_CARVER_REPLACEABLES).add(key(Blocks.CLAY));
+		// clay used to be added to overworld_carver_replaceables so caves cut through it; since 26.3 carvers cut every
+		// block except minecraft:uncarvable (bedrock), so it needs no tag
 	}
 
 	// since 26.2 tags are written from resource keys only

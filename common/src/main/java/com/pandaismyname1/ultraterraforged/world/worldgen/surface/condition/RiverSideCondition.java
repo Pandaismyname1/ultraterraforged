@@ -1,12 +1,12 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.surface.condition;
 
+import net.minecraft.world.level.levelgen.material.condition.MaterialCondition;
+import net.minecraft.world.level.levelgen.material.MaterialRuleContext;
 import com.pandaismyname1.ultraterraforged.data.UTFCodecs;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.world.level.levelgen.SurfaceRules;
-import net.minecraft.world.level.levelgen.SurfaceRules.Context;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.Cell;
 
 /**
@@ -15,7 +15,7 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.cell.Cell;
 class RiverSideCondition extends CellCondition {
 	private final float within;
 
-	public RiverSideCondition(Context context, float within) {
+	public RiverSideCondition(MaterialRuleContext context, float within) {
 		super(context);
 		this.within = within;
 	}
@@ -25,13 +25,13 @@ class RiverSideCondition extends CellCondition {
 		return cell.riverBank < this.within;
 	}
 
-	public record Source(float within) implements SurfaceRules.ConditionSource {
+	public record Source(float within) implements MaterialCondition {
 		public static final Codec<Source> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Codec.FLOAT.fieldOf("within").forGetter(Source::within)
 		).apply(instance, Source::new));
 
 		@Override
-		public RiverSideCondition apply(Context ctx) {
+		public RiverSideCondition compile(MaterialRuleContext ctx) {
 			return new RiverSideCondition(ctx, this.within);
 		}
 

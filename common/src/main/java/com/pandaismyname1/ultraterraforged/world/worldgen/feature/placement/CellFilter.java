@@ -12,10 +12,10 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
 import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.Cell;
 
-abstract class CellFilter extends PlacementFilter {
+abstract class CellFilter implements PlacementFilter {
 	
 	@Override
-	protected boolean shouldPlace(PlacementContext ctx, RandomSource rand, BlockPos pos) {
+	public boolean shouldPlace(PlacementContext ctx, RandomSource rand, BlockPos pos) {
 		WorldGenLevel level = ctx.getLevel();
 		RandomState randomState = level.getLevel().getChunkSource().randomState();
 		

@@ -4,17 +4,17 @@ import java.util.List;
 import java.util.Set;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.placement.PlacementContext;
-import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.Cell;
 import com.pandaismyname1.ultraterraforged.world.worldgen.terrain.Terrain;
 
 class TerrainFilter extends CellFilter {
-	public static final Codec<TerrainFilter> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+	public static final MapCodec<TerrainFilter> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
 		Terrain.CODEC.listOf().xmap(Set::copyOf, List::copyOf).fieldOf("terrain").forGetter((filter) -> filter.terrain),
 		Codec.BOOL.fieldOf("exclude").forGetter((filter) -> filter.exclude)
 	).apply(instance, TerrainFilter::new));
@@ -34,7 +34,7 @@ class TerrainFilter extends CellFilter {
 	}
 	
 	@Override
-	public PlacementModifierType<TerrainFilter> type() {
-		return UTFPlacementModifiers.TERRAIN_FILTER;
+	public MapCodec<TerrainFilter> codec() {
+		return CODEC;
 	}
 }

@@ -14,6 +14,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
+import net.minecraft.world.level.levelgen.structure.placement.AbstractSpreadingStructurePlacement;
 import net.minecraft.world.level.levelgen.structure.placement.ConcentricRingsStructurePlacement;
 import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement;
 import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement;
@@ -53,9 +54,14 @@ public class PresetStructureSets {
 	}
 
 	private static StructurePlacement placement(StructurePlacement original, StructureSetEntry entry, HolderGetter<StructureSet> structureSets, HolderGetter<Biome> biomes) {
-		float frequency = entry.frequency != null ? entry.frequency : original.frequency;
-		int salt = entry.salt != null ? entry.salt : original.salt;
-		Optional<StructurePlacement.ExclusionZone> exclusionZone = original.exclusionZone.map((zone) -> new StructurePlacement.ExclusionZone(reference(structureSets, zone.otherSet()), zone.chunkCount()));
+		// since 26.3 only spreading placements have a frequency, salt and exclusion zone (the new dimension_origin placement doesn't)
+		if (!(original instanceof AbstractSpreadingStructurePlacement spreading)) {
+			// other placement types (from vanilla or mods) can only be switched on and off
+			return original;
+		}
+		float frequency = entry.frequency != null ? entry.frequency : spreading.frequency();
+		int salt = entry.salt != null ? entry.salt : spreading.salt();
+		Optional<AbstractSpreadingStructurePlacement.ExclusionZone> exclusionZone = spreading.exclusionZone().map((zone) -> new AbstractSpreadingStructurePlacement.ExclusionZone(reference(structureSets, zone.otherSet()), zone.chunkCount()));
 
 		if (original instanceof RandomSpreadStructurePlacement randomSpread) {
 			int spacing = entry.spacing != null ? entry.spacing : randomSpread.spacing();
@@ -63,15 +69,15 @@ public class PresetStructureSets {
 			// vanilla rejects placements where separation isn't smaller than spacing
 			spacing = Math.max(spacing, 1);
 			separation = Math.max(0, Math.min(separation, spacing - 1));
-			return new RandomSpreadStructurePlacement(original.locateOffset, original.frequencyReductionMethod, frequency, salt, exclusionZone, spacing, separation, randomSpread.spreadType());
+			return new RandomSpreadStructurePlacement(spreading.locateOffset(), spreading.frequencyReductionMethod(), frequency, salt, exclusionZone, spacing, separation, randomSpread.spreadType());
 		}
 		if (original instanceof ConcentricRingsStructurePlacement rings) {
 			int distance = entry.distance != null ? entry.distance : rings.distance();
 			int spread = entry.spread != null ? entry.spread : rings.spread();
 			int count = entry.count != null ? entry.count : rings.count();
-			return new ConcentricRingsStructurePlacement(original.locateOffset, original.frequencyReductionMethod, frequency, salt, exclusionZone, distance, spread, count, reference(biomes, rings.preferredBiomes()));
+			return new ConcentricRingsStructurePlacement(spreading.locateOffset(), spreading.frequencyReductionMethod(), frequency, salt, exclusionZone, distance, spread, count, reference(biomes, rings.preferredBiomes()));
 		}
-		// other placement types (from mods) can only be switched on and off
+		// other spreading placement types (from mods) can only be switched on and off
 		return original;
 	}
 

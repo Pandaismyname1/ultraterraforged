@@ -1,7 +1,6 @@
 package com.pandaismyname1.ultraterraforged.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -44,7 +43,7 @@ public class PerformanceModsTest {
 	@Test
 	void onlyModsWithABuildCount() {
 		Report fabric = fabric();
-		// no Noisium, AllTheLeaks or ModernFix for 26.2, and C2ME OpenCL is optional
+		// no Noisium, AllTheLeaks, ModernFix or C2ME OpenCL for 26.3
 		assertEquals(3, fabric.available());
 		assertEquals(PerformanceMods.MODS.size(), fabric.statuses().size());
 		assertTrue(!status(fabric, "noisium").isAvailable());
@@ -55,15 +54,10 @@ public class PerformanceModsTest {
 	}
 
 	@Test
-	void optionalModsCountOnceInstalled() {
-		assertNotNull(status(fabric(), "c2meOpenCl").recommended());
-		Report withOpenCl = fabric("c2me", "c2me-opts-accel-opencl", "lithium", "sodium");
-		assertEquals(4, withOpenCl.installed());
-		assertEquals(4, withOpenCl.available());
-		assertEquals(Light.GREEN, withOpenCl.light());
-		// the NeoForge build loads under an id with underscores
-		assertNotNull(status(neoforge("c2me_opts_accel_opencl"), "c2meOpenCl").installed());
-		// and needs Java 25
-		assertNull(status(PerformanceMods.report(PerformanceMods.FABRIC, (id) -> false, 21), "c2meOpenCl").recommended());
+	void optionalModsWithoutABuildDontCount() {
+		// no C2ME OpenCL for 26.3: listed, greyed out, and not asked for
+		assertNull(status(fabric(), "c2meOpenCl").recommended());
+		assertNull(status(neoforge(), "c2meOpenCl").recommended());
+		assertEquals(Light.GREEN, fabric("c2me", "lithium", "sodium").light());
 	}
 }

@@ -7,8 +7,9 @@ UltraTerraForged is a continuation of [ReTerraForged](https://github.com/racoonm
 continued [TerraForged](https://github.com/TerraForged/TerraForged). It only shapes the world: it adds no biomes, and
 works alongside the mods that do.
 
-- Minecraft 26.2, on Fabric (with Fabric API) and NeoForge 26.2, with Java 25. Each Minecraft version has its own
-  branch: see [`26.1`](https://github.com/Pandaismyname1/ultraterraforged/tree/26.1) (26.1 to 26.1.2),
+- Minecraft 26.3, on Fabric (with Fabric API) and NeoForge 26.3 (beta), with Java 25. Each Minecraft version has its
+  own branch: see [`26.2`](https://github.com/Pandaismyname1/ultraterraforged/tree/26.2),
+  [`26.1`](https://github.com/Pandaismyname1/ultraterraforged/tree/26.1) (26.1 to 26.1.2),
   [`1.21.1`](https://github.com/Pandaismyname1/ultraterraforged/tree/1.21.1) and
   [`1.20.1`](https://github.com/Pandaismyname1/ultraterraforged/tree/1.20.1) (Fabric, Forge and NeoForge 47.1).
 - Maintained by pandaismyname1
@@ -108,8 +109,8 @@ rather than in flat fields.
 
 ### Performance
 
-- The Terrain tab recommends performance mods and shows with a light which of them are installed: C2ME, C2ME OpenCL
-  (optional), Lithium and Sodium. With them, UltraTerraForged generates new land as fast as
+- The Terrain tab recommends performance mods and shows with a light which of them are installed: C2ME, Lithium and
+  Sodium. With them, UltraTerraForged generates new land as fast as
   vanilla, or faster.
 - Tested and benchmarked with each; see [docs/porting/performance-mods.md](docs/porting/performance-mods.md).
 
@@ -166,7 +167,7 @@ presets. Dedicated servers seed `config/ultraterraforged/server-preset.json` fro
 
 Builds are published to the `maven` branch of this repository on every release: `ultraterraforged-fabric` and
 `ultraterraforged-neoforge` (`ultraterraforged-forge` for 1.20.1), each with a `sources` classifier, under the group
-`com.pandaismyname1.ultraterraforged`. Versions look like `0.1.0-alpha.1+26.2`.
+`com.pandaismyname1.ultraterraforged`. Versions look like `0.1.0-alpha.1+26.3`.
 
 ```groovy
 repositories {
@@ -182,7 +183,7 @@ repositories {
 }
 
 dependencies {
-    implementation "com.pandaismyname1.ultraterraforged:ultraterraforged-fabric:0.1.0-alpha.1+26.2"
+    implementation "com.pandaismyname1.ultraterraforged:ultraterraforged-fabric:0.1.0-alpha.1+26.3"
 }
 ```
 

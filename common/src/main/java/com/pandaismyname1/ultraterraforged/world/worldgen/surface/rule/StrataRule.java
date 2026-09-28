@@ -25,11 +25,15 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.FallingBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.SurfaceRules;
-import net.minecraft.world.level.levelgen.SurfaceRules.Context;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.levelgen.VerticalAnchor;
+import net.minecraft.world.level.levelgen.material.MaterialRuleContext;
+import net.minecraft.world.level.levelgen.material.rule.MaterialRule;
+import net.minecraft.world.level.levelgen.material.rule.RuleEvaluator;
 import com.pandaismyname1.ultraterraforged.UTFCommon;
 import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noise;
+import com.pandaismyname1.ultraterraforged.world.worldgen.surface.UTFMaterialContext;
 import com.pandaismyname1.ultraterraforged.world.worldgen.surface.UTFSurfaceSystem;
 
 /**
@@ -43,7 +47,7 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.surface.UTFSurfaceSyst
  * @param excluded rocks never to layer, even though a mod tagged them as stone
  * @param base the main rock, like stone above deepslate, which fills about {@code baseShare} of the layers
  */
-public record StrataRule(Identifier cacheId, Holder<Noise> selector, Holder<Noise> offset, Holder<Noise> thickness, Block base, float baseShare, TagKey<Block> materials, TagKey<Block> excluded, int variants, int minThickness, int maxThickness) implements SurfaceRules.RuleSource {
+public record StrataRule(Identifier cacheId, Holder<Noise> selector, Holder<Noise> offset, Holder<Noise> thickness, Block base, float baseShare, TagKey<Block> materials, TagKey<Block> excluded, int variants, int minThickness, int maxThickness) implements MaterialRule {
 	public static final Codec<StrataRule> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 		Identifier.CODEC.fieldOf("cache_id").forGetter(StrataRule::cacheId),
 		Noise.CODEC.fieldOf("selector").forGetter(StrataRule::selector),
@@ -65,13 +69,18 @@ public record StrataRule(Identifier cacheId, Holder<Noise> selector, Holder<Nois
 	private static final int PIVOT_Y = 64;
 
 	@Override
-	public SurfaceRules.SurfaceRule apply(Context ctx) {
-		if (!((Object) ctx.system instanceof UTFSurfaceSystem surfaceSystem) || !((Object) ctx.randomState instanceof UTFRandomState randomState)) {
-			throw new IllegalStateException("Strata need UltraTerraForged's surface system");
+	public RuleEvaluator compile(MaterialRuleContext ctx) {
+		UTFRandomState randomState = UTFMaterialContext.utfRandomState(ctx);
+		if (randomState == null) {
+			throw new IllegalStateException("Strata need UltraTerraForged's random state");
 		}
-		int bottom = ctx.chunk.getMinY();
+		UTFSurfaceSystem surfaceSystem = UTFMaterialContext.surfaceSystem(ctx);
+		// the chunk's build limits; the generator's when there's no chunk
+		ChunkAccess chunk = UTFMaterialContext.chunk();
+		int bottom = chunk != null ? chunk.getMinY() : ctx.resolveAnchorY(VerticalAnchor.bottom());
 		// getMaxY() is the top block, one below what getMaxBuildHeight() was
-		int height = ctx.chunk.getMaxY() + 1 - bottom + MARGIN * 2;
+		int top = chunk != null ? chunk.getMaxY() : ctx.resolveAnchorY(VerticalAnchor.top());
+		int height = top + 1 - bottom + MARGIN * 2;
 		List<StrataStack> stacks = surfaceSystem.getOrCreateStrata(this.cacheId, (random) -> this.generate(random, height));
 		// the noises are seeded by the world, so every world has its own regions and folds
 		return new Rule(stacks, bottom, randomState.wrap(this.selector.value()), randomState.wrap(this.offset.value()), randomState.wrap(this.thickness.value()));
@@ -111,7 +120,7 @@ public record StrataRule(Identifier cacheId, Holder<Noise> selector, Holder<Nois
 		return materials;
 	}
 
-	private class Rule implements SurfaceRules.SurfaceRule {
+	private class Rule implements RuleEvaluator {
 		private final List<StrataStack> stacks;
 		private final int bottom;
 		private final Noise selector;

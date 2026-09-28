@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.Heightmap.Types;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.placement.BiomeFilter;
 import net.minecraft.world.level.levelgen.placement.BlockPredicateFilter;
 import net.minecraft.world.level.levelgen.placement.CountPlacement;
@@ -98,7 +98,7 @@ public class PresetPlacedFeatures {
 	public static final ResourceKey<PlacedFeature> JUNGLE_EDGE_TREES = createKey("jungle_edge_trees");
     
 	public static void bootstrap(Preset preset, BootstrapContext<PlacedFeature> ctx) {
-		HolderGetter<ConfiguredFeature<?, ?>> features = ctx.lookup(Registries.CONFIGURED_FEATURE);
+		HolderGetter<Feature> features = ctx.lookup(Registries.FEATURE);
 		HolderGetter<Noise> noises = ctx.lookup(UTFRegistries.NOISE);
 		
 		MiscellaneousSettings miscellaneous = preset.miscellaneous();
@@ -157,7 +157,7 @@ public class PresetPlacedFeatures {
             PlacementUtils.register(ctx, SPRUCE_SMALL, features.getOrThrow(PresetConfiguredFeatures.SPRUCE_SMALL), PlacementUtils.filteredByBlockSurvival(Blocks.SPRUCE_SAPLING));
             PlacementUtils.register(ctx, SPRUCE_LARGE, features.getOrThrow(PresetConfiguredFeatures.SPRUCE_LARGE), PlacementUtils.filteredByBlockSurvival(Blocks.SPRUCE_SAPLING));
 
-            BlockPredicate isSnowPredicate = BlockPredicate.matchesBlocks(Direction.DOWN.getUnitVec3i(), Blocks.SNOW_BLOCK, Blocks.POWDER_SNOW);
+            BlockPredicate isSnowPredicate = BlockPredicate.matchesBlocks(Direction.DOWN, Blocks.SNOW_BLOCK, Blocks.POWDER_SNOW);
             List<PlacementModifier> onSnowPlacement = List.of(EnvironmentScanPlacement.scanningFor(Direction.UP, BlockPredicate.not(BlockPredicate.matchesBlocks(Blocks.POWDER_SNOW)), 8), BlockPredicateFilter.forPredicate(isSnowPredicate));
             PlacementUtils.register(ctx, SPRUCE_SMALL_ON_SNOW, features.getOrThrow(PresetConfiguredFeatures.SPRUCE_SMALL_ON_SNOW), onSnowPlacement);
             PlacementUtils.register(ctx, SPRUCE_LARGE_ON_SNOW, features.getOrThrow(PresetConfiguredFeatures.SPRUCE_LARGE_ON_SNOW), onSnowPlacement);

@@ -47,7 +47,7 @@ public class DataGenUtilImpl {
 	        return this.registries.thenCompose(provider -> {
 	            // a registry patch knows which registries its holders belong to; RegistryOps.create would lose that
 	            RegistryOps<JsonElement> ops = provider.createSerializationContext(JsonOps.INSTANCE);
-	            return CompletableFuture.allOf(DynamicRegistries.getDynamicRegistries().stream().flatMap(arg3 -> this.dumpRegistryCap(arg, provider, ops, arg3).stream()).toArray(CompletableFuture[]::new));
+	            return CompletableFuture.allOf(DynamicRegistries.getWorldRegistries().stream().flatMap(arg3 -> this.dumpRegistryCap(arg, provider, ops, arg3).stream()).toArray(CompletableFuture[]::new));
 	        });
 	    }
 

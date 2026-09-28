@@ -12,7 +12,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.registries.DataPackRegistryEvent;
+import net.neoforged.neoforge.registries.NewDatapackRegistryEvent;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import net.neoforged.neoforge.registries.RegistryBuilder;
@@ -33,7 +33,7 @@ public final class RegistryUtilImpl {
 				entries.forEach((entry) -> entry.register(event));
 			}
 		});
-		bus.addListener((DataPackRegistryEvent.NewRegistry event) -> DATA_REGISTRIES.forEach((registry) -> registry.register(event)));
+		bus.addListener((NewDatapackRegistryEvent event) -> DATA_REGISTRIES.forEach((registry) -> registry.register(event)));
 	}
 
 	public static <T> void register(Registry<T> registry, String name, T value) {
@@ -61,8 +61,8 @@ public final class RegistryUtilImpl {
 	private record DataRegistry<T>(ResourceKey<? extends Registry<T>> key, Codec<T> codec) {
 
 		@SuppressWarnings("unchecked")
-		void register(DataPackRegistryEvent.NewRegistry event) {
-			event.dataPackRegistry((ResourceKey<Registry<T>>) this.key, this.codec);
+		void register(NewDatapackRegistryEvent event) {
+			event.worldRegistry((ResourceKey<Registry<T>>) this.key, this.codec);
 		}
 	}
 }

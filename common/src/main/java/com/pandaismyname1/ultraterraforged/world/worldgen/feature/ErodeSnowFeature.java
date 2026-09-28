@@ -5,11 +5,13 @@ import java.util.function.Predicate;
 import org.jetbrains.annotations.Nullable;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Blocks;
@@ -25,12 +27,9 @@ import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
-import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
 import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.Cell;
-import com.pandaismyname1.ultraterraforged.world.worldgen.feature.ErodeSnowFeature.Config;
 import com.pandaismyname1.ultraterraforged.world.worldgen.heightmap.Levels;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.NoiseUtil;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noise;
@@ -38,7 +37,19 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noises;
 import com.pandaismyname1.ultraterraforged.world.worldgen.terrain.TerrainType;
 import com.pandaismyname1.ultraterraforged.world.worldgen.tile.Tile;
 
-public class ErodeSnowFeature extends Feature<Config> {
+/**
+ * @param aspect how many blocks lower the snow reaches on steep slopes in the shade, and higher on those in the sun
+ */
+public record ErodeSnowFeature(float steepness, float height, boolean erode, boolean smooth, float slopeModifier, float heightModifier, float aspect) implements Feature {
+	public static final MapCodec<ErodeSnowFeature> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+		Codec.FLOAT.fieldOf("steepness").forGetter(ErodeSnowFeature::steepness),
+		Codec.FLOAT.fieldOf("height").forGetter(ErodeSnowFeature::height),
+		Codec.BOOL.fieldOf("erode").forGetter(ErodeSnowFeature::erode),
+		Codec.BOOL.fieldOf("smooth").forGetter(ErodeSnowFeature::smooth),
+		Codec.FLOAT.fieldOf("slope_modifier").forGetter(ErodeSnowFeature::slopeModifier),
+		Codec.FLOAT.fieldOf("height_modifier").forGetter(ErodeSnowFeature::heightModifier),
+		Codec.FLOAT.optionalFieldOf("aspect", 0.0F).forGetter(ErodeSnowFeature::aspect)
+	).apply(instance, ErodeSnowFeature::new));
     private static final float MIN = min(SnowLayerBlock.LAYERS);
     private static final float MAX = max(SnowLayerBlock.LAYERS);
     // the slope is measured over this many blocks either side
@@ -47,20 +58,19 @@ public class ErodeSnowFeature extends Feature<Config> {
     private static final float ASPECT_MIN_SLOPE = 0.15F;
     private static final float ASPECT_FULL_SLOPE = 1.0F;
 
-	public ErodeSnowFeature(Codec<Config> codec) {
-		super(codec);
+	@Override
+	public MapCodec<ErodeSnowFeature> codec() {
+		return CODEC;
 	}
 
 	@Override
-	public boolean place(FeaturePlaceContext<Config> placeContext) {
-		WorldGenLevel level = placeContext.level();
+	public boolean place(WorldGenLevel level, ChunkGenerator generator, RandomSource random, BlockPos origin) {
 		RandomState randomState = level.getLevel().getChunkSource().randomState();
 		
 		@Nullable
 		GeneratorContext generatorContext;
 		if((Object) randomState instanceof UTFRandomState utfRandomState && (generatorContext = utfRandomState.generatorContext()) != null) {
-			ChunkGenerator generator = placeContext.chunkGenerator();
-			ChunkPos chunkPos = ChunkPos.containing(placeContext.origin());
+			ChunkPos chunkPos = ChunkPos.containing(origin);
 			int chunkX = chunkPos.x();
 			int chunkZ = chunkPos.z();
 			ChunkAccess chunk = level.getChunk(chunkX, chunkZ);
@@ -69,12 +79,11 @@ public class ErodeSnowFeature extends Feature<Config> {
 			Levels levels = heightmap.levels();
 			Noise rand = Noises.white(heightmap.climate().randomSeed(), 1);
 			BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
-			Config config = placeContext.config();
 			
-			if (config.aspect() > 0.0F) {
+			if (this.aspect > 0.0F) {
 				for (int x = 0; x < 16; x++) {
 					for (int z = 0; z < 16; z++) {
-						aspectSnow(level, chunk, tileChunk, chunkPos.getBlockX(x), chunkPos.getBlockZ(z), x, z, config.aspect() * shade(tileChunk, x, z, levels), pos);
+						aspectSnow(level, chunk, tileChunk, chunkPos.getBlockX(x), chunkPos.getBlockZ(z), x, z, this.aspect * shade(tileChunk, x, z, levels), pos);
 					}
 				}
 			}
@@ -90,16 +99,16 @@ public class ErodeSnowFeature extends Feature<Config> {
 		        		int worldZ = chunkPos.getBlockZ(z);
 				        pos.set(worldX, surfaceY, worldZ);
 				        
-				        if(config.erode) {
+				        if(this.erode) {
 //				        	if(level.getBiome(pos).value().getTemperature(pos) <= 0.25F) {
 					            float var = -ColumnDecorator.sampleNoise(worldX, worldZ, 16, 0);
-					            float hNoise = rand.compute(worldX, worldZ, 4) * config.heightModifier();
-					            float sNoise = rand.compute(worldX, worldZ, 5) * config.slopeModifier();
+					            float hNoise = rand.compute(worldX, worldZ, 4) * this.heightModifier;
+					            float sNoise = rand.compute(worldX, worldZ, 5) * this.slopeModifier;
 					            float vModifier = cell.terrain == TerrainType.VOLCANO ? 0.15F : 0F;
 					            float height = cell.height;// + var + hNoise + vModifier;
 					            float steepness = cell.gradient;// + var + sNoise + vModifier;
 					            
-					            if (snowErosion(config, worldX, worldZ, steepness, height)) {
+					            if (this.snowErosion(worldX, worldZ, steepness, height)) {
 					                Predicate<BlockState> predicate = Heightmap.Types.MOTION_BLOCKING.isOpaque();
 					                for (int dy = 2; dy > 0; dy--) {
 					                    pos.setY(surfaceY + dy);
@@ -112,7 +121,7 @@ public class ErodeSnowFeature extends Feature<Config> {
 //					        }
 				        }
 				        
-				        if(config.smooth) {
+				        if(this.smooth) {
 				            pos.setY(surfaceY + 1);
 
 				            BlockState state = chunk.getBlockState(pos);
@@ -188,8 +197,8 @@ public class ErodeSnowFeature extends Feature<Config> {
     	}
     }
 
-    private static boolean snowErosion(Config config, float x, float z, float steepness, float height) {
-        return /*steepness > erodeConfig.rockSteepness() ||*/ (steepness * 0.55F > config.steepness());// && height > config.height() || (steepness > erodeConfig.dirtSteepness() && height > ColumnDecorator.sampleNoise(x, z, erodeConfig.dirtVar(), erodeConfig.dirtMin()));
+    private boolean snowErosion(float x, float z, float steepness, float height) {
+        return /*steepness > erodeConfig.rockSteepness() ||*/ (steepness * 0.55F > this.steepness);// && height > config.height() || (steepness > erodeConfig.dirtSteepness() && height > ColumnDecorator.sampleNoise(x, z, erodeConfig.dirtVar(), erodeConfig.dirtMin()));
     }
 
     private static void erodeSnow(ChunkAccess chunk, BlockPos.MutableBlockPos pos) {
@@ -262,19 +271,4 @@ public class ErodeSnowFeature extends Feature<Config> {
     private static int max(Property<Integer> property) {
         return property.getPossibleValues().stream().max(Integer::compareTo).orElse(0);
     }
-
-	/**
-	 * @param aspect how many blocks lower the snow reaches on steep slopes in the shade, and higher on those in the sun
-	 */
-	public record Config(float steepness, float height, boolean erode, boolean smooth, float slopeModifier, float heightModifier, float aspect) implements FeatureConfiguration {
-		public static final Codec<Config> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-			Codec.FLOAT.fieldOf("steepness").forGetter(Config::steepness),
-			Codec.FLOAT.fieldOf("height").forGetter(Config::height),
-			Codec.BOOL.fieldOf("erode").forGetter(Config::erode),
-			Codec.BOOL.fieldOf("smooth").forGetter(Config::smooth),
-			Codec.FLOAT.fieldOf("slope_modifier").forGetter(Config::slopeModifier),
-			Codec.FLOAT.fieldOf("height_modifier").forGetter(Config::heightModifier),
-			Codec.FLOAT.optionalFieldOf("aspect", 0.0F).forGetter(Config::aspect)
-		).apply(instance, Config::new));
-	}
 }

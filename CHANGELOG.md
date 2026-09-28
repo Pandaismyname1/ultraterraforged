@@ -1,7 +1,7 @@
 ### UltraTerraForged
 * UltraTerraForged is a continuation of ReTerraForged (by raccoonman, Steveplays28 and EdoEquin0x), which continued TerraForged (by dags and Won-Ton). Full credit and history are in the README and this repository, a fork of ReTerraForged.
 * It has its own mod id, `ultraterraforged`, and isn't compatible with worlds made with ReTerraForged. The first start copies `config/reterraforged` to `config/ultraterraforged`, keeping saved presets and modpack setups. Dedicated servers use `level-type=ultraterraforged:ultraterraforged`.
-* The first release for Minecraft 26.2, on Fabric (with Fabric API) and NeoForge 26.2. It needs Java 25, as Minecraft 26.2 does. Its terrain generation is the same as in the 1.20.1, 1.21.1 and 26.1 releases.
+* The first release for Minecraft 26.3, on Fabric (with Fabric API) and NeoForge 26.3 (a beta). It needs Java 25, as Minecraft 26.3 does. Minecraft 26.3 rewrote world generation and UltraTerraForged was rebuilt on it; its terrain is the same as in the 1.20.1, 1.21.1, 26.1 and 26.2 releases.
 
 ### Creating worlds
 * A Terrain tab in Create World: presets, the main settings as sliders, and a live map of the result. UltraTerraForged is the default world type (configurable).
@@ -19,7 +19,7 @@
 * `/utf locate <terrain>` finds landforms and puts you on their surface.
 
 ### Performance
-* The Terrain tab recommends performance mods and shows which are installed: C2ME, Lithium and Sodium; C2ME OpenCL is optional, as it needs a graphics card with OpenCL. With them, new land generates as fast as vanilla or faster. Noisium, ModernFix and AllTheLeaks have no 26.2 builds.
+* The Terrain tab recommends performance mods and shows which are installed: C2ME, Lithium and Sodium. With them, new land generates as fast as vanilla or faster. C2ME OpenCL, Noisium, ModernFix and AllTheLeaks have no 26.3 builds.
 * Rock shelters no longer recompute the terrain for every block around a chunk (up to a third faster chunk generation in badlands and plateaus).
 
 ### Fixes

@@ -16,7 +16,7 @@ import com.pandaismyname1.ultraterraforged.compat.worldpreview.WPCompat;
 
 public class MixinPlugin implements IMixinConfigPlugin {
 	private static final String MIXIN_PACKAGE_PREFIX = "com.pandaismyname1.ultraterraforged.mixin.";
-	public static final List<String> TB_MIXINS = ImmutableList.of(mixinClassName("terrablender.MixinClimateSampler"), mixinClassName("terrablender.MixinNoiseChunk"), mixinClassName("terrablender.MixinParameterList"), mixinClassName("terrablender.MixinTargetPoint"));
+	public static final List<String> TB_MIXINS = ImmutableList.of(mixinClassName("terrablender.MixinClimateSampler"), mixinClassName("terrablender.MixinParameterList"), mixinClassName("terrablender.MixinTargetPoint"));
 	public static final List<String> WP_MIXINS = ImmutableList.of(mixinClassName("worldpreview.SampleUtilsMixin"));
 	
 	@Override

@@ -2,7 +2,7 @@ package com.pandaismyname1.ultraterraforged.world.worldgen.feature.placement;
 
 import java.util.List;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.BlockPos;
@@ -15,10 +15,9 @@ import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.placement.PlacementContext;
 import net.minecraft.world.level.levelgen.placement.PlacementFilter;
-import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 
-class DimensionFilter extends PlacementFilter {
-	public static final Codec<DimensionFilter> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+class DimensionFilter implements PlacementFilter {
+	public static final MapCodec<DimensionFilter> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
 		ResourceKey.codec(Registries.LEVEL_STEM).listOf().fieldOf("blacklist").forGetter((filter) -> filter.blacklist)
 	).apply(instance, DimensionFilter::new));
 	
@@ -31,7 +30,7 @@ class DimensionFilter extends PlacementFilter {
 	}
 	
 	@Override
-	protected boolean shouldPlace(PlacementContext ctx, RandomSource rand, BlockPos pos) {
+	public boolean shouldPlace(PlacementContext ctx, RandomSource rand, BlockPos pos) {
 		WorldGenLevel level = ctx.getLevel();
 		MinecraftServer server = level.getServer();
 				
@@ -44,7 +43,7 @@ class DimensionFilter extends PlacementFilter {
 	}	
 
 	@Override
-	public PlacementModifierType<DimensionFilter> type() {
-		return UTFPlacementModifiers.DIMENSION_FILTER;
+	public MapCodec<DimensionFilter> codec() {
+		return CODEC;
 	}
 }

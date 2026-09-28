@@ -2,46 +2,34 @@ package com.pandaismyname1.ultraterraforged.world.worldgen.surface.condition;
 
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.levelgen.SurfaceRules;
-import net.minecraft.world.level.levelgen.SurfaceRules.LazyXZCondition;
+import net.minecraft.world.level.levelgen.material.MaterialRuleContext;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
-import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.Cell;
-import com.pandaismyname1.ultraterraforged.world.worldgen.tile.Tile;
-import com.pandaismyname1.ultraterraforged.world.worldgen.util.PosUtil;
+import com.pandaismyname1.ultraterraforged.world.worldgen.surface.UTFMaterialContext;
 
-abstract class CellCondition extends LazyXZCondition {
+// a condition on the cell under a column, worked out once per column
+abstract class CellCondition extends MaterialRuleContext.LazyXZCondition {
 	@Nullable
-	private Tile.Chunk chunk;
-	private long lastXZ;
-	private boolean lastResult;
-	
+	private final ChunkCellReader cells;
+
 	@Nullable
-	protected GeneratorContext generatorContext;
-		
-	public CellCondition(SurfaceRules.Context context) {
+	protected final GeneratorContext generatorContext;
+
+	public CellCondition(MaterialRuleContext context) {
 		super(context);
-		//TODO store this in SurfaceRules$Context instead so we can cache the chunk lookup
-		if((Object) context.randomState instanceof UTFRandomState randomState && (this.generatorContext = randomState.generatorContext()) != null) {
-			ChunkPos chunkPos = context.chunk.getPos();
-			this.chunk = this.generatorContext.cache.provideChunk(chunkPos.x(), chunkPos.z());
-		}
-		this.lastXZ = Long.MIN_VALUE;
+		this.generatorContext = UTFMaterialContext.generatorContext(context);
+		this.cells = this.generatorContext != null ? new ChunkCellReader(this.generatorContext) : null;
 	}
-		
+
 	public abstract boolean test(Cell cell, int x, int z);
-	
+
 	@Override
-	public boolean compute() {
-        int x = this.context.blockX;
-        int z = this.context.blockZ;
-        long packedPos = PosUtil.pack(x, z);
-        if(this.lastXZ != packedPos && this.generatorContext != null) {
-        	this.lastXZ = packedPos;
-            Cell cell = this.chunk.getCell(x, z);
-        	this.lastResult = this.test(cell, x, z);
-        }
-        return this.lastResult;
+	protected boolean compute() {
+		if(this.cells == null) {
+			return false;
+		}
+        int x = this.context.blockX();
+        int z = this.context.blockZ();
+        return this.test(this.cells.getCell(x, z), x, z);
 	}
 }

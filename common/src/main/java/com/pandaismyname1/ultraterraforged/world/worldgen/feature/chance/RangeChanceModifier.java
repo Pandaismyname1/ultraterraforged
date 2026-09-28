@@ -1,6 +1,7 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.feature.chance;
 
-import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.WorldGenLevel;
 
 public abstract class RangeChanceModifier implements ChanceModifier {
 	protected float from;
@@ -13,11 +14,11 @@ public abstract class RangeChanceModifier implements ChanceModifier {
         this.exclusive = exclusive;
     }
     
-    protected abstract float getValue(ChanceContext chanceCtx, FeaturePlaceContext<?> placeCtx);
+    protected abstract float getValue(ChanceContext chanceCtx, WorldGenLevel level, BlockPos pos);
     
     @Override
-	public float getChance(ChanceContext chanceCtx, FeaturePlaceContext<?> placeCtx) {
-        return this.apply(this.getValue(chanceCtx, placeCtx));
+	public float getChance(ChanceContext chanceCtx, WorldGenLevel level, BlockPos pos) {
+        return this.apply(this.getValue(chanceCtx, level, pos));
     }
 
     private float apply(float value) {

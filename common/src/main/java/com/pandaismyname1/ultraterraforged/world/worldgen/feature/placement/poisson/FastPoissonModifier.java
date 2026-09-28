@@ -1,9 +1,10 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.feature.placement.poisson;
 
 import java.util.Random;
-import java.util.stream.Stream;
+import java.util.function.Consumer;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.BlockPos;
@@ -14,15 +15,13 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.placement.PlacementContext;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
-import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
-import com.pandaismyname1.ultraterraforged.world.worldgen.feature.placement.UTFPlacementModifiers;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noise;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noises;
 import com.pandaismyname1.ultraterraforged.world.worldgen.tile.Tile;
 
-public class FastPoissonModifier extends PlacementModifier {
-	public static final Codec<FastPoissonModifier> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+public class FastPoissonModifier implements PlacementModifier {
+	public static final MapCodec<FastPoissonModifier> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
 		Codec.INT.fieldOf("radius").forGetter((p) -> p.radius),
 		Codec.FLOAT.fieldOf("scale").forGetter((p) -> p.scale),
 		Codec.FLOAT.fieldOf("jitter").forGetter((p) -> p.jitter),
@@ -55,7 +54,7 @@ public class FastPoissonModifier extends PlacementModifier {
 	}
 	
 	@Override
-	public Stream<BlockPos> getPositions(PlacementContext ctx, RandomSource random, BlockPos pos) {
+	public void modify(PlacementContext ctx, RandomSource random, BlockPos pos, Consumer<BlockPos> output) {
 		WorldGenLevel level = ctx.getLevel();
 		ChunkAccess chunk = ctx.getLevel().getChunk(pos);
 		long levelSeed = level.getSeed();
@@ -66,16 +65,14 @@ public class FastPoissonModifier extends PlacementModifier {
         FastPoisson poisson = FastPoisson.LOCAL_POISSON.get();
         DensityNoise density = this.getDensityNoise(seed, chunkPos, level.getLevel().getChunkSource().randomState());
         FastPoissonContext poissonConfig = new FastPoissonContext(this.radius, this.jitter, this.scale, density);
-        Stream.Builder<BlockPos> builder = Stream.builder();
-        poisson.visit(seed, chunkX, chunkZ, new Random(levelSeed), poissonConfig, builder, (x, z, b) -> {
-        	b.accept(new BlockPos(x, 0, z));
+        poisson.visit(seed, chunkX, chunkZ, new Random(levelSeed), poissonConfig, output, (x, z, out) -> {
+        	out.accept(new BlockPos(x, 0, z));
         });
-        return builder.build();
     }
 
 	@Override
-	public PlacementModifierType<FastPoissonModifier> type() {
-		return UTFPlacementModifiers.FAST_POISSON;
+	public MapCodec<FastPoissonModifier> codec() {
+		return CODEC;
 	}
 
 	private DensityNoise getDensityNoise(int seed, ChunkPos chunkPos, RandomState randomState) {

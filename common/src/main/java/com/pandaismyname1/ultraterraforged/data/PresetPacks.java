@@ -29,7 +29,7 @@ public final class PresetPacks {
 	 * Writes the datapack for a preset as a zip, replacing any existing file.
 	 *
 	 * @param registries the registries the preset refers to, such as the world's worldgen registries or
-	 *                   {@link net.minecraft.data.registries.VanillaRegistries#createLookup()}
+	 *                   {@link net.minecraft.data.registries.VanillaRegistries#createWorldLookup()}
 	 */
 	public static void export(Preset preset, HolderLookup.Provider registries, Path zip) throws IOException {
 		Path workDir = Files.createTempDirectory("ultraterraforged-preset-");

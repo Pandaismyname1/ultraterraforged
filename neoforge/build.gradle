@@ -61,10 +61,9 @@ dependencies {
     // Performance mods, in the dev runs only: the ones PerformanceMods lists for NeoForge on this version, pinned to
     // Modrinth version ids. -Putf.perfMods=false leaves them out. See docs/porting/performance-mods.md.
     if (project.findProperty("utf.perfMods") != "false") {
-        devMods "maven.modrinth:c2me-neoforge:Gj7cXd5I"         // C2ME 0.4.2-alpha.0.96
-        devMods "maven.modrinth:c2me-ocl:V5SBeTwQ"              // C2ME OpenCL 0.4.2-alpha.0.96 (Java 25, which 26.x runs on)
-        devMods "maven.modrinth:lithium:J9CowDXK"               // Lithium 0.25.3
-        devMods "maven.modrinth:sodium:DmnNKsfS"                // Sodium 0.9.2
+        devMods "maven.modrinth:c2me-neoforge:xXHRHMRL"         // C2ME 0.4.2-alpha.0.100 (no C2ME OpenCL for 26.3 yet)
+        devMods "maven.modrinth:lithium:1rb9wI5K"               // Lithium 0.26.2
+        devMods "maven.modrinth:sodium:NM9w06Kr"                // Sodium 0.9.3-alpha.1
     }
 }
 

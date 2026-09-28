@@ -33,7 +33,7 @@ public class StructureOptionsTest {
 	@BeforeAll
 	static void bootstrap() {
 		TestBootstrap.init();
-		Page page = StructureOptions.page(VanillaRegistries.createLookup().lookupOrThrow(Registries.STRUCTURE_SET), (holder) -> true);
+		Page page = StructureOptions.page(VanillaRegistries.createWorldLookup().lookupOrThrow(Registries.STRUCTURE_SET), (holder) -> true);
 		options = page.options().collect(Collectors.toMap(Option::path, Function.identity()));
 		assertTrue(page.categories().stream().map(Category::id).anyMatch("minecraft:strongholds"::equals));
 	}

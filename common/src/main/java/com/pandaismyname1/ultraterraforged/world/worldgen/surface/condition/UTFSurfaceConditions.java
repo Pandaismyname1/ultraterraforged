@@ -11,7 +11,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.levelgen.SurfaceRules;
+import net.minecraft.world.level.levelgen.material.condition.MaterialCondition;
 import com.pandaismyname1.ultraterraforged.platform.RegistryUtil;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noise;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noises;
@@ -35,7 +35,7 @@ public class UTFSurfaceConditions {
 		register("any", AnyCondition.CODEC);
 	}
 
-	public static AnyCondition any(SurfaceRules.ConditionSource... conditions) {
+	public static AnyCondition any(MaterialCondition... conditions) {
 		return new AnyCondition(List.of(conditions));
 	}
 	
@@ -127,8 +127,8 @@ public class UTFSurfaceConditions {
 		return new HeightModificationDetection.Source(target);
 	}
 	
-	public static void register(String name, Codec<? extends SurfaceRules.ConditionSource> value) {
-		RegistryUtil.register(BuiltInRegistries.MATERIAL_CONDITION, name, UTFCodecs.entry(value));
+	public static void register(String name, Codec<? extends MaterialCondition> value) {
+		RegistryUtil.register(BuiltInRegistries.MATERIAL_CONDITION_TYPE, name, UTFCodecs.entry(value));
 	}
 	
 	private static Holder<Noise> constant(float value) {

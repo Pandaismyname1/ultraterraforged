@@ -10,12 +10,11 @@
   	"MixinChunkMap",
   	"MixinUtil",
   	"MixinBiomeGenerationSettings",
-  	"MixinSurfaceSystem",
+  	"MixinMaterialSystem",
+  	"MaterialRuleContextAccessor",
+  	"MixinRandomStateCompileContext",
   	"MixinStructure",
-  	"MixinMinecraftServer",
   	"MixinMinecraftServerTemplates",
-  	"MixinSpawnFinder",
-  	"MixinClimateSampler",
   	"MixinChunkStatusTasks",
   	"MixinServerPacksSource",
   	"MixinResourceManagerRegistryLoadTask",
@@ -23,7 +22,6 @@
   	"terrablender.MixinParameterList",
   	"terrablender.MixinClimateSampler",
   	"terrablender.MixinTargetPoint",
-  	"terrablender.MixinNoiseChunk",
   	"worldpreview.SampleUtilsMixin"
   ],
   "client": [

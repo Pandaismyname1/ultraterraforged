@@ -7,7 +7,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
-import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
+import net.minecraft.world.level.WorldGenLevel;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
 import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
 import com.pandaismyname1.ultraterraforged.world.worldgen.tile.Tile;
@@ -29,11 +29,10 @@ class ElevationChanceModifier extends RangeChanceModifier {
 	}
 
 	@Override
-	protected float getValue(ChanceContext chanceCtx, FeaturePlaceContext<?> placeCtx) {
-		BlockPos pos = placeCtx.origin();
+	protected float getValue(ChanceContext chanceCtx, WorldGenLevel level, BlockPos pos) {
 		@Nullable
 		GeneratorContext generatorContext;
-		if((Object) placeCtx.level().getLevel().getChunkSource().randomState() instanceof UTFRandomState utfRandomState && (generatorContext = utfRandomState.generatorContext()) != null) {
+		if((Object) level.getLevel().getChunkSource().randomState() instanceof UTFRandomState utfRandomState && (generatorContext = utfRandomState.generatorContext()) != null) {
 			int x = pos.getX();
 			int z = pos.getZ();
 			int chunkX = SectionPos.blockToSectionCoord(x);

@@ -1,53 +1,71 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.densityfunction;
 
-import com.pandaismyname1.ultraterraforged.data.UTFCodecs;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.util.KeyDispatchDataCodec;
-import net.minecraft.world.level.levelgen.DensityFunction;
+import net.minecraft.util.Interval;
+import net.minecraft.world.level.levelgen.densityfunction.DensityBuffer;
+import net.minecraft.world.level.levelgen.densityfunction.DensityFunction;
+import net.minecraft.world.level.levelgen.densityfunction.DensitySampler;
+import net.minecraft.world.level.levelgen.densityfunction.DensityVolume;
+import net.minecraft.world.level.levelgen.densityfunction.DfRewriteRule;
+import net.minecraft.world.level.levelgen.densityfunction.SamplerContext;
 
 record ClampToNearestUnit(DensityFunction function, int resolution) implements DensityFunction {
-	public static final Codec<ClampToNearestUnit> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+	public static final MapCodec<ClampToNearestUnit> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
 		DensityFunction.CODEC.fieldOf("function").forGetter(ClampToNearestUnit::function),
 		Codec.INT.fieldOf("resolution").forGetter(ClampToNearestUnit::resolution)
 	).apply(instance, ClampToNearestUnit::new));
-	
+
 	@Override
-	public double compute(FunctionContext ctx) {
-		return this.computeClamped(this.function.compute(ctx));
+	public DensitySampler compileSampler(CompileContext context) {
+		return new Sampler(this.function.compileSampler(context), this.resolution);
 	}
 
 	@Override
-	public void fillArray(double[] arr, ContextProvider ctx) {
-		this.function.fillArray(arr, ctx);
-		for(int i = 0; i < arr.length; i++) {
-			arr[i] = this.computeClamped(arr[i]);
+	public DensityFunction rewriteChildren(DfRewriteRule rule) {
+		DensityFunction function = rule.rewrite(this.function);
+		return function == this.function ? this : new ClampToNearestUnit(function, this.resolution);
+	}
+
+	@Override
+	public Interval range() {
+		Interval range = this.function.range();
+		if (Float.isInfinite(range.min()) || Float.isInfinite(range.max())) {
+			return Interval.INFINITE;
 		}
+		return Interval.of(clamp(range.min(), this.resolution), clamp(range.max(), this.resolution));
 	}
 
 	@Override
-	public DensityFunction mapChildren(Visitor visitor) {
-		return new ClampToNearestUnit(visitor.apply(this.function), this.resolution);
+	public @Axes int domainAxes() {
+		return this.function.domainAxes();
 	}
 
 	@Override
-	public double minValue() {
-		return this.computeClamped(this.function.minValue());
+	public MapCodec<ClampToNearestUnit> codec() {
+		return CODEC;
 	}
 
-	@Override
-	public double maxValue() {
-		return this.computeClamped(this.function.maxValue());
+	private static float clamp(float value, int resolution) {
+		float scaled = (int) (value * resolution) + 1;
+		return scaled / resolution;
 	}
 
-	@Override
-	public KeyDispatchDataCodec<ClampToNearestUnit> codec() {
-		return UTFCodecs.keyDispatch(CODEC);
-	}
-	
-	private double computeClamped(double value) {
-		float scaled = (int) (value * this.resolution) + 1;
-		return (scaled / this.resolution);
+	private record Sampler(DensitySampler function, int resolution) implements DensitySampler {
+
+		@Override
+		public float sampleValue(SamplerContext context, int blockX, int blockY, int blockZ) {
+			return clamp(this.function.sampleValue(context, blockX, blockY, blockZ), this.resolution);
+		}
+
+		@Override
+		public void sampleVolume(SamplerContext context, DensityBuffer outputBuffer, DensityVolume volume) {
+			this.function.sampleVolume(context, outputBuffer, volume);
+			for (int i = 0; i < volume.size(); i++) {
+				outputBuffer.set(i, clamp(outputBuffer.get(i), this.resolution));
+			}
+		}
 	}
 }

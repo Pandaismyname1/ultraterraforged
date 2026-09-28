@@ -413,7 +413,7 @@ public class ClientTest implements ClientModInitializer {
 		throw new IllegalStateException("No text box in " + this.describeWidgets(screen));
 	}
 
-	private static final KeyEvent PRESS = new KeyEvent(org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER, 0, 0);
+	private static final KeyEvent PRESS = new KeyEvent(com.mojang.blaze3d.platform.InputConstants.KEY_RETURN, 0, 0);
 
 	private AbstractButton button(Screen screen, String text) {
 		for (var child : screen.children()) {

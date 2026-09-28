@@ -10,6 +10,7 @@ import net.minecraft.data.registries.RegistriesDatapackGenerator;
 public final class DataGenUtilImpl {
 
 	public static DataProvider createRegistryProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> providerLookup) {
-		return new RegistriesDatapackGenerator(output, providerLookup);
+		// the world layer, which NeoForge extends with mods' datapack registries
+		return RegistriesDatapackGenerator.forWorldLayer(output, providerLookup);
 	}
 }

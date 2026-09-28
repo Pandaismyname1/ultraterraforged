@@ -88,8 +88,8 @@ public class SavePresetScreen extends Screen {
 
 	@Override
 	public boolean keyPressed(KeyEvent event) {
-		// enter saves
-		if ((event.key() == 257 || event.key() == 335) && this.save.active) {
+		// enter (or keypad enter) saves; since 26.3 keys are SDL scancodes, so no GLFW key numbers
+		if (event.isConfirmation() && this.save.active) {
 			this.save();
 			return true;
 		}

@@ -2,7 +2,7 @@ package com.pandaismyname1.ultraterraforged.world.worldgen.feature.template;
 
 import java.util.List;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.BlockPos;
@@ -13,12 +13,10 @@ import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
-import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import com.pandaismyname1.ultraterraforged.UTFCommon;
 import com.pandaismyname1.ultraterraforged.server.UTFMinecraftServer;
-import com.pandaismyname1.ultraterraforged.world.worldgen.feature.template.TemplateFeature.Config;
 import com.pandaismyname1.ultraterraforged.world.worldgen.feature.template.decorator.DecoratorConfig;
 import com.pandaismyname1.ultraterraforged.world.worldgen.feature.template.decorator.TemplateDecorator;
 import com.pandaismyname1.ultraterraforged.world.worldgen.feature.template.paste.Paste;
@@ -29,27 +27,32 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.feature.template.templ
 import com.pandaismyname1.ultraterraforged.world.worldgen.feature.template.template.FeatureTemplate;
 import com.pandaismyname1.ultraterraforged.world.worldgen.feature.template.template.TemplateContext;
 
-public class TemplateFeature extends Feature<Config<?>> {
+public record TemplateFeature<T extends TemplateContext>(List<Identifier> templates, TemplatePlacement<T> placement, PasteConfig paste, DecoratorConfig<T> decorator) implements Feature {
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static final MapCodec<TemplateFeature<?>> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+		Identifier.CODEC.listOf().fieldOf("templates").forGetter(TemplateFeature::templates),
+		TemplatePlacement.CODEC.fieldOf("placement").forGetter(TemplateFeature::placement),
+		PasteConfig.CODEC.fieldOf("paste").forGetter(TemplateFeature::paste),
+		DecoratorConfig.CODEC.fieldOf("decorator").forGetter(TemplateFeature::decorator)
+	).apply(instance, (templates, placement, paste, decorator) -> new TemplateFeature(templates, placement, paste, decorator)));
 
-	public TemplateFeature(Codec<Config<?>> codec) {
-		super(codec);
+	@Override
+	public MapCodec<TemplateFeature<?>> codec() {
+		return CODEC;
 	}
 
 	@Override
-	public boolean place(FeaturePlaceContext<Config<?>> ctx) {
-		RandomSource random = ctx.random();
-		Config<?> config = ctx.config();
-		
+	public boolean place(WorldGenLevel level, ChunkGenerator generator, RandomSource random, BlockPos origin) {
 		Mirror mirror = nextMirror(random);
 		Rotation rotation = nextRotation(random);
-        return paste(ctx.level(), random, ctx.origin(), mirror, rotation, config, FeatureTemplate.WORLD_GEN);
+        return paste(level, random, origin, mirror, rotation, this, FeatureTemplate.WORLD_GEN);
 	}
 
-    public static <T extends TemplateContext> boolean paste(WorldGenLevel world, RandomSource rand, BlockPos pos, Mirror mirror, Rotation rotation, Config<T> config, PasteType pasteType) {
+    public static <T extends TemplateContext> boolean paste(WorldGenLevel world, RandomSource rand, BlockPos pos, Mirror mirror, Rotation rotation, TemplateFeature<T> config, PasteType pasteType) {
         return paste(world, rand, pos, mirror, rotation, config, pasteType, false);
     }
 
-    public static <T extends TemplateContext> boolean paste(WorldGenLevel world, RandomSource rand, BlockPos pos, Mirror mirror, Rotation rotation, Config<T> config, PasteType pasteType, boolean modified) {
+    public static <T extends TemplateContext> boolean paste(WorldGenLevel world, RandomSource rand, BlockPos pos, Mirror mirror, Rotation rotation, TemplateFeature<T> config, PasteType pasteType, boolean modified) {
         if (config.templates().isEmpty()) {
             UTFCommon.LOGGER.warn("Empty template list for config");
             return false;
@@ -94,14 +97,4 @@ public class TemplateFeature extends Feature<Config<?>> {
     private static Rotation nextRotation(RandomSource random) {
         return Rotation.values()[random.nextInt(Rotation.values().length)];
     }
-    
-	public record Config<T extends TemplateContext>(List<Identifier> templates, TemplatePlacement<T> placement, PasteConfig paste, DecoratorConfig<T> decorator) implements FeatureConfiguration {
-		@SuppressWarnings({ "unchecked", "rawtypes" })
-		public static final Codec<Config<?>> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-			Identifier.CODEC.listOf().fieldOf("templates").forGetter(Config::templates),
-			TemplatePlacement.CODEC.fieldOf("placement").forGetter(Config::placement),
-			PasteConfig.CODEC.fieldOf("paste").forGetter(Config::paste),
-			DecoratorConfig.CODEC.fieldOf("decorator").forGetter(Config::decorator)
-		).apply(instance, (templates, placement, paste, decorator) -> new Config(templates, placement, paste, decorator)));
-	}
 }

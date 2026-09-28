@@ -14,7 +14,7 @@ import com.pandaismyname1.ultraterraforged.platform.ModLoaderUtil;
  * this file is updated from it when porting.
  */
 public final class PerformanceMods {
-	public static final String MINECRAFT_VERSION = "26.2";
+	public static final String MINECRAFT_VERSION = "26.3";
 	public static final String FABRIC = "fabric";
 	public static final String NEOFORGE = "neoforge";
 	// Sinytra Connector, which runs Fabric mods on NeoForge; none of the mods needs it on this version
@@ -84,11 +84,10 @@ public final class PerformanceMods {
 			List.of(Build.of("C2ME", "c2me", MODRINTH + "c2me-fabric")),
 			List.of(Build.of("C2ME", "c2me", MODRINTH + "c2me-neoforge")),
 			null),
+		// no C2ME OpenCL for 26.3 yet; it needs an OpenCL device, so it counts towards the light only once installed
 		new Mod("c2meOpenCl", "C2ME OpenCL", MODRINTH + "c2me-ocl", Category.WORLD_GENERATION,
-			List.of(Build.of("C2ME OpenCL", "c2me-opts-accel-opencl", MODRINTH + "c2me-ocl").needsJava(25)),
-			// the NeoForge build nests a mod with the id spelled with underscores
-			List.of(Build.of("C2ME OpenCL", "c2me_opts_accel_opencl", MODRINTH + "c2me-ocl").needsJava(25)),
-			// needs an OpenCL device, so it counts towards the light only once installed
+			List.of(),
+			List.of(),
 			null, true),
 		// no Noisium, Noisiumed or AllTheLeaks for 26.x; they stay listed, greyed out
 		new Mod("noisium", "Noisium", MODRINTH + "noisiumed", Category.WORLD_GENERATION,
@@ -99,7 +98,7 @@ public final class PerformanceMods {
 			List.of(Build.of("Lithium", "lithium", MODRINTH + "lithium")),
 			List.of(Build.of("Lithium", "lithium", MODRINTH + "lithium")),
 			null),
-		// no ModernFix for 26.2 yet on either loader
+		// no ModernFix for 26.2 or 26.3 on either loader
 		new Mod("modernFix", "ModernFix", MODRINTH + "modernfix", Category.GENERAL,
 			List.of(),
 			List.of(),

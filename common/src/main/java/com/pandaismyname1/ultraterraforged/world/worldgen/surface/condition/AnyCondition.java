@@ -7,20 +7,21 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.world.level.levelgen.SurfaceRules;
-import net.minecraft.world.level.levelgen.SurfaceRules.Context;
+import net.minecraft.world.level.levelgen.material.MaterialRuleContext;
+import net.minecraft.world.level.levelgen.material.condition.ConditionEvaluator;
+import net.minecraft.world.level.levelgen.material.condition.MaterialCondition;
 
 // true when any of the conditions is; vanilla only offers "not" and nesting, which is "and"
-public record AnyCondition(List<SurfaceRules.ConditionSource> conditions) implements SurfaceRules.ConditionSource {
+public record AnyCondition(List<MaterialCondition> conditions) implements MaterialCondition {
 	public static final Codec<AnyCondition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-		SurfaceRules.ConditionSource.CODEC.listOf().fieldOf("conditions").forGetter(AnyCondition::conditions)
+		MaterialCondition.CODEC.listOf().fieldOf("conditions").forGetter(AnyCondition::conditions)
 	).apply(instance, AnyCondition::new));
 
 	@Override
-	public SurfaceRules.Condition apply(Context ctx) {
-		List<SurfaceRules.Condition> conditions = this.conditions.stream().map((condition) -> condition.apply(ctx)).toList();
+	public ConditionEvaluator compile(MaterialRuleContext ctx) {
+		ConditionEvaluator[] conditions = this.conditions.stream().map((condition) -> condition.compile(ctx)).toArray(ConditionEvaluator[]::new);
 		return () -> {
-			for (SurfaceRules.Condition condition : conditions) {
+			for (ConditionEvaluator condition : conditions) {
 				if (condition.test()) {
 					return true;
 				}

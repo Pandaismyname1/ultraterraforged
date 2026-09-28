@@ -3,112 +3,92 @@ package com.pandaismyname1.ultraterraforged.mixin;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.core.SectionPos;
-import net.minecraft.server.level.ColumnPos;
+import net.minecraft.util.context.ContextMap;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Aquifer;
 import net.minecraft.world.level.levelgen.Beardifier;
-import net.minecraft.world.level.levelgen.DensityFunction;
-import net.minecraft.world.level.levelgen.DensityFunctions;
 import net.minecraft.world.level.levelgen.NoiseChunk;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
-import net.minecraft.world.level.levelgen.NoiseRouter;
-import net.minecraft.world.level.levelgen.NoiseSettings;
 import net.minecraft.world.level.levelgen.RandomState;
+import net.minecraft.world.level.levelgen.blending.Blender;
+import net.minecraft.world.level.levelgen.densityfunction.DensityVolume;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
 import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
 import com.pandaismyname1.ultraterraforged.world.worldgen.WorldGenFlags;
 import com.pandaismyname1.ultraterraforged.world.worldgen.densityfunction.CellSampler;
-import com.pandaismyname1.ultraterraforged.world.worldgen.densityfunction.CellSampler.Cache2d;
-import com.pandaismyname1.ultraterraforged.world.worldgen.tile.Tile;
 
 @Mixin(NoiseChunk.class)
 class MixinNoiseChunk {
+	@Shadow
+	@Final
 	private RandomState randomState;
-	private int chunkX, chunkZ;
-	private int generationHeight;
-	private Tile.Chunk chunk;
-	private Cache2d cache2d;
-    private NoiseGeneratorSettings generatorSettings;
-	
 	@Shadow
-    @Final
-	int firstNoiseX;
-	
+	@Final
+	private DensityVolume volume;
 	@Shadow
-    @Final
-    int firstNoiseZ;
-	
-	@Shadow
-    @Final
-	private int cellCountXZ;
-	
-	@Shadow
-	private int cellCountY;
-	
-	@Shadow
-    @Final
-    private int cellHeight;
-	
+	@Final
+	@Mutable
+	private Aquifer aquifer;
+
+	// the chunk's cells for its density functions to read (CellSampler), as vanilla gives them the chunk's beardifier;
+	// the random state and volume are set by then
 	@Redirect(
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/world/level/levelgen/RandomState;router()Lnet/minecraft/world/level/levelgen/NoiseRouter;"
+			target = "Lnet/minecraft/util/context/ContextMap$Builder;build()Lnet/minecraft/util/context/ContextMap;"
 		),
-		method = "<init>"
+		method = "<init>",
+		require = 1
 	)
-	private NoiseRouter NoiseChunk(RandomState randomState1, int cellCountXZ, RandomState randomState2, int minBlockX, int minBlockZ, NoiseSettings noiseSettings, DensityFunctions.BeardifierOrMarker beardifierOrMarker, NoiseGeneratorSettings noiseGeneratorSettings) {
-		this.randomState = randomState1;
-		this.chunkX = SectionPos.blockToSectionCoord(minBlockX);
-		this.chunkZ = SectionPos.blockToSectionCoord(minBlockZ);
-		this.generatorSettings = noiseGeneratorSettings;
+	private ContextMap ultraterraforged$samplerFields(ContextMap.Builder fields) {
 		GeneratorContext generatorContext;
 		if((Object) this.randomState instanceof UTFRandomState utfRandomState && (generatorContext = utfRandomState.generatorContext()) != null) {
-			boolean cache = !WorldGenFlags.fastLookups() || CellSampler.isCachedNoiseChunk(cellCountXZ);
-
-//			if(beardifierOrMarker instanceof Beardifier beardifier && (beardifier.pieceIterator.hasNext() || beardifier.junctionIterator.hasNext())) {
-//				this.generationHeight = noiseSettings.height();
-//				System.out.println(this.generationHeight);
-//			} else {
-				this.generationHeight = generatorContext.lookup.getGenerationHeight(this.chunkX, this.chunkZ, noiseGeneratorSettings, cache);
-//			}
-			
-			this.cellCountY = Math.min(this.cellCountY, this.generationHeight / this.cellHeight);
-			this.cache2d = new CellSampler.Cache2d();
-			
+			// a single column (a structure asking for the height) only loads the tile under fast lookups' rules
+			boolean cache = !WorldGenFlags.fastLookups() || this.volume.sizeX() > 1 || this.volume.sizeZ() > 1;
 			if(cache) {
-				this.chunk = generatorContext.cache.provideAtChunk(this.chunkX, this.chunkZ).getChunkReader(this.chunkX, this.chunkZ);
+				int chunkX = SectionPos.blockToSectionCoord(this.volume.minBlockX());
+				int chunkZ = SectionPos.blockToSectionCoord(this.volume.minBlockZ());
+				fields.set(CellSampler.CHUNK, new CellSampler.ChunkCells(generatorContext.cache.provideAtChunk(chunkX, chunkZ).getChunkReader(chunkX, chunkZ), chunkX, chunkZ));
 			}
-		} else {
-			this.generationHeight = noiseSettings.height();
 		}
-		return this.randomState.router();
+		return fields.build();
 	}
-	
+
+	// The volume ends at the chunk's highest ground (MixinNoiseBasedChunkGenerator), but carvers in the same chunk ask
+	// the aquifer about blocks up to the build limit; above the volume there's only air, as the disabled aquifer says.
+	@Inject(
+		method = "<init>",
+		at = @At("TAIL")
+	)
+	private void ultraterraforged$init(RandomState randomState, @Nullable Beardifier beardifier, NoiseGeneratorSettings noiseGeneratorSettings, Aquifer.FluidPicker fluidPicker, Blender blender, DensityVolume volume, CallbackInfo callback) {
+		if((Object) randomState instanceof UTFRandomState utfRandomState && utfRandomState.generatorContext() != null) {
+			this.aquifer = new VolumeAquifer(this.aquifer, Aquifer.createDisabled(fluidPicker), volume.maxBlockY());
+		}
+	}
+
+	// lava below the preset's lava level instead of vanilla's -54
 	@ModifyVariable(
 		method = "<init>",
 		at = @At("HEAD"),
-		name = "fluidPicker",
-		index = 7,
 		ordinal = 0,
 		argsOnly = true
 	)
-	//TODO clean this up
-	private static Aquifer.FluidPicker modifyFluidPicker(Aquifer.FluidPicker fluidPicker, int cellCountXZ, RandomState randomState, int minBlockX, int minBlockZ, NoiseSettings noiseSettings, DensityFunctions.BeardifierOrMarker beardifierOrMarker, NoiseGeneratorSettings noiseGeneratorSettings) {
+	private static Aquifer.FluidPicker modifyFluidPicker(Aquifer.FluidPicker fluidPicker, RandomState randomState, @Nullable Beardifier beardifier, NoiseGeneratorSettings noiseGeneratorSettings) {
 		if((Object) randomState instanceof UTFRandomState utfRandomState) {
 			@Nullable
 			Preset preset = utfRandomState.preset();
-			@Nullable
-			GeneratorContext generatorContext;
-			if(preset != null && (generatorContext = utfRandomState.generatorContext()) != null) {
+			if(preset != null && utfRandomState.generatorContext() != null) {
 				int lavaLevel = preset.world().properties.lavaLevel;
 		        Aquifer.FluidStatus lava = new Aquifer.FluidStatus(lavaLevel, Blocks.LAVA.defaultBlockState());
 		        int seaLevel = noiseGeneratorSettings.seaLevel();
@@ -124,14 +104,29 @@ class MixinNoiseChunk {
 		return fluidPicker;
 	}
 
-	@Inject(
-		at = @At("HEAD"),
-		method = "wrapNew",
-		cancellable = true
-	)
-	private void wrapNew(DensityFunction function, CallbackInfoReturnable<DensityFunction> callback) {
-		if((Object) this.randomState instanceof UTFRandomState randomState && function instanceof CellSampler mapped) {
-			callback.setReturnValue(mapped.new CacheChunk(this.chunk, this.cache2d, this.chunkX, this.chunkZ));
+	private static class VolumeAquifer implements Aquifer {
+		private final Aquifer inside;
+		private final Aquifer above;
+		private final int maxY;
+		private Aquifer last;
+
+		VolumeAquifer(Aquifer inside, Aquifer above, int maxY) {
+			this.inside = inside;
+			this.above = above;
+			this.maxY = maxY;
+			this.last = inside;
+		}
+
+		@Nullable
+		@Override
+		public BlockState computeSubstance(int blockX, int blockY, int blockZ, double density) {
+			this.last = blockY > this.maxY ? this.above : this.inside;
+			return this.last.computeSubstance(blockX, blockY, blockZ, density);
+		}
+
+		@Override
+		public boolean shouldScheduleFluidUpdate() {
+			return this.last.shouldScheduleFluidUpdate();
 		}
 	}
 }

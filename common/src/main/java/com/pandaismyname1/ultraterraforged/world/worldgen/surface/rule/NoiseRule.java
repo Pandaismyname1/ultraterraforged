@@ -10,21 +10,22 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.Holder;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.SurfaceRules;
-import net.minecraft.world.level.levelgen.SurfaceRules.Context;
+import net.minecraft.world.level.levelgen.material.MaterialRuleContext;
+import net.minecraft.world.level.levelgen.material.rule.MaterialRule;
+import net.minecraft.world.level.levelgen.material.rule.RuleEvaluator;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noise;
 import com.pandaismyname1.ultraterraforged.world.worldgen.util.PosUtil;
 
-record NoiseRule(Holder<Noise> noise, List<Pair<Float, SurfaceRules.RuleSource>> rules) implements SurfaceRules.RuleSource {
+record NoiseRule(Holder<Noise> noise, List<Pair<Float, MaterialRule>> rules) implements MaterialRule {
 	public static final Codec<NoiseRule> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 		Noise.CODEC.fieldOf("noise").forGetter(NoiseRule::noise),
 		entryCodec().listOf().fieldOf("rules").forGetter(NoiseRule::rules)
 	).apply(instance, NoiseRule::new));
-	
+
 	@Override
-	public Rule apply(Context ctx) {
+	public Rule compile(MaterialRuleContext ctx) {
 		return new Rule(this.noise.value(), this.rules.stream().map((pair) -> {
-			return Pair.of(pair.getFirst(), pair.getSecond().apply(ctx));
+			return Pair.of(pair.getFirst(), pair.getSecond().compile(ctx));
 		}).sorted((p1, p2) -> p2.getFirst().compareTo(p1.getFirst())).toList());
 	}
 
@@ -32,21 +33,21 @@ record NoiseRule(Holder<Noise> noise, List<Pair<Float, SurfaceRules.RuleSource>>
 	public MapCodec<NoiseRule> codec() {
 		return UTFCodecs.asMap(CODEC);
 	}
-	
-	private static Codec<Pair<Float, SurfaceRules.RuleSource>> entryCodec() {
+
+	private static Codec<Pair<Float, MaterialRule>> entryCodec() {
 		return RecordCodecBuilder.create(instance -> instance.group(
 			Codec.FLOAT.fieldOf("threshold").forGetter(Pair::getFirst),
-			SurfaceRules.RuleSource.CODEC.fieldOf("rule").forGetter(Pair::getSecond)
+			MaterialRule.CODEC.fieldOf("rule").forGetter(Pair::getSecond)
 		).apply(instance, Pair::new));
 	}
-	
-	private static class Rule implements SurfaceRules.SurfaceRule {
+
+	private static class Rule implements RuleEvaluator {
 		private Noise noise;
-		private List<Pair<Float, SurfaceRules.SurfaceRule>> rules;
+		private List<Pair<Float, RuleEvaluator>> rules;
 		private long lastPos;
-		private SurfaceRules.SurfaceRule rule;
-		
-		public Rule(Noise noise, List<Pair<Float, SurfaceRules.SurfaceRule>> rules) {
+		private RuleEvaluator rule;
+
+		public Rule(Noise noise, List<Pair<Float, RuleEvaluator>> rules) {
 			this.noise = noise;
 			this.rules = rules;
 			this.lastPos = Long.MIN_VALUE;
@@ -57,8 +58,8 @@ record NoiseRule(Holder<Noise> noise, List<Pair<Float, SurfaceRules.RuleSource>>
 			long pos = PosUtil.pack(x, z);
 			if(this.lastPos != pos) {
 				float noise = this.noise.compute(x, z, 0);
-				SurfaceRules.SurfaceRule newRule = null;
-				for(Pair<Float, SurfaceRules.SurfaceRule> entry : this.rules) {
+				RuleEvaluator newRule = null;
+				for(Pair<Float, RuleEvaluator> entry : this.rules) {
 					if(noise > entry.getFirst()) {
 						newRule = entry.getSecond();
 						break;

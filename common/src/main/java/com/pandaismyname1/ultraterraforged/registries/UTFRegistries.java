@@ -60,7 +60,7 @@ public class UTFRegistries {
 	// datapack registries and of UTF's
 	public static Cloner.Factory cloner() {
 		Cloner.Factory factory = new Cloner.Factory();
-		RegistryDataLoader.WORLDGEN_REGISTRIES.forEach((data) -> data.runWithArguments(factory::addCodec));
+		RegistryDataLoader.WORLD_REGISTRIES.forEach((data) -> data.runWithArguments(factory::addCodec));
 		RegistryDataLoader.DIMENSION_REGISTRIES.forEach((data) -> data.runWithArguments(factory::addCodec));
 		DATA_REGISTRY_CODECS.forEach((codec) -> codec.accept(factory));
 		return factory;
@@ -69,7 +69,7 @@ public class UTFRegistries {
 	// the registries cloner() can copy
 	private static Set<ResourceKey<? extends Registry<?>>> clonable() {
 		Set<ResourceKey<? extends Registry<?>>> keys = new HashSet<>(DATA_REGISTRIES);
-		RegistryDataLoader.WORLDGEN_REGISTRIES.forEach((data) -> keys.add(data.key()));
+		RegistryDataLoader.WORLD_REGISTRIES.forEach((data) -> keys.add(data.key()));
 		RegistryDataLoader.DIMENSION_REGISTRIES.forEach((data) -> keys.add(data.key()));
 		return keys;
 	}

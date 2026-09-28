@@ -8,13 +8,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup.RegistryLookup;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.Structure.GenerationContext;
 import net.minecraft.world.level.levelgen.structure.Structure.GenerationStub;
 import com.pandaismyname1.ultraterraforged.registries.UTFRegistries;
 import com.pandaismyname1.ultraterraforged.world.worldgen.structure.rule.StructureRule;
 
-@Mixin(Structure.class)
+// since 26.3 isValidBiome is an instance method of Structure.GenerationContext (it was static on Structure)
+@Mixin(GenerationContext.class)
 public class MixinStructure {
 
 	@Inject(
@@ -22,7 +22,8 @@ public class MixinStructure {
 		method = "isValidBiome",
 		cancellable = true
 	)
-    private static void isValidBiome(GenerationStub generationStub, GenerationContext generationContext, CallbackInfoReturnable<Boolean> callback) {
+    private void isValidBiome(GenerationStub generationStub, CallbackInfoReturnable<Boolean> callback) {
+		GenerationContext generationContext = (GenerationContext) (Object) this;
 		RegistryAccess registry = generationContext.registryAccess();
 		RegistryLookup<StructureRule> structureRules = registry.lookupOrThrow(UTFRegistries.STRUCTURE_RULE);
 		

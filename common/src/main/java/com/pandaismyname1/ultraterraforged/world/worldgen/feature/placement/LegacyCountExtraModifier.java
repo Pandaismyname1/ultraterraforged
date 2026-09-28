@@ -1,20 +1,19 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.feature.placement;
 
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
+import java.util.function.Consumer;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.placement.PlacementContext;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
-import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 
 @Deprecated
-class LegacyCountExtraModifier extends PlacementModifier {
-	public static final Codec<LegacyCountExtraModifier> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+class LegacyCountExtraModifier implements PlacementModifier {
+	public static final MapCodec<LegacyCountExtraModifier> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
 		Codec.INT.fieldOf("count").forGetter((p) -> p.count),
 		Codec.FLOAT.fieldOf("extra_chance").forGetter((p) -> p.extraChance),
 		Codec.INT.fieldOf("extra_count").forGetter((p) -> p.extraCount)
@@ -31,15 +30,15 @@ class LegacyCountExtraModifier extends PlacementModifier {
 	}
 	
 	@Override
-	public Stream<BlockPos> getPositions(PlacementContext ctx, RandomSource random, BlockPos pos) {
+	public void modify(PlacementContext ctx, RandomSource random, BlockPos pos, Consumer<BlockPos> output) {
 	      int i = this.count + (random.nextFloat() < this.extraChance ? this.extraCount : 0);
-	      return IntStream.range(0, i).mapToObj((o) -> {
-	         return pos;
-	      });
+	      for (int n = 0; n < i; n++) {
+	    	  output.accept(pos);
+	      }
 	}
 
 	@Override
-	public PlacementModifierType<LegacyCountExtraModifier> type() {
-		return UTFPlacementModifiers.LEGACY_COUNT_EXTRA;
+	public MapCodec<LegacyCountExtraModifier> codec() {
+		return CODEC;
 	}
 }

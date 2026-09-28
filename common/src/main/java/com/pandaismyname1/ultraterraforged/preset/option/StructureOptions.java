@@ -15,6 +15,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
+import net.minecraft.world.level.levelgen.structure.placement.AbstractSpreadingStructurePlacement;
 import net.minecraft.world.level.levelgen.structure.placement.ConcentricRingsStructurePlacement;
 import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement;
 import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement;
@@ -77,9 +78,10 @@ public final class StructureOptions {
 		}
 
 		// other placement types from mods can only be switched on and off
-		if (placement instanceof RandomSpreadStructurePlacement || placement instanceof ConcentricRingsStructurePlacement) {
-			float frequency = placement.frequency;
-			int salt = placement.salt;
+		// (since 26.3 the frequency and salt live on AbstractSpreadingStructurePlacement, which both extend)
+		if ((placement instanceof RandomSpreadStructurePlacement || placement instanceof ConcentricRingsStructurePlacement) && placement instanceof AbstractSpreadingStructurePlacement spreading) {
+			float frequency = spreading.frequency();
+			int salt = spreading.salt();
 			options.add(FloatOption.builder(path + "frequency")
 				.translation(UTFTranslationKeys.GUI_SLIDER_STRUCTURE_FREQUENCY)
 				.range(0.0F, 1.0F)

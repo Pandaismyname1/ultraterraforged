@@ -43,13 +43,13 @@ public final class PresetDatapack {
 		try (MockedStatic<BiomeModifiers> biomeModifiers = Mockito.mockStatic(BiomeModifiers.class, (invocation) -> {
 			return invocation.getMethod().getReturnType() == BiomeModifier.class ? Mockito.mock(BiomeModifier.class) : null;
 		})) {
-			patch = preset.buildPatch(VanillaRegistries.createLookup());
+			patch = preset.buildPatch(VanillaRegistries.createWorldLookup());
 		}
 
 		RegistryOps<JsonElement> ops = patch.createSerializationContext(JsonOps.INSTANCE);
 		Map<String, JsonElement> files = new TreeMap<>();
 		List<String> errors = new ArrayList<>();
-		for (RegistryDataLoader.RegistryData<?> data : RegistryDataLoader.WORLDGEN_REGISTRIES) {
+		for (RegistryDataLoader.RegistryData<?> data : RegistryDataLoader.WORLD_REGISTRIES) {
 			dump(patch, ops, data.key(), data.elementCodec(), files, errors);
 		}
 		TestBootstrap.DATA_REGISTRIES.forEach((key, codec) -> {
