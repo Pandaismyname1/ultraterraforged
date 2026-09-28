@@ -39,7 +39,7 @@ public class PerformanceModsTest {
 
 		assertEquals(Light.RED, neoforge().light());
 		assertEquals(Light.ORANGE, neoforge("sodium", "lithium", "modernfix", "alltheleaks").light());
-		assertEquals(Light.YELLOW, neoforge("c2me", "noisiumed", "lithium", "modernfix", "alltheleaks", "sodium").light());
+		assertEquals(Light.YELLOW, neoforge("c2me", "noisiumed", "lithium", "modernfix", "alltheleaks").light());
 		assertEquals(Light.GREEN, neoforge("c2me", "noisiumed", "lithium", "modernfix", "alltheleaks", "sodium").light());
 	}
 

@@ -23,14 +23,14 @@ also covers NeoForge 47.1) keeps its own copy of this page; its findings are kep
 
 What the dev runs need that a real game doesn't:
 
-- **NeoForge (1.21.1): nothing special.** NeoForge has run on Mojang's names since 1.20.2, as the dev game does, so
-  released jars work unchanged: `syncDevMods` puts them in `neoforge/run/mods` (and removes anything else there), nested
-  jars and all. None of the Forge workarounds below apply any more.
-
-- **Mods made of nested jars** (C2ME: one jar holding its ~20 modules) don't load from the Gradle classpath, which
-  doesn't unpack jars in jars ("requires c2me-base, which is missing"). Fabric puts them in the `devModsFolder`
-  configuration instead: `syncDevMods` copies them unremapped to `fabric/build/devmods`, and every run passes that
-  folder to Fabric loader as `fabric.addMods`, which unpacks and remaps them like a mods folder.
+- **NeoForge (1.21.1): released jars don't work unchanged either.** Released NeoForge mods name Minecraft's lambdas as
+  javac does (`lambda$fillFromNoise$11`), which the real game keeps, but Loom's dev jar renames them, so any mixin aimed
+  at one fails in dev (C2ME, Noisiumed, Lithium, ModernFix, AllTheLeaks and Sodium all have some; a crash or a silently
+  skipped fix). So `neoforge/build.gradle`'s `unpackDevMods` downloads the mods while Gradle configures the project,
+  takes out the jars nested in them (Loom drops those: C2ME's modules are in `META-INF/jars/`), and puts every mod
+  through Loom (`modLocalRuntime`), which renames the lambdas, and the libraries on the classpath as game libraries.
+  MixinExtras is left to NeoForge. **Sodium isn't in the NeoForge dev runs**: its jar is an early-loading service with
+  the mod nested in it, and the mod uses the service's classes, which it can't reach once Loom has remapped them.
 - **1.20.1 only: the Forge dev game runs with Mojang's names; released Forge mods use SRG names**, so released jars can't just go in
   `forge/run/mods` (unlike Fabric, whose loader remaps the mods folder in dev). Everything goes through Loom, which
   remaps dependencies, and a few things need more:

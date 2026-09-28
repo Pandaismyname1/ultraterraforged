@@ -42,14 +42,6 @@ configurations {
         canBeResolved = true
         canBeConsumed = false
     }
-
-    // performance mods for the dev game, as released: NeoForge has run on Mojang's names since 1.20.2, as the dev game
-    // does, so they go into its mods folder unchanged, nested jars and all
-    devMods {
-        canBeResolved = true
-        canBeConsumed = false
-        transitive = false
-    }
 }
 
 dependencies {
@@ -58,28 +50,114 @@ dependencies {
     common(project(path: ":common", configuration: "namedElements")) { transitive = false }
     shadowBundle(project(path: ":common", configuration: "transformProductionNeoForge")) { transitive = false }
 
-    // Performance mods, in the dev runs only: the ones PerformanceMods lists for NeoForge on this version, pinned to
-    // Modrinth version ids and a CurseForge file. -Putf.perfMods=false leaves them out. See
-    // docs/porting/performance-mods.md.
+    // Performance mods, in the dev runs only: the ones PerformanceMods lists for NeoForge on this version. -Putf.perfMods=false
+    // leaves them out. See docs/porting/performance-mods.md and unpackDevMods below.
     if (project.findProperty("utf.perfMods") != "false") {
-        // not C2ME OpenCL: it needs Java 25, the dev game runs on 21
-        devMods "maven.modrinth:c2me-neoforge:yxOYFgnK"         // C2ME 0.4.0-alpha.0.122
-        devMods "maven.modrinth:noisiumed:U3gpLtpO"             // Noisiumed 3.0.6
-        devMods "maven.modrinth:lithium:DDUrRVCA"               // Lithium 0.15.4
-        devMods "maven.modrinth:modernfix:5HLHxQ2F"             // ModernFix 5.27.24
-        devMods "maven.modrinth:sodium:uMOpc5uV"                // Sodium 0.8.13
-        devMods "curse.maven:alltheleaks-1091339:8943912"       // AllTheLeaks 1.1.13
+        def dir = unpackDevMods([
+            // Not Sodium: its jar is an early-loading service with the mod nested in it, and the mod uses the service's
+            // classes, which the dev game can't give it once Loom has remapped them. It only changes rendering.
+            // C2ME 0.4.0-alpha.0.122; not C2ME OpenCL: it needs Java 25, the dev game runs on 21
+            "https://api.modrinth.com/maven/maven/modrinth/c2me-neoforge/yxOYFgnK/c2me-neoforge-yxOYFgnK.jar",
+            "https://api.modrinth.com/maven/maven/modrinth/noisiumed/U3gpLtpO/noisiumed-U3gpLtpO.jar",   // Noisiumed 3.0.6
+            "https://api.modrinth.com/maven/maven/modrinth/lithium/DDUrRVCA/lithium-DDUrRVCA.jar",       // Lithium 0.15.4
+            "https://api.modrinth.com/maven/maven/modrinth/modernfix/5HLHxQ2F/modernfix-5HLHxQ2F.jar",   // ModernFix 5.27.24
+            "https://www.cursemaven.com/curse/maven/alltheleaks-1091339/8943912/alltheleaks-1091339-8943912.jar" // AllTheLeaks 1.1.13
+        ])
+        modLocalRuntime fileTree(new File(dir, "mods")) { include "*.jar" }
+        localRuntime fileTree(new File(dir, "libs")) { include "*.jar" }
     }
 }
 
-// the dev game's mods folder holds exactly the performance mods: a jar left from another version would break the game
-def devModsDir = file("run/mods")
-def syncDevMods = tasks.register("syncDevMods", Sync) {
-    from configurations.devMods
-    into devModsDir
-}
-tasks.matching { it.name.startsWith("run") }.configureEach {
-    dependsOn syncDevMods
+// The performance mods for the dev game, unpacked into build/devmods/{mods,libs}; done while Gradle configures the
+// project, as Loom remaps mod dependencies then.
+// - Released NeoForge mods name some of Minecraft's methods as javac does (lambda$fillFromNoise$11), and the dev game's
+//   jar doesn't keep those names, so the mods have to go through Loom, which renames them to match.
+// - Loom drops the jars nested in a mod, which hold C2ME's modules, Sodium's mod and the mods' libraries. So each nested
+//   jar is taken out: the mods among them go through Loom on their own, and the libraries go on the classpath, marked as
+//   game libraries as a real game treats them. MixinExtras is left to NeoForge, which ships it.
+File unpackDevMods(List<String> urls) {
+    def dir = layout.buildDirectory.dir("devmods").get().asFile
+    def stamp = new File(dir, "sources.txt")
+    // bump the version when the unpacking changes, so existing unpacked mods are redone
+    def stampText = (["unpacked v2"] + urls).join("\n")
+    if (stamp.exists() && stamp.text == stampText) {
+        return dir
+    }
+    project.delete(dir)
+    def modsDir = new File(dir, "mods")
+    def libsDir = new File(dir, "libs")
+    modsDir.mkdirs()
+    libsDir.mkdirs()
+    def libs = [:]
+    def versionParts = { String version -> version.findAll(/\d+/).collect { it as int } }
+    def newer = { String a, String b ->
+        def x = versionParts(a), y = versionParts(b)
+        for (int i = 0; i < Math.min(x.size(), y.size()); i++) {
+            if (x[i] != y[i]) return x[i] > y[i]
+        }
+        return x.size() > y.size()
+    }
+    def visit
+    visit = { String name, byte[] bytes ->
+        def zip = new java.util.zip.ZipInputStream(new ByteArrayInputStream(bytes))
+        boolean mod = false
+        String manifest = null
+        def nested = []
+        for (def entry = zip.nextEntry; entry != null; entry = zip.nextEntry) {
+            if (entry.name == "META-INF/neoforge.mods.toml") {
+                mod = true
+            } else if (entry.name == "META-INF/MANIFEST.MF") {
+                manifest = new String(zip.readAllBytes(), "UTF-8")
+            } else if (entry.name.startsWith("META-INF/") && entry.name.endsWith(".jar")) {
+                // META-INF/jarjar/ or META-INF/jars/ (C2ME's modules), wherever the jarjar metadata points
+                nested << [entry.name.substring(entry.name.lastIndexOf('/') + 1), zip.readAllBytes()]
+            }
+        }
+        if (mod) {
+            new File(modsDir, name).bytes = bytes
+        } else if (!name.startsWith("mixinextras")) {
+            // one version of each library, the newest
+            def matcher = name =~ /^(.+?)-(\d.*)\.jar$/
+            def key = matcher.matches() ? matcher.group(1) : name
+            def version = matcher.matches() ? matcher.group(2) : ""
+            if (!libs.containsKey(key) || newer(version, libs[key][0])) {
+                libs[key] = [version, name, bytes, manifest]
+            }
+        }
+        nested.each { visit(it[0], it[1]) }
+    }
+    urls.each { url ->
+        logger.lifecycle("Downloading {} for the dev game", url)
+        def bytes = new URL(url).openStream().withCloseable { it.readAllBytes() }
+        visit(url.substring(url.lastIndexOf('/') + 1), bytes)
+    }
+    libs.values().each { lib ->
+        def (version, name, bytes, manifest) = lib
+        def out = new File(libsDir, name)
+        if (manifest != null && manifest.contains("FMLModType")) {
+            out.bytes = bytes
+            return
+        }
+        // the same jar with FMLModType: GAMELIBRARY in its manifest
+        def text = (manifest ?: "Manifest-Version: 1.0\r\n").trim() + "\r\nFMLModType: GAMELIBRARY\r\n\r\n"
+        def zip = new java.util.zip.ZipInputStream(new ByteArrayInputStream(bytes))
+        out.withOutputStream { stream ->
+            def zipOut = new java.util.zip.ZipOutputStream(stream)
+            zipOut.putNextEntry(new java.util.zip.ZipEntry("META-INF/MANIFEST.MF"))
+            zipOut.write(text.getBytes("UTF-8"))
+            zipOut.closeEntry()
+            for (def entry = zip.nextEntry; entry != null; entry = zip.nextEntry) {
+                if (entry.name != "META-INF/MANIFEST.MF") {
+                    zipOut.putNextEntry(new java.util.zip.ZipEntry(entry.name))
+                    zipOut.write(zip.readAllBytes())
+                    zipOut.closeEntry()
+                }
+            }
+            zipOut.finish()
+        }
+    }
+    stamp.text = stampText
+    return dir
 }
 
 processResources {
