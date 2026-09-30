@@ -19,6 +19,8 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
     compileOnly "com.github.glitchfiend:TerraBlender-common:${rootProject.minecraft_version}-${rootProject.terrablender_version}"
     compileOnly "com.electronwill.night-config:toml:3.6.7"
+    // C2ME OpenCL compat: C2ME bundles MixinSquared 0.3.7-beta.1 on both loaders
+    compileOnly "com.github.bawnorton.mixinsquared:mixinsquared-common:0.3.7-beta.1"
 }
 
 dependencies {

@@ -18,6 +18,9 @@ public interface UTFRandomState {
 
 	@Nullable
 	GeneratorContext generatorContext();
+
+	// whether the world's terrain reads UltraTerraForged's cells: known from the start, before the preset is loaded
+	boolean usesCells();
 	
 	DensityFunction wrap(DensityFunction function);
 
