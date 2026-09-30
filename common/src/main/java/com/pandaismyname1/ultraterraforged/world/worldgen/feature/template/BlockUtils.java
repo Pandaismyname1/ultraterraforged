@@ -13,8 +13,10 @@ import net.minecraft.world.level.pathfinder.PathComputationType;
 
 public class BlockUtils {
 
+    // since 26.1 the dirt tag is dirt alone; what it used to hold, grass blocks, podzol, moss and mud with it, is the
+    // overworld substrate
     public static boolean isSoil(LevelAccessor world, BlockPos pos) {
-        return world.getBlockState(pos).is(BlockTags.DIRT);
+        return world.getBlockState(pos).is(BlockTags.SUBSTRATE_OVERWORLD);
     }
 
     public static boolean isLeavesOrLogs(BlockState state) {
@@ -26,8 +28,9 @@ public class BlockUtils {
         return state.is(BlockTags.SAPLINGS) || state.is(BlockTags.FLOWERS) || state.is(Blocks.VINE);
     }
 
+    // as vanilla's trees: short grass, ferns and the like give way to them too
     public static boolean canTreeReplace(LevelAccessor world, BlockPos pos) {
-        return TreeFeature.isAirOrLeaves(world, pos) || isVegetation(world, pos);
+        return TreeFeature.validTreePos(world, pos) || isVegetation(world, pos);
     }
 
     public static boolean isSolid(BlockGetter reader, BlockPos pos) {
@@ -41,7 +44,7 @@ public class BlockUtils {
 
     public static boolean isSoilOrRock(LevelAccessor world, BlockPos pos) {
         BlockState block = world.getBlockState(pos);
-        return block.is(BlockTags.DIRT) || block.is(BlockTags.BASE_STONE_OVERWORLD);
+        return block.is(BlockTags.SUBSTRATE_OVERWORLD) || block.is(BlockTags.BASE_STONE_OVERWORLD);
     }
 
     public static boolean isClearOverhead(LevelAccessor world, BlockPos pos, int height, BiPredicate<LevelAccessor, BlockPos> predicate) {
