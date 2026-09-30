@@ -47,6 +47,11 @@ allprojects {
             forRepository { maven { url = "https://cursemaven.com" } }
             filter { includeGroup "curse.maven" }
         }
+        // MixinSquared, for the C2ME OpenCL compat: C2ME bundles it, so it's only compiled against
+        exclusiveContent {
+            forRepository { maven { url = "https://maven.bawnorton.com/releases" } }
+            filter { includeGroup "com.github.bawnorton.mixinsquared" }
+        }
         // Sinytra Connector and Forgified Fabric API, published module by module so the dev runs can remap them
         exclusiveContent {
             forRepository { maven { url = "https://maven.su5ed.dev/releases" } }

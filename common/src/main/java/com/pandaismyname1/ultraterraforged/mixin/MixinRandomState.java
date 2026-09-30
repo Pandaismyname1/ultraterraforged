@@ -104,6 +104,10 @@ class MixinRandomState {
 		}
 	}
 	
+	public boolean ultraterraforged$UTFRandomState$usesCells() {
+		return this.hasContext;
+	}
+
 	@Nullable
 	public RegistryAccess ultraterraforged$UTFRandomState$registryAccess() {
 		return this.registryAccess;
