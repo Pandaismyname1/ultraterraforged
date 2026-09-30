@@ -537,7 +537,7 @@ public class UTFLanguageProvider {
 			this.add(UTFTranslationKeys.performanceModCategory("general"), "Speeds up the game and saves memory");
 			this.add(UTFTranslationKeys.performanceModCategory("client"), "Speeds up rendering");
 			this.add(UTFTranslationKeys.performanceModDescription("c2me"), "Generates, loads and saves chunks on many threads at once: the biggest speed-up for exploring new land.");
-			this.add(UTFTranslationKeys.performanceModDescription("c2meOpenCl"), "An add-on for C2ME that moves parts of world generation onto the graphics card. Optional: it needs Java 25 and a graphics card with OpenCL, and doesn't work together with Noisium(ed), so install one or the other.");
+			this.add(UTFTranslationKeys.performanceModDescription("c2meOpenCl"), "An add-on for C2ME that moves parts of world generation onto the graphics card. It can't speed up UltraTerraForged's worlds, which generate without it, only vanilla ones. Optional: it needs Java 25 and a graphics card with OpenCL, and doesn't work together with Noisium(ed), so install one or the other.");
 			this.add(UTFTranslationKeys.performanceModDescription("noisium"), "Fills new chunks with blocks faster, without changing the terrain. Noisium itself is no longer updated; Noisiumed is its maintained fork.");
 			this.add(UTFTranslationKeys.performanceModDescription("lithium"), "Speeds up ticking, mob AI, physics and parts of world generation, without changing how the game plays.");
 			this.add(UTFTranslationKeys.performanceModDescription("modernFix"), "Cuts loading times and memory use.");
