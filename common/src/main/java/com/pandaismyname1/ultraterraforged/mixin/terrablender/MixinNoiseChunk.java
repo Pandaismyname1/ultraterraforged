@@ -47,8 +47,9 @@ public class MixinNoiseChunk {
     	}
     }
 
+	// protected, as vanilla has it: widened to public, ModernFix's overwrite of it failed to apply
 	@Shadow
-    private DensityFunction wrap(DensityFunction densityFunction) {
+    protected DensityFunction wrap(DensityFunction densityFunction) {
 		throw new IllegalStateException();
     }
 }
