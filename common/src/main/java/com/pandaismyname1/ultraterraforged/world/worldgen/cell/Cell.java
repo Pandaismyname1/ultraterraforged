@@ -40,6 +40,8 @@ public class Cell {
     public float biomeRegionId;
     public float biomeRegionEdge;
     public float macroBiomeId;
+    // 0 to 1 per biome region, independent of its climate: picks vanilla's normal or variant biome there
+    public float biomeVariant;
     public float riverDistance;
     // the surface of a river, lake or wetland above the sea, as a height; 0 elsewhere
     public float waterLevel;
@@ -97,6 +99,7 @@ public class Cell {
         this.biomeRegionId = other.biomeRegionId;
         this.biomeRegionEdge = other.biomeRegionEdge;
         this.macroBiomeId = other.macroBiomeId;
+        this.biomeVariant = other.biomeVariant;
         this.riverDistance = other.riverDistance;
         this.waterLevel = other.waterLevel;
         this.riverBank = other.riverBank;
