@@ -23,7 +23,6 @@ accessible field net/minecraft/world/level/levelgen/SurfaceRules$Context biome L
 accessible field net/minecraft/world/level/levelgen/SurfaceSystem seaLevel I
 accessible field net/minecraft/world/level/levelgen/NoiseChunk initialDensityNoJaggedness Lnet/minecraft/world/level/levelgen/DensityFunction;
 mutable field net/minecraft/world/level/levelgen/NoiseChunk cellCountY I
-accessible method net/minecraft/world/level/levelgen/NoiseChunk wrap (Lnet/minecraft/world/level/levelgen/DensityFunction;)Lnet/minecraft/world/level/levelgen/DensityFunction;
 accessible field net/minecraft/world/level/levelgen/DensityFunctions MAX_REASONABLE_NOISE_VALUE D
 accessible class net/minecraft/world/level/levelgen/OreVeinifier$VeinType
 accessible field net/minecraft/world/level/levelgen/OreVeinifier$VeinType minY I
