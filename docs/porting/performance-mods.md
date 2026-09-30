@@ -130,6 +130,15 @@ The launcher runs 1.21.1 on Java 21, but C2ME's 0.4.0 line (June 2026 on) builds
   ("cannot inject into net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator"). Noisiumed is the one the light
   asks for (a release, on Java 21, no GPU needed); C2ME OpenCL is marked `optional`: shown as "Optional", with its
   description saying to pick one or the other, and counted only when installed.
+- **C2ME OpenCL can't compile UltraTerraForged's terrain**, which reads cells worked out in Java: its code generator
+  throws "Unsupported density function type: CellSampler", and with `openclAccel.allowIncompatibilityFallback` off
+  (the default) C2ME stops the game when the world loads. `mixin/c2me/MixinChunkMapOpenCL` turns the fallback on for
+  worlds whose terrain uses the cells (`UTFRandomState.usesCells`): C2ME logs "does not have compiled CL code" and
+  generates them as usual, while the Nether, the End and vanilla worlds still use the graphics card. C2ME reads its
+  config while its own mixins are set up, before other mods' apply, so the mixin changes the value C2ME's world loading
+  handler reads, through MixinSquared (bundled by C2ME on both loaders, compiled against only). It's listed in the
+  mixin config so the plugin leaves it out without C2ME OpenCL: mixins a plugin only returns from `getMixins()` aren't
+  filtered, and without MixinSquared its handler selector doesn't parse.
 
 ### Tested with UltraTerraForged
 
