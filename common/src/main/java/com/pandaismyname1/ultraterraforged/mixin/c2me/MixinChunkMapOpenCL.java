@@ -1,5 +1,6 @@
 package com.pandaismyname1.ultraterraforged.mixin.c2me;
 
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,6 +22,7 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
 @Mixin(value = ChunkMap.class, priority = 1500)
 class MixinChunkMapOpenCL {
 	@Shadow
+	@Final
 	private RandomState randomState;
 
 	@TargetHandler(mixin = "com.ishland.c2me.opts.accel.opencl.mixin.MixinThreadedAnvilChunkStorage", name = "postInit")
