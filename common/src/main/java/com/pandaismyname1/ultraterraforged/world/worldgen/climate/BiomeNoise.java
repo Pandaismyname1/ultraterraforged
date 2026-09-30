@@ -19,6 +19,9 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.terrain.TerrainType;
 import com.pandaismyname1.ultraterraforged.world.worldgen.util.Seed;
 
 public class BiomeNoise {
+	// a region's variant is hashed from its own seed, so adding it drew nothing from the world seed's sequence
+	private static final int VARIANT_SALT = 0x5BD1E995;
+
 	private int seed;
 	private float biomeFreq;
 	private float warpStrength;
@@ -124,6 +127,7 @@ public class BiomeNoise {
 			}
 		}
 		cell.biomeRegionId = cellValue(this.seed, cellX, cellZ);
+		cell.biomeVariant = cellValue(this.seed ^ VARIANT_SALT, cellX, cellZ);
 		cell.regionMoisture = this.moisture.compute(centerX, centerZ, 0);
 		cell.regionTemperature = this.temperature.compute(centerX, centerZ, 0);
 		cell.macroBiomeId = this.macroBiomeNoise.compute(centerX, centerZ, 0);
