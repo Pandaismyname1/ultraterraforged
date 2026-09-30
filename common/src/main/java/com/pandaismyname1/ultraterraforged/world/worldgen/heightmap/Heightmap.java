@@ -42,6 +42,10 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.util.Seed;
 
 //TODO rework this whole class
 public record Heightmap(CellSampler.Provider cellProvider, CellPopulator terrain, CellPopulator region, Continent continent, Climate climate, Levels levels, ControlPoints controlPoints, float terrainFrequency, @Deprecated Noise mountainChainAlpha, @Deprecated Noise beachAlpha, Landform landforms) { //TODO move noise fields to RegionModule
+	// the share of biome regions that get the variant biome, as in vanilla
+	private static final float VARIANT_SHARE = 0.5F;
+	// the middle of vanilla's most eroded level, where its swamps are
+	private static final float SWAMP_EROSION = 0.775F;
 	
 	//TODO move this to a factory or something instead
 	public Heightmap cache() {
@@ -124,30 +128,21 @@ public record Heightmap(CellSampler.Provider cellProvider, CellPopulator terrain
 	}
 	
 	public void applyClimate(Cell cell, float x, float z) {
-    	cell.weirdness = -cell.weirdness;
-
-		float riverValleyThreshold = 0.675F;
-//        if(cell.riverDistance < riverValleyThreshold) {
-//        	cell.erosion = 0.445F;
-//        	cell.weirdness = 0.34F;
-//        }
-//
-//        if(cell.terrain.isRiver()) {
-//            cell.erosion = -0.05F;
-//            cell.weirdness = -0.03F;
-//        }
-//
-//        if(cell.terrain.isLake() && cell.height < this.levels.water) {
-//            cell.erosion = Erosion.LEVEL_4.midpoint();
-//            cell.weirdness = -0.03F;
-//        }
-//        
-//        if(cell.terrain.isWetland()) {
-//        	cell.erosion = Erosion.LEVEL_6.midpoint();
-//        	cell.weirdness = Weirdness.VALLEY.midpoint();
-//        }
-        
         this.climate.apply(cell, x, z);
+
+        // the size of the terrain's weirdness sets vanilla's slice (valley, low, middle, high or peak), and its sign picks
+        // the slice's normal or variant biome: plains or sunflower plains, meadow or cherry grove, jungle or bamboo jungle.
+        // Vanilla's weirdness changes sign every so often; here each biome region is one or the other.
+        float weirdness = Math.abs(cell.weirdness);
+        cell.weirdness = cell.biomeVariant < VARIANT_SHARE ? weirdness : -weirdness;
+
+        if (cell.terrain.isWetland()) {
+        	// vanilla's swamps and mangrove swamps are its most eroded lowlands
+        	cell.erosion = SWAMP_EROSION;
+        } else if (cell.terrain.isRiver()) {
+        	// and its rivers the valleys
+        	cell.weirdness = 0.0F;
+        }
 	}
 	
 	public void applyPost(Cell cell, float x, float z) {
