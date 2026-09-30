@@ -9,7 +9,7 @@ displayName="UltraTerraForged"
 version="${version}"
 authors="pandaismyname1"
 credits="A continuation of ReTerraForged by raccoonman, Steveplays28 and EdoEquin0x, itself a continuation of TerraForged by dags and Won-Ton"
-logoFile="logo.png"
+iconFile="logo.png"
 displayURL="https://github.com/Pandaismyname1/ultraterraforged"
 description='''Realistic, configurable terrain: continents, mountain ranges, rivers that follow the land, coasts, caves and sea floors worth exploring. A continuation of ReTerraForged and TerraForged.'''
 

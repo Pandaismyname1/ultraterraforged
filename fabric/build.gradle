@@ -9,6 +9,14 @@ architectury {
 
 loom {
     accessWidenerPath = project(":common").loom.accessWidenerPath
+
+    // the dev runs' mod is both modules: Fabric Loader 0.19 only looks for the access widener in the mod's own paths
+    mods {
+        main {
+            sourceSet sourceSets.main
+            sourceSet project(":common").sourceSets.main
+        }
+    }
 }
 
 configurations {
