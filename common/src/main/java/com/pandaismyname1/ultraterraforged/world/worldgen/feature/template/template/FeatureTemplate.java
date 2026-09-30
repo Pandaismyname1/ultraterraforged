@@ -40,6 +40,8 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.util.datafix.DataFixTypes;
+import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -58,6 +60,8 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.feature.template.place
 import com.pandaismyname1.ultraterraforged.world.worldgen.feature.util.BlockReader;
 
 public class FeatureTemplate {
+    // the templates carry no data version: they were saved in 1.16.5's format
+    private static final int TEMPLATE_DATA_VERSION = 2586;
     public static final PasteType WORLD_GEN = FeatureTemplate::getWorldGenPaste;
     public static final PasteType CHECKED = FeatureTemplate::getCheckedPaste;
     public static final PasteType UNCHECKED = FeatureTemplate::getUnCheckedPaste;
@@ -219,6 +223,10 @@ public class FeatureTemplate {
         return dimensions.get(mirror, rotation);
     }
 
+    public BlockInfo[] getBlocks(Mirror mirror, Rotation rotation) {
+        return this.template.get(mirror, rotation);
+    }
+
     private Paste getWorldGenPaste() {
         return new Paste() {
 
@@ -309,6 +317,9 @@ public class FeatureTemplate {
     public static Optional<FeatureTemplate> load(HolderLookup<Block> blockLookup, InputStream data) {
         try {
             CompoundTag root = NbtIo.readCompressed(data, NbtAccounter.unlimitedHeap());
+            // brought up to this version's format, as vanilla does its own structures: 26.3 renamed a block's Name and
+            // Properties to id and properties, and read the old names as air
+            root = DataFixTypes.STRUCTURE.updateToCurrentVersion(DataFixers.getDataFixer(), root, NbtUtils.getDataVersion(root, TEMPLATE_DATA_VERSION));
             if (!root.contains("palette") || !root.contains("blocks")) {
                 return Optional.empty();
             }
