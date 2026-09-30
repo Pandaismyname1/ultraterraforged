@@ -1,3 +1,12 @@
+### New in 1.0.0
+* Vanilla's variant biomes generate: cherry groves, pale gardens, sunflower plains, ice spikes, bamboo and sparse jungles, old growth birch forests and pine taigas, frozen peaks, eroded badlands, windswept savannas and dappled forests. They never did: every region got the plain version of its biome.
+* Wetlands are swamps and mangrove swamps, and rivers are rivers and frozen rivers, as in vanilla.
+* Chunks get the biome `/locate` finds. A chunk could get another biome than the one `/locate` reported there, even a land biome in the sea.
+* Trees grow on grass again: since 26.1 they only grew on bare dirt, and forests and jungles had few of them.
+* Trees generate at all: on 26.3 every tree template was read as air.
+* NeoForge no longer warns about the mod's logo on every start.
+* Terrain is the same as in 0.1.0-alpha.1; biomes and trees differ, so in existing worlds new chunks can meet old ones at a visible seam.
+
 ### UltraTerraForged
 * UltraTerraForged is a continuation of ReTerraForged (by raccoonman, Steveplays28 and EdoEquin0x), which continued TerraForged (by dags and Won-Ton). Full credit and history are in the README and this repository, a fork of ReTerraForged.
 * It has its own mod id, `ultraterraforged`, and isn't compatible with worlds made with ReTerraForged. The first start copies `config/reterraforged` to `config/ultraterraforged`, keeping saved presets and modpack setups. Dedicated servers use `level-type=ultraterraforged:ultraterraforged`.
