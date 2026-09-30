@@ -22,7 +22,8 @@
   	"terrablender.MixinParameterList",
   	"terrablender.MixinClimateSampler",
   	"terrablender.MixinTargetPoint",
-  	"worldpreview.SampleUtilsMixin"
+  	"worldpreview.SampleUtilsMixin",
+  	"c2me.MixinChunkMapOpenCL"
   ],
   "client": [
   	"ScreenInvoker",
