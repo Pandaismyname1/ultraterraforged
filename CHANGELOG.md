@@ -1,3 +1,12 @@
+### New in 1.0.1
+* Other dimensions generate as their own again. With TerraBlender installed, the Nether, the Aether, Deeper Darker and other dimensions were cut off chunk by chunk at the overworld's height, in flat steps, and got its rivers and lakes.
+* Without TerraBlender, generating the Nether or the End crashed the server.
+* No more shipwrecks and ocean ruins on dry ground: islands and peninsulas no longer get ocean biomes.
+* New worlds leave vanilla's overworld density functions alone, so modded dimensions built on them keep their own terrain. Existing worlds keep the preset they were created with.
+* Works next to C2ME's OpenCL module: UltraTerraForged's worlds generate as usual instead of stopping the game; vanilla dimensions still use the graphics card.
+* Fabric: needs Fabric API 0.145.4+26.1.2 or newer (it asked for 0.155.3+26.1.2).
+* Terrain is the same as in 1.0.0; only biomes on islands and peninsulas change, in newly generated chunks.
+
 ### New in 1.0.0
 * Vanilla's variant biomes generate: cherry groves, pale gardens, sunflower plains, ice spikes, bamboo and sparse jungles, old growth birch forests and pine taigas, frozen peaks, eroded badlands and windswept savannas. They never did: every region got the plain version of its biome.
 * Wetlands are swamps and mangrove swamps, and rivers are rivers and frozen rivers, as in vanilla.
