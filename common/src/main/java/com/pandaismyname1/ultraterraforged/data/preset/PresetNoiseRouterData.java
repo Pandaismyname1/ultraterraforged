@@ -7,6 +7,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
+import net.minecraft.data.worldgen.TerrainProvider;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.OverworldBiomeBuilder;
@@ -17,7 +18,9 @@ import net.minecraft.world.level.levelgen.Noises;
 import net.minecraft.world.level.levelgen.OverworldFunctionSet;
 import net.minecraft.world.level.levelgen.densityfunction.DensityFunction;
 import net.minecraft.world.level.levelgen.densityfunction.DensityFunctions;
+import net.minecraft.world.level.levelgen.densityfunction.op.SplineFunction;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.CaveFeatureSettings;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.CaveSettings;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
@@ -26,12 +29,14 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.cell.CellField;
 import com.pandaismyname1.ultraterraforged.world.worldgen.densityfunction.UTFDensityFunctions;
 
 /*
- * The preset's density functions, registered over vanilla's overworld ones, and the router built from them.
+ * The preset's density functions, registered as UltraTerraForged's own overworld functions, and the router built from
+ * them. Registered over vanilla's they replaced its functions in every dimension built on them, as many modded
+ * dimensions are, and gave those UltraTerraForged's overworld.
  *
  * Since 26.3 the router only holds what's sampled by name (climate, the surface level, the final density); aquifers and
  * ore veins moved to the noise settings and the material rule, and the final density includes the beardifier and the
- * interpolation cell sizes itself. Vanilla's own overworld functions that aren't replaced here (factor, sloped cheese,
- * the cave pieces) read UltraTerraForged's continents, erosion, ridges, depth and jaggedness through their names.
+ * interpolation cell sizes itself. Factor and sloped cheese are built as vanilla builds them, from UltraTerraForged's
+ * continents, erosion, ridges, depth and jaggedness; vanilla's cave pieces that aren't changed are read by their names.
  */
 public class PresetNoiseRouterData {
 	private static final float SCALER = 128.0F;
@@ -48,16 +53,21 @@ public class PresetNoiseRouterData {
 	// how far under the surface cave entrances are kept to slopes
 	private static final float MOUTH_DEPTH = 24.0F;
 
-	private static final OverworldFunctionSet<ResourceKey<DensityFunction>> OVERWORLD = NoiseRouterData.OVERWORLD_FUNCTIONS;
-	// vanilla's overworld cave functions, private to NoiseRouterData
+	private static final DensityFunction BLENDING_FACTOR = DensityFunctions.constant(10.0F);
+
+	// vanilla's overworld functions, under UltraTerraForged's names
+	public static final OverworldFunctionSet<ResourceKey<DensityFunction>> OVERWORLD = NoiseRouterData.OVERWORLD_FUNCTIONS.map((key) -> createKey(key.identifier().getPath()));
+	public static final ResourceKey<DensityFunction> RIDGES = createKey("overworld/ridges");
+	private static final ResourceKey<DensityFunction> RIDGES_FOLDED = createKey("overworld/ridges_folded");
+	private static final ResourceKey<DensityFunction> BASE_3D_NOISE = createKey("overworld/base_3d_noise");
+	private static final ResourceKey<DensityFunction> ENTRANCES = createKey("overworld/caves/entrances");
+	private static final ResourceKey<DensityFunction> NOODLE = createKey("overworld/caves/noodle");
+	private static final ResourceKey<DensityFunction> SPAGHETTI_2D = createKey("overworld/caves/spaghetti_2d");
+	// vanilla's overworld functions read as they are, private to NoiseRouterData
 	private static final ResourceKey<DensityFunction> Y = vanillaKey("y");
-	private static final ResourceKey<DensityFunction> BASE_3D_NOISE_OVERWORLD = vanillaKey("overworld/base_3d_noise");
 	private static final ResourceKey<DensityFunction> SPAGHETTI_ROUGHNESS_FUNCTION = vanillaKey("overworld/caves/spaghetti_roughness_function");
-	private static final ResourceKey<DensityFunction> ENTRANCES = vanillaKey("overworld/caves/entrances");
-	private static final ResourceKey<DensityFunction> NOODLE = vanillaKey("overworld/caves/noodle");
 	private static final ResourceKey<DensityFunction> PILLARS = vanillaKey("overworld/caves/pillars");
 	private static final ResourceKey<DensityFunction> SPAGHETTI_2D_THICKNESS_MODULATOR = vanillaKey("overworld/caves/spaghetti_2d_thickness_modulator");
-	private static final ResourceKey<DensityFunction> SPAGHETTI_2D = vanillaKey("overworld/caves/spaghetti_2d");
 
     public static void bootstrap(Preset preset, BootstrapContext<DensityFunction> ctx) {
         HolderGetter<DensityFunction> densityFunctions = ctx.lookup(Registries.DENSITY_FUNCTION);
@@ -71,14 +81,24 @@ public class PresetNoiseRouterData {
 
         ctx.register(OVERWORLD.temperature(), UTFDensityFunctions.cell(CellField.TEMPERATURE));
         ctx.register(OVERWORLD.vegetation(), UTFDensityFunctions.cell(CellField.MOISTURE));
-        ctx.register(OVERWORLD.continents(), UTFDensityFunctions.cell(CellField.CONTINENTALNESS));
-        ctx.register(OVERWORLD.erosion(), UTFDensityFunctions.cell(CellField.EROSION));
-        ctx.register(NoiseRouterData.RIDGES, UTFDensityFunctions.cell(CellField.WEIRDNESS));
+        DensityFunction continents = registerAndWrap(ctx, OVERWORLD.continents(), UTFDensityFunctions.cell(CellField.CONTINENTALNESS));
+        DensityFunction erosion = registerAndWrap(ctx, OVERWORLD.erosion(), UTFDensityFunctions.cell(CellField.EROSION));
+        DensityFunction ridges = registerAndWrap(ctx, RIDGES, UTFDensityFunctions.cell(CellField.WEIRDNESS));
+        DensityFunction ridgesFolded = registerAndWrap(ctx, RIDGES_FOLDED, NoiseRouterData.peaksAndValleys(ridges));
 
         DensityFunction offset = registerAndWrap(ctx, OVERWORLD.offset(), DensityFunctions.add(DensityFunctions.constant(NoiseRouterData.GLOBAL_OFFSET - 0.5F), DensityFunctions.mul(UTFDensityFunctions.clampToNearestUnit(UTFDensityFunctions.cell(CellField.HEIGHT), properties.terrainScaler()), DensityFunctions.constant(2.0F))));
         DensityFunction depth = registerAndWrap(ctx, OVERWORLD.depth(), DensityFunctions.add(DensityFunctions.yClampedGradient(-worldDepth, worldHeight, yGradientRange(-worldDepth), yGradientRange(worldHeight)), offset));
-        ctx.register(BASE_3D_NOISE_OVERWORLD, DensityFunctions.zero());
-        ctx.register(OVERWORLD.jaggedness(), DensityFunctions.zero());
+        DensityFunction base3dNoise = registerAndWrap(ctx, BASE_3D_NOISE, DensityFunctions.zero());
+        DensityFunction jaggedness = registerAndWrap(ctx, OVERWORLD.jaggedness(), DensityFunctions.zero());
+        // vanilla's factor and sloped cheese, read from the functions above
+        SplineFunction.Coordinate continentsCoordinate = new SplineFunction.Coordinate(continents);
+        SplineFunction.Coordinate erosionCoordinate = new SplineFunction.Coordinate(erosion);
+        SplineFunction.Coordinate ridgesCoordinate = new SplineFunction.Coordinate(ridges);
+        SplineFunction.Coordinate ridgesFoldedCoordinate = new SplineFunction.Coordinate(ridgesFolded);
+        DensityFunction factor = registerAndWrap(ctx, OVERWORLD.factor(), DensityFunctions.cache(DensityFunctions.lerp(DensityFunctions.blendAlpha(), BLENDING_FACTOR, DensityFunctions.spline(TerrainProvider.overworldFactor(continentsCoordinate, erosionCoordinate, ridgesCoordinate, ridgesFoldedCoordinate, false)))));
+        DensityFunction jaggedNoise = DensityFunctions.noise(noiseParams.getOrThrow(Noises.JAGGED), 1500.0, 0.0);
+        DensityFunction jagged = DensityFunctions.cache(DensityFunctions.mul(jaggedness, jaggedNoise.halfNegative()));
+        ctx.register(OVERWORLD.slopedCheese(), DensityFunctions.cache(DensityFunctions.add(noiseGradientDensity(factor, DensityFunctions.add(depth, jagged)), base3dNoise)));
         CaveSettings caves = preset.caves();
         ctx.register(NOODLE, noodle(-worldDepth, worldHeight, 1.0F - caves.noodleCaveProbability, densityFunctions, noiseParams));
         DensityFunction entrances = probabilityDensity(caves.entranceCaveProbability, entrances(densityFunctions, noiseParams));
@@ -100,7 +120,6 @@ public class PresetNoiseRouterData {
         ctx.register(SPAGHETTI_2D, probabilityDensity(caves.spaghettiCaveProbability, spaghetti2D(-worldDepth, worldHeight, densityFunctions, noiseParams)));
 
         // the overworld's surface level and final density, over vanilla's: mods that read them by name get the preset's
-        DensityFunction factor = getFunction(densityFunctions, OVERWORLD.factor());
         DensityFunction initialDensity = noiseGradientDensity(DensityFunctions.cache(factor), depth);
         // Since 1.21.9 the router gives the surface's height here, not a density. It's found as NoiseChunk found it before:
         // from the top down, one noise cell (8 blocks) at a time, the first height where the density passes NOISE_ZERO.
@@ -113,7 +132,7 @@ public class PresetNoiseRouterData {
 
     protected static NoiseRouter overworld(HolderGetter<DensityFunction> densityFunctions) {
     	OverworldFunctionSet<DensityFunction> functions = OVERWORLD.map((key) -> getFunction(densityFunctions, key));
-    	return new NoiseRouter(functions.temperature(), functions.vegetation(), functions.continents(), functions.erosion(), functions.depth(), getFunction(densityFunctions, NoiseRouterData.RIDGES), functions.chunkSurfaceLevel(), functions.finalDensity());
+    	return new NoiseRouter(functions.temperature(), functions.vegetation(), functions.continents(), functions.erosion(), functions.depth(), getFunction(densityFunctions, RIDGES), functions.chunkSurfaceLevel(), functions.finalDensity());
 	}
 
     // as vanilla's overworld aquifers, below the preset's preliminary surface
@@ -237,6 +256,10 @@ public class PresetNoiseRouterData {
 
     private static DensityFunction getFunction(HolderGetter<DensityFunction> densityFunctions, ResourceKey<DensityFunction> key) {
     	return NoiseRouterData.getFunction(densityFunctions, key);
+    }
+
+    private static ResourceKey<DensityFunction> createKey(String name) {
+    	return ResourceKey.create(Registries.DENSITY_FUNCTION, UTFCommon.location(name));
     }
 
     private static ResourceKey<DensityFunction> vanillaKey(String name) {

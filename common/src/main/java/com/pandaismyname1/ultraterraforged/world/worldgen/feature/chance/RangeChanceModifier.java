@@ -22,6 +22,10 @@ public abstract class RangeChanceModifier implements ChanceModifier {
     }
 
     private float apply(float value) {
+    	// nothing to go by: the chance stays as it is
+    	if (Float.isNaN(value)) {
+    		return 1.0F;
+    	}
     	float max = this.exclusive ? 0 : 1;;
     	float range = Math.abs(max - this.from);
         if (this.from < this.to) {

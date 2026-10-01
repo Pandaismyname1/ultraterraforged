@@ -141,9 +141,9 @@ public record ErodeSnowFeature(float steepness, float height, boolean erode, boo
 				}
 			}
 	        return true;
-		} else {
-			throw new IllegalStateException();
 		}
+		// the feature is in every biome, and so in dimensions UltraTerraForged doesn't generate
+		return false;
 	}
 
     // where facing north, into the shade, 1 on steep slopes; where facing south, into the sun, -1; 0 on flat ground

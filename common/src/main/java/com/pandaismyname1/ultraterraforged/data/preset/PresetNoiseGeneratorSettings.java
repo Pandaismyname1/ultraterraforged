@@ -51,7 +51,7 @@ public class PresetNoiseGeneratorSettings {
 				new NoiseGeneratorSettings.DebugFunctionEntry("E", router.erosion()),
 				new NoiseGeneratorSettings.DebugFunctionEntry("D", router.depth()),
 				new NoiseGeneratorSettings.DebugFunctionEntry("W", router.ridges()),
-				new NoiseGeneratorSettings.DebugFunctionEntry("PS", NoiseRouterData.getFunction(densityFunctions, NoiseRouterData.OVERWORLD_FUNCTIONS.preliminarySurfaceLevel()))
+				new NoiseGeneratorSettings.DebugFunctionEntry("PS", NoiseRouterData.getFunction(densityFunctions, PresetNoiseRouterData.OVERWORLD.preliminarySurfaceLevel()))
 			))
 		));
     }

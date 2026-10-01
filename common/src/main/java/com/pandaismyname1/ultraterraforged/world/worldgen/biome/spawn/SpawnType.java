@@ -9,9 +9,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.biome.Climate;
-import net.minecraft.world.level.levelgen.NoiseRouterData;
 import net.minecraft.world.level.levelgen.SpawnTargetPoint;
 import net.minecraft.world.level.levelgen.densityfunction.DensityFunction;
+import com.pandaismyname1.ultraterraforged.data.preset.PresetNoiseRouterData;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
 import com.pandaismyname1.ultraterraforged.world.worldgen.util.PosUtil;
 
@@ -30,11 +30,11 @@ public enum SpawnType implements StringRepresentable {
 		@Override
 		public List<SpawnTargetPoint> getTargetPoints(HolderGetter<DensityFunction> functions) {
 			return List.of(new SpawnTargetPoint(Map.of(
-				functions.getOrThrow(NoiseRouterData.OVERWORLD_FUNCTIONS.temperature()), FULL_RANGE,
-				functions.getOrThrow(NoiseRouterData.OVERWORLD_FUNCTIONS.vegetation()), FULL_RANGE,
-				functions.getOrThrow(NoiseRouterData.OVERWORLD_FUNCTIONS.continents()), Climate.Parameter.span(INLAND_CONTINENTALNESS, FULL_RANGE),
-				functions.getOrThrow(NoiseRouterData.OVERWORLD_FUNCTIONS.erosion()), FULL_RANGE,
-				functions.getOrThrow(NoiseRouterData.RIDGES), FULL_RANGE
+				functions.getOrThrow(PresetNoiseRouterData.OVERWORLD.temperature()), FULL_RANGE,
+				functions.getOrThrow(PresetNoiseRouterData.OVERWORLD.vegetation()), FULL_RANGE,
+				functions.getOrThrow(PresetNoiseRouterData.OVERWORLD.continents()), Climate.Parameter.span(INLAND_CONTINENTALNESS, FULL_RANGE),
+				functions.getOrThrow(PresetNoiseRouterData.OVERWORLD.erosion()), FULL_RANGE,
+				functions.getOrThrow(PresetNoiseRouterData.RIDGES), FULL_RANGE
 			)));
 		}
 	},
