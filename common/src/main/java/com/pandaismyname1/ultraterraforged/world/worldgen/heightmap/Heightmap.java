@@ -46,6 +46,8 @@ public record Heightmap(CellSampler.Provider cellProvider, CellPopulator terrain
 	private static final float VARIANT_SHARE = 0.5F;
 	// the middle of vanilla's most eroded level, where its swamps are
 	private static final float SWAMP_EROSION = 0.775F;
+	// how many blocks above the sea land in the sea's part of the continent turns from coast to inland
+	private static final int ISLAND_INLAND = 6;
 	
 	//TODO move this to a factory or something instead
 	public Heightmap cache() {
@@ -177,6 +179,14 @@ public record Heightmap(CellSampler.Provider cellProvider, CellPopulator terrain
 			float alpha = NoiseUtil.clamp(cell.continentEdge, shallowOcean, beach);
 			alpha = NoiseUtil.lerp(alpha, shallowOcean, beach, 0.0F, 1.0F);
 			cell.continentalness = NoiseUtil.lerp(Continentalness.COAST.min(), Continentalness.COAST.max(), alpha);
+		}
+
+		// land the continent counts as sea, such as islands and peninsulas, is still land: with the sea's climate it got
+		// ocean biomes, and ocean structures such as shipwrecks and ruins on dry ground. Coast at the water's edge,
+		// inland from a few blocks up.
+		if(cell.continentalness < Continentalness.COAST.min() && cell.height >= this.levels.ground) {
+			float alpha = NoiseUtil.map(cell.height, this.levels.ground, this.levels.ground(ISLAND_INLAND));
+			cell.continentalness = NoiseUtil.lerp(Continentalness.COAST.lerp(0.5F), Continentalness.NEAR_INLAND.lerp(0.5F), alpha);
 		}
 	}
 	

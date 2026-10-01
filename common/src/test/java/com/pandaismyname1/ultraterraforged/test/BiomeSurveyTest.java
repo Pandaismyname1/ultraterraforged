@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
 
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
+import com.pandaismyname1.ultraterraforged.world.worldgen.biome.Continentalness;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.Cell;
 import com.pandaismyname1.ultraterraforged.world.worldgen.tile.Tile;
 
@@ -29,6 +30,9 @@ import net.minecraft.world.level.biome.OverworldBiomeBuilder;
  *
  * Chunks read their climate from tiles and /locate from columns it looks up one by one: the two have to agree, or a
  * chunk gets another biome than /locate finds there.
+ *
+ * Land has a land climate: islands and peninsulas in the continent's sea used to get ocean biomes, and with them
+ * shipwrecks and ocean ruins on dry ground.
  */
 public class BiomeSurveyTest {
 
@@ -97,5 +101,28 @@ public class BiomeSurveyTest {
 			}
 		}
 		assertTrue(differ <= total / 100, differ + " of " + total + " columns have another climate in their tile");
+	}
+
+	@Test
+	void landHasALandClimate() {
+		TestBootstrap.init();
+		GeneratorContext context = GeneratorContext.makeCached(BuiltinPresetRenderTest.presets().get("default").get(), 1111, 3, 6, false);
+		Cell cell = new Cell();
+		int land = 0;
+		int sea = 0;
+		for (int x = -12800; x < 12800; x += 32) {
+			for (int z = -12800; z < 12800; z += 32) {
+				context.lookup.apply(cell.reset(), x, z);
+				if (cell.height < context.levels.ground) {
+					continue;
+				}
+				land++;
+				if (cell.continentalness < Continentalness.COAST.min()) {
+					sea++;
+				}
+			}
+		}
+		assertTrue(land > 0);
+		assertTrue(sea == 0, sea + " of " + land + " land columns have the sea's climate");
 	}
 }
