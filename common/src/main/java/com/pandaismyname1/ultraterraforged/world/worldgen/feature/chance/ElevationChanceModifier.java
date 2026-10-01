@@ -40,8 +40,8 @@ class ElevationChanceModifier extends RangeChanceModifier {
 			int chunkZ = SectionPos.blockToSectionCoord(z);
 			Tile.Chunk chunk = generatorContext.cache.provideAtChunk(chunkX, chunkZ).getChunkReader(chunkX, chunkZ);
 			return utfRandomState.generatorContext().localHeightmap.get().levels().elevation(chunk.getCell(x, z).height);
-		} else {
-			throw new UnsupportedOperationException();
 		}
+		// a dimension UltraTerraForged doesn't generate, using an overworld biome
+		return Float.NaN;
 	}
 }
