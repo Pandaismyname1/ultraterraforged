@@ -104,7 +104,9 @@ class MixinRandomState {
 		RegistryLookup<Preset> presets = registryAccess.lookupOrThrow(UTFRegistries.PRESET);
 		RegistryLookup<DensityFunction> functions = registryAccess.lookupOrThrow(Registries.DENSITY_FUNCTION);
 		
-		if((Object) this.sampler instanceof TBClimateSampler tbClimateSampler && TBCompat.isEnabled()) {
+		// only in a world whose terrain reads the cells: mapping the uniqueness, a cell too, would count any other
+		// dimension TerraBlender places biomes in, such as the Nether, as UltraTerraForged's and generate it as one
+		if((Object) this.sampler instanceof TBClimateSampler tbClimateSampler && TBCompat.isEnabled() && this.hasContext) {
 			functions.get(TBNoiseRouterData.UNIQUENESS).ifPresent((uniqueness) -> {
 				tbClimateSampler.setUniqueness(uniqueness.value().mapAll(this.densityFunctionWrapper));
 			});
