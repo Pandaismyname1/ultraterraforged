@@ -3,8 +3,8 @@
   <groupId>com.pandaismyname1.ultraterraforged</groupId>
   <artifactId>ultraterraforged-fabric</artifactId>
   <versioning>
-    <latest>1.0.1+26.3</latest>
-    <release>1.0.1+26.3</release>
+    <latest>1.0.1+26.1.2</latest>
+    <release>1.0.1+26.1.2</release>
     <versions>
       <version>0.1.0-alpha.1+1.20.1</version>
       <version>0.1.0-alpha.1+1.21.1</version>
@@ -19,7 +19,8 @@
       <version>1.0.1+1.20.1</version>
       <version>1.0.1+1.21.1</version>
       <version>1.0.1+26.3</version>
+      <version>1.0.1+26.1.2</version>
     </versions>
-    <lastUpdated>20261001092329</lastUpdated>
+    <lastUpdated>20261001092519</lastUpdated>
   </versioning>
 </metadata>
