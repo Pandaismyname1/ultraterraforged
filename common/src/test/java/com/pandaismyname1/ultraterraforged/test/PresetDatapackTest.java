@@ -46,6 +46,21 @@ public class PresetDatapackTest {
 		}));
 	}
 
+	// other dimensions, modded ones especially, build on vanilla's overworld functions: replacing those gave them the
+	// overworld's terrain
+	@Test
+	void vanillaDensityFunctionsAreLeftAlone() {
+		PresetDatapack.Result pack = PresetDatapack.generate(defaultPreset());
+		assertTrue(pack.files().keySet().stream().noneMatch((file) -> file.startsWith("data/minecraft/worldgen/density_function/")), String.join("\n", pack.files().keySet()));
+		assertTrue(pack.files().containsKey("data/ultraterraforged/worldgen/density_function/overworld/sloped_cheese.json"));
+		// the overworld reads UltraTerraForged's, and vanilla's only where they're unchanged
+		String noise = pack.files().get(NOISE_SETTINGS).toString();
+		assertTrue(noise.contains("\"ultraterraforged:overworld/sloped_cheese\""), noise);
+		for (String replaced : List.of("continents", "erosion", "ridges", "offset", "factor", "depth", "jaggedness", "sloped_cheese", "caves/noodle", "caves/entrances", "caves/spaghetti_2d")) {
+			assertTrue(!noise.contains("\"minecraft:overworld/" + replaced + "\""), replaced);
+		}
+	}
+
 	@Test
 	void worldHeightReachesTheDimension() {
 		Preset preset = defaultPreset();
