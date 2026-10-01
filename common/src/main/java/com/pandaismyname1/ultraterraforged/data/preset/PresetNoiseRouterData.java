@@ -2,7 +2,6 @@ package com.pandaismyname1.ultraterraforged.data.preset;
 
 import java.util.stream.Stream;
 
-import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
@@ -64,10 +63,10 @@ public class PresetNoiseRouterData {
         int worldHeight = properties.worldHeight;
         int worldDepth = properties.worldDepth;
         
-        Holder<DensityFunction> continents = ctx.register(CONTINENTS, UTFDensityFunctions.cell(CellField.CONTINENTALNESS));
-        Holder<DensityFunction> erosion = ctx.register(EROSION, UTFDensityFunctions.cell(CellField.EROSION));
-        Holder<DensityFunction> ridges = ctx.register(RIDGES, UTFDensityFunctions.cell(CellField.WEIRDNESS));
-        Holder<DensityFunction> ridgesFolded = ctx.register(RIDGES_FOLDED, peaksAndValleys(new DensityFunctions.HolderHolder(ridges)));
+        DensityFunction continents = NoiseRouterData.registerAndWrap(ctx, CONTINENTS, UTFDensityFunctions.cell(CellField.CONTINENTALNESS));
+        DensityFunction erosion = NoiseRouterData.registerAndWrap(ctx, EROSION, UTFDensityFunctions.cell(CellField.EROSION));
+        DensityFunction ridges = NoiseRouterData.registerAndWrap(ctx, RIDGES, UTFDensityFunctions.cell(CellField.WEIRDNESS));
+        DensityFunction ridgesFolded = NoiseRouterData.registerAndWrap(ctx, RIDGES_FOLDED, peaksAndValleys(ridges));
         
         DensityFunction offset = NoiseRouterData.registerAndWrap(ctx, OFFSET, DensityFunctions.add(DensityFunctions.constant(NoiseRouterData.GLOBAL_OFFSET - 0.5F), DensityFunctions.mul(UTFDensityFunctions.clampToNearestUnit(UTFDensityFunctions.cell(CellField.HEIGHT), properties.terrainScaler()), DensityFunctions.constant(2.0D))));
         DensityFunction depth = NoiseRouterData.registerAndWrap(ctx, DEPTH, DensityFunctions.add(DensityFunctions.yClampedGradient(-worldDepth, worldHeight, yGradientRange(-worldDepth), yGradientRange(worldHeight)), offset));
@@ -80,7 +79,7 @@ public class PresetNoiseRouterData {
         DensityFunctions.Spline.Coordinate ridgesFoldedCoordinate = new DensityFunctions.Spline.Coordinate(ridgesFolded);
         DensityFunction factor = NoiseRouterData.registerAndWrap(ctx, FACTOR, splineWithBlending(DensityFunctions.spline(TerrainProvider.overworldFactor(continentsCoordinate, erosionCoordinate, ridgesCoordinate, ridgesFoldedCoordinate, false)), BLENDING_FACTOR));
         DensityFunction jaggedNoise = DensityFunctions.noise(noiseParams.getOrThrow(Noises.JAGGED), 1500.0D, 0.0D);
-        DensityFunction slopedCheese = NoiseRouterData.noiseGradientDensity(factor, DensityFunctions.add(depth, DensityFunctions.mul(jaggedness, jaggedNoise.halfNegative())));
+        DensityFunction slopedCheese = NoiseRouterData.noiseGradientDensity(factor, DensityFunctions.add(depth, DensityFunctions.flatCache(DensityFunctions.mul(jaggedness, jaggedNoise.halfNegative()))));
         ctx.register(SLOPED_CHEESE, DensityFunctions.add(slopedCheese, base3dNoise));
         CaveSettings caves = preset.caves();
         ctx.register(NOODLE, noodle(-worldDepth, worldHeight, 1.0F - caves.noodleCaveProbability, densityFunctions, noiseParams));
