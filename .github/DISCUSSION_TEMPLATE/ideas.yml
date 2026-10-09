@@ -1,0 +1,30 @@
+labels: ["type: feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Suggest landforms, settings and other improvements to world generation, and upvote the ideas you'd like most: votes help decide what comes next. UltraTerraForged leaves biomes to other mods, so new biomes are out of scope.
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: The idea
+      placeholder: Glacial lakes in the valleys below cirques.
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it would be good
+      description: What it adds to a world, or the problem it solves.
+    validations:
+      required: false
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Examples
+      description: Screenshots, real-world photos or places, or other mods that do something similar.
+    validations:
+      required: false

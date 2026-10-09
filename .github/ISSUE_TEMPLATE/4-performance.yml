@@ -1,0 +1,74 @@
+name: 🐢 Performance problem
+description: World generation is slow, the server lags, or memory use is high.
+labels: ["type: performance", "status: needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        UltraTerraForged generates more detailed terrain than vanilla, so new land takes more work. The Terrain tab in Create World lists performance mods that help a lot (C2ME, Lithium, ModernFix and others). If it's still slow with those, a profile shows where the time goes.
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What's slow?
+      placeholder: New chunks load about twice as slowly as in vanilla while flying with an elytra.
+    validations:
+      required: true
+
+  - type: input
+    id: profile
+    attributes:
+      label: Profile
+      description: A [spark](https://spark.lucko.me) profile taken while it's slow (`/spark profiler start`, wait a minute, `/spark profiler stop`) gives the most to go on.
+      placeholder: https://spark.lucko.me/...
+    validations:
+      required: false
+
+  - type: input
+    id: hardware
+    attributes:
+      label: Hardware and memory
+      description: CPU, how much memory the game or server is given (-Xmx), singleplayer or dedicated server.
+      placeholder: Ryzen 5 5600, 6 GB, singleplayer
+    validations:
+      required: false
+
+  - type: dropdown
+    id: minecraft
+    attributes:
+      label: Minecraft version
+      options:
+        - "1.20.1"
+        - "1.21.1"
+        - "26.1"
+        - "26.2"
+        - "26.3"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: loader
+    attributes:
+      label: Mod loader
+      options:
+        - Fabric
+        - NeoForge
+        - Forge
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: UltraTerraForged version
+      placeholder: 1.0.1
+    validations:
+      required: true
+
+  - type: textarea
+    id: mods
+    attributes:
+      label: Other mods
+      description: Your mod list, the modpack's name and version, or "none". Performance mods matter most.
+    validations:
+      required: true
