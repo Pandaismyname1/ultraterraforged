@@ -1,0 +1,49 @@
+labels: ["type: question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ask anything about using UltraTerraForged: presets and settings, servers, modpacks, other mods. When someone's answer solves it, mark it as the answer so the next person finds it.
+
+        Found a bug or a crash? [Open an issue](https://github.com/Pandaismyname1/ultraterraforged/issues/new/choose) instead.
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+    validations:
+      required: true
+
+  - type: dropdown
+    id: minecraft
+    attributes:
+      label: Minecraft version
+      options:
+        - "1.20.1"
+        - "1.21.1"
+        - "26.1"
+        - "26.2"
+        - "26.3"
+        - "Not specific to a version"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: loader
+    attributes:
+      label: Mod loader
+      options:
+        - Fabric
+        - NeoForge
+        - Forge
+        - "Not specific to a loader"
+    validations:
+      required: false
+
+  - type: input
+    id: mods
+    attributes:
+      label: Modpack or other mods, if they matter
+      placeholder: Fabulously Optimized, plus TerraBlender and Biomes O' Plenty
+    validations:
+      required: false

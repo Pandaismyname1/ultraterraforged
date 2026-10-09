@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: ❓ Question or help with setup
+    url: https://github.com/Pandaismyname1/ultraterraforged/discussions/categories/q-a
+    about: 'Presets, servers, modpacks, "how do I…": ask in Q&A, where the answer stays findable for the next person.'
+  - name: 💡 Idea or suggestion
+    url: https://github.com/Pandaismyname1/ultraterraforged/discussions/categories/ideas
+    about: 'Suggest landforms, settings or features, and upvote the ideas you want most.'
+  - name: 🗺️ Share a world, preset or seed
+    url: https://github.com/Pandaismyname1/ultraterraforged/discussions/categories/show-and-tell
+    about: 'Screenshots, seeds, preset share codes and modpacks built with UltraTerraForged.'
