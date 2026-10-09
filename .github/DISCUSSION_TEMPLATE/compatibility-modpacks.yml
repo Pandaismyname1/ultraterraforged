@@ -1,0 +1,50 @@
+labels: ["type: compatibility"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ask whether mods work together, share setups that work, or get help putting UltraTerraForged in a modpack. When a reply answers it, mark it as the answer so others can find it.
+
+        If something is broken with another mod, [open a Compatibility issue](https://github.com/Pandaismyname1/ultraterraforged/issues/new?template=3-compatibility.yml) instead.
+
+  - type: textarea
+    id: topic
+    attributes:
+      label: Your question or finding
+      placeholder: Does UltraTerraForged work with Biomes O' Plenty through TerraBlender?
+    validations:
+      required: true
+
+  - type: input
+    id: mods
+    attributes:
+      label: The mods, datapacks or modpack involved
+      placeholder: TerraBlender 4.1.0.8, Biomes O' Plenty 21.1.0
+    validations:
+      required: false
+
+  - type: dropdown
+    id: minecraft
+    attributes:
+      label: Minecraft version
+      options:
+        - "1.20.1"
+        - "1.21.1"
+        - "26.1"
+        - "26.2"
+        - "26.3"
+        - "Not specific to a version"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: loader
+    attributes:
+      label: Mod loader
+      options:
+        - Fabric
+        - NeoForge
+        - Forge
+        - "Not specific to a loader"
+    validations:
+      required: false
