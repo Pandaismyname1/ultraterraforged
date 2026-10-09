@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for reporting! One problem per issue, please. For crashes use the **Crash report** form, and for problems that only happen together with another mod, **Compatibility**.
+        Thanks for reporting! One problem per issue, please. For crashes use the **Crash report** form, and for problems that only happen together with another mod, **Conflict with another mod**. Questions go to [Discussions](https://github.com/Pandaismyname1/ultraterraforged/discussions).
 
   - type: textarea
     id: what
