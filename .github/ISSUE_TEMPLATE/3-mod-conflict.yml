@@ -1,11 +1,11 @@
-name: 🧩 Compatibility problem
-description: Something goes wrong only together with another mod, datapack or modpack.
-labels: ["type: compatibility", "status: needs triage"]
+name: ⚔️ Conflict with another mod
+description: Something breaks only together with another mod, datapack or modpack.
+labels: ["type: mod conflict", "status: needs triage"]
 body:
   - type: markdown
     attributes:
       value: |
-        If the game crashes, use the **Crash report** form; mention the other mod there.
+        If the game crashes, use the **Crash report** form and mention the other mod there. To ask whether mods work together, use [Discussions › Compatibility & modpacks](https://github.com/Pandaismyname1/ultraterraforged/discussions/categories/compatibility-modpacks).
 
   - type: input
     id: other
