@@ -1,0 +1,94 @@
+name: 🧩 Compatibility problem
+description: Something goes wrong only together with another mod, datapack or modpack.
+labels: ["type: compatibility", "status: needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        If the game crashes, use the **Crash report** form; mention the other mod there.
+
+  - type: input
+    id: other
+    attributes:
+      label: The other mod or datapack
+      description: Its name, version and a link to its page.
+      placeholder: TerraBlender 4.1.0.8, https://modrinth.com/mod/terrablender
+    validations:
+      required: true
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What goes wrong?
+      description: Screenshots help a lot.
+      placeholder: The Aether's islands are cut into flat steps.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: without
+    attributes:
+      label: Does it happen without the other mod?
+      options:
+        - "No, only with it"
+        - "Yes, it happens without it too"
+        - "I haven't tried"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: minecraft
+    attributes:
+      label: Minecraft version
+      options:
+        - "1.20.1"
+        - "1.21.1"
+        - "26.1"
+        - "26.2"
+        - "26.3"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: loader
+    attributes:
+      label: Mod loader
+      options:
+        - Fabric
+        - NeoForge
+        - Forge
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: UltraTerraForged version
+      placeholder: 1.0.1
+    validations:
+      required: true
+
+  - type: textarea
+    id: mods
+    attributes:
+      label: Other mods
+      description: The rest of your mod list, or the modpack's name and version.
+    validations:
+      required: false
+
+  - type: input
+    id: log
+    attributes:
+      label: Log
+      description: Upload `logs/latest.log` to [mclo.gs](https://mclo.gs) and paste the link.
+      placeholder: https://mclo.gs/...
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched the open and closed issues for this mod.
+          required: true

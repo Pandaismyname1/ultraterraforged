@@ -1,0 +1,105 @@
+name: 🐛 Bug report
+description: Something generates or behaves wrong, without crashing.
+labels: ["type: bug", "status: needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! One problem per issue, please. For crashes use the **Crash report** form, and for problems that only happen together with another mod, **Compatibility**.
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What's wrong, and where. Screenshots help a lot with terrain.
+      placeholder: Shipwrecks generate on dry land near the coast.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: false
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: How to reproduce it
+      placeholder: |
+        1. Create a world with seed 1111 and the Default preset
+        2. /tp 3440 100 1552
+        3. Look north
+    validations:
+      required: false
+
+  - type: input
+    id: seed
+    attributes:
+      label: Seed, preset and coordinates
+      description: The world seed, the preset (its name, or its share code if you changed settings) and the coordinates from F3.
+      placeholder: Seed 1111, Default preset, at 3440 73 1552
+    validations:
+      required: false
+
+  - type: dropdown
+    id: minecraft
+    attributes:
+      label: Minecraft version
+      options:
+        - "1.20.1"
+        - "1.21.1"
+        - "26.1"
+        - "26.2"
+        - "26.3"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: loader
+    attributes:
+      label: Mod loader
+      options:
+        - Fabric
+        - NeoForge
+        - Forge
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: UltraTerraForged version
+      description: From the jar's name or the mods list, such as 1.0.1.
+      placeholder: 1.0.1
+    validations:
+      required: true
+
+  - type: textarea
+    id: mods
+    attributes:
+      label: Other mods
+      description: Your mod list, the modpack's name and version, or "none". World generation and performance mods matter most.
+      placeholder: Fabric API 0.116.17, C2ME 0.4.0, Lithium 0.15.4, TerraBlender 4.1.0.8
+    validations:
+      required: true
+
+  - type: input
+    id: log
+    attributes:
+      label: Log
+      description: Upload `logs/latest.log` to [mclo.gs](https://mclo.gs) and paste the link.
+      placeholder: https://mclo.gs/...
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I'm on the latest UltraTerraForged release for my Minecraft version.
+          required: false
+        - label: I searched the open and closed issues for this problem.
+          required: true
