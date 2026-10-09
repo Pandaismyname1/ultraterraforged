@@ -1,0 +1,45 @@
+name: ✨ Feature request
+description: A specific, well-defined change. For open-ended ideas, start a discussion in Ideas instead.
+labels: ["type: feature", "status: needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ideas that are still taking shape fit better in [Discussions › Ideas](https://github.com/Pandaismyname1/ultraterraforged/discussions/categories/ideas), where others can vote on them. UltraTerraForged improves world generation and leaves biomes to other mods, so requests for new biomes are out of scope.
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What should change?
+      placeholder: A setting for how far inland rivers start.
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: Why?
+      description: The problem it solves or what it would make possible.
+    validations:
+      required: true
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Examples
+      description: Screenshots, real-world references, or other mods that do it.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: minecraft
+    attributes:
+      label: Minecraft version you play on
+      options:
+        - "1.20.1"
+        - "1.21.1"
+        - "26.1"
+        - "26.2"
+        - "26.3"
+    validations:
+      required: false
