@@ -1,0 +1,37 @@
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Share worlds, builds, seeds, presets and modpacks made with UltraTerraForged. Seeds and share codes let others visit the same places.
+
+  - type: textarea
+    id: show
+    attributes:
+      label: What you'd like to share
+      description: Drag screenshots straight into this box.
+    validations:
+      required: true
+
+  - type: input
+    id: seed
+    attributes:
+      label: Seed and coordinates
+      placeholder: Seed 1111, around 6224 165 -48
+    validations:
+      required: false
+
+  - type: textarea
+    id: preset
+    attributes:
+      label: Preset
+      description: The built-in preset's name, or the share code from the Terrain tab if you changed settings.
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: Minecraft and UltraTerraForged versions
+      placeholder: 1.21.1, UltraTerraForged 1.0.1
+    validations:
+      required: false

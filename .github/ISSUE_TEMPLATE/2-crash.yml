@@ -1,0 +1,90 @@
+name: 💥 Crash report
+description: The game or server crashes, freezes or won't start.
+labels: ["type: crash", "status: needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The crash report is the most useful thing you can send. It's in the `crash-reports` folder of your game or server, or shown in the launcher.
+
+  - type: input
+    id: crash
+    attributes:
+      label: Crash report
+      description: Upload the crash report to [mclo.gs](https://mclo.gs) and paste the link. If there's no crash report, upload `logs/latest.log` instead.
+      placeholder: https://mclo.gs/...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: when
+    attributes:
+      label: When does it crash?
+      options:
+        - While the game starts
+        - Opening Create World or the terrain editor
+        - Creating a world
+        - Exploring the overworld
+        - Entering or exploring another dimension
+        - Starting or running a dedicated server
+        - Something else
+    validations:
+      required: true
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What were you doing?
+      placeholder: Flew north from spawn for a few minutes, then the server stopped.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: minecraft
+    attributes:
+      label: Minecraft version
+      options:
+        - "1.20.1"
+        - "1.21.1"
+        - "26.1"
+        - "26.2"
+        - "26.3"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: loader
+    attributes:
+      label: Mod loader
+      options:
+        - Fabric
+        - NeoForge
+        - Forge
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: UltraTerraForged version
+      placeholder: 1.0.1
+    validations:
+      required: true
+
+  - type: textarea
+    id: mods
+    attributes:
+      label: Other mods
+      description: Your mod list, the modpack's name and version, or "none".
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I'm on the latest UltraTerraForged release for my Minecraft version.
+          required: false
+        - label: I searched the open and closed issues for this crash.
+          required: true
