@@ -1,15 +1,5 @@
 blank_issues_enabled: false
-# not issues: these open the matching category in Discussions
 contact_links:
-  - name: 🙏 Questions and help → Discussions
-    url: https://github.com/Pandaismyname1/ultraterraforged/discussions/categories/q-a
-    about: 'Not a bug? Questions about presets, settings, servers and setup go to Q&A in Discussions.'
-  - name: 🧩 Does it work with another mod? → Discussions
-    url: https://github.com/Pandaismyname1/ultraterraforged/discussions/categories/compatibility-modpacks
-    about: 'Questions about mod combinations and modpack setups go to Discussions.'
-  - name: 💡 Ideas and suggestions → Discussions
-    url: https://github.com/Pandaismyname1/ultraterraforged/discussions/categories/ideas
-    about: 'Suggest features and upvote ideas in Discussions.'
-  - name: 🙌 Share worlds, presets and seeds → Discussions
-    url: https://github.com/Pandaismyname1/ultraterraforged/discussions/categories/show-and-tell
-    about: 'Screenshots, seeds and preset share codes go to Show and tell in Discussions.'
+  - name: 💬 Not a bug? → Discussions
+    url: https://github.com/Pandaismyname1/ultraterraforged/discussions
+    about: 'Questions, help, "does it work with…", ideas and sharing your worlds all go to Discussions.'
