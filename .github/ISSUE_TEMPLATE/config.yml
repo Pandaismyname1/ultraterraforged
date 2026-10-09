@@ -3,6 +3,9 @@ contact_links:
   - name: ❓ Question or help with setup
     url: https://github.com/Pandaismyname1/ultraterraforged/discussions/categories/q-a
     about: 'Presets, servers, modpacks, "how do I…": ask in Q&A, where the answer stays findable for the next person.'
+  - name: 🧩 Does it work with another mod or modpack?
+    url: https://github.com/Pandaismyname1/ultraterraforged/discussions/categories/compatibility-modpacks
+    about: 'Ask about mod combinations and modpack setups. Report something broken with the Compatibility problem form above.'
   - name: 💡 Idea or suggestion
     url: https://github.com/Pandaismyname1/ultraterraforged/discussions/categories/ideas
     about: 'Suggest landforms, settings or features, and upvote the ideas you want most.'
