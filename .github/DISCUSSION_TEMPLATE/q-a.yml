@@ -1,4 +1,3 @@
-labels: ["type: question"]
 body:
   - type: markdown
     attributes:
