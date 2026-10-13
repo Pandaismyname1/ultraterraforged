@@ -662,6 +662,7 @@
   "ultraterraforged.gui.terrainTab.simple.continentSize": "Continent Size",
   "ultraterraforged.gui.terrainTab.simple.lakes": "Lakes",
   "ultraterraforged.gui.terrainTab.simple.mountains": "Mountains",
+  "ultraterraforged.gui.terrainTab.simple.raisedWater": "Rivers Follow the Land",
   "ultraterraforged.gui.terrainTab.simple.rivers": "Rivers",
   "ultraterraforged.gui.terrainTab.simple.seaLevel": "Sea Level",
   "ultraterraforged.gui.terrainTab.simple.terrainAreaSize": "Terrain Area Size",
