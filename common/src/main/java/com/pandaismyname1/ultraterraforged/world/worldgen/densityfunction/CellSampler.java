@@ -24,7 +24,7 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.Cell;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.CellField;
 import com.pandaismyname1.ultraterraforged.world.worldgen.heightmap.WorldLookup;
-import com.pandaismyname1.ultraterraforged.world.worldgen.tile.Tile;
+import com.pandaismyname1.ultraterraforged.world.worldgen.tile.TileChunkRef;
 import com.pandaismyname1.ultraterraforged.world.worldgen.util.PosUtil;
 
 /**
@@ -71,13 +71,14 @@ public record CellSampler(CellField field) implements DensityFunction {
 	}
 
 	/**
-	 * The cells of the chunk being generated.
+	 * The cells of the chunk being generated. Not the tile's chunk itself: a chunk waiting to be generated would keep
+	 * its whole tile alive.
 	 */
-	public record ChunkCells(Tile.Chunk chunk, int chunkX, int chunkZ) {
+	public record ChunkCells(TileChunkRef chunk) {
 
 		@Nullable
 		public Cell getCell(int blockX, int blockZ) {
-			return SectionPos.blockToSectionCoord(blockX) == this.chunkX && SectionPos.blockToSectionCoord(blockZ) == this.chunkZ ? this.chunk.getCell(blockX, blockZ) : null;
+			return SectionPos.blockToSectionCoord(blockX) == this.chunk.chunkX() && SectionPos.blockToSectionCoord(blockZ) == this.chunk.chunkZ() ? this.chunk.get().getCell(blockX, blockZ) : null;
 		}
 	}
 

@@ -27,6 +27,7 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
 import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
 import com.pandaismyname1.ultraterraforged.world.worldgen.WorldGenFlags;
 import com.pandaismyname1.ultraterraforged.world.worldgen.densityfunction.CellSampler;
+import com.pandaismyname1.ultraterraforged.world.worldgen.tile.TileChunkRef;
 
 @Mixin(NoiseChunk.class)
 class MixinNoiseChunk {
@@ -59,7 +60,7 @@ class MixinNoiseChunk {
 			if(cache) {
 				int chunkX = SectionPos.blockToSectionCoord(this.volume.minBlockX());
 				int chunkZ = SectionPos.blockToSectionCoord(this.volume.minBlockZ());
-				fields.set(CellSampler.CHUNK, new CellSampler.ChunkCells(generatorContext.cache.provideAtChunk(chunkX, chunkZ).getChunkReader(chunkX, chunkZ), chunkX, chunkZ));
+				fields.set(CellSampler.CHUNK, new CellSampler.ChunkCells(new TileChunkRef(generatorContext.cache, chunkX, chunkZ)));
 			}
 		}
 		return fields.build();
