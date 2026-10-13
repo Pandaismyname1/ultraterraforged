@@ -549,6 +549,7 @@ public class UTFLanguageProvider {
 			this.add(UTFTranslationKeys.SIMPLE_MOUNTAINS, "Mountains");
 			this.add(UTFTranslationKeys.SIMPLE_RIVERS, "Rivers");
 			this.add(UTFTranslationKeys.SIMPLE_LAKES, "Lakes");
+			this.add(UTFTranslationKeys.SIMPLE_RAISED_WATER, "Rivers Follow the Land");
 			this.add(UTFTranslationKeys.SIMPLE_SEA_LEVEL, "Sea Level");
 			this.add(UTFTranslationKeys.SIMPLE_WORLD_HEIGHT, "World Height");
 			this.add(UTFTranslationKeys.SIMPLE_CAVES, "Caves");

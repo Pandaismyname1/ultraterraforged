@@ -402,6 +402,7 @@ public class UTFTranslationKeys {
 	public static final String SIMPLE_MOUNTAINS = resolve("gui.terrainTab.simple.mountains");
 	public static final String SIMPLE_RIVERS = resolve("gui.terrainTab.simple.rivers");
 	public static final String SIMPLE_LAKES = resolve("gui.terrainTab.simple.lakes");
+	public static final String SIMPLE_RAISED_WATER = resolve("gui.terrainTab.simple.raisedWater");
 	public static final String SIMPLE_SEA_LEVEL = resolve("gui.terrainTab.simple.seaLevel");
 	public static final String SIMPLE_WORLD_HEIGHT = resolve("gui.terrainTab.simple.worldHeight");
 	public static final String SIMPLE_CAVES = resolve("gui.terrainTab.simple.caves");

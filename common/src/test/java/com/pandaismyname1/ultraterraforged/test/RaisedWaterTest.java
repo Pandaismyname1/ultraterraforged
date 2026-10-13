@@ -12,6 +12,7 @@ import java.util.Random;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import com.pandaismyname1.ultraterraforged.data.preset.settings.LandformSettings;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.Cell;
@@ -104,6 +105,69 @@ public class RaisedWaterTest {
 		System.out.println(wet + " cells of raised water, " + leaks + " beside lower dry ground");
 		assertTrue(wet > 5000, "only " + wet + " cells of raised water");
 		assertEquals(0, leaks, leaks + " cells of raised water lie beside lower dry ground");
+	}
+
+	// Issues #5 and #6: the water's level was worked out from the ground somewhere else than where the water ended up, and
+	// before the lakes' valleys brought it down, so rivers ran on embankments above the land, and dry land lay far below
+	// the water beside it.
+	@Test
+	void waterLiesBelowTheLandAroundIt() {
+		Preset preset = preset();
+		// landforms raise land of their own (buttes, dunes); the rivers don't depend on them
+		Preset bare = new Preset(preset.world(), preset.surface(), preset.caves(), preset.climate(), preset.terrain(), preset.rivers(), preset.filters(), preset.structures(), preset.miscellaneous(), LandformSettings.makeNone(), preset.coasts(), preset.caveFeatures(), preset.oceans());
+		// the places from the issues: seed 1111, and the seed of #6 as the game passes it on
+		int[] reported = survey(bare, 1111, 5236.0F, 2514.0F);
+		int[] lake = survey(bare, (int) -5371518255054548833L, 1864.0F, 1150.0F);
+		int[] spread = new int[3];
+		for (float[] spot : riverSpots(preset, 8)) {
+			int[] counts = survey(bare, PresetRenderer.SEED, spot[0], spot[1]);
+			for (int i = 0; i < 3; i++) {
+				spread[i] += counts[i];
+			}
+		}
+		System.out.printf("cells of raised water / of land built up more than 2 blocks / of dry land more than 8 blocks below water within 4: issue #5 %d / %d / %d, issue #6 %d / %d / %d, elsewhere %d / %d / %d%n", reported[0], reported[1], reported[2], lake[0], lake[1], lake[2], spread[0], spread[1], spread[2]);
+		assertTrue(reported[0] > 100 && lake[0] > 100 && spread[0] > 2000, "too little raised water");
+		for (int[] counts : new int[][] { reported, lake, spread }) {
+			assertTrue(counts[1] < 1 + counts[0] / 500, counts[1] + " cells of built up land for " + counts[0] + " of raised water");
+			assertTrue(counts[2] < 1 + counts[0] / 20, counts[2] + " cells of dry land below the water beside it for " + counts[0] + " of raised water");
+		}
+	}
+
+	// more than a waterfall where a river steps down to its next pool, with its banks
+	private static final int DROP = 8;
+
+	// in a view, every other cell: of raised water, of dry land built up more than 2 blocks above the ground the terrain
+	// gives it, and of dry land more than DROP blocks below raised water within 4 cells
+	private static int[] survey(Preset preset, int seed, float centerX, float centerZ) {
+		GeneratorContext context = GeneratorContext.makeUncached(preset, seed, PresetRenderer.TILE_SIZE, 0, 6);
+		Heightmap heightmap = context.localHeightmap.get();
+		TerrainViews.View view = new TerrainViews.View(context.generator.generateZoomed(centerX, centerZ, 1.0F, false).join(), centerX, centerZ, 1.0F, TerrainViews.levels(preset));
+		int size = view.size();
+		int[] counts = new int[3];
+		for (int x = 0; x < size; x += 2) {
+			for (int z = 0; z < size; z += 2) {
+				if (view.raisedWater(x, z)) {
+					counts[0]++;
+					continue;
+				}
+				int y = view.blockY(x, z);
+				if (y > view.levels().scale(heightmap.sampleGround(view.blockX(x), view.blockZ(z)).height) + 2) {
+					counts[1]++;
+				}
+				search:
+				for (int dx = -4; dx <= 4; dx++) {
+					for (int dz = -4; dz <= 4; dz++) {
+						int nx = x + dx;
+						int nz = z + dz;
+						if (nx >= 0 && nz >= 0 && nx < size && nz < size && view.raisedWater(nx, nz) && view.waterY(nx, nz) > y + DROP) {
+							counts[2]++;
+							break search;
+						}
+					}
+				}
+			}
+		}
+		return counts;
 	}
 
 	@Test
