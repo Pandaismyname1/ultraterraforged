@@ -97,8 +97,18 @@ public class RiverPopulator implements Comparable<RiverPopulator> {
     
     // the water stays level from one sample to the next, so it changes in steps: small waterfalls
     private static float sample(float[] values, float t) {
-    	int index = (int) (NoiseUtil.clamp(t, 0.0F, 1.0F) * (values.length - 1));
-    	return values[Math.min(index, values.length - 1)];
+    	return values[stretch(t, values.length)];
+    }
+
+    // which of the given number of samples along a river the water at this point along it takes its level from
+    public static int stretch(float t, int samples) {
+    	int index = (int) (NoiseUtil.clamp(t, 0.0F, 1.0F) * (samples - 1));
+    	return Math.min(index, samples - 1);
+    }
+
+    // the squared distance from the middle of the river, in its own space, at a point along it
+    public float distance2(float x, float z, float t) {
+    	return this.getDistance2(x, z, t);
     }
 
     @Override

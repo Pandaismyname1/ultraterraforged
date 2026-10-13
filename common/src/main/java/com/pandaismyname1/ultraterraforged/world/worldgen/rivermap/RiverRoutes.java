@@ -182,8 +182,11 @@ public final class RiverRoutes {
 		return PosUtil.packf(qx, qz);
 	}
 
-	// where a river moves a place in its own space to, as Network.carve does
-	private static long carve(RiverPopulator carver, float x, float z) {
+	/**
+	 * Where a river moves a place in its own space to, as Network.carve does: into the space its line is straight in,
+	 * and its forks, lakes and wetlands lie in.
+	 */
+	public static long carve(RiverPopulator carver, float x, float z) {
 		River river = carver.river;
 		RiverWarp warp = carver.warp;
 		float t = Line.distanceOnLine(x, z, river.x1, river.z1, river.x2, river.z2);
