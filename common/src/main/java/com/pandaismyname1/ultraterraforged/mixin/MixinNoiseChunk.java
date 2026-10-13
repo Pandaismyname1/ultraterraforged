@@ -28,14 +28,14 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
 import com.pandaismyname1.ultraterraforged.world.worldgen.WorldGenFlags;
 import com.pandaismyname1.ultraterraforged.world.worldgen.densityfunction.CellSampler;
 import com.pandaismyname1.ultraterraforged.world.worldgen.densityfunction.CellSampler.Cache2d;
-import com.pandaismyname1.ultraterraforged.world.worldgen.tile.Tile;
+import com.pandaismyname1.ultraterraforged.world.worldgen.tile.TileChunkRef;
 
 @Mixin(NoiseChunk.class)
 class MixinNoiseChunk {
 	private RandomState randomState;
 	private int chunkX, chunkZ;
 	private int generationHeight;
-	private Tile.Chunk chunk;
+	private TileChunkRef chunk;
 	private Cache2d cache2d;
     private NoiseGeneratorSettings generatorSettings;
 	
@@ -85,7 +85,7 @@ class MixinNoiseChunk {
 			this.cache2d = new CellSampler.Cache2d();
 			
 			if(cache) {
-				this.chunk = generatorContext.cache.provideAtChunk(this.chunkX, this.chunkZ).getChunkReader(this.chunkX, this.chunkZ);
+				this.chunk = new TileChunkRef(generatorContext.cache, this.chunkX, this.chunkZ);
 			}
 		} else {
 			this.generationHeight = noiseSettings.height();
