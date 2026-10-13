@@ -1335,6 +1335,7 @@ public final class PresetOptions {
 		simple("terrain.mountains.weight", UTFTranslationKeys.SIMPLE_MOUNTAINS),
 		simple("rivers.riverCount", UTFTranslationKeys.SIMPLE_RIVERS),
 		simple("rivers.lakes.chance", UTFTranslationKeys.SIMPLE_LAKES),
+		simple("rivers.raisedWater", UTFTranslationKeys.SIMPLE_RAISED_WATER),
 		simple("world.properties.seaLevel", UTFTranslationKeys.SIMPLE_SEA_LEVEL),
 		simple("world.properties.worldHeight", UTFTranslationKeys.SIMPLE_WORLD_HEIGHT),
 		simple("caves.cheeseCaveProbability", UTFTranslationKeys.SIMPLE_CAVES)

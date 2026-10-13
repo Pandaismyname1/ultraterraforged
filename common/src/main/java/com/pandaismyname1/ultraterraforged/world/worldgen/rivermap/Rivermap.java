@@ -50,7 +50,7 @@ public class Rivermap implements ExpiringEntry {
     		if (!this.levelled) {
     			RiverRoutes.route(this.networks, this.riverWarp, heightmap, this.winding);
     			if (this.raisedWater) {
-    				WaterLevels.level(this.networks, this.gorgeDepth, heightmap);
+    				WaterLevels.level(this.networks, this.gorgeDepth, heightmap, this.riverWarp, this.lakeWarp);
     			}
     			this.levelled = true;
     		}
