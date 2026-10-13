@@ -14,7 +14,7 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.Cell;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.CellField;
 import com.pandaismyname1.ultraterraforged.world.worldgen.heightmap.WorldLookup;
-import com.pandaismyname1.ultraterraforged.world.worldgen.tile.Tile;
+import com.pandaismyname1.ultraterraforged.world.worldgen.tile.TileChunkRef;
 import com.pandaismyname1.ultraterraforged.world.worldgen.util.PosUtil;
 
 public record CellSampler(Supplier<GeneratorContext> generatorContext, CellField field) implements MappedFunction {
@@ -59,12 +59,13 @@ public record CellSampler(Supplier<GeneratorContext> generatorContext, CellField
 	}
 	
 	public class CacheChunk implements MappedFunction {
+		// not the tile's chunk itself: a chunk waiting to be generated would keep its whole tile alive
 		@Nullable
-		private Tile.Chunk chunk;
+		private TileChunkRef chunk;
 		private Cache2d cache2d;
 		private int chunkX, chunkZ;
 
-		public CacheChunk(@Nullable Tile.Chunk chunk, Cache2d cache2d, int chunkX, int chunkZ) {
+		public CacheChunk(@Nullable TileChunkRef chunk, Cache2d cache2d, int chunkX, int chunkZ) {
 			this.chunk = chunk;
 			this.cache2d = cache2d;
 			this.chunkX = chunkX;
@@ -82,7 +83,7 @@ public record CellSampler(Supplier<GeneratorContext> generatorContext, CellField
 			
 			WorldLookup worldLookup = CellSampler.this.generatorContext.get().lookup;
 			Cell cell = (this.chunk != null && this.chunkX == chunkX && this.chunkZ == chunkZ) ? 
-				this.chunk.getCell(blockX, blockZ) :
+				this.chunk.get().getCell(blockX, blockZ) :
 				this.cache2d.getAndUpdate(worldLookup, quartBlockX, quartBlockZ);
 			return CellSampler.this.field.read(cell);
 		}
