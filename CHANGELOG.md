@@ -1,3 +1,10 @@
+### New in 1.0.2
+* Far less memory used while chunks generate, above all with Distant Horizons: every chunk waiting to be generated kept a whole stretch of UltraTerraForged's terrain in memory, about 4 MB, long after it was done with it. With thousands of them waiting, memory filled up and the game slowed to a crawl.
+* Rivers no longer run along walls above the land, and water no longer stands high above dry ground near rivers' sources. Rivers and lakes now take their water level from the land where they actually lie, so rivers sit a few blocks lower than before.
+* Lakes no longer build wide raised platforms around themselves.
+* Rivers Follow the Land is on the Terrain tab too: turn it off for the original rivers, all cut down to sea level.
+* Terrain changes along rivers and lakes above the sea, in newly generated chunks, so existing worlds can show a seam where new chunks meet old ones. Presets with Rivers Follow the Land off, like the original TerraForged presets, generate as before.
+
 ### New in 1.0.1
 * Other dimensions generate as their own again. With TerraBlender installed, the Nether, the Aether, Deeper Darker and other dimensions were cut off chunk by chunk at the overworld's height, in flat steps, and got its rivers and lakes.
 * Without TerraBlender, generating the Nether or the End crashed the server.
