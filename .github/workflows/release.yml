@@ -65,6 +65,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.composite_version.outputs.composite_version }}
+          # the commit released; a new tag otherwise lands on the default branch, 1.20.1, whichever branch is released
+          target_commitish: ${{ github.sha }}
           name: UltraTerraForged ${{ steps.composite_version.outputs.composite_version }}
           body_path: CHANGELOG.md
           prerelease: ${{ inputs.version_type != 'release' }}
