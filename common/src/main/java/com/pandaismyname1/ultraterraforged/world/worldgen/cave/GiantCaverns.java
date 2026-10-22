@@ -66,16 +66,16 @@ final class GiantCaverns implements CaveFeatures.Feature {
 				if (flat > 1.7F) {
 					continue;
 				}
-				// pillars from floor to roof, where the cells of the pillar noise meet
-				boolean pillar = this.pillars.compute(x, z, 0) < 0.12F && flat < 0.7F;
+				// pillars from floor to roof, where the cells of the pillar noise meet: left whole, through the lake to
+				// its bed, rather than standing on its water
+				if (this.pillars.compute(x, z, 0) < 0.12F && flat < 0.7F) {
+					continue;
+				}
 				for (int y = y0; y <= y1; y++) {
 					float ny = (y - cavern.y()) / cavern.radiusY();
 					// ragged walls: the noise, sampled along a slanted plane, stands in for a 3D one
 					float ragged = (this.walls.compute(x + y * 0.7F, z - y * 0.7F, 0) - 0.5F) * 0.7F;
 					if (flat + ny * ny + ragged >= 1.0F) {
-						continue;
-					}
-					if (pillar && y > lake) {
 						continue;
 					}
 					carving.clear(x, y, z, lake);
