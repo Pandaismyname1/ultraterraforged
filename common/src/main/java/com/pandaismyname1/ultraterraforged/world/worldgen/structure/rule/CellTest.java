@@ -10,7 +10,12 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.StructureTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.levelgen.RandomState;
+import net.minecraft.world.level.levelgen.structure.Structure;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
 import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.Cell;
@@ -18,14 +23,21 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.heightmap.WorldLookup;
 import com.pandaismyname1.ultraterraforged.world.worldgen.terrain.Terrain;
 import com.pandaismyname1.ultraterraforged.world.worldgen.terrain.TerrainType;
 
-record CellTest(float cutoff, Set<Terrain> terrainTypeBlacklist) implements StructureRule {
+// targets: the structures it's for; presets saved before it was kept had only villages in mind
+record CellTest(TagKey<Structure> targets, float cutoff, Set<Terrain> terrainTypeBlacklist) implements StructureRule {
 	public static final Codec<CellTest> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+		TagKey.hashedCodec(Registries.STRUCTURE).optionalFieldOf("targets", StructureTags.VILLAGE).forGetter(CellTest::targets),
 		Codec.FLOAT.fieldOf("cutoff").forGetter(CellTest::cutoff),
 		Codec.STRING.xmap(TerrainType::get, Terrain::getName).listOf().fieldOf("terrain_type_blacklist").forGetter((set) -> set.terrainTypeBlacklist().stream().toList())
 	).apply(instance, CellTest::new));
 
-	public CellTest(float cutoff, List<Terrain> terrainTypeBlacklist) {
-		this(cutoff, ImmutableSet.copyOf(terrainTypeBlacklist));
+	public CellTest(TagKey<Structure> targets, float cutoff, List<Terrain> terrainTypeBlacklist) {
+		this(targets, cutoff, ImmutableSet.copyOf(terrainTypeBlacklist));
+	}
+
+	@Override
+	public boolean appliesTo(Holder<Structure> structure) {
+		return structure.is(this.targets);
 	}
 	
 	@Override
