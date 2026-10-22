@@ -16,7 +16,7 @@ public class StructureRules {
 	}
 	
 	public static CellTest cellTest(TagKey<Structure> targets, float cutoff, Terrain... terrainTypeBlacklist) {
-		return new CellTest(cutoff, ImmutableSet.copyOf(terrainTypeBlacklist));
+		return new CellTest(targets, cutoff, ImmutableSet.copyOf(terrainTypeBlacklist));
 	}
 
 	private static void register(String name, Codec<? extends StructureRule> value) {
