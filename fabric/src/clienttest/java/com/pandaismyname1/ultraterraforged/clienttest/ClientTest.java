@@ -210,6 +210,15 @@ public class ClientTest implements ClientModInitializer {
 			this.log("screen after reopening: " + (mc.screen == null ? "none (in world)" : mc.screen.getClass().getSimpleName() + " '" + mc.screen.getTitle().getString() + "'"));
 			this.log("in world: " + (mc.level != null));
 			this.screenshot("12_reopened");
+			// a reopened world has its feature order worked out before the server applies the biome modifiers (issue
+			// #11): new chunks with UTF's trees must still decorate
+			IntegratedServer server = mc.getSingleplayerServer();
+			server.execute(() -> this.command(server, "execute as @a at @s run tp @s ~3000 200 ~3000"));
+		});
+		this.step("new chunks after reopening", () -> true, 400, () -> {
+			IntegratedServer server = mc.getSingleplayerServer();
+			this.log("still in world after new chunks: " + (mc.level != null && server != null && server.isRunning()));
+			this.screenshot("14_reopened_new_chunks");
 			this.log("done");
 			mc.stop();
 		});
@@ -372,6 +381,14 @@ public class ClientTest implements ClientModInitializer {
 	private void tick() {
 		if (this.stepIndex >= this.steps.size()) {
 			return;
+		}
+		Minecraft mc = Minecraft.getInstance();
+		// a fresh run folder opens on the accessibility screen instead of the title, and a game in the background
+		// pauses, which stops the integrated server too
+		mc.options.onboardAccessibility = false;
+		mc.options.pauseOnLostFocus = false;
+		if (mc.gui.screen() instanceof net.minecraft.client.gui.screens.AccessibilityOnboardingScreen) {
+			mc.gui.setScreen(new TitleScreen());
 		}
 		if (++this.totalTicks > (TOUR ? TIMEOUT_TICKS * 8 : TIMEOUT_TICKS)) {
 			this.log("TIMEOUT waiting for: " + this.steps.get(this.stepIndex).name() + " (screen " + Minecraft.getInstance().screen + ")");
