@@ -17,8 +17,10 @@ public class RiverCache {
     }
     
     public Rivermap getRivers(int x, int z) {
-        return this.cache.computeIfAbsent(PosUtil.pack(x, z), id -> {
+        Rivermap rivermap = this.cache.computeIfAbsent(PosUtil.pack(x, z), id -> {
         	return this.generator.generateRivers(PosUtil.unpackLeft(id), PosUtil.unpackRight(id), id);
         });
+        rivermap.touch();
+        return rivermap;
     }
 }
