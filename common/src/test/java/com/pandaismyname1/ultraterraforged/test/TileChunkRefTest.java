@@ -110,7 +110,7 @@ public class TileChunkRefTest {
 		}
 
 		@Override
-		public void drop(int tileX, int tileZ) {
+		public void dropAtChunk(int chunkX, int chunkZ) {
 		}
 
 		@Override

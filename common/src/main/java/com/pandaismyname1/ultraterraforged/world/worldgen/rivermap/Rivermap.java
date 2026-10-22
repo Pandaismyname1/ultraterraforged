@@ -19,7 +19,7 @@ public class Rivermap implements ExpiringEntry {
     private Domain lakeWarp;
     private Domain riverWarp;
     private Network[] networks;
-    private long timestamp;
+    private volatile long timestamp;
     private boolean raisedWater;
     private int gorgeDepth;
     private boolean winding;
@@ -90,6 +90,10 @@ public class Rivermap implements ExpiringEntry {
     	return mouths;
     }
     
+    Network[] networks() {
+    	return this.networks;
+    }
+    
     // a place in the world in the rivers' space, where they're laid out as straight lines
     public float riverX(float x, float z) {
     	return this.riverWarp.getX(x, z, 0);
@@ -110,6 +114,15 @@ public class Rivermap implements ExpiringEntry {
     @Override
     public long getTimestamp() {
         return this.timestamp;
+    }
+    
+    // a rivermap in use stays: it once expired five minutes after it was made, in use or not, and was made again.
+    // Written at most once a second, as every worker reads it for every cell
+    public void touch() {
+        long now = System.currentTimeMillis();
+        if (now - this.timestamp > 1000L) {
+            this.timestamp = now;
+        }
     }
     
     public int getX() {
