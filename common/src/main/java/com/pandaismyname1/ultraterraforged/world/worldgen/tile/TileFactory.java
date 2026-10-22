@@ -5,7 +5,8 @@ public interface TileFactory {
 	
 	void queue(int tileX, int tileZ);
 	
-	void drop(int tileX, int tileZ);
+	// a chunk of the tile is done with it
+	void dropAtChunk(int chunkX, int chunkZ);
 
 	int chunkToTile(int chunkCoord);
 	
@@ -17,10 +18,6 @@ public interface TileFactory {
 		this.queue(this.chunkToTile(chunkX), this.chunkToTile(chunkZ));
 	}
 
-	default void dropAtChunk(int chunkX, int chunkZ) {
-		this.drop(this.chunkToTile(chunkX), this.chunkToTile(chunkZ));
-	}
-	
 	default Tile.Chunk provideChunk(int chunkX, int chunkZ) {
 		return this.provideAtChunk(chunkX, chunkZ).getChunkReader(chunkX, chunkZ);
 	}

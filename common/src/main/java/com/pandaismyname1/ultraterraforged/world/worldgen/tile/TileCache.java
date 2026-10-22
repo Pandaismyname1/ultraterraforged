@@ -2,6 +2,7 @@ package com.pandaismyname1.ultraterraforged.world.worldgen.tile;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLongArray;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -31,7 +32,15 @@ public class TileCache implements TileFactory {
 	public Tile provideIfPresent(int tileX, int tileZ) {
 		@Nullable
 		CacheEntry<Entry> entry = this.cache.get(PosUtil.pack(tileX, tileZ));
-		return entry != null && entry.isDone() ? entry.get().tile : null;
+		if(entry == null || !entry.isDone()) {
+			return null;
+		}
+		try {
+			return entry.get().tile;
+		} catch(RuntimeException | Error e) {
+			this.cache.forget(entry);
+			return null;
+		}
 	}
 
 	@Nullable
@@ -41,7 +50,15 @@ public class TileCache implements TileFactory {
 
 	@Override
 	public Tile provide(int tileX, int tileZ) {
-		return this.computeEntry(tileX, tileZ).get().tile;
+		CacheEntry<Entry> entry = this.computeEntry(tileX, tileZ);
+		try {
+			return entry.get().tile;
+		} catch(RuntimeException | Error e) {
+			// a tile that failed isn't kept, failing everyone who asks for it while they keep it from expiring: the
+			// next one to ask makes it again
+			this.cache.forget(entry);
+			throw e;
+		}
 	}
 	
 	@Override
@@ -52,10 +69,10 @@ public class TileCache implements TileFactory {
 	}
 
 	@Override
-	public void drop(int tileX, int tileZ) {
-		long packedTilePos = PosUtil.pack(tileX, tileZ);
+	public void dropAtChunk(int chunkX, int chunkZ) {
+		long packedTilePos = PosUtil.pack(this.chunkToTile(chunkX), this.chunkToTile(chunkZ));
 		CacheEntry<Entry> entry = this.cache.get(packedTilePos);
-		if(entry != null && entry.get().drop()) {
+		if(entry != null && entry.get().drop(chunkX, chunkZ)) {
 			// out of the cache first, so nothing new picks the tile up while it's being closed
 			this.cache.remove(packedTilePos);
 			entry.get().tile.close();
@@ -75,6 +92,9 @@ public class TileCache implements TileFactory {
 	
 	private class Entry {
 		private AtomicInteger refCount;
+		// the chunks done with the tile, a bit each: a chunk done twice (a mod running a chunk's features again, on a
+		// copy) counts once, and doesn't have the tile closed while other chunks still need it
+		private AtomicLongArray dropped;
 		private int chunkCount;
 		private Tile tile;
 		
@@ -82,11 +102,18 @@ public class TileCache implements TileFactory {
 			int tileSize = tile.getChunkSize().size();
 			this.refCount = new AtomicInteger();
 			this.chunkCount = tileSize * tileSize;
+			this.dropped = new AtomicLongArray((this.chunkCount + 63) >> 6);
 			this.tile = tile;
 		}
 		
 		// whether every chunk of the tile is done with it; true once only
-		public boolean drop() {
+		public boolean drop(int chunkX, int chunkZ) {
+			Size size = this.tile.getChunkSize();
+			int index = size.mask(chunkZ) * size.size() + size.mask(chunkX);
+			long bit = 1L << (index & 63);
+			if((this.dropped.getAndAccumulate(index >> 6, bit, (bits, chunk) -> bits | chunk) & bit) != 0L) {
+				return false;
+			}
 			return this.refCount.incrementAndGet() == this.chunkCount;
 		}
 	}

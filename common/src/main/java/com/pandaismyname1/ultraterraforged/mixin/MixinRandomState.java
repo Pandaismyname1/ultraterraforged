@@ -28,7 +28,6 @@ import com.pandaismyname1.ultraterraforged.compat.terrablender.TBClimateSampler;
 import com.pandaismyname1.ultraterraforged.compat.terrablender.TBCompat;
 import com.pandaismyname1.ultraterraforged.compat.terrablender.TBNoiseRouterData;
 import com.pandaismyname1.ultraterraforged.concurrent.ThreadPools;
-import com.pandaismyname1.ultraterraforged.concurrent.cache.CacheManager;
 import com.pandaismyname1.ultraterraforged.config.PerformanceConfig;
 import com.pandaismyname1.ultraterraforged.data.preset.PresetData;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
@@ -116,9 +115,6 @@ class MixinRandomState {
 			this.preset = presetHolder.value();
 
 			if(this.hasContext) {
-				//TODO move this somewhere else
-				CacheManager.clear();
-				
 				PerformanceConfig config = PerformanceConfig.read(PerformanceConfig.DEFAULT_FILE_PATH)
 					.resultOrPartial(UTFCommon.LOGGER::error)
 					.orElseGet(PerformanceConfig::makeDefault);
