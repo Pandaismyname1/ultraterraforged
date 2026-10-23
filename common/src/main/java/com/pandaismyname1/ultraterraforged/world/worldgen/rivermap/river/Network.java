@@ -18,6 +18,18 @@ public record Network(RiverPopulator riverCarver, LakePopulator[] lakes, Wetland
     }
     
     public void carve(Cell cell, float x, float z, float nx, float nz) {
+        this.carve(cell, x, z, nx, nz, false, null);
+    }
+
+    /**
+     * Carves the land as {@link #carve} does, for working out where the water lies (WaterLevels): by the lakes and by
+     * the rivers whose water is levelled, but not the given one, and not by the wetlands.
+     */
+    public void carveLand(Cell cell, float x, float z, float nx, float nz, RiverPopulator except) {
+        this.carve(cell, x, z, nx, nz, true, except);
+    }
+
+    private void carve(Cell cell, float x, float z, float nx, float nz, boolean land, RiverPopulator except) {
         River river = this.riverCarver.river;
         RiverWarp warp = this.riverCarver.warp;
         float t = Line.distanceOnLine(x, z, river.x1, river.z1, river.x2, river.z2);
@@ -37,11 +49,15 @@ public record Network(RiverPopulator riverCarver, LakePopulator[] lakes, Wetland
         float preRoute = this.riverCarver.routeOffset(pt);
         px -= river.normX * preRoute;
         pz -= river.normZ * preRoute;
-        this.carveRiver(cell, px, pz, pt, x, z, t);
-        this.carveWetlands(cell, x, z, nx, nz);
+        if (!land || this.riverCarver != except && this.riverCarver.hasWaterLevels()) {
+            this.carveRiver(cell, px, pz, pt, x, z, t);
+        }
+        if (!land) {
+            this.carveWetlands(cell, x, z, nx, nz);
+        }
         this.carveLakes(cell, x, z, nx, nz);
         for (Network network : this.children) {
-            network.carve(cell, x, z, nx, nz);
+            network.carve(cell, x, z, nx, nz, land, except);
         }
     }
     

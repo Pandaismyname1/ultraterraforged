@@ -224,10 +224,11 @@ public class RaisedWaterTest {
 		Rivermap rivermap = Rivermap.get(cell, null, heightmap);
 		Network[] networks = (Network[]) field(Rivermap.class, "networks").get(rivermap);
 		Domain warp = (Domain) field(Rivermap.class, "riverWarp").get(rivermap);
+		Domain lakeWarp = (Domain) field(Rivermap.class, "lakeWarp").get(rivermap);
 		int[] counts = new int[5];
 		for (Network network : networks) {
 			assertEquals(levels.water, network.riverCarver().waterLevelAt(1.0F), 1.0E-6F, "a river doesn't reach the sea at sea level");
-			check(network, warp, heightmap, preset.rivers().gorgeDepth, counts);
+			check(network, networks, warp, lakeWarp, heightmap, preset.rivers().gorgeDepth, counts);
 		}
 		System.out.println(counts[0] + " forks, " + counts[1] + " points along rivers checked, " + counts[2] + " in gorges, " + counts[3] + " with water more than 4 blocks above the land beside it, " + counts[4] + " cutting more than 8 blocks deeper than a gorge");
 		assertTrue(counts[0] > 10 && counts[1] > 1000, "too few rivers checked");
@@ -237,7 +238,7 @@ public class RaisedWaterTest {
 		assertTrue(counts[4] < counts[1] / 50, counts[4] + " points cutting deeper than a gorge");
 	}
 
-	private static void check(Network network, Domain warp, Heightmap heightmap, int gorgeDepth, int[] counts) {
+	private static void check(Network network, Network[] networks, Domain warp, Domain lakeWarp, Heightmap heightmap, int gorgeDepth, int[] counts) {
 		Levels levels = heightmap.levels();
 		RiverPopulator carver = network.riverCarver();
 		River river = carver.river;
@@ -248,7 +249,7 @@ public class RaisedWaterTest {
 			float side = carver.config.bankWidth + 4.0F;
 			for (float offset : new float[] { 0.0F, side, -side }) {
 				long world = carver.frame.toWorld(PosUtil.unpackLeftf(channel) + river.normX * offset, PosUtil.unpackRightf(channel) + river.normZ * offset);
-				lowest = Math.min(lowest, heightmap.sampleGround(PosUtil.unpackLeftf(world), PosUtil.unpackRightf(world)).height);
+				lowest = Math.min(lowest, carved(networks, warp, lakeWarp, heightmap, carver, PosUtil.unpackLeftf(world), PosUtil.unpackRightf(world)));
 			}
 			counts[1]++;
 			// between samples the land can dip or rise, so allow a few blocks
@@ -270,8 +271,22 @@ public class RaisedWaterTest {
 			counts[0]++;
 			float junction = carver.waterLevelAt(child.riverCarver().junction);
 			assertEquals(junction, child.riverCarver().waterLevelAt(1.0F), 1.0E-6F, "a fork doesn't meet its river at its river's level");
-			check(child, warp, heightmap, gorgeDepth, counts);
+			check(child, networks, warp, lakeWarp, heightmap, gorgeDepth, counts);
 		}
+	}
+
+	// the land at a place as the lakes and the other rivers leave it: a river in another's valley, or a lake's, lies
+	// lower than the land around the valley
+	private static float carved(Network[] networks, Domain warp, Domain lakeWarp, Heightmap heightmap, RiverPopulator except, float x, float z) {
+		Cell cell = heightmap.sampleGround(x, z);
+		float rx = warp.getX(x, z, 0);
+		float rz = warp.getZ(x, z, 0);
+		for (Network network : networks) {
+			if (network.contains(rx, rz)) {
+				network.carveLand(cell, rx, rz, lakeWarp.getOffsetX(rx, rz, 0), lakeWarp.getOffsetZ(rx, rz, 0), except);
+			}
+		}
+		return cell.height;
 	}
 
 	private static Field field(Class<?> type, String name) throws NoSuchFieldException {
