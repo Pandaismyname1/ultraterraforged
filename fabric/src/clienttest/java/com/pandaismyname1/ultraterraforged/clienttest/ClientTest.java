@@ -306,6 +306,7 @@ public class ClientTest implements ClientModInitializer {
 		}
 		this.step("done", () -> true, 20, () -> {
 			this.log("seed " + mc.getSingleplayerServer().overworld().getSeed() + "; water pockets in all: " + this.pocketColumns + " of " + this.waterColumns + " raised-water columns");
+			this.log("blocks Streams Reflowing's rivers were kept from carving: " + com.pandaismyname1.ultraterraforged.compat.streams.StreamsCompat.kept());
 			this.log("done");
 			this.exitOnceStopped();
 			mc.stop();

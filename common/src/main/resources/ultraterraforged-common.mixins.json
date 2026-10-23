@@ -29,7 +29,9 @@
   	"c2me.MixinChunkMapOpenCL",
   	"byepregen.AccessorNoiseChunk",
   	"byepregen.MixinArenaNoiseFiller",
-  	"streams.MixinStreamFlowGrid"
+  	"streams.MixinRiverCarverFeature",
+  	"streams.MixinStreamFlowGrid",
+  	"streams.MixinWorldGenRegion"
   ],
   "client": [
   	"ScreenInvoker",
