@@ -220,6 +220,7 @@ public class ClientTest implements ClientModInitializer {
 			this.log("still in world after new chunks: " + (mc.level != null && server != null && server.isRunning()));
 			this.screenshot("14_reopened_new_chunks");
 			this.log("done");
+			this.exitOnceStopped();
 			mc.stop();
 		});
 
@@ -275,6 +276,16 @@ public class ClientTest implements ClientModInitializer {
 				IntegratedServer server = mc.getSingleplayerServer();
 				server.execute(() -> this.surfaceStats(server.overworld(), target, stop));
 			});
+			if (stop.equals("river") || stop.equals("delta")) {
+				this.step("currents at " + stop, () -> true, 20, () -> {
+					BlockPos target = this.located;
+					if (target == null) {
+						return;
+					}
+					IntegratedServer server = mc.getSingleplayerServer();
+					server.execute(() -> this.currents(server.overworld(), target, stop));
+				});
+			}
 			if (stop.equals("glacial_valley") || stop.equals("cirque")) {
 				this.step("snow at " + stop, () -> true, 20, () -> {
 					BlockPos target = this.located;
@@ -288,8 +299,86 @@ public class ClientTest implements ClientModInitializer {
 		}
 		this.step("done", () -> true, 20, () -> {
 			this.log("done");
+			this.exitOnceStopped();
 			mc.stop();
 		});
+	}
+
+	// with Streams Reflowing (-Putf.streams=true): the flow grids it built around a place, read by name so the test
+	// builds without it. The last layer is UltraTerraForged's (RiverCurrents); the first is Streams' own, which should
+	// have no river currents of its own in an UltraTerraForged world (MixinStreamFlowGrid)
+	private void currents(ServerLevel level, BlockPos center, String name) {
+		try {
+			Class<?> grids = Class.forName("dev.streamsreflowing.flow.StreamFlowGrid");
+			java.lang.reflect.Method peek = grids.getMethod("peek", int.class, int.class);
+			java.lang.reflect.Method layerCount = grids.getMethod("layerCount", byte[].class);
+			com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext context = ((com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState) (Object) level.getChunkSource().randomState()).generatorContext();
+			com.pandaismyname1.ultraterraforged.world.worldgen.cell.Cell cell = new com.pandaismyname1.ultraterraforged.world.worldgen.cell.Cell();
+			com.pandaismyname1.ultraterraforged.world.worldgen.rivermap.Rivermap rivermap = null;
+			int chunks = 0, built = 0, riverColumns = 0, ours = 0, agree = 0, streamsOwn = 0;
+			java.util.Map<Integer, Integer> layers = new java.util.TreeMap<>();
+			for (int cx = (center.getX() >> 4) - 4; cx <= (center.getX() >> 4) + 4; cx++) {
+				for (int cz = (center.getZ() >> 4) - 4; cz <= (center.getZ() >> 4) + 4; cz++) {
+					chunks++;
+					byte[] grid = (byte[]) peek.invoke(null, cx, cz);
+					if (grid == null) {
+						continue;
+					}
+					built++;
+					int count = (int) layerCount.invoke(null, grid);
+					layers.merge(count, 1, Integer::sum);
+					for (int i = 0; i < 256; i++) {
+						int x = (cx << 4) + (i & 15);
+						int z = (cz << 4) + (i >> 4);
+						context.lookup.apply(cell.reset(), x, z, true);
+						if (cell.terrain == null || !cell.terrain.isRiver()) {
+							continue;
+						}
+						riverColumns++;
+						if (grid.length >= 1536 && grid[i] != -1) {
+							streamsOwn++;
+						}
+						if (count < 2) {
+							continue;
+						}
+						byte angle = grid[(count - 1) * 1536 + i];
+						if (angle == -1) {
+							continue;
+						}
+						ours++;
+						rivermap = com.pandaismyname1.ultraterraforged.world.worldgen.rivermap.Rivermap.get(cell, rivermap, context.localHeightmap.get());
+						com.pandaismyname1.ultraterraforged.world.worldgen.rivermap.RiverFlow.Sample sample = com.pandaismyname1.ultraterraforged.world.worldgen.rivermap.RiverFlow.sample(rivermap, x, z);
+						double radians = (angle & 0xFF) / 255.0 * Math.PI * 2.0;
+						if (sample != null && Math.cos(radians) * sample.dirX() + Math.sin(radians) * sample.dirZ() > 0.95) {
+							agree++;
+						}
+					}
+				}
+			}
+			this.log("currents at " + name + ": " + built + " of " + chunks + " chunks have grids, layers " + layers + "; " + riverColumns + " river columns, " + ours + " with UltraTerraForged's current (" + agree + " running the river's way), " + streamsOwn + " with one in Streams' first layer");
+		} catch (ClassNotFoundException e) {
+			this.log("currents at " + name + ": no Streams Reflowing");
+		} catch (ReflectiveOperationException e) {
+			this.log("currents at " + name + ": " + e);
+		}
+	}
+
+	// The dev run's Architectury Transformer leaves two thread pools behind that keep the JVM from exiting, so the
+	// client's shutdown watchdog ended every run in a crash report and a failed task. Once the game has stopped after
+	// a run that got to the end, the JVM is let go; a run that crashed or hung still fails.
+	private void exitOnceStopped() {
+		Thread render = Thread.currentThread();
+		Thread exit = new Thread(() -> {
+			try {
+				render.join();
+				Thread.sleep(2000L);
+			} catch (InterruptedException e) {
+				return;
+			}
+			Runtime.getRuntime().halt(0);
+		}, "Client Test exit");
+		exit.setDaemon(true);
+		exit.start();
 	}
 
 	private void command(IntegratedServer server, String command) {
