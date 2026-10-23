@@ -30,7 +30,9 @@
   	"c2me.MixinChunkMapOpenCL",
   	"streams.MixinRiverCarverFeature",
   	"streams.MixinStreamFlowGrid",
-  	"streams.MixinWorldGenRegion"
+  	"streams.MixinWorldGenRegion",
+  	"alexscaves.MixinBiomeGenerationNoiseCondition",
+  	"alexscaves.MixinClimateSampler"
   ],
   "client": [
   	"ScreenInvoker",
