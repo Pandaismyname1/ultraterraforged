@@ -23,6 +23,8 @@ loom {
             server()
             name = "Server Test"
             runDir = "run-servertest"
+            // system properties for this server, to switch other mods' options: -Putf.serverTestProps=<key=value, separated by commas>
+            project.findProperty("utf.serverTestProps")?.split(",")?.each { def kv = it.split("=", 2); property kv[0], kv[1] }
         }
         data {
             data()
@@ -58,8 +60,9 @@ dependencies {
 
     // Performance mods, in the dev runs only: the ones PerformanceMods lists for NeoForge on this version. -Putf.perfMods=false
     // leaves them out. See docs/porting/performance-mods.md and unpackDevMods below.
+    def unpacked = []
     if (project.findProperty("utf.perfMods") != "false") {
-        def dir = unpackDevMods([
+        unpacked += [
             // Embeddium 1.0.15 rather than Sodium: Sodium's jar is an early-loading service with the mod nested in it, and
             // the mod uses the service's classes, which the dev game can't give it once Loom has remapped them
             "https://api.modrinth.com/maven/maven/modrinth/embeddium/J7b96IEd/embeddium-J7b96IEd.jar",
@@ -69,7 +72,13 @@ dependencies {
             "https://api.modrinth.com/maven/maven/modrinth/lithium/DDUrRVCA/lithium-DDUrRVCA.jar",       // Lithium 0.15.4
             "https://api.modrinth.com/maven/maven/modrinth/modernfix/5HLHxQ2F/modernfix-5HLHxQ2F.jar",   // ModernFix 5.27.24
             "https://www.cursemaven.com/curse/maven/alltheleaks-1091339/8943912/alltheleaks-1091339-8943912.jar" // AllTheLeaks 1.1.13
-        ])
+        ]
+    }
+    // other mods unpacked the same way, for those whose nested libraries the dev game needs (Generator Accelerator's
+    // MixinSquared): -Putf.unpackMods=<their download URLs, separated by commas>
+    project.findProperty("utf.unpackMods")?.split(",")?.each { unpacked << it }
+    if (!unpacked.isEmpty()) {
+        def dir = unpackDevMods(unpacked)
         modLocalRuntime fileTree(new File(dir, "mods")) { include "*.jar" }
         localRuntime fileTree(new File(dir, "libs")) { include "*.jar" }
     }
@@ -84,7 +93,7 @@ dependencies {
     }
 }
 
-// The performance mods for the dev game, unpacked into build/devmods/{mods,libs}; done while Gradle configures the
+// The performance mods (and -Putf.unpackMods) for the dev game, unpacked into build/devmods/{mods,libs}; done while Gradle configures the
 // project, as Loom remaps mod dependencies then.
 // - Released NeoForge mods name some of Minecraft's methods as javac does (lambda$fillFromNoise$11), and the dev game's
 //   jar doesn't keep those names, so the mods have to go through Loom, which renames them to match.
