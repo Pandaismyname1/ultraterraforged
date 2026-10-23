@@ -24,7 +24,9 @@
   	"terrablender.MixinTargetPoint",
   	"worldpreview.SampleUtilsMixin",
   	"c2me.MixinChunkMapOpenCL",
-  	"streams.MixinStreamFlowGrid"
+  	"streams.MixinRiverCarverFeature",
+  	"streams.MixinStreamFlowGrid",
+  	"streams.MixinWorldGenRegion"
   ],
   "client": [
   	"ScreenInvoker",
