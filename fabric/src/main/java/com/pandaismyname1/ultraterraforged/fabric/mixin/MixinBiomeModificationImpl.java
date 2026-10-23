@@ -1,7 +1,6 @@
 package com.pandaismyname1.ultraterraforged.fabric.mixin;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -28,6 +27,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.biome.FeatureSorter;
 import net.minecraft.world.level.chunk.ChunkGenerator;
+import com.pandaismyname1.ultraterraforged.UTFCommon;
 import com.pandaismyname1.ultraterraforged.registries.UTFRegistries;
 import com.pandaismyname1.ultraterraforged.world.worldgen.biome.modifier.BiomeModifier;
 import com.pandaismyname1.ultraterraforged.world.worldgen.biome.modifier.fabric.FabricBiomeModifier;
@@ -52,9 +52,20 @@ public class MixinBiomeModificationImpl {
 		List<Object> modifiers = new ArrayList<>(this.getSortedModifiers());
 		for(Holder.Reference<BiomeModifier> holder : registries.lookupOrThrow(UTFRegistries.BIOME_MODIFIER).listElements().toList()) {
 			if(holder.value() instanceof FabricBiomeModifier modifier) {
-				modifiers.add(this.makeModifierRecord(holder.key().identifier(), ModificationPhase.POST_PROCESSING, (ctx) -> {
+				Identifier id = holder.key().identifier();
+				Object record = this.makeModifierRecord(id, ModificationPhase.POST_PROCESSING, (ctx) -> {
 					return true;
-				}, modifier::apply));
+				}, (selection, modification) -> {
+					// one modifier failing on one biome shouldn't stop the world from loading
+					try {
+						modifier.apply(selection, modification);
+					} catch (RuntimeException e) {
+						UTFCommon.LOGGER.error("Biome modifier {} failed on biome {}", id, selection.getBiomeKey().identifier(), e);
+					}
+				});
+				if (record != null) {
+					modifiers.add(record);
+				}
 			}
 		}
 		modifiers.sort(MODIFIER_ORDER_COMPARATOR);
@@ -88,22 +99,43 @@ public class MixinBiomeModificationImpl {
 		throw new UnsupportedOperationException();
 	}
 	
+	// Fabric API's record of a modifier, made through reflection as it's internal: null, with the reason logged, if
+	// this Fabric API's record doesn't take what it used to
 	private Object makeModifierRecord(Identifier id, ModificationPhase phase, Predicate<BiomeSelectionContext> selector, BiConsumer<BiomeSelectionContext, BiomeModificationContext> modifier) {
+		if (CTOR == null) {
+			UTFCommon.LOGGER.error("Can't add biome modifier {}: this Fabric API's biome modification records aren't made as expected", id);
+			return null;
+		}
+		Class<?>[] types = CTOR.getParameterTypes();
+		Object[] args = new Object[types.length];
+		for (int i = 0; i < types.length; i++) {
+			for (Object arg : new Object[] { phase, id, selector, modifier }) {
+				if (types[i].isInstance(arg)) {
+					args[i] = arg;
+				}
+			}
+		}
 		try {
-			return CTOR.newInstance(phase, id, selector, modifier);
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			e.printStackTrace();
+			return CTOR.newInstance(args);
+		} catch (ReflectiveOperationException | RuntimeException e) {
+			UTFCommon.LOGGER.error("Can't add biome modifier {}", id, e);
 			return null;
 		}
 	}
 	
 	static {
-		Constructor<?> ctor;
+		Constructor<?> ctor = null;
 		try {
-			ctor = Class.forName("net.fabricmc.fabric.impl.biome.modification.BiomeModificationImpl$ModifierRecord").getDeclaredConstructor(ModificationPhase.class, Identifier.class, Predicate.class, BiConsumer.class);
-		} catch (NoSuchMethodException | SecurityException | ClassNotFoundException e) {
-			e.printStackTrace();
-			ctor = null;
+			// the record's fields have been reordered before: take the constructor that takes these four, in any order
+			for (Constructor<?> candidate : Class.forName("net.fabricmc.fabric.impl.biome.modification.BiomeModificationImpl$ModifierRecord").getDeclaredConstructors()) {
+				List<Class<?>> types = List.of(candidate.getParameterTypes());
+				if (types.size() == 4 && types.containsAll(List.of(ModificationPhase.class, Identifier.class, Predicate.class, BiConsumer.class))) {
+					candidate.setAccessible(true);
+					ctor = candidate;
+				}
+			}
+		} catch (ClassNotFoundException | SecurityException e) {
+			UTFCommon.LOGGER.error("Fabric API's biome modification records weren't found", e);
 		}
 		CTOR = ctor;
 	}
