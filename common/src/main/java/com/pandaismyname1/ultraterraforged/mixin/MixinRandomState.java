@@ -21,6 +21,8 @@ import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.densityfunction.DensityFunction;
 import net.minecraft.world.level.levelgen.densityfunction.SamplerContext;
 import com.pandaismyname1.ultraterraforged.UTFCommon;
+import com.pandaismyname1.ultraterraforged.compat.alexscaves.ACClimateSampler;
+import com.pandaismyname1.ultraterraforged.compat.alexscaves.AlexsCavesCompat;
 import com.pandaismyname1.ultraterraforged.compat.terrablender.TBClimateSampler;
 import com.pandaismyname1.ultraterraforged.compat.terrablender.TBCompat;
 import com.pandaismyname1.ultraterraforged.compat.terrablender.TBNoiseRouterData;
@@ -97,6 +99,9 @@ class MixinRandomState {
 	private void createClimateSampler(SamplerContext context, CallbackInfoReturnable<Climate.Sampler> callback) {
 		if(this.uniqueness != null && (Object) callback.getReturnValue() instanceof TBClimateSampler tbClimateSampler) {
 			tbClimateSampler.setUniqueness(((RandomState) (Object) this).getSampler(this.uniqueness).bind(context));
+		}
+		if(this.hasContext && AlexsCavesCompat.isEnabled()) {
+			((ACClimateSampler) (Object) callback.getReturnValue()).ultraterraforged$setTerrain(true);
 		}
 	}
 	
