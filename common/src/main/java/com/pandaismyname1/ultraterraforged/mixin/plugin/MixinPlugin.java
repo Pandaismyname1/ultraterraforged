@@ -21,7 +21,7 @@ public class MixinPlugin implements IMixinConfigPlugin {
 	public static final List<String> TB_MIXINS = ImmutableList.of(mixinClassName("terrablender.MixinClimateSampler"), mixinClassName("terrablender.MixinNoiseChunk"), mixinClassName("terrablender.MixinParameterList"), mixinClassName("terrablender.MixinTargetPoint"));
 	public static final List<String> WP_MIXINS = ImmutableList.of(mixinClassName("worldpreview.SampleUtilsMixin"));
 	public static final List<String> BYE_PREGEN_MIXINS = ImmutableList.of(mixinClassName("byepregen.AccessorNoiseChunk"), mixinClassName("byepregen.MixinArenaNoiseFiller"));
-	public static final List<String> STREAMS_MIXINS = ImmutableList.of(mixinClassName("streams.MixinStreamFlowGrid"));
+	public static final List<String> STREAMS_MIXINS = ImmutableList.of(mixinClassName("streams.MixinStreamFlowGrid"), mixinClassName("streams.MixinRiverCarverFeature"), mixinClassName("streams.MixinWorldGenRegion"));
 	
 	@Override
 	public void onLoad(String mixinPackage) {

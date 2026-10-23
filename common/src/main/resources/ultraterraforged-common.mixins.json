@@ -28,7 +28,9 @@
   	"worldpreview.SampleUtilsMixin",
   	"byepregen.AccessorNoiseChunk",
   	"byepregen.MixinArenaNoiseFiller",
-  	"streams.MixinStreamFlowGrid"
+  	"streams.MixinRiverCarverFeature",
+  	"streams.MixinStreamFlowGrid",
+  	"streams.MixinWorldGenRegion"
   ],
   "client": [
   	"ScreenInvoker",
