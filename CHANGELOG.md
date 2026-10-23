@@ -1,4 +1,5 @@
 ### Unreleased
+* Rivers no longer stand on embankments above the valley they run through (#6): a stream inside a bigger river's valley, or where the valleys of rivers and lakes overlap, took its water level from the land as if those valleys weren't there. Each river's water now comes from the land as the other rivers and lakes really leave it, and rivers climb a little less. Terrain changes in newly generated chunks.
 * Chunks no longer wait for each other while the rivers of a new stretch of land are worked out: every lookup of any river map waited for one being made, so with many big rivers the world's generator threads all queued behind one (#2).
 
 ### New in 1.0.3
