@@ -25,8 +25,8 @@ public class Island {
 		int points = segments.length + 1;
 		float minX = Float.MAX_VALUE;
 		float minZ = Float.MAX_VALUE;
-		float maxX = Float.MIN_VALUE;
-		float maxZ = Float.MIN_VALUE;
+		float maxX = -Float.MAX_VALUE;
+		float maxZ = -Float.MAX_VALUE;
 		float maxRadius = coast;
 		for (int i = 0; i < segments.length; ++i) {
 			Segment segment = segments[i];
@@ -43,6 +43,7 @@ public class Island {
 			y += segment.b.y();
 		}
 		this.id = id;
+		this.segments = segments;
 		this.shallowOcean = shallowOcean;
 		this.coast2 = coast * coast;
 		this.deepOcean2 = deepOcean * deepOcean;
