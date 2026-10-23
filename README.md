@@ -164,6 +164,9 @@ presets. Dedicated servers seed `config/ultraterraforged/server-preset.json` fro
   them (after Mikaaah's Terraforged-Alexs-Caves-Fix).
 - Streams Reflowing gives UltraTerraForged's rivers currents that run the way they flow (after Mikaaah's
   UltraTerraForged-Streams-Currents).
+- Bye Pregen's fast terrain filler works with UltraTerraForged's terrain. Its 26.1 build's density compiler shifts
+  the ground by a block or more, in vanilla worlds too: set `density-column-compiler = "False"` in
+  `config/byepregen.toml` for exact terrain.
 
 ## Maven
 
