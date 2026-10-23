@@ -19,6 +19,10 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
     compileOnly "com.github.glitchfiend:TerraBlender-forge:${rootProject.minecraft_version}-${rootProject.terrablender_version}"
     compileOnly "com.electronwill.night-config:toml:3.6.7"
+    // Streams Reflowing 2.15.2 (All Rights Reserved: compiled against, never shipped), for the currents of UltraTerraForged's
+    // rivers. A Modrinth version id, not 2.15.2, which every loader's and Minecraft version's build shares. Its common
+    // code is the same in the Fabric and Forge builds.
+    modCompileOnly "maven.modrinth:streams-reflowing:fPodpXtQ"
 }
 
 dependencies {

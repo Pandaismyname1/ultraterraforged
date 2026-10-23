@@ -27,7 +27,8 @@
   	"terrablender.MixinNoiseChunk",
   	"worldpreview.SampleUtilsMixin",
   	"byepregen.AccessorNoiseChunk",
-  	"byepregen.MixinArenaNoiseFiller"
+  	"byepregen.MixinArenaNoiseFiller",
+  	"streams.MixinStreamFlowGrid"
   ],
   "client": [
   	"ScreenInvoker",
