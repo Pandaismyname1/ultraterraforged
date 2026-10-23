@@ -475,8 +475,8 @@ public class ClientTest implements ClientModInitializer {
 		// pauses, which stops the integrated server too
 		mc.options.onboardAccessibility = false;
 		mc.options.pauseOnLostFocus = false;
-		if (mc.gui.screen() instanceof net.minecraft.client.gui.screens.AccessibilityOnboardingScreen) {
-			mc.gui.setScreen(new TitleScreen());
+		if (mc.screen instanceof net.minecraft.client.gui.screens.AccessibilityOnboardingScreen) {
+			mc.setScreen(new TitleScreen());
 		}
 		if (++this.totalTicks > (TOUR ? TIMEOUT_TICKS * 8 : TIMEOUT_TICKS)) {
 			this.log("TIMEOUT waiting for: " + this.steps.get(this.stepIndex).name() + " (screen " + Minecraft.getInstance().screen + ")");
