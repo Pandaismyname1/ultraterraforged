@@ -29,7 +29,7 @@ public class StructureRuleTest {
 	@Test
 	void savedRulesWithoutTargetsAreForVillages() {
 		JsonElement saved = JsonParser.parseString("{\"cutoff\": 0.225, \"terrain_type_blacklist\": []}");
-		CellTest rule = CellTest.CODEC.parse(JsonOps.INSTANCE, saved).getOrThrow();
+		CellTest rule = CellTest.CODEC.parse(JsonOps.INSTANCE, saved).getOrThrow(false, (error) -> {});
 		assertEquals(StructureTags.VILLAGE, rule.targets());
 	}
 
@@ -37,9 +37,9 @@ public class StructureRuleTest {
 	void targetsAreKept() {
 		TagKey<net.minecraft.world.level.levelgen.structure.Structure> mineshafts = TagKey.create(Registries.STRUCTURE, new ResourceLocation("minecraft:mineshaft"));
 		CellTest rule = StructureRules.cellTest(mineshafts, 0.1F);
-		JsonElement written = CellTest.CODEC.encodeStart(JsonOps.INSTANCE, rule).getOrThrow();
+		JsonElement written = CellTest.CODEC.encodeStart(JsonOps.INSTANCE, rule).getOrThrow(false, (error) -> {});
 		assertEquals("#minecraft:mineshaft", written.getAsJsonObject().get("targets").getAsString());
-		CellTest read = CellTest.CODEC.parse(JsonOps.INSTANCE, written).getOrThrow();
+		CellTest read = CellTest.CODEC.parse(JsonOps.INSTANCE, written).getOrThrow(false, (error) -> {});
 		assertEquals(rule, read);
 	}
 }
