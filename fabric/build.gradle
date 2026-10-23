@@ -51,6 +51,10 @@ dependencies {
         localRuntime "maven.modrinth:sodium:tZQ3jqnf"           // Sodium 0.9.2
         localRuntime "maven.modrinth:voxy:Zt3LPI0b"             // Voxy 0.2.18: level of detail, to see generated terrain from far off
     }
+    // Streams Reflowing 2.15.2, to see UltraTerraForged's river currents in a dev run: -Putf.streams=true
+    if (project.findProperty("utf.streams") == "true") {
+        localRuntime "maven.modrinth:streams-reflowing:1PyyzYS1"
+    }
 }
 
 processResources {
@@ -130,6 +134,10 @@ loom {
             property "ultraterraforged.clienttest.tour", System.getProperty("ultraterraforged.clienttest.tour", "false")
             property "ultraterraforged.clienttest.stops", System.getProperty("ultraterraforged.clienttest.stops", "river,salt_flat,alluvial_fan,glacial_valley,cirque,drumlins,moraine,barrier_island,karst,sinkhole,delta,wetland,lake,peninsula,coastal_island,sand_bar,skerry,volcanic_island,river_island,submarine_canyon,seamount,guyot,blue_hole,coral_reef,ocean_trench,ocean_ridge,sand_waves")
             property "ultraterraforged.dev.creative", "true"
+            // a flight recording of the run, e.g. to find who started a thread: -Dutf.jfr=<file>
+            if (System.getProperty("utf.jfr") != null) {
+                vmArg "-XX:StartFlightRecording=filename=" + System.getProperty("utf.jfr") + ",settings=profile"
+            }
         }
     }
 }
