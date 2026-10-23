@@ -56,6 +56,11 @@ dependencies {
     if (project.findProperty("utf.streams") == "true") {
         modLocalRuntime "maven.modrinth:streams-reflowing:OBnu1pc1"
     }
+    // other mods for a dev run, e.g. to try a compat: -Putf.extraMod=<paths to their jars, or dependencies such as
+    // maven.modrinth:alexs-caves-continued:T5wPX7t2, separated by commas>
+    project.findProperty("utf.extraMod")?.split(",")?.each { mod ->
+        modLocalRuntime(new File(mod).exists() ? files(mod) : mod)
+    }
 }
 
 processResources {

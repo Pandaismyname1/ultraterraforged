@@ -16,6 +16,7 @@ import com.pandaismyname1.ultraterraforged.compat.worldpreview.WPCompat;
 import com.pandaismyname1.ultraterraforged.compat.c2me.C2MECompat;
 import com.pandaismyname1.ultraterraforged.compat.byepregen.ByePregenCompat;
 import com.pandaismyname1.ultraterraforged.compat.streams.StreamsCompat;
+import com.pandaismyname1.ultraterraforged.compat.alexscaves.AlexsCavesCompat;
 
 public class MixinPlugin implements IMixinConfigPlugin {
 	private static final String MIXIN_PACKAGE_PREFIX = "com.pandaismyname1.ultraterraforged.mixin.";
@@ -24,6 +25,7 @@ public class MixinPlugin implements IMixinConfigPlugin {
 	public static final List<String> C2ME_OPENCL_MIXINS = ImmutableList.of(mixinClassName("c2me.MixinChunkMapOpenCL"));
 	public static final List<String> BYE_PREGEN_MIXINS = ImmutableList.of(mixinClassName("byepregen.AccessorNoiseChunk"), mixinClassName("byepregen.MixinArenaNoiseFiller"));
 	public static final List<String> STREAMS_MIXINS = ImmutableList.of(mixinClassName("streams.MixinStreamFlowGrid"), mixinClassName("streams.MixinRiverCarverFeature"), mixinClassName("streams.MixinWorldGenRegion"));
+	public static final List<String> AC_MIXINS = ImmutableList.of(mixinClassName("alexscaves.MixinBiomeGenerationNoiseCondition"), mixinClassName("alexscaves.MixinClimateSampler"));
 	
 	@Override
 	public void onLoad(String mixinPackage) {
@@ -32,6 +34,7 @@ public class MixinPlugin implements IMixinConfigPlugin {
 		log(C2MECompat.isOpenCLLoaded(), "C2ME OpenCL");
 		log(ByePregenCompat.isEnabled(), "Bye Pregen");
 		log(StreamsCompat.isEnabled(), "Streams Reflowing");
+		log(AlexsCavesCompat.isEnabled(), "Alex's Caves");
 	}
 
 	@Override
@@ -46,6 +49,7 @@ public class MixinPlugin implements IMixinConfigPlugin {
 			   C2ME_OPENCL_MIXINS.contains(mixinClassName) ? C2MECompat.isOpenCLLoaded() :
 			   BYE_PREGEN_MIXINS.contains(mixinClassName) ? ByePregenCompat.isEnabled() :
 			   STREAMS_MIXINS.contains(mixinClassName) ? StreamsCompat.isEnabled() :
+			   AC_MIXINS.contains(mixinClassName) ? AlexsCavesCompat.isEnabled() :
 			   true;
 	}
 
@@ -55,7 +59,7 @@ public class MixinPlugin implements IMixinConfigPlugin {
 
 	@Override
 	public List<String> getMixins() {
-		return Stream.of(TB_MIXINS, WP_MIXINS, C2ME_OPENCL_MIXINS, BYE_PREGEN_MIXINS, STREAMS_MIXINS).flatMap(List::stream).map((str) -> {
+		return Stream.of(TB_MIXINS, WP_MIXINS, C2ME_OPENCL_MIXINS, BYE_PREGEN_MIXINS, STREAMS_MIXINS, AC_MIXINS).flatMap(List::stream).map((str) -> {
 			return str.replace(MIXIN_PACKAGE_PREFIX, "");
 		}).toList();
 	}

@@ -6,6 +6,7 @@ import java.util.List;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.CaveFeatureSettings;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.OceanSettings;
+import com.pandaismyname1.ultraterraforged.compat.alexscaves.AlexsCavesCompat;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
 
 /**
@@ -72,7 +73,7 @@ public final class CaveFeatures {
 		if (this.features.isEmpty()) {
 			return;
 		}
-		CaveCarving carving = new CaveCarving(chunk, this.context);
+		CaveCarving carving = new CaveCarving(chunk, this.context, AlexsCavesCompat.isEnabled());
 		for (Feature feature : this.features) {
 			feature.carve(carving);
 		}
