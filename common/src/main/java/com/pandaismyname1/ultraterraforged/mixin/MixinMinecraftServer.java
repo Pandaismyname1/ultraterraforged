@@ -34,8 +34,12 @@ class MixinMinecraftServer {
 			return registry.get(PresetData.PRESET);
 		}).ifPresent((preset) -> {
 			if((Object) randomState instanceof UTFRandomState utfRandomState && (Object) sampler instanceof UTFClimateSampler utfClimateSampler) {
-				BlockPos searchCenter = preset.value().world().properties.spawnType.getSearchCenter(utfRandomState.generatorContext());
-				utfClimateSampler.setSpawnSearchCenter(searchCenter);
+				// an overworld that doesn't read the cells (a datapack's own noise settings) has no terrain of ours to
+				// search: vanilla's search, from 0,0
+				if(utfRandomState.generatorContext() != null) {
+					BlockPos searchCenter = preset.value().world().properties.spawnType.getSearchCenter(utfRandomState.generatorContext());
+					utfClimateSampler.setSpawnSearchCenter(searchCenter);
+				}
 			} else {
 				throw new IllegalStateException();
 			}
