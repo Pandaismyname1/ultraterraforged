@@ -28,14 +28,16 @@ public record CellSampler(Supplier<GeneratorContext> generatorContext, CellField
 		return this.field.read(cell);
 	}
 
+	// no bounds: continentalness, erosion and weirdness are negative too, and vanilla's min and max skip an argument
+	// by its bounds
 	@Override
 	public double minValue() {
-		return 0.0F;
+		return Double.NEGATIVE_INFINITY;
 	}
 
 	@Override
 	public double maxValue() {
-		return 1.0F;
+		return Double.POSITIVE_INFINITY;
 	}
 
 	public static boolean isCachedNoiseChunk(int cellCountXZ) {
