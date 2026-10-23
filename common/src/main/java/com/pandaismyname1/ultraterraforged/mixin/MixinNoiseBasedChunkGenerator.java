@@ -13,6 +13,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Local;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.SectionPos;
@@ -27,7 +30,9 @@ import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.NoiseSettings;
 import net.minecraft.world.level.levelgen.RandomState;
+import net.minecraft.world.level.levelgen.Aquifer;
 import com.pandaismyname1.ultraterraforged.world.worldgen.rivermap.RaisedWater;
+import com.pandaismyname1.ultraterraforged.world.worldgen.rivermap.RaisedWaterGuard;
 import net.minecraft.world.level.levelgen.blending.Blender;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.WorldSettings;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
@@ -51,6 +56,23 @@ class MixinNoiseBasedChunkGenerator {
 			RaisedWater.fill(chunkAccess, generatorContext);
 		}
     }
+	
+	// carvers keep out of the water of rivers and lakes above the sea (RaisedWaterGuard)
+	@ModifyExpressionValue(
+		method = "applyCarvers",
+		at = @At(
+			value = "INVOKE",
+			target = "Lnet/minecraft/world/level/levelgen/NoiseChunk;aquifer()Lnet/minecraft/world/level/levelgen/Aquifer;"
+		),
+		require = 1
+	)
+	private Aquifer applyCarvers$aquifer(Aquifer aquifer, @Local(argsOnly = true) RandomState randomState, @Local(argsOnly = true) ChunkAccess chunkAccess) {
+		GeneratorContext generatorContext;
+		if((Object) randomState instanceof UTFRandomState utfRandomState && (generatorContext = utfRandomState.generatorContext()) != null) {
+			return new RaisedWaterGuard(chunkAccess, generatorContext).wrap(aquifer);
+		}
+		return aquifer;
+	}
 	
 	@Inject(at = @At("TAIL"), method = "buildSurface", require = 1)
     public void buildSurface$TAIL(WorldGenRegion worldGenRegion, StructureManager structureManager, RandomState randomState, ChunkAccess chunkAccess, CallbackInfo callback) {
