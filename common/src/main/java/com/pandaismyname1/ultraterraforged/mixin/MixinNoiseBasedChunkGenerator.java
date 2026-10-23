@@ -12,10 +12,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.sugar.Local;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -26,6 +24,7 @@ import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.NoiseColumn;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
@@ -61,15 +60,13 @@ class MixinNoiseBasedChunkGenerator {
     }
 	
 	// carvers keep out of the water of rivers and lakes above the sea (RaisedWaterGuard)
-	@ModifyExpressionValue(
+	@ModifyVariable(
 		method = "applyCarvers",
-		at = @At(
-			value = "INVOKE",
-			target = "Lnet/minecraft/world/level/levelgen/NoiseChunk;aquifer()Lnet/minecraft/world/level/levelgen/Aquifer;"
-		),
+		at = @At("STORE"),
+		ordinal = 0,
 		require = 1
 	)
-	private Aquifer applyCarvers$aquifer(Aquifer aquifer, @Local(argsOnly = true) RandomState randomState, @Local(argsOnly = true) ChunkAccess chunkAccess) {
+	private Aquifer applyCarvers$aquifer(Aquifer aquifer, WorldGenRegion region, long seed, RandomState randomState, BiomeManager biomeManager, StructureManager structureManager, ChunkAccess chunkAccess) {
 		GeneratorContext generatorContext;
 		if((Object) randomState instanceof UTFRandomState utfRandomState && (generatorContext = utfRandomState.generatorContext()) != null) {
 			return new RaisedWaterGuard(chunkAccess, generatorContext).wrap(aquifer);
