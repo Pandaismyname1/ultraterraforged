@@ -18,6 +18,12 @@ loom {
         // ./gradlew :neoforge:runData regenerates the translation files into neoforge/src/generated; copy them into
         // common resources. The dev datagen JVM does not exit on its own once it prints "All providers took", so stop
         // it manually.
+        // a dedicated server in its own folder, for automated checks (world creation with another mod, say)
+        serverTest {
+            server()
+            name = "Server Test"
+            runDir = "run-servertest"
+        }
         data {
             data()
             programArgs "--mod", "ultraterraforged", "--all", "--output", file("src/generated/resources").absolutePath
@@ -66,6 +72,16 @@ dependencies {
         ])
         modLocalRuntime fileTree(new File(dir, "mods")) { include "*.jar" }
         localRuntime fileTree(new File(dir, "libs")) { include "*.jar" }
+    }
+    // Streams Reflowing 2.15.2, to see UltraTerraForged's river currents in a dev run: -Putf.streams=true
+    if (project.findProperty("utf.streams") == "true") {
+        modLocalRuntime "maven.modrinth:streams-reflowing:vbJ5meb8"
+    }
+    // another mod for a dev run, e.g. to try a compat: -Putf.extraMod=<path to its jar, or a dependency such as
+    // curse.maven:bye-pregen-1567378:9206739>
+    def extraMod = project.findProperty("utf.extraMod")
+    if (extraMod != null) {
+        modLocalRuntime(new File(extraMod).exists() ? files(extraMod) : extraMod)
     }
 }
 

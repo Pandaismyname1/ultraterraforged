@@ -54,7 +54,7 @@ dependencies {
     }
     // Streams Reflowing 2.15.2, to see UltraTerraForged's river currents in a dev run: -Putf.streams=true
     if (project.findProperty("utf.streams") == "true") {
-        localRuntime "maven.modrinth:streams-reflowing:1PyyzYS1"
+        modLocalRuntime "maven.modrinth:streams-reflowing:OBnu1pc1"
     }
 }
 
