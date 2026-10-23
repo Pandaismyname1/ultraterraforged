@@ -6,6 +6,7 @@
 * Canyon walls are slopes again instead of columns of very different heights (#10): narrow canyons are shallower.
 * Where a stream joins a river, the river's water no longer drops to the stream's level in a step with walls of water around it: the stream's last stretch rises to the river's level.
 * Creating a world with Bye Pregen no longer crashes (#13).
+* Generator Accelerator works with UltraTerraForged: with it, chunks failed to generate.
 * Fabric: reopening a world no longer crashes with "Biome decoration … Index -1 out of bounds" (#11), and a biome modifier that fails is logged and left out instead of stopping the world from loading.
 * The Experimental continent type works: creating a world with it failed at once.
 * Pillars in giant caverns stand in their lakes instead of ending at the water.

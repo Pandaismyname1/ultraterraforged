@@ -164,6 +164,7 @@ presets. Dedicated servers seed `config/ultraterraforged/server-preset.json` fro
 - Streams Reflowing gives UltraTerraForged's rivers currents that run the way they flow (after Mikaaah's
   UltraTerraForged-Streams-Currents).
 - Bye Pregen's fast terrain filler works with UltraTerraForged's terrain.
+- Generator Accelerator generates UltraTerraForged worlds, the same terrain as without it.
 
 ## Maven
 
