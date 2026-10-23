@@ -3,11 +3,13 @@ package com.pandaismyname1.ultraterraforged.world.worldgen.cave;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.QuartPos;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.Heightmap;
+import com.pandaismyname1.ultraterraforged.compat.alexscaves.AlexsCavesCompat;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.Cell;
 import com.pandaismyname1.ultraterraforged.world.worldgen.heightmap.Levels;
@@ -35,6 +37,8 @@ public final class CaveCarving {
 	public final int bottom;
 	private final int[] ground = new int[256];
 	private final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+	// whether Alex's Caves' biomes are left to it: its own caves are built there
+	private final boolean keepOutOfCaveBiomes;
 	private final Cell cell = new Cell();
 	// the chunk around this one that ground last read from its tile, or null if its tile wasn't there
 	@Nullable
@@ -43,8 +47,13 @@ public final class CaveCarving {
 	private int nearZ = Integer.MIN_VALUE;
 
 	CaveCarving(ChunkAccess chunk, GeneratorContext context) {
+		this(chunk, context, false);
+	}
+
+	CaveCarving(ChunkAccess chunk, GeneratorContext context, boolean keepOutOfCaveBiomes) {
 		this.chunk = chunk;
 		this.context = context;
+		this.keepOutOfCaveBiomes = keepOutOfCaveBiomes;
 		this.levels = context.levels;
 		ChunkPos chunkPos = chunk.getPos();
 		this.chunkX = chunkPos.x;
@@ -147,7 +156,7 @@ public final class CaveCarving {
 		BlockState state = this.chunk.getBlockState(this.pos.set(x, y + 1, z));
 		boolean underFluid = !state.getFluidState().isEmpty();
 		state = this.chunk.getBlockState(this.pos.set(x, y, z));
-		if (state.is(Blocks.BEDROCK) || !state.getFluidState().isEmpty()) {
+		if (state.is(Blocks.BEDROCK) || !state.getFluidState().isEmpty() || this.isCaveBiome(x, y, z)) {
 			return;
 		}
 		BlockState fill = y <= water ? WATER : AIR;
@@ -188,7 +197,7 @@ public final class CaveCarving {
 					}
 					this.pos.set(x, y, z);
 					BlockState state = this.chunk.getBlockState(this.pos);
-					if (state.isAir() || state.is(Blocks.BEDROCK) || !state.getFluidState().isEmpty()) {
+					if (state.isAir() || state.is(Blocks.BEDROCK) || !state.getFluidState().isEmpty() || this.isCaveBiome(x, y, z)) {
 						continue;
 					}
 					this.chunk.setBlockState(this.pos, lining.at(x, y, z), false);
@@ -209,7 +218,13 @@ public final class CaveCarving {
 	}
 
 	public void set(int x, int y, int z, BlockState state) {
-		this.chunk.setBlockState(this.pos.set(x, y, z), state, false);
+		if (!this.isCaveBiome(x, y, z)) {
+			this.chunk.setBlockState(this.pos.set(x, y, z), state, false);
+		}
+	}
+
+	private boolean isCaveBiome(int x, int y, int z) {
+		return this.keepOutOfCaveBiomes && AlexsCavesCompat.isCaveBiome(this.chunk.getNoiseBiome(QuartPos.fromBlock(x), QuartPos.fromBlock(y), QuartPos.fromBlock(z)));
 	}
 
 	// whether a block is in this chunk
