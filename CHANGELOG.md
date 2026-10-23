@@ -4,12 +4,14 @@
 * Streams Reflowing: UltraTerraForged's rivers get its currents, running the way the river flows, raised rivers too (discussion #3). This was Mikaaah's UltraTerraForged-Streams-Currents add-on, which is no longer needed. Streams' own streams no longer cut away the water of UltraTerraForged's rivers and lakes.
 * No more air under raised rivers and lakes (#9): vanilla's and other mods' carvers took their water away, and UltraTerraForged's own caves hollowed out the ground under them, leaving water hanging.
 * Canyon walls are slopes again instead of columns of very different heights (#10): narrow canyons are shallower.
+* Where a stream joins a river, the river's water no longer drops to the stream's level in a step with walls of water around it: the stream's last stretch rises to the river's level.
 * Creating a world with Bye Pregen no longer crashes (#13).
 * Fabric: reopening a world no longer crashes with "Biome decoration … Index -1 out of bounds" (#11), and a biome modifier that fails is logged and left out instead of stopping the world from loading.
 * The Experimental continent type works: creating a world with it failed at once.
 * Pillars in giant caverns stand in their lakes instead of ending at the water.
+* With World Preview installed, chunks are no longer generated at full height, slower, for the rest of the session once a preview has been shown.
 * With a second dimension on UltraTerraForged's terrain, its caches no longer stop letting go of what they no longer need, so memory no longer grows for the rest of the session; more fixes from Mikaaah's audit (discussion #12).
-* Terrain changes in newly generated chunks (canyons, the ground under raised rivers and lakes, caves inside Alex's Caves' biomes), so existing worlds can show a seam where new chunks meet old ones.
+* Terrain changes in newly generated chunks (canyons, streams where they join rivers, the ground under raised rivers and lakes, caves inside Alex's Caves' biomes), so existing worlds can show a seam where new chunks meet old ones.
 * Thanks to Mikaaah for the Alex's Caves fix, the Streams Reflowing add-on and the audit this release builds on.
 
 ### New in 1.0.2
