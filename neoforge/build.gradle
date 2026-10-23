@@ -69,8 +69,8 @@ dependencies {
     }
     // Alex's Caves Continued 1.1.3 and the CodxLib it needs, to see its cave biomes in a dev run: -Putf.alexscaves=true
     if (project.findProperty("utf.alexscaves") == "true") {
-        devMods "maven.modrinth:alexs-caves-continued:ztASgsHp"
-        devMods "maven.modrinth:codxlib:udL6euJF"
+        devMods "maven.modrinth:alexs-caves-continued:6s20qfE5"
+        devMods "maven.modrinth:codxlib:sJnMZYnV"
     }
 }
 
