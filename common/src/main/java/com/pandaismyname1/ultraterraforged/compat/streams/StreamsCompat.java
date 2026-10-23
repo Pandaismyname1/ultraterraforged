@@ -47,11 +47,12 @@ public class StreamsCompat {
 	/**
 	 * Streams also carves rivers of its own, which in an UltraTerraForged world cut into its rivers and lakes above the
 	 * sea: water put in before the features was turned to air, and so was the ground under it, leaving water hanging.
-	 * Its rivers still come; a block that is water, or that water rests on, just stays.
+	 * Its rivers still come; water just stays water, and the ground under water isn't hollowed out. Ground put in where
+	 * there was none, such as the bed Streams seals its own water with, is always let through.
 	 */
 	public static boolean keeps(net.minecraft.server.level.WorldGenRegion region, net.minecraft.core.BlockPos pos, net.minecraft.world.level.block.state.BlockState state) {
 		boolean keeps = state.getFluidState().isEmpty()
-			&& (!region.getFluidState(pos).isEmpty() || !region.getFluidState(pos.above()).isEmpty())
+			&& (!region.getFluidState(pos).isEmpty() || state.isAir() && !region.getBlockState(pos).isAir() && !region.getFluidState(pos.above()).isEmpty())
 			&& context(region.getLevel()) != null;
 		if (keeps) {
 			KEPT.incrementAndGet();
