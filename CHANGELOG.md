@@ -1,3 +1,6 @@
+### Unreleased
+* Chunks no longer wait for each other while the rivers of a new stretch of land are worked out: every lookup of any river map waited for one being made, so with many big rivers the world's generator threads all queued behind one (#2).
+
 ### New in 1.0.3
 * Alex's Caves: its cave biomes generate in UltraTerraForged worlds about as often as in vanilla ones (#7). Alex's Caves chooses them by the climate at the centre of each of its cells, and UltraTerraForged's land rarely reached the values it asks for; inland it now reads the value vanilla has over the same share of the world, so its own settings keep their meaning. UltraTerraForged's caves stay out of its biomes. After Mikaaah's Terraforged-Alexs-Caves-Fix.
 * Structures of every mod, Alex's Caves' underground chambers among them, can start near rivers: a rule meant for villages kept every structure away from rivers.
