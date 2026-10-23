@@ -329,6 +329,22 @@ public class CavesTest {
 	}
 
 	@Test
+	void waterIsNotLeftHanging() {
+		CaveWorld world = world("default");
+		CaveCarving carving = world.probe();
+		int ground = world.ground(5, 5);
+		// a lake's water on the ground, as RaisedWater puts it in before the caves
+		carving.set(5, ground + 1, 5, Blocks.WATER.defaultBlockState());
+		carving.hollow(5.5F, ground - 4, 5.5F, 4.0F, 6.0F, 4.0F, CaveCarving.DRY, CaveCarving.OPEN);
+		assertTrue(world.get(5, ground, 5).is(Blocks.STONE), "the bed of the lake was carved away");
+		assertTrue(world.get(5, ground - 1, 5).isAir(), "the cave under the bed wasn't carved");
+		assertTrue(world.get(6, ground, 5).isAir(), "the ground beside the lake wasn't carved");
+		// a flooded cave may open under it
+		carving.hollow(5.5F, ground - 4, 5.5F, 4.0F, 6.0F, 4.0F, ground, CaveCarving.OPEN);
+		assertTrue(world.get(5, ground, 5).is(Blocks.WATER), "the flooded cave didn't reach the lake");
+	}
+
+	@Test
 	void springsWellOutOfHillsides() {
 		CaveWorld world = world("highlands");
 		Springs springs = new Springs(SEED, 1.0F);

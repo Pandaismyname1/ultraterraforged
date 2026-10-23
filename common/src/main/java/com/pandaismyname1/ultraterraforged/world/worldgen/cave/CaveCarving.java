@@ -107,7 +107,7 @@ public final class CaveCarving {
 
 	/**
 	 * Hollows out an ellipsoid: water up to the given level, air above it. Bedrock and fluids are left alone, and so
-	 * is the ground within roof blocks of the surface, unless roof is OPEN.
+	 * is the ground within roof blocks of the surface, unless roof is OPEN, and the ground a fluid rests on.
 	 */
 	public void hollow(float cx, float cy, float cz, float rx, float ry, float rz, int water, int roof) {
 		int x0 = Math.max(this.minX, (int) Math.floor(cx - rx));
@@ -140,15 +140,20 @@ public final class CaveCarving {
 	}
 
 	/**
-	 * Hollows out a single block, as hollow does.
+	 * Hollows out a single block, as hollow does. The block under a fluid isn't turned to air either: the river or lake
+	 * above, put in before the caves, would be left hanging over it (issue #9).
 	 */
 	public void clear(int x, int y, int z, int water) {
-		this.pos.set(x, y, z);
-		BlockState state = this.chunk.getBlockState(this.pos);
+		BlockState state = this.chunk.getBlockState(this.pos.set(x, y + 1, z));
+		boolean underFluid = !state.getFluidState().isEmpty();
+		state = this.chunk.getBlockState(this.pos.set(x, y, z));
 		if (state.is(Blocks.BEDROCK) || !state.getFluidState().isEmpty()) {
 			return;
 		}
 		BlockState fill = y <= water ? WATER : AIR;
+		if (fill == AIR && underFluid) {
+			return;
+		}
 		if (state != fill) {
 			this.chunk.setBlockState(this.pos, fill, 0);
 		}
