@@ -44,6 +44,8 @@ public class ClientTest implements ClientModInitializer {
 	// with -Dultraterraforged.clienttest.tour=true: a default world, visiting each of these, as /utf locate finds them
 	private static final boolean TOUR = Boolean.getBoolean("ultraterraforged.clienttest.tour");
 	private static final String[] TOUR_STOPS = System.getProperty("ultraterraforged.clienttest.stops", "river,salt_flat,alluvial_fan,glacial_valley,cirque,drumlins,moraine,barrier_island,karst,sinkhole,delta,wetland,lake,peninsula,coastal_island,sand_bar,skerry,volcanic_island,river_island,submarine_canyon,seamount,guyot,blue_hole,coral_reef,ocean_trench,ocean_ridge,sand_waves").split(",");
+	// with -Dultraterraforged.clienttest.seed=<seed>: the tour's world has that seed, so two runs can be compared
+	private static final String SEED = System.getProperty("ultraterraforged.clienttest.seed", "");
 	private static final String SAVED_PRESET = "ClientTest Preset";
 
 	private final Path out = Path.of(System.getProperty("ultraterraforged.clienttest.out", "clienttest"));
@@ -231,6 +233,9 @@ public class ClientTest implements ClientModInitializer {
 		this.step("title screen", () -> mc.gui.screen() instanceof TitleScreen, 40, () -> CreateWorldScreen.openFresh(mc, () -> mc.gui.setScreen(new TitleScreen())));
 		this.step("create world screen", () -> mc.gui.screen() instanceof CreateWorldScreen, 40, () -> {
 			this.log("ultraterraforged selected: " + TerrainState.of((CreateWorldScreen) mc.gui.screen()).isUltraTerraForgedSelected() + ", preset " + TerrainState.of((CreateWorldScreen) mc.gui.screen()).name().getString());
+			if (!SEED.isEmpty()) {
+				((CreateWorldScreen) mc.gui.screen()).getUiState().setSeed(SEED);
+			}
 			this.button(mc.gui.screen(), "Create New World").onPress(PRESS);
 		});
 		this.step("world loaded", () -> mc.level != null && mc.player != null, 200, () -> {
@@ -274,7 +279,10 @@ public class ClientTest implements ClientModInitializer {
 				}
 				this.screenshot("tour_" + stop);
 				IntegratedServer server = mc.getSingleplayerServer();
-				server.execute(() -> this.surfaceStats(server.overworld(), target, stop));
+				server.execute(() -> {
+					this.surfaceStats(server.overworld(), target, stop);
+					this.waterPockets(server.overworld(), target, stop);
+				});
 			});
 			if (stop.equals("river") || stop.equals("delta")) {
 				this.step("currents at " + stop, () -> true, 20, () -> {
@@ -298,10 +306,60 @@ public class ClientTest implements ClientModInitializer {
 			}
 		}
 		this.step("done", () -> true, 20, () -> {
+			this.log("seed " + mc.getSingleplayerServer().overworld().getSeed() + "; water pockets in all: " + this.pocketColumns + " of " + this.waterColumns + " raised-water columns");
 			this.log("done");
 			this.exitOnceStopped();
 			mc.stop();
 		});
+	}
+
+	// columns of still water above the sea with air under it, in the loaded chunks around a place: caves cut into
+	// rivers and lakes (#9). Flowing water is left out, as it may be caught moving
+	private int waterColumns;
+	private int pocketColumns;
+
+	private void waterPockets(ServerLevel level, BlockPos center, String name) {
+		int columns = 0, pockets = 0, air = 0;
+		List<String> examples = new ArrayList<>();
+		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+		for (int cx = (center.getX() >> 4) - 6; cx <= (center.getX() >> 4) + 6; cx++) {
+			for (int cz = (center.getZ() >> 4) - 6; cz <= (center.getZ() >> 4) + 6; cz++) {
+				net.minecraft.world.level.chunk.LevelChunk chunk = level.getChunkSource().getChunkNow(cx, cz);
+				if (chunk == null) {
+					continue;
+				}
+				for (int dx = 0; dx < 16; dx++) {
+					for (int dz = 0; dz < 16; dz++) {
+						int x = (cx << 4) + dx, z = (cz << 4) + dz;
+						int top = chunk.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE, dx, dz);
+						net.minecraft.world.level.block.state.BlockState state = chunk.getBlockState(pos.set(x, top, z));
+						if (top <= level.getSeaLevel() || !state.is(net.minecraft.world.level.block.Blocks.WATER) || !state.getFluidState().isSource()) {
+							continue;
+						}
+						columns++;
+						int found = 0;
+						for (int y = top - 1; y > top - 64; y--) {
+							net.minecraft.world.level.block.state.BlockState below = chunk.getBlockState(pos.set(x, y, z));
+							if (below.isAir()) {
+								found++;
+							} else if (!below.is(net.minecraft.world.level.block.Blocks.WATER)) {
+								break;
+							}
+						}
+						if (found > 0) {
+							pockets++;
+							air += found;
+							if (examples.size() < 5) {
+								examples.add(x + " " + top + " " + z);
+							}
+						}
+					}
+				}
+			}
+		}
+		this.waterColumns += columns;
+		this.pocketColumns += pockets;
+		this.log("water pockets at " + name + ": " + pockets + " of " + columns + " raised-water columns (" + air + " blocks of air) " + examples);
 	}
 
 	// with Streams Reflowing (-Putf.streams=true): the flow grids it built around a place, read by name so the test

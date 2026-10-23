@@ -140,6 +140,8 @@ loom {
             property "ultraterraforged.clienttest.out", file("build/clienttest").absolutePath
             // -Dultraterraforged.clienttest.tour=true visits the landforms in a default world instead
             property "ultraterraforged.clienttest.tour", System.getProperty("ultraterraforged.clienttest.tour", "false")
+            // -Dultraterraforged.clienttest.seed=<seed> makes the tour's world with that seed
+            property "ultraterraforged.clienttest.seed", System.getProperty("ultraterraforged.clienttest.seed", "")
             property "ultraterraforged.clienttest.stops", System.getProperty("ultraterraforged.clienttest.stops", "river,salt_flat,alluvial_fan,glacial_valley,cirque,drumlins,moraine,barrier_island,karst,sinkhole,delta,wetland,lake,peninsula,coastal_island,sand_bar,skerry,volcanic_island,river_island,submarine_canyon,seamount,guyot,blue_hole,coral_reef,ocean_trench,ocean_ridge,sand_waves")
             property "ultraterraforged.dev.creative", "true"
             // a flight recording of the run, e.g. to find who started a thread: -Dutf.jfr=<file>
