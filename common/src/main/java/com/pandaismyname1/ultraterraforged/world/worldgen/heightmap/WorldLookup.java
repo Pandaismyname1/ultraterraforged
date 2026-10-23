@@ -99,15 +99,17 @@ public class WorldLookup {
 		Cell oldCell = cellProvider.getCacheCell();
 		
 		cellProvider.setCacheCell(cell);
-		heightmap.applyContinent(cell, x, z);
-		heightmap.applyTerrain(cell, x, z, Rivermap.get(cell, null, heightmap));
-		heightmap.applyClimate(cell, x, z);
-		if (cell.terrain == TerrainType.COAST && cell.height > this.waterLevel && cell.height <= this.beachLevel) {
-			cell.terrain = TerrainType.BEACH;
+		try {
+			heightmap.applyContinent(cell, x, z);
+			heightmap.applyTerrain(cell, x, z, Rivermap.get(cell, null, heightmap));
+			heightmap.applyClimate(cell, x, z);
+			if (cell.terrain == TerrainType.COAST && cell.height > this.waterLevel && cell.height <= this.beachLevel) {
+				cell.terrain = TerrainType.BEACH;
+			}
+			heightmap.applyPost(cell, x, z);
+		} finally {
+			cellProvider.setCacheCell(oldCell);
 		}
-		heightmap.applyPost(cell, x, z);
-
-		cellProvider.setCacheCell(oldCell);
 		return false;
 	}
 }
