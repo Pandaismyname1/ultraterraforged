@@ -24,7 +24,7 @@ dependencies {
     // Streams Reflowing 2.15.2 (All Rights Reserved: compiled against, never shipped), for the currents of UltraTerraForged's
     // rivers. A Modrinth version id, not 2.15.2, which every loader's and Minecraft version's build shares. Its common
     // code is the same in the Fabric and NeoForge builds.
-    compileOnly "maven.modrinth:streams-reflowing:1PyyzYS1"
+    compileOnly "maven.modrinth:streams-reflowing:t9NK6sX3"
 }
 
 dependencies {
