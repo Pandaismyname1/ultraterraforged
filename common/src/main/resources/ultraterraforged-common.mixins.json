@@ -25,7 +25,9 @@
   	"terrablender.MixinClimateSampler",
   	"terrablender.MixinTargetPoint",
   	"terrablender.MixinNoiseChunk",
-  	"worldpreview.SampleUtilsMixin"
+  	"worldpreview.SampleUtilsMixin",
+  	"byepregen.AccessorNoiseChunk",
+  	"byepregen.MixinArenaNoiseFiller"
   ],
   "client": [
   	"ScreenInvoker",
