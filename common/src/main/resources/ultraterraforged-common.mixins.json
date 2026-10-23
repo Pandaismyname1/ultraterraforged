@@ -32,7 +32,9 @@
   	"streams.MixinStreamFlowGrid",
   	"streams.MixinWorldGenRegion",
   	"alexscaves.MixinBiomeGenerationNoiseCondition",
-  	"alexscaves.MixinClimateSampler"
+  	"alexscaves.MixinClimateSampler",
+  	"byepregen.AccessorNoiseChunk",
+  	"byepregen.MixinArenaNoiseFiller"
   ],
   "client": [
   	"ScreenInvoker",
