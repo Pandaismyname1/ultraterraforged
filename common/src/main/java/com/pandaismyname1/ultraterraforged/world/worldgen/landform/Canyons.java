@@ -23,6 +23,10 @@ public record Canyons(Noise main, Noise side, float depth, float floorStart, flo
 	private static final float SIDE_DEPTH = 0.55F;
 	// the floor stays this many blocks above the sea
 	private static final int FLOOR_ABOVE_SEA = 3;
+	// at most this many blocks deeper for each block in from the rim: a narrow canyon is a shallow one, as where a real
+	// one begins. Cut to the full depth, the narrow ones had walls far steeper than a block per block, which came out
+	// as columns of very different heights (#10)
+	private static final float MAX_SLOPE = 3.0F;
 
 	public static Canyons make(int seed, LandformSettings.Canyons settings, Levels levels) {
 		// the zero lines of single octave noise meander and branch like a drainage network
@@ -47,8 +51,10 @@ public record Canyons(Noise main, Noise side, float depth, float floorStart, flo
 		if (mask <= 0.0F || cell.terrain.isSubmerged() || cell.terrain.isRiver()) {
 			return;
 		}
-		float mainDepth = this.profile(this.main.compute(x, z, 0));
-		float sideDepth = this.profile(this.side.compute(x, z, 0)) * SIDE_DEPTH;
+		float mainRidge = this.main.compute(x, z, 0);
+		float sideRidge = this.side.compute(x, z, 0);
+		float mainDepth = this.profile(mainRidge);
+		float sideDepth = this.profile(sideRidge) * SIDE_DEPTH;
 		float cut = Math.max(mainDepth, sideDepth);
 		if (cut <= 0.0F) {
 			return;
@@ -59,11 +65,21 @@ public record Canyons(Noise main, Noise side, float depth, float floorStart, flo
 			return;
 		}
 		float depth = Math.min(this.depth * this.levels.unit * cut * mask, available);
+		depth = Math.min(depth, MAX_SLOPE * this.levels.unit * (mainDepth >= sideDepth ? this.inFromRim(this.main, mainRidge, x, z) : this.inFromRim(this.side, sideRidge, x, z)));
 		cell.height -= depth;
 		if (cut < 1.0F) {
 			// keep the stepped walls crisp; the filters would round them off
 			cell.erosionMask = true;
 		}
+	}
+
+	// how many blocks a place is in from the rim of the canyon a ridge noise makes, from how fast the noise changes there
+	// (on either side, as the middle line is a crease)
+	private float inFromRim(Noise ridge, float value, float x, float z) {
+		float dx = Math.max(Math.abs(ridge.compute(x + 1.0F, z, 0) - value), Math.abs(ridge.compute(x - 1.0F, z, 0) - value));
+		float dz = Math.max(Math.abs(ridge.compute(x, z + 1.0F, 0) - value), Math.abs(ridge.compute(x, z - 1.0F, 0) - value));
+		float rise = (float) Math.sqrt(dx * dx + dz * dz);
+		return (value - this.wallStart) / Math.max(rise, 1.0E-4F);
 	}
 
 	// 0 outside the canyon to 1 on its floor, in ledges
