@@ -19,6 +19,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.SectionPos;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.NoiseColumn;
 import net.minecraft.world.level.StructureManager;
@@ -40,11 +41,13 @@ import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.WorldSettings;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
 import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
+import com.pandaismyname1.ultraterraforged.world.worldgen.VolumeAquifer;
 import com.pandaismyname1.ultraterraforged.world.worldgen.WorldGenFlags;
 import com.pandaismyname1.ultraterraforged.world.worldgen.biome.spawn.SpawnFinder;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.Cell;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.NoiseUtil;
 import com.pandaismyname1.ultraterraforged.world.worldgen.rivermap.RaisedWater;
+import com.pandaismyname1.ultraterraforged.world.worldgen.rivermap.RaisedWaterGuard;
 
 @Mixin(value = NoiseBasedChunkGenerator.class, priority = 9001 /* we need this so we don't break noisium */)
 class MixinNoiseBasedChunkGenerator {
@@ -71,6 +74,22 @@ class MixinNoiseBasedChunkGenerator {
 			generatorContext.caveFeatures.carve(chunkAccess);
 		}
     }
+
+	// carvers don't cut into the water of rivers and lakes above the sea (RaisedWaterGuard)
+	@Inject(at = @At("HEAD"), method = "generateCarvers", require = 1)
+	private void generateCarvers$HEAD(ChunkAccess chunkAccess, Blender blender, NoiseChunk noiseChunk, RandomState randomState, BiomeManager biomeManager, @Nullable WorldGenRegion carverBiomeRegion, MaterialRule materialRule, CallbackInfo callback) {
+		GeneratorContext generatorContext;
+		if((Object) randomState instanceof UTFRandomState utfRandomState && (generatorContext = utfRandomState.generatorContext()) != null && noiseChunk.aquifer() instanceof VolumeAquifer aquifer) {
+			aquifer.setGuard(new RaisedWaterGuard(chunkAccess, generatorContext));
+		}
+	}
+
+	@Inject(at = @At("RETURN"), method = "generateCarvers", require = 1)
+	private void generateCarvers$RETURN(ChunkAccess chunkAccess, Blender blender, NoiseChunk noiseChunk, RandomState randomState, BiomeManager biomeManager, @Nullable WorldGenRegion carverBiomeRegion, MaterialRule materialRule, CallbackInfo callback) {
+		if(noiseChunk.aquifer() instanceof VolumeAquifer aquifer) {
+			aquifer.setGuard(null);
+		}
+	}
 
 	// noise is only filled in up to the highest ground of the chunk, and air above it
 	@Redirect(

@@ -14,7 +14,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.core.SectionPos;
 import net.minecraft.util.context.ContextMap;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Aquifer;
 import net.minecraft.world.level.levelgen.Beardifier;
 import net.minecraft.world.level.levelgen.NoiseChunk;
@@ -25,6 +24,7 @@ import net.minecraft.world.level.levelgen.densityfunction.DensityVolume;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
 import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
+import com.pandaismyname1.ultraterraforged.world.worldgen.VolumeAquifer;
 import com.pandaismyname1.ultraterraforged.world.worldgen.WorldGenFlags;
 import com.pandaismyname1.ultraterraforged.world.worldgen.densityfunction.CellSampler;
 import com.pandaismyname1.ultraterraforged.world.worldgen.tile.TileChunkRef;
@@ -66,8 +66,7 @@ class MixinNoiseChunk {
 		return fields.build();
 	}
 
-	// The volume ends at the chunk's highest ground (MixinNoiseBasedChunkGenerator), but carvers in the same chunk ask
-	// the aquifer about blocks up to the build limit; above the volume there's only air, as the disabled aquifer says.
+	// the chunk's aquifer knows where the volume ends and keeps carvers out of raised water (VolumeAquifer)
 	@Inject(
 		method = "<init>",
 		at = @At("TAIL")
@@ -103,31 +102,5 @@ class MixinNoiseChunk {
 			}
 		}
 		return fluidPicker;
-	}
-
-	private static class VolumeAquifer implements Aquifer {
-		private final Aquifer inside;
-		private final Aquifer above;
-		private final int maxY;
-		private Aquifer last;
-
-		VolumeAquifer(Aquifer inside, Aquifer above, int maxY) {
-			this.inside = inside;
-			this.above = above;
-			this.maxY = maxY;
-			this.last = inside;
-		}
-
-		@Nullable
-		@Override
-		public BlockState computeSubstance(int blockX, int blockY, int blockZ, double density) {
-			this.last = blockY > this.maxY ? this.above : this.inside;
-			return this.last.computeSubstance(blockX, blockY, blockZ, density);
-		}
-
-		@Override
-		public boolean shouldScheduleFluidUpdate() {
-			return this.last.shouldScheduleFluidUpdate();
-		}
 	}
 }
