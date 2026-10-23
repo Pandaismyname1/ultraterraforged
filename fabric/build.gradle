@@ -63,6 +63,12 @@ dependencies {
     if (project.findProperty("utf.streams") == "true") {
         localRuntime "maven.modrinth:streams-reflowing:t9NK6sX3"
     }
+    // another mod for a dev run, e.g. to try a compat: -Putf.extraMod=<path to its jar, or a dependency such as
+    // curse.maven:bye-pregen-1567378:9267100>
+    def extraMod = project.findProperty("utf.extraMod")
+    if (extraMod != null) {
+        localRuntime(new File(extraMod).exists() ? files(extraMod) : extraMod)
+    }
 }
 
 processResources {
