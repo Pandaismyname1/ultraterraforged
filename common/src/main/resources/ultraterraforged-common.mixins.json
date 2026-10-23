@@ -25,7 +25,8 @@
   	"terrablender.MixinTargetPoint",
   	"terrablender.MixinNoiseChunk",
   	"worldpreview.SampleUtilsMixin",
-  	"c2me.MixinChunkMapOpenCL"
+  	"c2me.MixinChunkMapOpenCL",
+  	"streams.MixinStreamFlowGrid"
   ],
   "client": [
   	"ScreenInvoker",
