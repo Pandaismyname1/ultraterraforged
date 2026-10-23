@@ -344,6 +344,57 @@ public class RaisedWaterTest {
 		}
 	}
 
+	// audit A05: a fork meets its river at the river's level, so the whole step between its last stretch and that level
+	// is at the junction. Down is a waterfall into the river; up would put the river's water above the fork's last pool
+	@Test
+	void forksStepIntoTheirRiverGently() throws Exception {
+		Preset preset = preset();
+		GeneratorContext context = GeneratorContext.makeUncached(preset, PresetRenderer.SEED, PresetRenderer.TILE_SIZE, 0, 6);
+		Heightmap heightmap = context.localHeightmap.get();
+		int[] steps = new int[64];
+		int[] counts = new int[3];
+		java.util.Set<Rivermap> seen = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+		for (float[] at : new float[][] { { 0.0F, 0.0F }, { 6000.0F, 2000.0F }, { -5000.0F, 4000.0F }, { 2000.0F, -6000.0F } }) {
+			Cell cell = new Cell();
+			heightmap.applyContinent(cell, at[0], at[1]);
+			Rivermap rivermap = Rivermap.get(cell, null, heightmap);
+			if (!seen.add(rivermap)) {
+				continue;
+			}
+			for (Network network : (Network[]) field(Rivermap.class, "networks").get(rivermap)) {
+				junctions(network, heightmap.levels(), steps, counts);
+			}
+		}
+		StringBuilder histogram = new StringBuilder();
+		for (int i = 0; i < steps.length; i++) {
+			if (steps[i] > 0) {
+				histogram.append(' ').append(i - 32).append(':').append(steps[i]);
+			}
+		}
+		System.out.printf("%d forks; steps down into their river (blocks: forks):%s; %d forks step up, %d down 10 or more%n", counts[0], histogram, counts[1], counts[2]);
+		assertTrue(counts[0] > 50, "only " + counts[0] + " forks");
+		assertTrue(counts[1] <= counts[0] / 50, counts[1] + " of " + counts[0] + " forks step up into their river");
+	}
+
+	private static void junctions(Network network, Levels levels, int[] steps, int[] counts) {
+		for (Network child : network.children()) {
+			RiverPopulator carver = child.riverCarver();
+			// the fork's last stretch, which runs up to the junction (the last sample, the river's level, is only the end point)
+			int samples = Math.max(2, (int) Math.ceil(carver.river.length / 16.0F) + 1);
+			float before = carver.waterLevelAt((samples - 1.5F) / (samples - 1));
+			int step = Math.round((before - carver.waterLevelAt(1.0F)) * levels.worldHeight);
+			counts[0]++;
+			steps[Math.max(0, Math.min(steps.length - 1, step + 32))]++;
+			if (step < 0) {
+				counts[1]++;
+			}
+			if (step >= 10) {
+				counts[2]++;
+			}
+			junctions(child, levels, steps, counts);
+		}
+	}
+
 	@Test
 	void legacyPresetsKeepWaterAtSeaLevel() {
 		for (String name : new String[] { "legacy_default", "beautiful", "huge_biomes", "lite", "vanillaish" }) {
