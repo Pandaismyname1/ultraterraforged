@@ -170,7 +170,7 @@ presets. Dedicated servers seed `config/ultraterraforged/server-preset.json` fro
 
 Builds are published to the `maven` branch of this repository on every release: `ultraterraforged-fabric` and
 `ultraterraforged-neoforge` (`ultraterraforged-forge` for 1.20.1), each with a `sources` classifier, under the group
-`com.pandaismyname1.ultraterraforged`. Versions look like `1.0.2+26.2`.
+`com.pandaismyname1.ultraterraforged`. Versions look like `1.0.3+26.2`.
 
 ```groovy
 repositories {
@@ -186,7 +186,7 @@ repositories {
 }
 
 dependencies {
-    implementation "com.pandaismyname1.ultraterraforged:ultraterraforged-fabric:1.0.2+26.2"
+    implementation "com.pandaismyname1.ultraterraforged:ultraterraforged-fabric:1.0.3+26.2"
 }
 ```
 
