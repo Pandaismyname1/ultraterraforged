@@ -1,5 +1,6 @@
 package com.pandaismyname1.ultraterraforged.world.worldgen.densityfunction;
 
+import java.lang.ref.WeakReference;
 import java.util.function.Supplier;
 
 import org.jetbrains.annotations.Nullable;
@@ -41,8 +42,11 @@ public record CellSampler(Supplier<GeneratorContext> generatorContext, CellField
 		return cellCountXZ > 1;
 	}
 	
+	// the last cell looked up on this thread, at the corner of its 4x4 column, and the world it was looked up in: worlds
+	// open one after another, or side by side, share the worker threads. Held weakly, so a closed world can go
 	public static class Cache2d {
 		private long lastPos = Long.MAX_VALUE;
+		private WeakReference<WorldLookup> lastLookup = new WeakReference<>(null);
 		private Cell cell = new Cell();
 		
 		public Cell getAndUpdate(WorldLookup lookup, int blockX, int blockZ) {
@@ -50,9 +54,12 @@ public record CellSampler(Supplier<GeneratorContext> generatorContext, CellField
 			blockZ = QuartPos.toBlock(QuartPos.fromBlock(blockZ));
 			
 			long packedPos = PosUtil.pack(blockX, blockZ);
-			if(this.lastPos != packedPos) {
+			if(this.lastPos != packedPos || this.lastLookup.get() != lookup) {
 				lookup.apply(this.cell.reset(), blockX, blockZ);
 				this.lastPos = packedPos;
+				if(this.lastLookup.get() != lookup) {
+					this.lastLookup = new WeakReference<>(lookup);
+				}
 			}
 			return this.cell;
 		}
