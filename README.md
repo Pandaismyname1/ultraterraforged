@@ -158,6 +158,11 @@ presets. Dedicated servers seed `config/ultraterraforged/server-preset.json` fro
 - Biome mods (TerraBlender-based ones included) place their biomes into UltraTerraForged's terrain.
 - World Preview shows UltraTerraForged worlds.
 - Rock mods join the rock layers automatically when they tag their stone as vanilla does.
+- Alex's Caves places its cave biomes about as often as in vanilla worlds, and UltraTerraForged's caves stay out of
+  them (after Mikaaah's Terraforged-Alexs-Caves-Fix).
+- Streams Reflowing gives UltraTerraForged's rivers currents that run the way they flow (after Mikaaah's
+  UltraTerraForged-Streams-Currents).
+- Bye Pregen's fast terrain filler works with UltraTerraForged's terrain.
 
 ## Maven
 
