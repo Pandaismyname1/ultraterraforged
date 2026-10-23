@@ -19,8 +19,9 @@ dependencies {
     implementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
     compileOnly "com.github.glitchfiend:TerraBlender-common:${rootProject.minecraft_version}-${rootProject.terrablender_version}"
     compileOnly "com.electronwill.night-config:toml:3.6.7"
-    // C2ME OpenCL compat: C2ME bundles MixinSquared 0.3.7-beta.1 on both loaders
-    compileOnly "com.github.bawnorton.mixinsquared:mixinsquared-common:0.3.7-beta.1"
+    // C2ME OpenCL compat: C2ME bundles MixinSquared 0.3.7-beta.1 on both loaders. Its jar (MIT, licence inside) is kept
+    // here, as its own maven can be down, and only its @TargetHandler is compiled against
+    compileOnly files("libs/mixinsquared-common-0.3.7-beta.1.jar")
     // Streams Reflowing 2.15.2 (All Rights Reserved: compiled against, never shipped), for the currents of UltraTerraForged's
     // rivers. A Modrinth version id, not 2.15.2, which every loader's and Minecraft version's build shares. Its common
     // code is the same in the Fabric and NeoForge builds.
