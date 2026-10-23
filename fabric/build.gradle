@@ -57,6 +57,10 @@ dependencies {
         localRuntime "maven.modrinth:lithium:xS0Q8LSi"          // Lithium 0.26.2
         localRuntime "maven.modrinth:sodium:v4PSXean"           // Sodium 0.9.3-alpha.1
     }
+    // Streams Reflowing 2.15.2, to see UltraTerraForged's river currents in a dev run: -Putf.streams=true
+    if (project.findProperty("utf.streams") == "true") {
+        localRuntime "maven.modrinth:streams-reflowing:1PyyzYS1"
+    }
 }
 
 processResources {
@@ -136,6 +140,10 @@ loom {
             property "ultraterraforged.clienttest.tour", System.getProperty("ultraterraforged.clienttest.tour", "false")
             property "ultraterraforged.clienttest.stops", System.getProperty("ultraterraforged.clienttest.stops", "river,salt_flat,alluvial_fan,glacial_valley,cirque,drumlins,moraine,barrier_island,karst,sinkhole,delta,wetland,lake,peninsula,coastal_island,sand_bar,skerry,volcanic_island,river_island,submarine_canyon,seamount,guyot,blue_hole,coral_reef,ocean_trench,ocean_ridge,sand_waves")
             property "ultraterraforged.dev.creative", "true"
+            // a flight recording of the run, e.g. to find who started a thread: -Dutf.jfr=<file>
+            if (System.getProperty("utf.jfr") != null) {
+                vmArg "-XX:StartFlightRecording=filename=" + System.getProperty("utf.jfr") + ",settings=profile"
+            }
         }
     }
 }
