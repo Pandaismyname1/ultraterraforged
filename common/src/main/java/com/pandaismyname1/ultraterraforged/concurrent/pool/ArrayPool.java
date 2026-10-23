@@ -73,9 +73,10 @@ public class ArrayPool<T> {
 
 		@Override
 		public void close() {
+			// released whether or not the pool had room to take it back: closing twice mustn't restore it twice
 			if (!this.released) {
 				this.released = true;
-				this.released = this.pool.restore(this);
+				this.pool.restore(this);
 			}
 		}
 
