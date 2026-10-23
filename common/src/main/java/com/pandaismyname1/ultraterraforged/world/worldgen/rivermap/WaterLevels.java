@@ -6,6 +6,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.pandaismyname1.ultraterraforged.world.worldgen.cell.Cell;
 import com.pandaismyname1.ultraterraforged.world.worldgen.heightmap.Heightmap;
 import com.pandaismyname1.ultraterraforged.world.worldgen.heightmap.Levels;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.NoiseUtil;
@@ -21,6 +22,7 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.util.PosUtil;
 import it.unimi.dsi.fastutil.floats.FloatArrayList;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.longs.Long2FloatOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 
@@ -41,6 +43,10 @@ import it.unimi.dsi.fastutil.longs.LongSet;
  * - a lake's valley brings the land around it down towards the lake's water, so a river crossing it has to lie lower
  *   than the land it crossed before, and meets the lake's water where it runs into the lake; and a lake reaching into another's (their warp can stretch lakes out into long
  *   strips) has to lie below the other's bed. The lakes are settled first, from the land around them, then the rivers.
+ * - other rivers' valleys, and their valleys and the lakes' where they overlap, bring the land down further, so a
+ *   river passing through them, like a fork near the river it flows into, lies lower (#6 again): the land beside each
+ *   river is carved by the lakes and the other rivers as the world is, and the rivers are levelled a few times over,
+ *   each time from the others' latest water.
  * - a lake's water lies below its shore all round.
  */
 public final class WaterLevels {
@@ -63,6 +69,8 @@ public final class WaterLevels {
 	private static final float LAKE_SHIFT = 360.0F;
 	// lakes reaching into each other are settled again at most this many times, each lower than the last
 	private static final int RESETTLE = 4;
+	// the rivers are levelled again this many times, as the others' valleys, now lower, leave the land beside them
+	private static final int RELEVEL = 2;
 
 	private WaterLevels() {
 	}
@@ -77,7 +85,7 @@ public final class WaterLevels {
 	public static void level(Network[] networks, int gorgeDepth, Heightmap heightmap, Domain riverWarp, Domain lakeWarp) {
 		Levels levels = heightmap.levels();
 		float gorge = gorgeDepth * levels.unit;
-		Survey survey = new Survey(heightmap, levels, riverWarp, lakeWarp);
+		Survey survey = new Survey(networks, heightmap, levels, riverWarp, lakeWarp);
 		for (Network network : networks) {
 			survey.measure(network, new RiverPopulator[] { network.riverCarver() });
 		}
@@ -89,14 +97,19 @@ public final class WaterLevels {
 				settleLakes(network, gorge, survey, levels);
 			}
 		}
+		for (int i = 0; i <= RELEVEL; i++) {
+			for (Network network : networks) {
+				level(network, levels.water, gorge, survey, levels);
+			}
+		}
 		for (Network network : networks) {
-			level(network, new RiverPopulator[] { network.riverCarver() }, levels.water, gorge, survey, levels);
+			levelWetlands(network, levels);
 		}
 	}
 
 	// the lakes at a river's source take its first water, from the land around them and beside the river's first stretch
 	private static void settleLakes(Network network, float gorge, Survey survey, Levels levels) {
-		float level = height(step(Integer.MAX_VALUE, survey.lowest(network.riverCarver(), false)[0], gorge, levels), levels);
+		float level = height(step(Integer.MAX_VALUE, survey.lowest(network.riverCarver(), false, 0.0F)[0], gorge, levels), levels);
 		for (LakePopulator lake : network.lakes()) {
 			lake.setWaterLevel(level);
 		}
@@ -106,9 +119,9 @@ public final class WaterLevels {
 	}
 
 	// levels a river ending at the given water level, then the forks flowing into it
-	private static void level(Network network, RiverPopulator[] chain, float mouth, float gorge, Survey survey, Levels levels) {
+	private static void level(Network network, float mouth, float gorge, Survey survey, Levels levels) {
 		RiverPopulator carver = network.riverCarver();
-		float[] lowest = survey.lowest(carver, true);
+		float[] lowest = survey.lowest(carver, true, mouth);
 		float[] water = new float[lowest.length];
 		// the top water block, stepping down where the land beside the river drops below it, and up where the river
 		// would otherwise cut deeper than a gorge
@@ -130,7 +143,15 @@ public final class WaterLevels {
 			water[i] = height(raised, levels);
 		}
 		carver.setWaterLevels(water);
+		for (Network child : network.children()) {
+			float junction = child.riverCarver().junction;
+			level(child, carver.waterLevelAt(junction < 0.0F ? 1.0F : junction), gorge, survey, levels);
+		}
+	}
 
+	// wetlands take the level of their stretch of river, if it's level enough
+	private static void levelWetlands(Network network, Levels levels) {
+		RiverPopulator carver = network.riverCarver();
 		for (WetlandPopulator wetland : network.wetlands()) {
 			float upstream = carver.waterLevelAt(wetland.startT);
 			float downstream = carver.waterLevelAt(wetland.endT);
@@ -141,8 +162,7 @@ public final class WaterLevels {
 			}
 		}
 		for (Network child : network.children()) {
-			float junction = child.riverCarver().junction;
-			level(child, append(chain, child.riverCarver()), carver.waterLevelAt(junction < 0.0F ? 1.0F : junction), gorge, survey, levels);
+			levelWetlands(child, levels);
 		}
 	}
 
@@ -181,14 +201,18 @@ public final class WaterLevels {
 	private static final class Survey {
 		private final Heightmap heightmap;
 		private final Levels levels;
+		private final Network[] networks;
 		private final Domain riverWarp;
 		private final Domain lakeWarp;
 		private final Map<RiverPopulator, Beside> rivers = new IdentityHashMap<>();
 		private final List<LakeSite> lakes = new ArrayList<>();
 		// the ground on the grid, measured once: forks, the rivers they flow into and the shores of lakes share places
 		private final Long2FloatOpenHashMap grid = new Long2FloatOpenHashMap();
+		// and the terrain beside rivers
+		private final Long2ObjectOpenHashMap<Cell> cells = new Long2ObjectOpenHashMap<>();
 
-		Survey(Heightmap heightmap, Levels levels, Domain riverWarp, Domain lakeWarp) {
+		Survey(Network[] networks, Heightmap heightmap, Levels levels, Domain riverWarp, Domain lakeWarp) {
+			this.networks = networks;
 			this.heightmap = heightmap;
 			this.levels = levels;
 			this.riverWarp = riverWarp;
@@ -214,10 +238,14 @@ public final class WaterLevels {
 		 * The lowest land beside each stretch of a river's water, see {@link RiverPopulator#stretch}; the first also
 		 * around the lakes at its source.
 		 *
-		 * @param lakes whether as the lakes' valleys leave it; their water must be settled
+		 * @param lakes whether as the lakes and the other rivers levelled so far leave it; the lakes' water must be
+		 *              settled
+		 * @param mouth the level of the water the river flows into, which the other rivers don't bring the land below
 		 */
-		float[] lowest(RiverPopulator carver, boolean lakes) {
+		float[] lowest(RiverPopulator carver, boolean lakes, float mouth) {
 			Beside beside = this.rivers.get(carver);
+			// lower, and the fork would lie below the river it flows into, stepping up into it where they meet
+			float valleyFloor = mouth + MARGIN * this.levels.unit;
 			float[] lowest = new float[beside.samples];
 			Arrays.fill(lowest, Float.MAX_VALUE);
 			for (int i = 0; i < beside.ground.size(); i++) {
@@ -236,6 +264,11 @@ public final class WaterLevels {
 							}
 						}
 					}
+					// a river near another, like a fork near the river it flows into, runs through the other's valley, cut
+					// far below the land where the other cuts a gorge, and the valleys of lakes and rivers bring the land
+					// down further where they meet: from the land and each lake on its own, its water stood high above
+					// the valley floor on embankments (#6)
+					ground = Math.min(ground, Math.max(this.carved(carver, x, z), valleyFloor));
 				}
 				int stretch = beside.stretch.getInt(i);
 				lowest[stretch] = Math.min(lowest[stretch], ground);
@@ -279,7 +312,7 @@ public final class WaterLevels {
 						if (carver.distance2(rx, rz, t) > side * side) {
 							continue;
 						}
-						beside.add(RiverPopulator.stretch(t, samples), x, z, this.ground(gx, gz));
+						beside.add(RiverPopulator.stretch(t, samples), x, z, this.terrain(gx, gz).height);
 					}
 				}
 			}
@@ -358,6 +391,23 @@ public final class WaterLevels {
 			return lake.distance2(lx, lz);
 		}
 
+		// the land at a place on the grid as the lakes and the rivers levelled so far, but not the given one, leave it,
+		// carved as Rivermap.apply carves it; where it lies under their water, a little above that water
+		private float carved(RiverPopulator except, float x, float z) {
+			Cell cell = new Cell();
+			cell.copyFrom(this.terrain(NoiseUtil.floor(x / GRID), NoiseUtil.floor(z / GRID)));
+			float rx = this.riverWarp.getX(x, z, 0);
+			float rz = this.riverWarp.getZ(x, z, 0);
+			float lx = this.lakeWarp.getOffsetX(rx, rz, 0);
+			float lz = this.lakeWarp.getOffsetZ(rx, rz, 0);
+			for (Network network : this.networks) {
+				if (network.contains(rx, rz)) {
+					network.carveLand(cell, rx, rz, lx, lz, except);
+				}
+			}
+			return cell.waterLevel > 0.0F ? Math.max(cell.height, cell.waterLevel + MARGIN * this.levels.unit) : cell.height;
+		}
+
 		private long toRivermap(float x, float z) {
 			return PosUtil.packf(this.riverWarp.getX(x, z, 0), this.riverWarp.getZ(x, z, 0));
 		}
@@ -384,6 +434,18 @@ public final class WaterLevels {
 			float ground = this.ground(gridX * GRID, gridZ * GRID);
 			this.grid.put(key, ground);
 			return ground;
+		}
+
+		// the terrain at a place on the grid beside a river, kept to carve
+		private Cell terrain(int gridX, int gridZ) {
+			long key = PosUtil.pack(gridX, gridZ);
+			Cell cell = this.cells.get(key);
+			if (cell == null) {
+				cell = this.heightmap.sampleGround(gridX * GRID, gridZ * GRID);
+				this.cells.put(key, cell);
+				this.grid.put(key, cell.height);
+			}
+			return cell;
 		}
 
 		// the lowest land at a river's middle and either side of it, where undoing the warps puts them
