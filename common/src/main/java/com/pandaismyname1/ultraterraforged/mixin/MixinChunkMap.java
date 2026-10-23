@@ -11,7 +11,6 @@ import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.levelgen.RandomState;
 import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
-import com.pandaismyname1.ultraterraforged.world.worldgen.WorldGenFlags;
 
 @Mixin(ChunkMap.class)
 public class MixinChunkMap {
@@ -28,8 +27,6 @@ public class MixinChunkMap {
 	)
 	private void ultraterraforged$init(CallbackInfo callback) {
 		if((Object) this.randomState instanceof UTFRandomState utfRandomState) {
-			WorldGenFlags.setCullNoiseSections(true);
-
 			utfRandomState.initialize(this.level.registryAccess());
 		}
 	}

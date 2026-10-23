@@ -24,7 +24,6 @@ import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.WorldOptions;
 import com.pandaismyname1.ultraterraforged.UTFCommon;
 import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
-import com.pandaismyname1.ultraterraforged.world.worldgen.WorldGenFlags;
 
 @Pseudo
 @Mixin(targets = "caeruleusTait.world.preview.backend.worker.SampleUtils", remap = false)
@@ -66,9 +65,11 @@ public class SampleUtilsMixin {
 	
 	private void initUTF() {
 		if((Object) this.randomState instanceof UTFRandomState utfRandomState) {
-			WorldGenFlags.setCullNoiseSections(false);
-			
 			utfRandomState.initialize(this.registryAccess);
+			// the preview reads every section: its own world isn't culled, and no other is touched
+			if(utfRandomState.generatorContext() != null) {
+				utfRandomState.generatorContext().lookup.setCullNoiseSections(false);
+			}
 			
 			UTFCommon.LOGGER.info("initialized utf data");
 		} else {
