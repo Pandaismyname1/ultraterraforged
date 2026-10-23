@@ -33,12 +33,12 @@ record ClampToNearestUnit(DensityFunction function, int resolution) implements D
 
 	@Override
 	public double minValue() {
-		return this.computeClamped(this.function.minValue());
+		return this.clampedBound(this.function.minValue());
 	}
 
 	@Override
 	public double maxValue() {
-		return this.computeClamped(this.function.maxValue());
+		return this.clampedBound(this.function.maxValue());
 	}
 
 	@Override
@@ -46,6 +46,12 @@ record ClampToNearestUnit(DensityFunction function, int resolution) implements D
 		return UTFCodecs.keyDispatch(CODEC);
 	}
 	
+	// an unbounded function stays unbounded: rounding an infinite bound overflowed, and the maximum came out a large
+	// negative number, which density compilers that go by bounds (Generator Accelerator's) took at its word
+	private double clampedBound(double value) {
+		return Double.isInfinite(value) ? value : this.computeClamped(value);
+	}
+
 	private double computeClamped(double value) {
 		float scaled = (int) (value * this.resolution) + 1;
 		return (scaled / this.resolution);
