@@ -33,6 +33,39 @@ public class StreamsCompat {
 		}
 	}
 
+	// set on a worldgen thread while Streams carves one of its own rivers (MixinRiverCarverFeature)
+	private static final ThreadLocal<Boolean> CARVING = ThreadLocal.withInitial(() -> false);
+
+	public static boolean carving() {
+		return CARVING.get();
+	}
+
+	public static void setCarving(boolean carving) {
+		CARVING.set(carving);
+	}
+
+	/**
+	 * Streams also carves rivers of its own, which in an UltraTerraForged world cut into its rivers and lakes above the
+	 * sea: water put in before the features was turned to air, and so was the ground under it, leaving water hanging.
+	 * Its rivers still come; a block that is water, or that water rests on, just stays.
+	 */
+	public static boolean keeps(net.minecraft.server.level.WorldGenRegion region, net.minecraft.core.BlockPos pos, net.minecraft.world.level.block.state.BlockState state) {
+		boolean keeps = state.getFluidState().isEmpty()
+			&& (!region.getFluidState(pos).isEmpty() || !region.getFluidState(pos.above()).isEmpty())
+			&& context(region.getLevel()) != null;
+		if (keeps) {
+			KEPT.incrementAndGet();
+		}
+		return keeps;
+	}
+
+	// how many blocks keeps has kept this session, for tests
+	private static final java.util.concurrent.atomic.AtomicLong KEPT = new java.util.concurrent.atomic.AtomicLong();
+
+	public static long kept() {
+		return KEPT.get();
+	}
+
 	/**
 	 * The generator of a world UltraTerraForged makes, or null. Streams only gives the overworld currents.
 	 */
