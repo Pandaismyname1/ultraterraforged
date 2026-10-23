@@ -28,7 +28,8 @@
   	"worldpreview.SampleUtilsMixin",
   	"c2me.MixinChunkMapOpenCL",
   	"byepregen.AccessorNoiseChunk",
-  	"byepregen.MixinArenaNoiseFiller"
+  	"byepregen.MixinArenaNoiseFiller",
+  	"streams.MixinStreamFlowGrid"
   ],
   "client": [
   	"ScreenInvoker",

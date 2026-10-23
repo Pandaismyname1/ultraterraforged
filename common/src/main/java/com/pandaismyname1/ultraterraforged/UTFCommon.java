@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import net.minecraft.resources.ResourceLocation;
+import com.pandaismyname1.ultraterraforged.compat.streams.StreamsCompat;
 import com.pandaismyname1.ultraterraforged.compat.terrablender.TBCompat;
 import com.pandaismyname1.ultraterraforged.compat.terrablender.TBSurfaceRules;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
@@ -57,6 +58,10 @@ public class UTFCommon {
 		
 		if(TBCompat.isEnabled()) {
 			TBCompat.bootstrap();
+		}
+		
+		if(StreamsCompat.isEnabled()) {
+			StreamsCompat.bootstrap();
 		}
 		
 		UTFRegistries.createDataRegistry(UTFRegistries.NOISE, Noise.DIRECT_CODEC);
