@@ -3,6 +3,8 @@ package com.pandaismyname1.ultraterraforged.world.worldgen.feature.placement;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import it.unimi.dsi.fastutil.longs.LongArrayList;
+
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
@@ -36,6 +38,12 @@ class LegacyCountExtraModifier extends PlacementModifier {
 	      return IntStream.range(0, i).mapToObj((o) -> {
 	         return pos;
 	      });
+	}
+
+	// Generator Accelerator's feature placement on 1.20.1 asks every modifier for this instead of getPositions, and fails
+	// for one that doesn't have it (GeneratorAcceleratorCompat): the same positions
+	public void generatePositionsFast(PlacementContext ctx, RandomSource random, long packedPos, LongArrayList output) {
+		this.getPositions(ctx, random, BlockPos.of(packedPos)).forEach((pos) -> output.add(pos.asLong()));
 	}
 
 	@Override

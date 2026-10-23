@@ -7,6 +7,7 @@ import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.data.worldgen.TerrainProvider;
+import com.pandaismyname1.ultraterraforged.compat.generatoraccelerator.GeneratorAcceleratorCodecs;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.levelgen.DensityFunction;
@@ -78,7 +79,7 @@ public class PresetNoiseRouterData {
         DensityFunctions.Spline.Coordinate erosionCoordinate = new DensityFunctions.Spline.Coordinate(erosion);
         DensityFunctions.Spline.Coordinate ridgesCoordinate = new DensityFunctions.Spline.Coordinate(ridges);
         DensityFunctions.Spline.Coordinate ridgesFoldedCoordinate = new DensityFunctions.Spline.Coordinate(ridgesFolded);
-        DensityFunction factor = NoiseRouterData.registerAndWrap(ctx, FACTOR, splineWithBlending(DensityFunctions.spline(TerrainProvider.overworldFactor(continentsCoordinate, erosionCoordinate, ridgesCoordinate, ridgesFoldedCoordinate, false)), BLENDING_FACTOR));
+        DensityFunction factor = NoiseRouterData.registerAndWrap(ctx, FACTOR, splineWithBlending(DensityFunctions.spline(GeneratorAcceleratorCodecs.vanillaSpline(TerrainProvider.overworldFactor(continentsCoordinate, erosionCoordinate, ridgesCoordinate, ridgesFoldedCoordinate, false))), BLENDING_FACTOR));
         DensityFunction jaggedNoise = DensityFunctions.noise(noiseParams.getOrThrow(Noises.JAGGED), 1500.0D, 0.0D);
         DensityFunction slopedCheese = NoiseRouterData.noiseGradientDensity(factor, DensityFunctions.add(depth, DensityFunctions.mul(jaggedness, jaggedNoise.halfNegative())));
         ctx.register(SLOPED_CHEESE, DensityFunctions.add(slopedCheese, base3dNoise));

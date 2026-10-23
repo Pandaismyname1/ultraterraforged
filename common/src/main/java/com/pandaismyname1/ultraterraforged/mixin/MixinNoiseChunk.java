@@ -30,7 +30,9 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.densityfunction.CellSa
 import com.pandaismyname1.ultraterraforged.world.worldgen.densityfunction.CellSampler.Cache2d;
 import com.pandaismyname1.ultraterraforged.world.worldgen.tile.TileChunkRef;
 
-@Mixin(NoiseChunk.class)
+// after mods that overwrite NoiseChunk's methods (Generator Accelerator overwrites computePreliminarySurfaceLevel): a
+// mixin can only inject into a method another one merged if it comes after it, and NoiseChunk failed to load otherwise
+@Mixin(value = NoiseChunk.class, priority = 1100)
 class MixinNoiseChunk {
 	private RandomState randomState;
 	private int chunkX, chunkZ;

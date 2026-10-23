@@ -3,6 +3,8 @@ package com.pandaismyname1.ultraterraforged.world.worldgen.feature.placement.poi
 import java.util.Random;
 import java.util.stream.Stream;
 
+import it.unimi.dsi.fastutil.longs.LongArrayList;
+
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
@@ -54,6 +56,12 @@ public class FastPoissonModifier extends PlacementModifier {
 		this.densityVariation = densityVariation;
 	}
 	
+	// Generator Accelerator's feature placement on 1.20.1 asks every modifier for this instead of getPositions, and fails
+	// for one that doesn't have it (GeneratorAcceleratorCompat): the same positions
+	public void generatePositionsFast(PlacementContext ctx, RandomSource random, long packedPos, LongArrayList output) {
+		this.getPositions(ctx, random, BlockPos.of(packedPos)).forEach((pos) -> output.add(pos.asLong()));
+	}
+
 	@Override
 	public Stream<BlockPos> getPositions(PlacementContext ctx, RandomSource random, BlockPos pos) {
 		WorldGenLevel level = ctx.getLevel();
