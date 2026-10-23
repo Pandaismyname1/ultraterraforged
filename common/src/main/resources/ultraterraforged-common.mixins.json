@@ -26,7 +26,9 @@
   	"terrablender.MixinTargetPoint",
   	"terrablender.MixinNoiseChunk",
   	"worldpreview.SampleUtilsMixin",
-  	"c2me.MixinChunkMapOpenCL"
+  	"c2me.MixinChunkMapOpenCL",
+  	"byepregen.AccessorNoiseChunk",
+  	"byepregen.MixinArenaNoiseFiller"
   ],
   "client": [
   	"ScreenInvoker",
