@@ -42,8 +42,8 @@ public class WorldLookup {
 		this.approximateColumns = approximateColumns;
 	}
 
-	// whether a lookup here may skip making a tile and read the heightmap without the tiles' filters: in a world
-	// preview, and in a pass that only looks (WorldGenFlags.approximately); never where structures are placed
+	// whether a lookup here reads the heightmap alone, without the tiles' filters, instead of making the tile: in a
+	// world preview, and in a pass that only looks (WorldGenFlags.approximately); never where structures are placed
 	public boolean approximate() {
 		return this.approximateColumns || WorldGenFlags.approximateLookups();
 	}
@@ -74,10 +74,14 @@ public class WorldLookup {
 		return this.apply(cell, x, z, false);
 	}
 
-	// the cell as the chunk there is generated with it, from its tile, on whichever thread asks: where a structure is
-	// placed. A quick guess only in a pass that just looks
+	// the cell as the chunk there is generated with it, from its tile, made if it has to be: where a structure is
+	// placed. In a pass that only looks, the heightmap's, which is quick. Either way the same on whichever thread
+	// asks and whenever, as neither depends on which tiles happen to be made
 	public boolean applyAsGenerated(Cell cell, int x, int z) {
-		return this.apply(cell, x, z, !this.approximate());
+		if (this.approximate()) {
+			return this.compute(cell, x, z);
+		}
+		return this.apply(cell, x, z, true);
 	}
 
 	public boolean apply(Cell cell, int x, int z, boolean load) {

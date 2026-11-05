@@ -87,7 +87,7 @@ public record CellSampler(CellField field) implements DensityFunction {
 	private record Sampler(UTFRandomState randomState, CellField field) implements DensitySampler {
 		private static final Cell EMPTY = new Cell();
 		private static final ThreadLocal<Cache2d> LOCAL_CELL = ThreadLocal.withInitial(Cache2d::new);
-		// apart, so a guess made in a locate isn't handed out afterwards as the tile's cell
+		// apart, so the heightmap's cell, read in a pass that only looks, isn't handed out afterwards as the tile's
 		private static final ThreadLocal<Cache2d> LOCAL_TILE_CELL = ThreadLocal.withInitial(Cache2d::new);
 
 		@Override
@@ -129,8 +129,9 @@ public record CellSampler(CellField field) implements DensityFunction {
 	}
 
 	// the cell a sampler reads at a column, given the cells of the NoiseChunk it samples for. Outside them (the corners
-	// on a chunk's far edges, in the next chunk or tile) it's that tile's cell too, made if it has to be: the heightmap
-	// alone lacks the tiles' filters, and whether the tile is made yet depends on the thread and the moment
+	// on a chunk's far edges, in the next chunk or tile, or no NoiseChunk at all) it's the cell as the chunk there is
+	// generated with it, or the heightmap's in a pass that only looks (WorldLookup.applyAsGenerated); never whatever
+	// tile happens to be made, which depends on the thread and the moment
 	public static Cell cell(@Nullable GeneratorContext generatorContext, @Nullable ChunkCells chunk, int blockX, int blockZ) {
 		Cell cell;
 		if (chunk != null && (cell = chunk.getCell(blockX, blockZ)) != null) {
@@ -139,8 +140,7 @@ public record CellSampler(CellField field) implements DensityFunction {
 		if (generatorContext == null) {
 			return Sampler.EMPTY;
 		}
-		boolean approximate = generatorContext.lookup.approximate();
-		return (approximate ? Sampler.LOCAL_CELL : Sampler.LOCAL_TILE_CELL).get().getAndUpdate(generatorContext.lookup, blockX, blockZ, !approximate);
+		return (generatorContext.lookup.approximate() ? Sampler.LOCAL_CELL : Sampler.LOCAL_TILE_CELL).get().getAndUpdate(generatorContext.lookup, blockX, blockZ, true);
 	}
 
 	// the last cell looked up on this thread, at the corner of its 4x4 column, and the world it was looked up in: worlds
@@ -154,14 +154,19 @@ public record CellSampler(CellField field) implements DensityFunction {
 			return this.getAndUpdate(lookup, blockX, blockZ, false);
 		}
 
-		// load: make the tile if it isn't yet, for its cell instead of the heightmap's
-		public Cell getAndUpdate(WorldLookup lookup, int blockX, int blockZ, boolean load) {
+		// asGenerated: the cell as the chunk is generated with it (WorldLookup.applyAsGenerated), instead of the tile's
+		// if it's made already and the heightmap's if not
+		public Cell getAndUpdate(WorldLookup lookup, int blockX, int blockZ, boolean asGenerated) {
 			blockX = QuartPos.toBlock(QuartPos.fromBlock(blockX));
 			blockZ = QuartPos.toBlock(QuartPos.fromBlock(blockZ));
 
 			long packedPos = PosUtil.pack(blockX, blockZ);
 			if(this.lastPos != packedPos || this.lastLookup.get() != lookup) {
-				lookup.apply(this.cell.reset(), blockX, blockZ, load);
+				if (asGenerated) {
+					lookup.applyAsGenerated(this.cell.reset(), blockX, blockZ);
+				} else {
+					lookup.apply(this.cell.reset(), blockX, blockZ);
+				}
 				this.lastPos = packedPos;
 				if(this.lastLookup.get() != lookup) {
 					this.lastLookup = new WeakReference<>(lookup);

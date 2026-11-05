@@ -22,6 +22,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.levelgen.densityfunction.DensityVolume;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
+import com.pandaismyname1.ultraterraforged.world.worldgen.WorldGenFlags;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.Cell;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.CellField;
 import com.pandaismyname1.ultraterraforged.world.worldgen.densityfunction.CellSampler;
@@ -37,7 +38,8 @@ import com.pandaismyname1.ultraterraforged.world.worldgen.densityfunction.CellSa
  * thread (the server thread) and on several other threads at once, each in its own order, in a world whose tiles
  * aren't made yet and in one whose tiles are, and every one must be the cell of the tile, as the generated chunk has
  * it. Mods that place structure starts ahead of the players on their own threads (Panda's Structure Optimizer) found
- * starts 1-2 blocks off when they weren't.
+ * starts 1-2 blocks off when they weren't. In a pass that only looks (a locate, a biome or spawn search) the reads are
+ * the heightmap's, which needs no tile, and those must be the same everywhere too.
  */
 public class ThreadPureHeightsTest {
 	private static final int SEED = 20261105;
@@ -65,7 +67,7 @@ public class ThreadPureHeightsTest {
 
 		List<String> failures = new ArrayList<>();
 		// no tile made yet, as for structure starts worked out ahead of the players
-		check("tiles not made yet", context(), probes, expected, failures);
+		check("tiles not made yet", context(), probes, expected, failures, false);
 		// every tile made first, as when the chunks around were generated already
 		GeneratorContext generated = context();
 		for (Probe probe : probes) {
@@ -73,17 +75,22 @@ public class ThreadPureHeightsTest {
 				generated.cache.provideChunk(pos[0] >> 4, pos[1] >> 4);
 			}
 		}
-		check("tiles made first", generated, probes, expected, failures);
+		check("tiles made first", generated, probes, expected, failures, false);
+
+		// in a pass that only looks (a locate), the heightmap's cells: not the tile's, but the same everywhere too
+		float[][] guessed = WorldGenFlags.approximately(() -> read(context(), probes, 0L));
+		check("a locate, tiles not made yet", context(), probes, guessed, failures, true);
+		check("a locate, tiles made first", generated, probes, guessed, failures, true);
 
 		Map<String, Integer> counts = new TreeMap<>();
 		for (String failure : failures) {
 			counts.merge(failure.substring(0, failure.indexOf(':')), 1, Integer::sum);
 		}
-		assertTrue(failures.isEmpty(), failures.size() + " of " + probes.size() + " probes on " + (THREADS + 1) + " threads in 2 worlds aren't the generated terrain, " + counts + ":\n" + String.join("\n", failures.subList(0, Math.min(40, failures.size()))));
+		assertTrue(failures.isEmpty(), failures.size() + " of " + probes.size() + " probes on " + (THREADS + 1) + " threads, in 2 worlds and in a locate, aren't what they should be, " + counts + ":\n" + String.join("\n", failures.subList(0, Math.min(40, failures.size()))));
 	}
 
 	// every probe, on the test thread and on THREADS others at the same time, each in its own order
-	private static void check(String phase, GeneratorContext context, List<Probe> probes, float[][] expected, List<String> failures) throws Exception {
+	private static void check(String phase, GeneratorContext context, List<Probe> probes, float[][] expected, List<String> failures, boolean locate) throws Exception {
 		CyclicBarrier start = new CyclicBarrier(THREADS + 1);
 		ExecutorService pool = Executors.newFixedThreadPool(THREADS);
 		try {
@@ -92,12 +99,12 @@ public class ThreadPureHeightsTest {
 				long orderSeed = t + 1;
 				others.add(pool.submit(() -> {
 					start.await();
-					return read(context, probes, orderSeed);
+					return locate ? WorldGenFlags.approximately(() -> read(context, probes, orderSeed)) : read(context, probes, orderSeed);
 				}));
 			}
 			start.await();
 			List<float[][]> results = new ArrayList<>();
-			results.add(read(context, probes, 0L));
+			results.add(locate ? WorldGenFlags.approximately(() -> read(context, probes, 0L)) : read(context, probes, 0L));
 			for (Future<float[][]> other : others) {
 				results.add(other.get());
 			}

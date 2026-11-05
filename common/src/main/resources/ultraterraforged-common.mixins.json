@@ -20,6 +20,7 @@
   	"MixinResourceManagerRegistryLoadTask",
   	"MixinNoiseBasedChunkGenerator",
   	"MixinChunkGenerator",
+  	"MixinBiomeSource",
   	"terrablender.MixinParameterList",
   	"terrablender.MixinClimateSampler",
   	"terrablender.MixinTargetPoint",
