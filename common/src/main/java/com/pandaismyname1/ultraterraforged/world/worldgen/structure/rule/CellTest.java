@@ -48,7 +48,7 @@ record CellTest(TagKey<Structure> targets, float cutoff, Set<Terrain> terrainTyp
 			if(generatorContext != null) {
 				WorldLookup worldLookup = generatorContext.lookup;
 				Cell cell = new Cell();
-				worldLookup.apply(cell.reset(), pos.getX(), pos.getZ());
+				worldLookup.applyAsGenerated(cell.reset(), pos.getX(), pos.getZ());
 				if(cell.riverDistance < this.cutoff) {//FIXME this breaks ancient city generation || this.terrainTypeBlacklist.contains(cell.terrain)) {
 					return false;
 				}

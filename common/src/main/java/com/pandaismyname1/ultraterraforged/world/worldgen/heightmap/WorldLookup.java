@@ -61,6 +61,11 @@ public class WorldLookup {
 		return this.apply(cell, x, z, false);
 	}
 
+	// the cell where a structure is placed
+	public boolean applyAsGenerated(Cell cell, int x, int z) {
+		return this.apply(cell, x, z);
+	}
+
 	public boolean apply(Cell cell, int x, int z, boolean load) {
 		if (load && this.computeAccurate(cell, x, z)) {
 			return true;
