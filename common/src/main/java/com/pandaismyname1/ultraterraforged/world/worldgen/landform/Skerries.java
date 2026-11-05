@@ -51,7 +51,8 @@ public record Skerries(int seed, float shoreline, Noise field, float fieldLow, f
 		}
 		int gridX = NoiseUtil.floor(x / GRID);
 		int gridZ = NoiseUtil.floor(z / GRID);
-		float best = 0.0F;
+		// in blocks above the sea; from 0 every place in the swarm would be raised to the sea's surface
+		float best = Float.NEGATIVE_INFINITY;
 		for (int gx = gridX - 1; gx <= gridX + 1; gx++) {
 			for (int gz = gridZ - 1; gz <= gridZ + 1; gz++) {
 				if (Landform.random(this.seed, gx, gz, 0) >= CHANCE * mask) {
