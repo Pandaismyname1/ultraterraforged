@@ -226,6 +226,33 @@ public class CoastsTest {
 	}
 
 	@Test
+	void skerriesLeaveTheSeaBetweenThem() throws IOException {
+		Preset with = preset("frozen_north", (p) -> {});
+		Preset without = preset("frozen_north", (p) -> p.coasts().skerries.enabled = false);
+		TerrainLocator.Found found = find(with, TerrainType.SKERRY);
+		TerrainViews.View on = TerrainViews.view(with, found.x(), found.z(), 1.0F);
+		TerrainViews.View off = TerrainViews.view(without, found.x(), found.z(), 1.0F);
+		float water = on.levels().water;
+		// sea without them that they leave with no water over it: the ground reaches the sea's surface
+		int sea = 0;
+		int dried = 0;
+		for (int x = 0; x < on.size(); x++) {
+			for (int z = 0; z < on.size(); z++) {
+				if (off.cell(x, z).height >= water) {
+					continue;
+				}
+				sea++;
+				if (on.cell(x, z).height >= water) {
+					dried++;
+				}
+			}
+		}
+		System.out.printf("of %d cells of sea without skerries, %d are dry with them%n", sea, dried);
+		assertTrue(sea > 10000, "only " + sea + " cells of sea");
+		assertTrue(dried < sea / 10, "the skerries fill the sea between them: " + dried + " of " + sea + " cells dry");
+	}
+
+	@Test
 	void volcanicIslandsRiseOutOfTheOpenSea() throws IOException {
 		Preset preset = preset("default", (p) -> {});
 		TerrainLocator.Found found = find(preset, TerrainType.VOLCANIC_ISLAND);
