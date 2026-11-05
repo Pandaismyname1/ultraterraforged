@@ -1,7 +1,9 @@
-### Unreleased
+### New in 1.0.4
+* No more wide flats at sea level where the sea should be, off cold coasts above all: skerries, the small rocky islets that form in shallow sea, raised all the sea between them to the water's surface, leaving plains of gravel, stone and grass with ocean biomes, beaches that ended in a step, and water only where the sea was deeper. Terrain changes in newly generated chunks.
 * Rivers no longer stand on embankments above the valley they run through (#6): a stream inside a bigger river's valley, or where the valleys of rivers and lakes overlap, took its water level from the land as if those valleys weren't there. Each river's water now comes from the land as the other rivers and lakes really leave it, and rivers climb a little less. Terrain changes in newly generated chunks.
 * Chunks no longer wait for each other while the rivers of a new stretch of land are worked out: every lookup of any river map waited for one being made, so with many big rivers the world's generator threads all queued behind one (#2).
 * The height of the terrain at a column is the same whichever thread asks for it, and whenever: off the chunk generator's own structure step it was worked out without the finishing passes over the land (erosion, smoothing), 1-2 blocks off. Mods that place structures ahead of the players on their own threads (Panda's Structure Optimizer) now put them where the game would. Locating a structure stays quick, with the rough terrain.
+* Terrain changes in newly generated chunks (rivers inside other valleys, the sea around skerries), so existing worlds can show a seam where new chunks meet old ones.
 
 ### New in 1.0.3
 * Alex's Caves: its cave biomes generate in UltraTerraForged worlds about as often as in vanilla ones (#7). Alex's Caves chooses them by the climate at the centre of each of its cells, and UltraTerraForged's land rarely reached the values it asks for; inland it now reads the value vanilla has over the same share of the world, so its own settings keep their meaning. UltraTerraForged's caves stay out of its biomes. After Mikaaah's Terraforged-Alexs-Caves-Fix.
