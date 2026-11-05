@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.NoiseSettings;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
+import com.pandaismyname1.ultraterraforged.world.worldgen.WorldGenFlags;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.Cell;
 import com.pandaismyname1.ultraterraforged.world.worldgen.rivermap.Rivermap;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.noise.CellSampler;
@@ -22,6 +23,8 @@ public class WorldLookup {
 	private Levels levels;
 	// whether chunks are generated only as high as their terrain: off for a world preview, which reads every section
 	private volatile boolean cullNoiseSections = true;
+	// whether single columns may be a quick guess in this world: a world preview's, which only looks
+	private volatile boolean approximateColumns;
 	
 	public WorldLookup(GeneratorContext context) {
 		this.context = context;
@@ -33,6 +36,16 @@ public class WorldLookup {
 
 	public void setCullNoiseSections(boolean cullNoiseSections) {
 		this.cullNoiseSections = cullNoiseSections;
+	}
+
+	public void setApproximateColumns(boolean approximateColumns) {
+		this.approximateColumns = approximateColumns;
+	}
+
+	// whether a lookup here reads the heightmap alone, without the tiles' filters, instead of making the tile: in a
+	// world preview, and in a pass that only looks (WorldGenFlags.approximately); never where structures are placed
+	public boolean approximate() {
+		return this.approximateColumns || WorldGenFlags.approximateLookups();
 	}
 
 	public int getGenerationHeight(int chunkX, int chunkZ, NoiseGeneratorSettings generatorSettings, boolean load) {
@@ -59,6 +72,16 @@ public class WorldLookup {
 
 	public boolean apply(Cell cell, int x, int z) {
 		return this.apply(cell, x, z, false);
+	}
+
+	// the cell as the chunk there is generated with it, from its tile, made if it has to be: where a structure is
+	// placed. In a pass that only looks, the heightmap's, which is quick. Either way the same on whichever thread
+	// asks and whenever, as neither depends on which tiles happen to be made
+	public boolean applyAsGenerated(Cell cell, int x, int z) {
+		if (this.approximate()) {
+			return this.compute(cell, x, z);
+		}
+		return this.apply(cell, x, z, true);
 	}
 
 	public boolean apply(Cell cell, int x, int z, boolean load) {

@@ -11,7 +11,6 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.core.SectionPos;
 import net.minecraft.util.context.ContextMap;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.Aquifer;
@@ -25,9 +24,7 @@ import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
 import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
 import com.pandaismyname1.ultraterraforged.world.worldgen.VolumeAquifer;
-import com.pandaismyname1.ultraterraforged.world.worldgen.WorldGenFlags;
 import com.pandaismyname1.ultraterraforged.world.worldgen.densityfunction.CellSampler;
-import com.pandaismyname1.ultraterraforged.world.worldgen.tile.TileChunkRef;
 
 @Mixin(NoiseChunk.class)
 class MixinNoiseChunk {
@@ -55,12 +52,9 @@ class MixinNoiseChunk {
 	private ContextMap ultraterraforged$samplerFields(ContextMap.Builder fields) {
 		GeneratorContext generatorContext;
 		if((Object) this.randomState instanceof UTFRandomState utfRandomState && (generatorContext = utfRandomState.generatorContext()) != null) {
-			// a single column (a structure asking for the height) only loads the tile under fast lookups' rules
-			boolean cache = !WorldGenFlags.fastLookups() || this.volume.sizeX() > 1 || this.volume.sizeZ() > 1;
-			if(cache) {
-				int chunkX = SectionPos.blockToSectionCoord(this.volume.minBlockX());
-				int chunkZ = SectionPos.blockToSectionCoord(this.volume.minBlockZ());
-				fields.set(CellSampler.CHUNK, new CellSampler.ChunkCells(new TileChunkRef(generatorContext.cache, chunkX, chunkZ)));
+			CellSampler.ChunkCells cells = CellSampler.chunkCells(generatorContext, this.volume);
+			if(cells != null) {
+				fields.set(CellSampler.CHUNK, cells);
 			}
 		}
 		return fields.build();

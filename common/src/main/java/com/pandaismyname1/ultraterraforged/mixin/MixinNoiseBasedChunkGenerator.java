@@ -121,7 +121,11 @@ class MixinNoiseBasedChunkGenerator {
     private int iterateNoiseColumn(NoiseSettings settings, LevelHeightAccessor levelHeightAccessor, RandomState randomState, int blockX, int blockZ, @Nullable MutableObject<NoiseColumn> mutableObject, @Nullable Predicate<BlockState> predicate) {
 		GeneratorContext generatorContext;
 		if((Object) randomState instanceof UTFRandomState utfRandomState && (generatorContext = utfRandomState.generatorContext()) != null) {
-			return Math.min(settings.height(), generatorContext.lookup.getGenerationHeight(SectionPos.blockToSectionCoord(blockX), SectionPos.blockToSectionCoord(blockZ), this.settings.value(), !WorldGenFlags.fastLookups()));
+			if(generatorContext.lookup.approximate()) {
+				// the heightmap's column isn't held to the tile's highest point, nor to whether the tile is made yet
+				return settings.height();
+			}
+			return Math.min(settings.height(), generatorContext.lookup.getGenerationHeight(SectionPos.blockToSectionCoord(blockX), SectionPos.blockToSectionCoord(blockZ), this.settings.value(), true));
     	} else {
     		return settings.height();
     	}
@@ -135,7 +139,8 @@ class MixinNoiseBasedChunkGenerator {
 		if((Object) randomState instanceof UTFRandomState utfRandomState && (generatorContext = utfRandomState.generatorContext()) != null && (preset = utfRandomState.preset()) != null) {
 			BlockPos center = preset.world().properties.spawnType.getSearchCenter(generatorContext);
 			List<SpawnTargetPoint> targetPoints = this.settings.value().spawnTarget();
-			BlockPos spawn = targetPoints.isEmpty() ? center : SpawnFinder.findSpawnPosition(targetPoints, randomState.samplersWithContext(SamplerContext.builder().enableCaches().build()), center);
+			// the search only looks, over a wide area where no tile is made yet: the heightmap's cells, as it always had
+			BlockPos spawn = targetPoints.isEmpty() ? center : WorldGenFlags.approximately(() -> SpawnFinder.findSpawnPosition(targetPoints, randomState.samplersWithContext(SamplerContext.builder().enableCaches().build()), center));
 			callback.setReturnValue(ChunkPos.containing(spawn));
 		}
 	}
