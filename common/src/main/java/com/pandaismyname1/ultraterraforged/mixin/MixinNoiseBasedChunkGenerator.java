@@ -42,7 +42,6 @@ import com.pandaismyname1.ultraterraforged.data.preset.settings.WorldSettings;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
 import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
 import com.pandaismyname1.ultraterraforged.world.worldgen.VolumeAquifer;
-import com.pandaismyname1.ultraterraforged.world.worldgen.WorldGenFlags;
 import com.pandaismyname1.ultraterraforged.world.worldgen.biome.spawn.SpawnFinder;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.Cell;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.NoiseUtil;
@@ -121,7 +120,7 @@ class MixinNoiseBasedChunkGenerator {
     private int iterateNoiseColumn(NoiseSettings settings, LevelHeightAccessor levelHeightAccessor, RandomState randomState, int blockX, int blockZ, @Nullable MutableObject<NoiseColumn> mutableObject, @Nullable Predicate<BlockState> predicate) {
 		GeneratorContext generatorContext;
 		if((Object) randomState instanceof UTFRandomState utfRandomState && (generatorContext = utfRandomState.generatorContext()) != null) {
-			return Math.min(settings.height(), generatorContext.lookup.getGenerationHeight(SectionPos.blockToSectionCoord(blockX), SectionPos.blockToSectionCoord(blockZ), this.settings.value(), !WorldGenFlags.fastLookups()));
+			return Math.min(settings.height(), generatorContext.lookup.getGenerationHeight(SectionPos.blockToSectionCoord(blockX), SectionPos.blockToSectionCoord(blockZ), this.settings.value(), !generatorContext.lookup.approximate()));
     	} else {
     		return settings.height();
     	}

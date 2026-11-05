@@ -23,7 +23,6 @@ import com.pandaismyname1.ultraterraforged.UTFCommon;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
 import com.pandaismyname1.ultraterraforged.world.worldgen.UTFCompileContext;
 import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
-import com.pandaismyname1.ultraterraforged.world.worldgen.WorldGenFlags;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.Cell;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.CellField;
 import com.pandaismyname1.ultraterraforged.world.worldgen.heightmap.WorldLookup;
@@ -88,6 +87,8 @@ public record CellSampler(CellField field) implements DensityFunction {
 	private record Sampler(UTFRandomState randomState, CellField field) implements DensitySampler {
 		private static final Cell EMPTY = new Cell();
 		private static final ThreadLocal<Cache2d> LOCAL_CELL = ThreadLocal.withInitial(Cache2d::new);
+		// apart, so a guess made in a locate isn't handed out afterwards as the tile's cell
+		private static final ThreadLocal<Cache2d> LOCAL_TILE_CELL = ThreadLocal.withInitial(Cache2d::new);
 
 		@Override
 		public float sampleValue(SamplerContext context, int blockX, int blockY, int blockZ) {
@@ -117,9 +118,9 @@ public record CellSampler(CellField field) implements DensityFunction {
 	 */
 	@Nullable
 	public static ChunkCells chunkCells(GeneratorContext generatorContext, DensityVolume volume) {
-		// a single column (a structure asking for the height) only loads the tile under fast lookups' rules
-		boolean cache = !WorldGenFlags.fastLookups() || volume.sizeX() > 1 || volume.sizeZ() > 1;
-		if (!cache) {
+		// a single column (a structure asking for the height) reads its chunk's cells too, so it has the terrain its
+		// chunk is generated with on whichever thread asks; only a pass that just looks makes a quick guess
+		if (volume.sizeX() == 1 && volume.sizeZ() == 1 && generatorContext.lookup.approximate()) {
 			return null;
 		}
 		int chunkX = SectionPos.blockToSectionCoord(volume.minBlockX());
@@ -127,7 +128,9 @@ public record CellSampler(CellField field) implements DensityFunction {
 		return new ChunkCells(new TileChunkRef(generatorContext.cache, chunkX, chunkZ));
 	}
 
-	// the cell a sampler reads at a column, given the cells of the NoiseChunk it samples for
+	// the cell a sampler reads at a column, given the cells of the NoiseChunk it samples for. Outside them (the corners
+	// on a chunk's far edges, in the next chunk or tile) it's that tile's cell too, made if it has to be: the heightmap
+	// alone lacks the tiles' filters, and whether the tile is made yet depends on the thread and the moment
 	public static Cell cell(@Nullable GeneratorContext generatorContext, @Nullable ChunkCells chunk, int blockX, int blockZ) {
 		Cell cell;
 		if (chunk != null && (cell = chunk.getCell(blockX, blockZ)) != null) {
@@ -136,7 +139,8 @@ public record CellSampler(CellField field) implements DensityFunction {
 		if (generatorContext == null) {
 			return Sampler.EMPTY;
 		}
-		return Sampler.LOCAL_CELL.get().getAndUpdate(generatorContext.lookup, blockX, blockZ);
+		boolean approximate = generatorContext.lookup.approximate();
+		return (approximate ? Sampler.LOCAL_CELL : Sampler.LOCAL_TILE_CELL).get().getAndUpdate(generatorContext.lookup, blockX, blockZ, !approximate);
 	}
 
 	// the last cell looked up on this thread, at the corner of its 4x4 column, and the world it was looked up in: worlds
@@ -147,12 +151,17 @@ public record CellSampler(CellField field) implements DensityFunction {
 		private Cell cell = new Cell();
 
 		public Cell getAndUpdate(WorldLookup lookup, int blockX, int blockZ) {
+			return this.getAndUpdate(lookup, blockX, blockZ, false);
+		}
+
+		// load: make the tile if it isn't yet, for its cell instead of the heightmap's
+		public Cell getAndUpdate(WorldLookup lookup, int blockX, int blockZ, boolean load) {
 			blockX = QuartPos.toBlock(QuartPos.fromBlock(blockX));
 			blockZ = QuartPos.toBlock(QuartPos.fromBlock(blockZ));
 
 			long packedPos = PosUtil.pack(blockX, blockZ);
 			if(this.lastPos != packedPos || this.lastLookup.get() != lookup) {
-				lookup.apply(this.cell.reset(), blockX, blockZ);
+				lookup.apply(this.cell.reset(), blockX, blockZ, load);
 				this.lastPos = packedPos;
 				if(this.lastLookup.get() != lookup) {
 					this.lastLookup = new WeakReference<>(lookup);

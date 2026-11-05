@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.NoiseSettings;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
+import com.pandaismyname1.ultraterraforged.world.worldgen.WorldGenFlags;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.Cell;
 import com.pandaismyname1.ultraterraforged.world.worldgen.rivermap.Rivermap;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.noise.CellSampler;
@@ -22,6 +23,8 @@ public class WorldLookup {
 	private Levels levels;
 	// whether chunks are generated only as high as their terrain: off for a world preview, which reads every section
 	private volatile boolean cullNoiseSections = true;
+	// whether single columns may be a quick guess in this world: a world preview's, which only looks
+	private volatile boolean approximateColumns;
 	
 	public WorldLookup(GeneratorContext context) {
 		this.context = context;
@@ -33,6 +36,16 @@ public class WorldLookup {
 
 	public void setCullNoiseSections(boolean cullNoiseSections) {
 		this.cullNoiseSections = cullNoiseSections;
+	}
+
+	public void setApproximateColumns(boolean approximateColumns) {
+		this.approximateColumns = approximateColumns;
+	}
+
+	// whether a lookup here may skip making a tile and read the heightmap without the tiles' filters: in a world
+	// preview, and in a pass that only looks (WorldGenFlags.approximately); never where structures are placed
+	public boolean approximate() {
+		return this.approximateColumns || WorldGenFlags.approximateLookups();
 	}
 
 	public int getGenerationHeight(int chunkX, int chunkZ, NoiseGeneratorSettings generatorSettings, boolean load) {
@@ -61,9 +74,10 @@ public class WorldLookup {
 		return this.apply(cell, x, z, false);
 	}
 
-	// the cell where a structure is placed
+	// the cell as the chunk there is generated with it, from its tile, on whichever thread asks: where a structure is
+	// placed. A quick guess only in a pass that just looks
 	public boolean applyAsGenerated(Cell cell, int x, int z) {
-		return this.apply(cell, x, z);
+		return this.apply(cell, x, z, !this.approximate());
 	}
 
 	public boolean apply(Cell cell, int x, int z, boolean load) {
