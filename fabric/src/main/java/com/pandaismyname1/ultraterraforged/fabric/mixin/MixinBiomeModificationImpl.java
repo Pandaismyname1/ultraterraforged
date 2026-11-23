@@ -12,8 +12,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.google.common.base.Suppliers;
 
@@ -40,16 +40,26 @@ public class MixinBiomeModificationImpl {
 	
 	private static final Constructor<?> CTOR;
 	
-	@Redirect(
-		method = "finalizeWorldGen",
-		at = @At(
-			value = "INVOKE",
-			target = "getSortedModifiers"
-		),
-		remap = false
-	)
-	public List<Object> getSortedModifiers(BiomeModificationImpl self, RegistryAccess registries) {
-		List<Object> modifiers = new ArrayList<>(this.getSortedModifiers());
+	// the registries finalizeWorldGen works on, for getSortedModifiers, which takes them only in newer Fabric APIs
+	private static final ThreadLocal<RegistryAccess> REGISTRIES = new ThreadLocal<>();
+
+	@Inject(method = "finalizeWorldGen", at = @At("HEAD"), remap = false)
+	private void finalizeWorldGen$HEAD(RegistryAccess registries, CallbackInfo callback) {
+		REGISTRIES.set(registries);
+	}
+
+	/**
+	 * UTF's biome modifiers join Fabric API's, in its order. getSortedModifiers took nothing before Fabric API 0.165
+	 * (26.3) and takes the registries since, to add data-driven modifiers (#21): this matches both, as it names no
+	 * arguments.
+	 */
+	@Inject(method = "getSortedModifiers", at = @At("RETURN"), cancellable = true, remap = false)
+	private void getSortedModifiers$RETURN(CallbackInfoReturnable<List<Object>> callback) {
+		RegistryAccess registries = REGISTRIES.get();
+		if (registries == null) {
+			return;
+		}
+		List<Object> modifiers = new ArrayList<>(callback.getReturnValue());
 		for(Holder.Reference<BiomeModifier> holder : registries.lookupOrThrow(UTFRegistries.BIOME_MODIFIER).listElements().toList()) {
 			if(holder.value() instanceof FabricBiomeModifier modifier) {
 				Identifier id = holder.key().identifier();
@@ -69,8 +79,8 @@ public class MixinBiomeModificationImpl {
 			}
 		}
 		modifiers.sort(MODIFIER_ORDER_COMPARATOR);
-		return modifiers;
-    }
+		callback.setReturnValue(modifiers);
+	}
 
 	/**
 	 * Vanilla works out the order of the biomes' features once, and in singleplayer the client already did, before the
@@ -80,6 +90,7 @@ public class MixinBiomeModificationImpl {
 	 */
 	@Inject(method = "finalizeWorldGen", at = @At("TAIL"), remap = false)
 	private void finalizeWorldGen$TAIL(RegistryAccess registries, CallbackInfo callback) {
+		REGISTRIES.remove();
 		boolean modified = registries.lookupOrThrow(UTFRegistries.BIOME_MODIFIER).stream().anyMatch((modifier) -> modifier instanceof FabricBiomeModifier);
 		if (!modified) {
 			return;
@@ -92,11 +103,6 @@ public class MixinBiomeModificationImpl {
 				return FeatureSorter.buildFeaturesPerStep(List.copyOf(generator.getBiomeSource().possibleBiomes()), (biome) -> settings.apply(biome).features(), true);
 			}));
 		});
-	}
-	
-	@Shadow(remap = false)
-	private List<Object> getSortedModifiers() {
-		throw new UnsupportedOperationException();
 	}
 	
 	// Fabric API's record of a modifier, made through reflection as it's internal: null, with the reason logged, if
