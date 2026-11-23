@@ -27,7 +27,9 @@ public class Slider extends AbstractSliderButton {
         this.updateMessage();
     }
     
-    public void setValue(double value) {
+    // sets the position without applying it. Not named setValue: Epic Fight makes vanilla's setValue(double) public,
+    // and this one then overrides it, so dragging a slider no longer applied its value (#20)
+    public void setSliderValue(double value) {
     	this.value = value;
     }
     

@@ -111,7 +111,7 @@ public final class OptionWidgets {
 		public boolean mouseClicked(double mouseX, double mouseY, int button) {
 			if (this.active && this.visible && Screen.hasControlDown() && this.clicked(mouseX, mouseY)) {
 				this.option.resetTo(this.preset, this.baseline);
-				this.setValue(this.getSliderValue(this.option.get(this.preset).floatValue()));
+				this.setSliderValue(this.getSliderValue(this.option.get(this.preset).floatValue()));
 				this.applyValue();
 				this.updateMessage();
 				this.playDownSound(net.minecraft.client.Minecraft.getInstance().getSoundManager());
