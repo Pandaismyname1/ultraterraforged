@@ -22,8 +22,10 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.DropExperienceBlock;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.FallingBlock;
+import net.minecraft.world.level.block.RedStoneOreBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
@@ -112,12 +114,37 @@ public record StrataRule(Identifier cacheId, Holder<Noise> selector, Holder<Nois
 		List<BlockState> materials = new ArrayList<>();
 		for (Block block : blocks) {
 			BlockState state = block.defaultBlockState();
-			if (block == this.base || state.is(this.excluded) || block instanceof FallingBlock || block instanceof EntityBlock || !state.isCollisionShapeFullBlock(EmptyBlockGetter.INSTANCE, BlockPos.ZERO)) {
+			if (block == this.base || state.is(this.excluded) || isOre(block, state) || block instanceof FallingBlock || block instanceof EntityBlock || !state.isCollisionShapeFullBlock(EmptyBlockGetter.INSTANCE, BlockPos.ZERO)) {
 				continue;
 			}
 			materials.add(state);
 		}
 		return materials;
+	}
+
+	// the loaders' tags for ores: Fabric's and NeoForge's c:ores, Forge's forge:ores
+	private static final List<TagKey<Block>> ORE_TAGS = List.of(TagKey.create(Registries.BLOCK, UTFCommon.location("c:ores")), TagKey.create(Registries.BLOCK, UTFCommon.location("forge:ores")));
+
+	/**
+	 * Whether a block is an ore. Mods tag their ores as stone so ore features can replace them (#18: Hazen 'n Stuff's
+	 * zenalite ore), and in rock layers they'd fill the world. Ores in the loaders' tags, made of vanilla's ore
+	 * blocks, or named like one ("_ore", "ore_").
+	 */
+	public static boolean isOre(Block block, BlockState state) {
+		for (TagKey<Block> tag : ORE_TAGS) {
+			if (state.is(tag)) {
+				return true;
+			}
+		}
+		if (block instanceof DropExperienceBlock || block instanceof RedStoneOreBlock) {
+			return true;
+		}
+		for (String word : BuiltInRegistries.BLOCK.getKey(block).getPath().split("[_/]")) {
+			if (word.equals("ore") || word.equals("ores")) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private class Rule implements RuleEvaluator {
