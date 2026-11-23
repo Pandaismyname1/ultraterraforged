@@ -25,7 +25,6 @@ import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
 import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
-import com.pandaismyname1.ultraterraforged.world.worldgen.WorldGenFlags;
 import com.pandaismyname1.ultraterraforged.world.worldgen.rivermap.FrozenFalls;
 
 // Targets are ChunkStatus lambdas, which have no Mojang names: method_* is the Fabric intermediary (and dev) name, m_*_ the Forge/NeoForge 1.20.1 SRG name.
@@ -47,24 +46,6 @@ public class MixinChunkStatus {
 			
 			if(context != null) {
 				context.cache.queueAtChunk(chunkPos.x, chunkPos.z);
-
-				WorldGenFlags.setFastCellLookups(false);
-			}
-		}
-	}
-	
-	@Inject(
-		at = @At("TAIL"),
-		method = { "method_39464", "m_289181_" },
-		remap = false
-	)
-	private static void method_39464$TAIL(ChunkStatus status, Executor executor, ServerLevel level, ChunkGenerator generator, StructureTemplateManager templateManager, ThreadedLevelLightEngine lightEngine, Function<ChunkAccess, CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>>> chunkLookup, List<ChunkAccess> regionChunks, ChunkAccess centerChunk, CallbackInfoReturnable<CompletableFuture<ChunkAccess>> callback) {
-		RandomState randomState = level.getChunkSource().randomState();
-		if((Object) randomState instanceof UTFRandomState utfRandomState) {
-			@Nullable
-			GeneratorContext context = utfRandomState.generatorContext();
-			if(context != null) {
-				WorldGenFlags.setFastCellLookups(true);
 			}
 		}
 	}

@@ -37,7 +37,6 @@ import net.minecraft.world.level.levelgen.blending.Blender;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.WorldSettings;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
 import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
-import com.pandaismyname1.ultraterraforged.world.worldgen.WorldGenFlags;
 import com.pandaismyname1.ultraterraforged.world.worldgen.cell.Cell;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.NoiseUtil;
 import com.pandaismyname1.ultraterraforged.world.worldgen.surface.SurfaceRegion;
@@ -112,7 +111,11 @@ class MixinNoiseBasedChunkGenerator {
     private int iterateNoiseColumn(NoiseSettings settings, LevelHeightAccessor levelHeightAccessor, RandomState randomState, int blockX, int blockZ, @Nullable MutableObject<NoiseColumn> mutableObject, @Nullable Predicate<BlockState> predicate) {
 		GeneratorContext generatorContext;
 		if((Object) randomState instanceof UTFRandomState utfRandomState && (generatorContext = utfRandomState.generatorContext()) != null) {
-			return generatorContext.lookup.getGenerationHeight(SectionPos.blockToSectionCoord(blockX), SectionPos.blockToSectionCoord(blockZ), this.settings.value(), !WorldGenFlags.fastLookups());
+			if(generatorContext.lookup.approximate()) {
+				// the heightmap's column isn't held to the tile's highest point, nor to whether the tile is made yet
+				return settings.height();
+			}
+			return generatorContext.lookup.getGenerationHeight(SectionPos.blockToSectionCoord(blockX), SectionPos.blockToSectionCoord(blockZ), this.settings.value(), true);
     	} else {
     		return settings.height();
     	}
