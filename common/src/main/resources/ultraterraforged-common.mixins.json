@@ -21,6 +21,8 @@
   	"MixinNoiseBasedChunkGenerator",
   	"MixinContext",
   	"MixinSurfaceRules$BiomeConditionSource",
+  	"MixinChunkGenerator",
+  	"MixinBiomeSource",
   	"terrablender.MixinParameterList",
   	"terrablender.MixinClimateSampler",
   	"terrablender.MixinTargetPoint",

@@ -11,6 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.Climate.ParameterPoint;
 import net.minecraft.world.level.biome.Climate.Sampler;
+import com.pandaismyname1.ultraterraforged.world.worldgen.WorldGenFlags;
 import com.pandaismyname1.ultraterraforged.world.worldgen.biome.spawn.SpawnFinderFix;
 
 // FIXME the mixin that we should actually be using just refuses to work for some reason
@@ -21,7 +22,8 @@ class MixinSpawnFinder {
 
 	@Inject(at = @At("HEAD"), method = "findSpawnPosition", cancellable = true)
     private static void findSpawnPosition(List<ParameterPoint> list, Sampler sampler, CallbackInfoReturnable<BlockPos> callback) {
-    	callback.setReturnValue(new SpawnFinderFix(list, sampler).result.location());
+    	// the search only looks, over a wide area where no tile is made yet: the heightmap's cells, as it always had
+    	callback.setReturnValue(WorldGenFlags.approximately(() -> new SpawnFinderFix(list, sampler).result.location()));
     }
 //	@ModifyArg(
 //		at = @At(
