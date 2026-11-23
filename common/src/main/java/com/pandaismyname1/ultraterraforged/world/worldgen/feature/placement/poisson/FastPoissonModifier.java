@@ -15,6 +15,7 @@ import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.placement.PlacementContext;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
+import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
 import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
 import com.pandaismyname1.ultraterraforged.world.worldgen.feature.placement.UTFPlacementModifiers;
 import com.pandaismyname1.ultraterraforged.world.worldgen.noise.module.Noise;
@@ -82,8 +83,11 @@ public class FastPoissonModifier extends PlacementModifier {
 		BiomeVariance biomeVariance = BiomeVariance.NONE;
 		
 		if (this.biomeFade > BiomeVariance.MIN_FADE) {
-			if((Object) randomState instanceof UTFRandomState utfRandomState) {
-				Tile.Chunk reader = utfRandomState.generatorContext().cache.provideAtChunk(chunkPos.x(), chunkPos.z()).getChunkReader(chunkPos.x(), chunkPos.z());
+			// no context in a dimension that isn't on UltraTerraForged's terrain (#14): its biomes, and so these
+			// trees, can still be the overworld's. The trees are spread evenly there
+			GeneratorContext generatorContext;
+			if((Object) randomState instanceof UTFRandomState utfRandomState && (generatorContext = utfRandomState.generatorContext()) != null) {
+				Tile.Chunk reader = generatorContext.cache.provideAtChunk(chunkPos.x(), chunkPos.z()).getChunkReader(chunkPos.x(), chunkPos.z());
 				if (reader != null) {
 					biomeVariance = new BiomeVariance(reader, this.biomeFade);
 				}
