@@ -25,18 +25,14 @@ import net.minecraft.world.level.levelgen.RandomState;
 import com.pandaismyname1.ultraterraforged.data.preset.settings.Preset;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
 import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
-import com.pandaismyname1.ultraterraforged.world.worldgen.WorldGenFlags;
 import com.pandaismyname1.ultraterraforged.world.worldgen.densityfunction.CellSampler;
-import com.pandaismyname1.ultraterraforged.world.worldgen.densityfunction.CellSampler.Cache2d;
-import com.pandaismyname1.ultraterraforged.world.worldgen.tile.TileChunkRef;
 
 @Mixin(NoiseChunk.class)
 class MixinNoiseChunk {
 	private RandomState randomState;
 	private int chunkX, chunkZ;
 	private int generationHeight;
-	private TileChunkRef chunk;
-	private Cache2d cache2d;
+	private CellSampler.ChunkCells chunk;
     private NoiseGeneratorSettings generatorSettings;
 	
 	@Shadow
@@ -72,21 +68,11 @@ class MixinNoiseChunk {
 		this.generatorSettings = noiseGeneratorSettings;
 		GeneratorContext generatorContext;
 		if((Object) this.randomState instanceof UTFRandomState utfRandomState && (generatorContext = utfRandomState.generatorContext()) != null) {
-			boolean cache = !WorldGenFlags.fastLookups() || CellSampler.isCachedNoiseChunk(cellCountXZ);
-
-//			if(beardifierOrMarker instanceof Beardifier beardifier && (beardifier.pieceIterator.hasNext() || beardifier.junctionIterator.hasNext())) {
-//				this.generationHeight = noiseSettings.height();
-//				System.out.println(this.generationHeight);
-//			} else {
-				this.generationHeight = generatorContext.lookup.getGenerationHeight(this.chunkX, this.chunkZ, noiseGeneratorSettings, cache);
-//			}
-			
+			// a single column (a structure asking for the height) reads its chunk's tile too, on whichever thread asks;
+			// in a pass that only looks it reads the heightmap, and isn't cut off at the tile's highest point either
+			this.chunk = CellSampler.chunkCells(generatorContext, cellCountXZ, this.chunkX, this.chunkZ);
+			this.generationHeight = this.chunk != null ? generatorContext.lookup.getGenerationHeight(this.chunkX, this.chunkZ, noiseGeneratorSettings, true) : noiseSettings.height();
 			this.cellCountY = Math.min(this.cellCountY, this.generationHeight / this.cellHeight);
-			this.cache2d = new CellSampler.Cache2d();
-			
-			if(cache) {
-				this.chunk = new TileChunkRef(generatorContext.cache, this.chunkX, this.chunkZ);
-			}
 		} else {
 			this.generationHeight = noiseSettings.height();
 		}
@@ -131,7 +117,7 @@ class MixinNoiseChunk {
 	)
 	private void wrapNew(DensityFunction function, CallbackInfoReturnable<DensityFunction> callback) {
 		if((Object) this.randomState instanceof UTFRandomState randomState && function instanceof CellSampler mapped) {
-			callback.setReturnValue(mapped.new CacheChunk(this.chunk, this.cache2d, this.chunkX, this.chunkZ));
+			callback.setReturnValue(mapped.new CacheChunk(this.chunk));
 		}
 	}
 }

@@ -20,10 +20,9 @@ import net.minecraft.world.level.chunk.status.WorldGenContext;
 import net.minecraft.world.level.levelgen.RandomState;
 import com.pandaismyname1.ultraterraforged.world.worldgen.GeneratorContext;
 import com.pandaismyname1.ultraterraforged.world.worldgen.UTFRandomState;
-import com.pandaismyname1.ultraterraforged.world.worldgen.WorldGenFlags;
 import com.pandaismyname1.ultraterraforged.world.worldgen.rivermap.FrozenFalls;
 
-// Both steps finish synchronously and return a completed future, so their TAIL runs after the step's work.
+// The features step finishes synchronously and returns a completed future, so its TAIL runs after the step's work.
 @Mixin(ChunkStatusTasks.class)
 public class MixinChunkStatusTasks {
 
@@ -47,18 +46,6 @@ public class MixinChunkStatusTasks {
 		if(context != null) {
 			ChunkPos chunkPos = centerChunk.getPos();
 			context.cache.queueAtChunk(chunkPos.x(), chunkPos.z());
-
-			WorldGenFlags.setFastCellLookups(false);
-		}
-	}
-
-	@Inject(
-		at = @At("TAIL"),
-		method = "generateStructureStarts"
-	)
-	private static void ultraterraforged$structureStartsTail(WorldGenContext worldGenContext, ChunkStep step, StaticCache2D<GenerationChunkHolder> cache, ChunkAccess centerChunk, CallbackInfoReturnable<CompletableFuture<ChunkAccess>> callback) {
-		if(ultraterraforged$context(worldGenContext) != null) {
-			WorldGenFlags.setFastCellLookups(true);
 		}
 	}
 
