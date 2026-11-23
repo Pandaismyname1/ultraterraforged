@@ -53,10 +53,9 @@ record CellTest(TagKey<Structure> targets, float cutoff, Set<Terrain> terrainTyp
 					return false;
 				}
 			}
-			return true;
-		} else {
-			throw new IllegalStateException();
 		}
+		// not on UltraTerraForged's terrain, or no context: nothing keeps the structure away
+		return true;
 	}
 
 	@Override
