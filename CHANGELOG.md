@@ -1,3 +1,8 @@
+### New in 1.0.5
+* Fabric: starts with Fabric API 0.165 and newer (#21): it stopped at launch with "getSortedModifiers() was not located".
+* Trees and other features placed by UltraTerraForged's rules no longer crash the server in a dimension that has the overworld's biomes but not UltraTerraForged's terrain, like Lost Cities' or a datapack's (#14).
+* A mod's ore no longer forms rock layers across the whole world (#18, Hazen 'n Stuff's zenalite): blocks tagged as ores, or named or built like one, are left out of the stone a world's rock layers are picked from. Rock layers change in newly generated chunks only when a mod's ore was among them.
+
 ### New in 1.0.4
 * No more wide flats at sea level where the sea should be, off cold coasts above all: skerries, the small rocky islets that form in shallow sea, raised all the sea between them to the water's surface, leaving plains of gravel, stone and grass with ocean biomes, beaches that ended in a step, and water only where the sea was deeper. Terrain changes in newly generated chunks.
 * Rivers no longer stand on embankments above the valley they run through (#6): a stream inside a bigger river's valley, or where the valleys of rivers and lakes overlap, took its water level from the land as if those valleys weren't there. Each river's water now comes from the land as the other rivers and lakes really leave it, and rivers climb a little less. Terrain changes in newly generated chunks.
